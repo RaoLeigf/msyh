@@ -1,0 +1,206 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    
+    <script type="text/javascript">
+		var checkedId;
+        var clickUserCode;
+        var Now_UserID = '@ViewBag.UserID';
+		var Delete=[];
+        Ext.onReady(function () {
+			
+			
+			
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save',
+                    '->',  'close'
+                ]
+            });
+			
+			var storeDYGX2 = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 200,
+				fields: [{
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "Dwdm",
+    "type": "string",
+    "mapping": "Dwdm"
+  },
+  {
+    "name": "Dydm",
+    "type": "string",
+    "mapping": "Dydm"
+  },
+  {
+    "name": "Dylx",
+    "type": "string",
+    "mapping": "Dylx"
+	},
+  {
+    "name": "DefStr1",
+    "type": "string",
+    "mapping": "DefStr1"
+  },
+  {
+    "name": "DefStr2",
+    "type": "string",
+    "mapping": "DefStr2"
+  },
+  {
+    "name": "DefStr3",
+    "type": "string",
+    "mapping": "DefStr3"
+	  },
+  {
+    "name": "DefStr4",
+    "type": "string",
+    "mapping": "DefStr4"
+
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetConnDbConfig',
+				autoLoad:true 
+
+			});
+		
+			gridDYGX2 = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				//height: 390,
+				store: storeDYGX2,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DefStr1'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Dydm'
+				}, {
+					header: '数据库连接串',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DefStr2',
+					editor: {
+						xtype: "textfield"
+					}
+				}, {
+					header: '账套',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DefStr3',
+					editor: {
+						xtype: "textfield"
+					}
+				}, {
+					header: '年度',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DefStr4',
+					editor: {
+						xtype: "textfield"
+					},
+                    hidden: true
+				}],
+				listeners: {
+					
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				plugins:[
+					Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false  //不解析成html
+					})
+				]
+				
+			});
+			
+			
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridDYGX2],
+				
+				}]
+            });
+           
+			//保存
+            ngToolbar.get('save').on('click', function () {
+				//alert(storeDYGX2.getModifiedRecords().length);
+				var Models=[];
+				for(var i=0;i<storeDYGX2.getModifiedRecords().length;i++)
+				{
+					var data=storeDYGX2.getModifiedRecords()[i].data;
+					Models.push({'PhId':data.PhId,'Dwdm':data.Dwdm,'Dydm':data.Dydm,'Dylx':'config','DefStr1':data.DefStr1,'DefStr2':data.DefStr2,'DefStr3':data.DefStr3,'DefStr4':data.DefStr4});
+				}
+				
+				Ext.Ajax.request({
+					params:{'Models':Models},
+					url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/SaveDbConfig',
+					async:false,
+					success: function (response) {
+						var resp = Ext.JSON.decode(response.responseText);
+						if (resp.Status === "success"){
+							Ext.MessageBox.alert('提示', "保存成功！");
+							
+						}else{
+							Ext.MessageBox.alert('提示', "保存失败");
+						}
+						storeDYGX2.load();
+					}
+					
+				});
+				
+				
+            });
+
+        });
+		
+    </script>
+}
+
+

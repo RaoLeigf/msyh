@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="AddinServiceModel">
+		<property name="Phid" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="ServiceName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="ServiceFuncName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="TargetAssemblyName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="TargetClassName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="TargetMethodName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="MatchCondition" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="NgInsertDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="NgUpdateDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CurOrgId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Creator" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Editor" >
+			<not-null />
+			<not-Empty />
+		</property>
+	</class>
+</nhv-mapping>

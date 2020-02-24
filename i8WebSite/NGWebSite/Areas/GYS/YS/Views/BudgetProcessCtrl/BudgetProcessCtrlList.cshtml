@@ -1,0 +1,797 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/BudgetProcessCtrlEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var grid;
+        var grid2;
+        var selectData;
+        var fyear = new Date().getFullYear();
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    '->','refresh'
+                ]
+            });
+			
+			var ngToolbar1 = Ext.create('Ext.ng.Toolbar',{
+				region:'north',
+				ngbuttons:[
+					new Ext.form.Field({
+						id:'queryParm',
+						itemId:'queryParm',
+						width:200,
+						style:{
+							
+                        },
+                        listeners: {
+                            specialkey: function (textfield, e) {
+                                if (e.getKey() == Ext.EventObject.ENTER) {
+                                    var dmindex = store.find('FOcode', Ext.getCmp('queryParm').getValue());
+                                    var mcindex = store.find('FOname', Ext.getCmp('queryParm').getValue());
+                                    if (dmindex >= 0) {
+                                        grid.getSelectionModel().select(dmindex);
+                                    } else if (mcindex >= 0) {
+                                        grid.getSelectionModel().select(mcindex);
+                                    } else {
+
+                                    }
+                                }
+                            }
+                        }
+					}),
+					{
+						id:'queryButton',
+						itemId:'queryButton',
+						xtype:'button',
+						text:'定位',
+						iconCls:'icon-Query',
+						style:{
+							//background:'#199ED8'
+						}
+					}
+				]
+			});
+			
+			var ngToolbar2 = Ext.create('Ext.ng.Toolbar',{
+				region:'north',
+				ngbuttons:[
+					//'申报进度统一设置:',
+					new Ext.form.ComboBox({
+						id:'allSettings',
+						itemId:'allSettings',
+						editable:false,
+						fieldLabel:'申报进度统一设置:',
+						labelWidth:200,//105
+						store:new Ext.data.ArrayStore({
+							fields:['value','text'],
+							data:[
+								["1","年初申报阶段"],
+								["2","初报完成阶段"],
+								["3","年中调整阶段"],
+								["4","调整完成阶段"]
+							]
+						})
+					}),
+					{
+						id:'settingButton',
+						itemId:'settingButton',
+						xtype:'button',
+						text:'设置',
+						iconCls:'icon-Edit',
+                    },
+                    {
+                        //text: "年度",
+                        text: fyear,
+                        width: 80,
+                        itemId: 'FYear',
+                        id: 'FYear',
+                        //xtype: 'ngComboBox',
+                        //store:states,
+                        handler: function (t, e, eOpts) {
+                            e.stopEvent();
+                            Ext.create("Ext.menu.Menu", {
+                                items: [
+                                    {
+                                        text: '2019',
+                                        handler: function () {
+                                            fyear = "2019";
+                                            //sessionStorage.setItem("FYear", "2019");
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                     
+                                        }
+                                    },
+                                    {
+                                        text: "2020",
+                                        handler: function () {
+                                            fyear = "2020";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                       
+                                        }
+                                    },
+                                    {
+                                        text: "2021",
+                                        handler: function () {
+                                            fyear = "2021";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                      
+                                        }
+                                    },
+                                    {
+                                        //iconCls: 'icon-Assign',
+                                        text: "2022",
+                                        handler: function () {
+                                            fyear = "2022";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                    
+                                        }
+                                    },
+                                    {
+                                        text: "2023",
+                                        handler: function () {
+                                            fyear = "2023";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                           
+                                        }
+                                    },
+                                    {
+                                        text: "2024",
+                                        handler: function () {
+                                            fyear = "2024";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                 
+                                        }
+                                    },
+                                    {
+                                        text: "2025",
+                                        handler: function () {
+                                            fyear = "2025";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                   
+                                        }
+                                    },
+                                    {
+                                        text: "2026",
+                                        handler: function () {
+                                            fyear = "2026";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                        
+                                        }
+                                    },
+                                    {
+                                        text: "2027",
+                                        handler: function () {
+                                            fyear = "2027";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                            
+                                        }
+                                    },
+                                    {
+                                        text: "2028",
+                                        handler: function () {
+                                            fyear = "2028";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                         
+                                        }
+                                    },
+                                    {
+                                        text: "2029",
+                                        handler: function () {
+                                            fyear = "2029";
+                                            //sessionStorage.setItem("FYear", fyear);
+
+                                            referData(fyear);
+
+                                            Ext.getCmp('FYear').setText(fyear);
+                                           
+                                        }
+                                    }
+                                ]
+                            }).showAt(e.getXY())
+                            //bottomTabPanel.tabMenu.showAt(e.getXY());
+                            return false;
+                        }
+                    },
+					'->','save'
+				]
+				
+			});
+
+
+            function referData(ChooseYear) {
+                var code = "";
+                if (grid2.hasModifyed()) {
+
+                    Ext.MessageBox.confirm('提示', '数据已修改，是否保存？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+
+                            var items = grid.getSelectionModel().selected.items;
+                            if (items.length > 0) {
+                                code = items[0].data.FOcode;
+
+                            }
+
+                            grid2.getStore().load({
+                                params: {
+                                    'FOcode': code, 'FYear': ChooseYear
+                                }
+                            });
+
+                        } else {
+                            ngToolbar2.get('save').fireEvent('click');
+
+                            setTimeout(function () {
+
+                                var items = grid.getSelectionModel().selected.items;
+                                if (items.length > 0) {
+                                    code = items[0].data.FOcode;
+                                }
+
+                                grid2.getStore().load({
+                                    params: {
+                                        'FOcode': code, 'FYear': ChooseYear
+                                    }
+                                });
+                            }, 300);
+                        }
+                    }
+
+
+                }
+                else {
+                    var items = grid.getSelectionModel().selected.items;
+                    if (items.length > 0) {
+                        code = items[0].data.FOcode;
+
+                    }
+
+                    grid2.getStore().load({
+                        params: {
+                            'FOcode': code, 'FYear': ChooseYear
+                        }
+                    });
+                }
+            }
+
+
+
+			var fields = [
+				{
+					"name": "PhId",
+					"type": "string",
+					"mapping": "PhId"
+				},
+				{
+					"name": "FOcode",
+					"type": "string",
+					"mapping": "FOcode"
+				},
+				{
+					"name": "FOname",
+					"type": "string",
+					"mapping": "FOname"
+				}
+			];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'orgList');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: true,
+                url: C_ROOT + 'GYS/YS/BudgetProcessCtrl/GetBudgetProcessCtrlDistinctList',
+				sorters:[{
+					property:'FOcode',
+					direction:'ASC'
+				}]
+            });
+
+            store.on('beforeload', function (currentStore, options) {
+                var userId = { 'userId': $appinfo.userID };
+                Ext.apply(currentStore.proxy.extraParams, userId);
+                //debugger;
+            });
+
+			grid = Ext.create('Ext.ng.GridPanel',{
+				autoScroll: true,
+				columnLines: true,
+				store:store,
+				height:document.documentElement.clientHeight-70,
+				columns: [
+					/*{
+						dataIndex: "PhId",
+						width: 100,
+						header: "主键",
+						hidden: true,
+						sortable: true,
+						menuDisabled: true,
+						draggable: false
+					},*/
+					{
+						dataIndex: "FOcode",
+						width: 100,
+						header: "组织代码",
+						sortable: true,
+						menuDisabled: true,
+						draggable: false
+					},
+					{
+						dataIndex: "FOname",
+						width: 185,
+						header: "组织名称",
+						sortable: true,
+						menuDisabled: true,
+						draggable: false
+					}
+			    ],
+				listeners:{
+                    'itemclick': function (thisView, modelRecord, eleItem, index, e, eOptions) {
+                        selectData = modelRecord.get('FOcode');
+						grid2.getStore().load({
+							params:{
+                                'FOcode': modelRecord.get('FOcode'), 'FYear': fyear
+							}
+						});
+					}
+				}
+			});
+			
+
+			function showRadioButton(value,m){
+				var name = m.record.data.PhId;
+				var radioValue = m.cellIndex-1;
+				if(m.cellIndex-1 == value){
+					return "<input type='radio' id='" + name + "_"+ radioValue +"' name='"+ name +"' value='"+ radioValue +"' checked='checked'></input>";
+				}else{
+					return "<input type='radio' id='" + name + "_"+ radioValue +"' name='"+ name +"' value='"+ radioValue +"'></input>";
+				}
+			}
+			
+            var store2 = Ext.create('Ext.ng.JsonStore',{
+				autoLoad:false,
+				fields:[
+					{
+						"name": "PhId",
+						"type": "int",
+						"mapping": "PhId"
+					},{
+						"name": "FDeptName",
+						"type": "string",
+						"mapping": "FDeptName"
+					},{
+						"name": "FProcessStatus",
+						"type": "string",
+						"mapping": "FProcessStatus"
+					},{
+						"name": "FOcode",
+						"type": "string",
+						"mapping": "FOcode"
+					},{
+						"name": "FOname",
+						"type": "string",
+						"mapping": "FOname"
+					},{
+						"name": "FDeptCode",
+						"type": "string",
+						"mapping": "FDeptCode"
+					},{
+						"name": "FSetByDept",
+						"type": "int",
+						"mapping": "FSetByDept"
+					},{
+						"name": "NgRecordVer",
+						"type": "int",
+						"mapping": "NgRecordVer"
+					}
+				],
+                url: C_ROOT + 'GYS/YS/BudgetProcessCtrl/GetBudgetProcessCtrlPorcessList',
+                sorters: [{
+                    property: 'FDeptCode',
+                    direction: 'ASC'
+                }]
+            });
+
+            store2.on('beforeload', function (currentStore, options) {
+                var new_param = { 'FOcode': (selectData == undefined ? "" : selectData), 'FYear': fyear };
+                Ext.apply(currentStore.proxy.extraParams, new_param);
+                //debugger;
+            });
+
+			var pagingbar2 = Ext.create('Ext.ng.PagingBar', {
+				store: store2
+            });
+			grid2 = Ext.create('Ext.ng.GridPanel',{
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				store:store2,
+				height:document.documentElement.clientHeight-70,
+				bbar:[pagingbar2],
+				columns:[{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'PhId',
+					hidden:true
+				},{
+					header: '部门名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FDeptName',
+					align:'center',
+					hidden:false
+				},
+				{
+					header: '年初申报阶段',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FProcessStatus',
+					align:'center',
+					hidden:false,
+					renderer:showRadioButton
+				},{
+					header: '初报完成阶段',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FProcessStatus',
+					align:'center',
+					hidden:false,
+					renderer:showRadioButton
+				},{
+					header: '年中调整阶段',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FProcessStatus',
+					align:'center',
+					hidden:false,
+					renderer:showRadioButton
+				},{
+					header: '调整完成阶段',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FProcessStatus',
+					align:'center',
+					hidden:false,
+					renderer:showRadioButton
+				},{
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FOcode',
+					hidden:true
+				},{
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FOname',
+					hidden:true
+				},{
+					header: '部门代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FDeptCode',
+					hidden:true
+				},{
+					header: '按部门设置',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'FSetByDept',
+					hidden:true
+				},{
+					header: '版本',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					width:200,
+					dataIndex: 'NgRecordVer',
+					hidden:true
+				}]
+			});
+			
+			
+			/*var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '53aa7a29-2b6e-4470-b92e-fcb85d3eca91',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				}
+			};*/
+ 
+			//var gridConfig = Ext.apply(initConfig,individualInfo.grid['orgList']);
+			//var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [
+					ngToolbar, 
+					{
+						region:'west',
+						xtype:"panel",
+						items:[ngToolbar1,grid],
+						width:300
+					},
+					{
+						region:'center',
+						xtype:'panel',
+						items:[ngToolbar2,grid2]
+					}
+				]
+            });
+
+            //刷新
+            ngToolbar.get('refresh').on('click', function () {
+                store.load();
+				//store2.load();
+                var code = "";
+                var items = grid.getSelectionModel().selected.items;
+                if (items.length > 0) {
+                    code = items[0].data.FOcode;
+                }
+                if (code == "") {
+                    //store2.load();
+                } else {
+                    grid2.getStore().load({
+                        params: {
+                            'FOcode': code, 'FYear': fyear
+                        }
+                    });
+                }
+            });
+			
+			//定位
+            ngToolbar1.get('queryButton').on('click', function () {
+                //alert("定位成功");
+				/*var jsonStr = Ext.getCmp("queryParm").lastValue;
+				grid.getStore().load({
+					params:{
+						"FOcode":jsonStr
+					}
+				});*/
+                var dmindex = store.find('FOcode', Ext.getCmp('queryParm').getValue());
+                var mcindex = store.find('FOname', Ext.getCmp('queryParm').getValue());
+                if (dmindex >= 0) {
+                    grid.getSelectionModel().select(dmindex);
+                } else if (mcindex >= 0) {
+                    grid.getSelectionModel().select(mcindex);
+                } else {
+
+                }
+            });
+			
+			function setting(index){
+				var storeObj = grid2.getStore();
+				for(var i=0;i<storeObj.getCount();i++){
+					var phid = storeObj.getAt(i).data.PhId;
+					document.getElementById(phid + "_" + index).checked = true;
+				}
+			}
+			//设置
+            ngToolbar2.get('settingButton').on('click', function () {
+                var value = ngToolbar2.get('allSettings').getValue();
+				if(value == "年初申报阶段"){
+					setting(1);
+				}
+				else if(value == "初报完成阶段"){
+					setting(2);
+				}
+				else if(value == "年中调整阶段"){
+					setting(3);
+				}
+				else if(value == "调整完成阶段"){
+					setting(4);
+				}else{
+					Ext.MessageBox.alert('设置失败', '请选择申报进度！');
+				}
+            });
+			
+			//保存
+            ngToolbar2.get('save').on('click', function () {
+                var storeObj = grid2.getStore();
+				var jsonArray = [];
+				var code = "";
+				for(var i=0;i<storeObj.getCount();i++){
+					var phid = storeObj.getAt(i).data.PhId;
+					var processStatus = "";
+					var items = grid.getSelectionModel().selected.items;
+					if(items.length>0){
+						code = items[0].data.FOcode;
+					}
+					for(var j = 1;j<=4;j++){
+						if(document.getElementById(phid + "_" + j).checked){
+							processStatus = document.getElementById(phid + "_" + j).value;
+							//alert(processStatus);
+						}
+                    }
+                    jsonArray.push({ 'PhId': phid, 'FProcessStatus': processStatus, 'FYear': fyear, 'key': phid });
+				}
+                var mydata = { "form": { "key": "PhId", "modifiedRow": jsonArray } };
+                var myMask = new Ext.LoadMask(Ext.getBody(), {
+                    msg: "提交数据中......"
+                });
+                myMask.show();
+                Ext.Ajax.request({
+                    params: { 'jsonArray': mydata, 'symbol': '1' },
+                    url: C_ROOT + 'GYS/YS/BudgetProcessCtrl/save',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            myMask.hide();
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                if (window.external.RefreshWebListPage != undefined) {
+									window.external.RefreshWebListPage();
+								} else {
+									//$NG3Refresh();
+								}
+
+                                
+								if(code == ""){
+									//store2.load();
+								}else{
+									grid2.getStore().load({
+                                        params: {
+                                            'FOcode': code, 'FYear': fyear
+										}
+									});
+								}
+                            });
+                        } else {
+                            myMask.hide();
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+							if(code == ""){
+								//store2.load();
+							}else{
+								grid2.getStore().load({
+									params:{
+                                        'FOcode': code, 'FYear': fyear
+									}
+								});
+							}
+                        }
+                    }
+                });
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GYS/YS/BudgetProcessCtrl/GetBudgetProcessCtrlList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+		window.onresize = function(){
+			grid.setHeight(document.documentElement.clientHeight-50);
+			grid2.setHeight(document.documentElement.clientHeight-50);
+		}
+    </script>
+}
+
+

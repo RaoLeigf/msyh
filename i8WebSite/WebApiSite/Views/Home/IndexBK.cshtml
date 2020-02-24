@@ -1,0 +1,483 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+            is an ideal platform for building RESTful applications on the .NET Framework.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <button id="test">测试接口</button>
+        <button id="test2">测试接口2</button>
+    </div>
+    <form enctype="multipart/form-data">
+        <input id="upload_file" name="file" type="file" />
+        <input id="upload_file2" name="file2" type="file" />
+        <input id="upload_file3" name="file3" type="file" />
+        <button id="aa" type="button" onclick="upFile()">提交</button>
+    </form>
+</div>
+<script src="@Url.Content("~/Scripts/jquery-2.1.1.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.md5.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    var appKey = 'D31B7F91-3068-4A49-91EE-F3E13AE5C48C',
+        appSecret = '103CB639-840C-4E4F-8812-220ECE3C4E4D',
+        url = "http://127.0.0.1:8098",
+        reqTimeStamp = Date.parse(new Date());
+    var sign = $.md5((url + reqTimeStamp + appKey + appSecret).toLowerCase());
+    var items = [sign, url, reqTimeStamp, appKey];
+    var configData = [];
+
+    //var appinfo = {
+    //    'DbName': 'NG0001',
+    //    'OrgId': '547181121000001',
+    //    'OrgName': '',
+    //    'OCode': '',
+    //    'UserId': '521180820000001',
+    //    'UserKey': '9999',
+    //    'UserName': '',
+    //    'TokenKey': '',
+    //    'AppKey': appKey,
+    //    'AppSecret': appSecret,
+    //    'DbServerName': '',
+    //    'SessionKey': '',
+    //    'UName': ''
+    //};
+
+    var appinfo = {
+        'DbName': 'NG0007',
+        'OrgId': '488181024000002',
+        'OrgName': '',
+        'OCode': '',
+        'UserId': '488181024000001',
+        'UserKey': '9999',
+        'UserName': '',
+        'TokenKey': '',
+        'AppKey': appKey,
+        'AppSecret': appSecret,
+        'DbServerName': '',
+        'SessionKey': '',
+        'UName': ''
+    };
+    //488181024000002, '101', '浙江省总本级', 251181026000001, '100.03', '办公室', 3800, '2019-05-29'
+    //484190514000001, '201900000419', '测试123', 1900, NULL
+    $(function () {
+        $("#test").bind('click', function () {
+            //var info = {
+            //    FYear: '2019',
+            //    FName: '小红子',
+            //    FOrgphid: '488181024000002',
+            //    FOrgcode: '101',
+            //    FOrgname: '浙江省总本级',
+            //    FDepphid: "251181026000001",
+            //    FDepcode: '100.03',
+            //    FDepname: '办公室',
+            //    FAmountTotal: '120',
+            //    FDate: '2019-05-30',
+            //    FApproval: '',
+            //    IsPay: '',
+            //    FDescribe: '111',
+            //    FRemarks: '',
+            //};
+            //var info3 = {
+            //    XmMstPhid: '484190514000001',
+            //    XmProjcode:'201900000419',
+            //    XmProjname:'测试123',
+            //    FAmountTotal:'120',
+            //    FRemarks:'lalala'
+            //};
+            ////484190514000001, 484190514000010, '101.09', '法工部', 1000, 'mx1', '测试123' 
+            //var info4 = [
+            //    {
+            //        XmMstPhid:'484190514000001',
+            //        BudgetdtlPhid:'484190514000010',
+            //        BudgetdtlName:'mx1',
+            //        FDepartmentcode:'101.09',
+            //        FDepartmentname:'法工部',
+            //        FAmount:'120',
+            //        FRemarks:'555',
+            //        QtKmdm:'201900000419',
+            //        QtKmmc:'测试123'
+            //    }
+            //];
+            //var info2 = {
+            //    PaymentXm: info3,
+            //    PaymentDtls: info4,
+            //};
+
+            //var data = {
+            //    infoData: {
+            //        PaymentMst:info,
+            //        PaymentXmDtl: info2
+            //    },
+            //};
+
+            var data = {
+                OrgPhid: 488181024000003
+            };
+
+            $.ajax({
+                headers: {
+                    'Accept': "multipart/form-data; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                type: 'get',
+                url: '@Url.Content("~/api/GQT/QtXmDistributeApi/GetQtXmDistributeList")',
+                data: data,
+                datatype: 'json',
+                success: function (data, textstatus) {
+                    console.log(JSON.parse(data));
+                },
+                error: function (xmlhttprequest, textstatus, errorThrown) {
+
+                }
+            });
+        });
+
+        $("#test2").bind('click', function () {
+
+            //var info = {
+            //    'Author': 'xiaowang',
+            //    'Phone': '13587381870',
+            //    'Description': '很严峻',
+            //    'IsFinish': '0',
+            //};
+            //var info2 = {
+            //    RefbillPhid:'10',
+            //    FBilltype:'001',
+            //    ProcPhid:'1',
+            //    PostPhid:'1',
+            //    //OperaPhid:'1',
+            //    //OperatorCode:'001',
+            //    NextOperators:['1'],
+            //    FSeq:'',
+            //    FSendDate:'',
+            //    FApproval:'1',
+            //    FOpinion:'FFFF',
+            //};
+            //var data = {
+            //    RefbillPhid: '10',
+            //    FBilltype: '001',
+            //    ProcPhid: '1',
+            //    PostPhid: '1',
+            //    //OperaPhid:'1',
+            //    //OperatorCode:'001',
+            //    NextOperators: ['1'],
+            //    FSeq: '',
+            //    FSendDate: '',
+            //    FApproval: '1',
+            //    FOpinion: 'FFFF',
+            //};
+
+            //var data2 = {
+            //    OrgPhid: '521180820000002',
+            //    OrgCode: '100',
+            //    FCode: '1003',
+            //    FName: '测试三',
+            //    //OperaPhid:'1',
+            //    //OperatorCode:'001',
+            //    FBilltype: '001',
+            //    FEnable: '',
+            //    FDescribe: '2222',
+            //};
+            //var info = {
+            //    //PhId: '895190530000001',
+            //    //FCode:'201905300001',
+            //    FYear: '2019',
+            //    FName: '小红子',
+            //    FOrgphid: '488181024000002',
+            //    FOrgcode: '101',
+            //    FOrgname: '浙江省总本级',
+            //    FDepphid: "251181026000001",
+            //    FDepcode: '100.03',
+            //    FDepname: '办公室',
+            //    FAmountTotal: '120',
+            //    FDate: '2019-05-30',
+            //    FApproval: '',
+            //    IsPay: '',
+            //    FDescribe: '222',
+            //    FRemarks: '222',
+            //    //NgRecordVer:'1',
+            //};
+            //var info3 = {
+            //    //PhId:'895190530000001',
+            //    //MstPhid:'895190530000001',
+            //    XmMstPhid: '484190514000001',
+            //    XmProjcode: '201900000419',
+            //    XmProjname: '测试123',
+            //    FAmountTotal: '120',
+            //    FRemarks: 'xixixi'
+            //};
+            ////484190514000001, 484190514000010, '101.09', '法工部', 1000, 'mx1', '测试123' 
+            //var info4 = [
+            //    {
+            //        //PhId:'895190530000001',
+            //        //MstPhid:'895190530000001',
+            //        //PayXmPhid:'895190530000001',
+            //        XmMstPhid: '484190514000001',
+            //        BudgetdtlPhid: '484190514000010',
+            //        BudgetdtlName: 'mx1',
+            //        FDepartmentcode: '101.09',
+            //        FDepartmentname: '法工部',
+            //        FAmount: '120',
+            //        FRemarks: 'xixixi',
+            //        QtKmdm: '201900000419',
+            //        QtKmmc: '测试123'
+            //    }
+            //];
+            //var info2 = [{
+            //    PaymentXm: info3,
+            //    PaymentDtls: info4,
+            //}];
+
+            //var data = {
+            //    infoData: {
+            //        PaymentMst: info,
+            //        PaymentXmDtl: info2
+            //    },
+            //};
+            //var info1 = {
+            //    PhId:'396190605000001',
+            //    OrgPhid: '521180820000002',
+            //    OrgCode: '100',
+            //    FCode: '0002',
+            //    FName: '谢飞rats',
+            //    FDescribe: 'fff',
+            //    FEnable: '0',
+            //    NgRecordVer:'1'
+            //}
+            //var info2 = [{
+            //    OperatorPhid: '521180820000005',
+            //    OperatorCode: '0005',
+            //    FSeq:'1'
+            //}, {
+            //        OperatorPhid: '521180820000006',
+            //        OperatorCode: '0006',
+            //        FSeq: '2'
+            //    }]
+            //var data = {
+            //    GAppvalPost: info1,
+            //    GAppvalPost4Opers: info2
+            //}
+
+            //var data2 = {
+            //    PostPhidList: ['153190605000001']
+            //}
+            var data = {
+                /*
+                //api/GQT/QtXmDistributeApi/PostAdd  新增
+                Year: '2020',
+                FProjname: '2020项目2',
+                Orgid: 488181024000002,
+                Orgcode: '101',
+                uid: 488181024000001,
+                FBusiness:''
+                */
+                /*
+                //api/GQT/QtXmDistributeApi/PostXmFF 项目分发
+                FProjcode: '202000000001',
+                FProjname: '2020项目1',
+                FBusiness: '',
+                Orgid: 488181024000002,
+                userid: 488181024000001,
+                EnableOrgList: [488181024000002, 488181024000001]
+                */
+                /*
+                //api/GQT/QtXmDistributeApi/PostUpdate 修改
+                FProjcode: '202000000001',
+                FProjname: '2020项目11',
+                FBusiness: '',
+                */
+                //api/GQT/QtXmDistributeApi/PostDelete 删除
+                //FProjcode: '202000000002',
+
+                /*
+                ///api/GQT/QTSysSetApi/PostSave
+                orgid: 488181024000002,
+                uid: 488181024000001,
+                infoData: [
+                    {
+                        PhId: 109200108000003,
+                        DicType: 'Business',
+                        Isactive: 0,
+                        PersistentState: 1,
+                        DicName: '业务条线',
+                        Orgid: 488181024000002,
+                        Orgcode: '101',
+                        TypeCode: '001',
+                        TypeName: '业务条线1',
+                        PhidList: [488181024000002]
+                    },
+                    {
+                        PhId:109200108000004,
+                        DicType: 'Business',
+                        Isactive: 0,
+                        PersistentState: 1,
+                        DicName: '业务条线',
+                        Orgid: 488181024000002,
+                        Orgcode: '101',
+                        TypeCode: '002',
+                        TypeName: '业务条线2',
+                        PhidList: [488181024000002]
+                    }
+                ]*/
+            };
+            $.ajax({
+                headers: {
+                    'Accept': "multipart/form-data; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                type: 'post',
+                url: '@Url.Content("~/api/GQT/QTSysSetApi/PostSave")',
+                data: data,
+                datatype: 'json',
+                success: function (data, textstatus) {
+                    alert(data);
+                },
+                error: function (xmlhttprequest, textstatus, errorThrown) {
+
+                }
+            });
+        });
+
+        //$("#test").bind('click', function () {
+
+        //});
+
+    })
+
+    function upFile() {
+
+        var form = new FormData();
+        form.append("file", $("#upload_file")[0].files[0]);
+        //form.append("file", $("#upload_file2")[0].files[0]);
+        //form.append("file", $("#upload_file3")[0].files[0]);
+        //新增新闻
+
+        form.append("PhIdType", "199181225000001");             //信息类别
+        form.append("Title", "测试数据");                       //标题
+        form.append("Content", "这是一条测试新增的数据");       //内容
+        form.append("Name", "网络");                            //来源
+        form.append("LevelType","1");                           //制度级别
+
+
+        //修改新闻
+        /*
+        form.append("PhId", "553181226000001");
+        form.append("PhIdType", "199181225000001");
+        form.append("Title", "测试数据2");
+        form.append("Content", "这是一条测试修改的数据2");
+        form.append("Hitrate", "0");
+        form.append("Publish", "0");
+        form.append("Ontop", "0");
+        form.append("Name", "网络");
+        form.append("Picpath", "/UpLoadFiles/SysNews/2018-12-26/cd8e680ddb9140c4afeeb29289bd19f6.jpg");
+        form.append("AttachmentName", "img.jpg");
+        form.append("AttachmentSize", "6.00");
+        form.append("LevelType", "1");
+        form.append("Creator", "521180820000001");
+        form.append("Editor", "521180820000001");
+        form.append("CurOrgId", "521180820000002");
+        form.append("NgInsertDt", "2018-12-26 20:00:24.000");
+        form.append("NgUpdateDt", "2018-12-26 20:00:24.000");
+        form.append("NgRecordVer", "2");
+        */
+
+        //新增图片新闻
+        //form.append("Title", "测试数据");
+
+        //修改图片新闻
+        /*form.append("PhId", "559181226000001");
+        form.append("Title", "测试修改4");
+        form.append("Picpath", "/UpLoadFiles/SysPicture/2018-12-27/3a61a8c1d9f34cecb11fe6255e55445e.png");
+        form.append("AttachmentName", "logo.png");
+        form.append("AttachmentSize","3.82");
+        form.append("Publish", "0");
+        form.append("Ontop", "0");
+        form.append("SortCode", "0");*/
+        //form.append("Creator", "521180820000001");
+        //form.append("Editor", "521180820000001");
+        //form.append("CurOrgId", "521180820000002");
+        //form.append("NgInsertDt", "2018-12-26 22:09:22.000");
+        //form.append("NgUpdateDt", "2018-12-26 22:38:28.000");
+        //form.append("NgRecordVer", "6");
+
+        //console.log(form)
+
+        @*$.ajax({
+            headers: {
+                'Accept': "multipart/form-data; charset=utf-8",
+                'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                'Sign': items
+            },
+            url: '@Url.Content("~/api/GCW/SysNews/PostUpdateSysNews")',
+            type: 'post',
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function (data, textstatus) {
+                console.log(data);
+                alert("上传成功");
+            },
+            error: function (xmlhttprequest, textstatus, errorThrown) {
+                alert("服务器未正常响应，请重试");
+            }
+        });*@
+
+        //var FileResultDTO = new {
+        //    ID = 1111, FileName=$("#upload_file")[0].files[0].FileName,
+        //    ServerFileName= ""
+        //};
+
+        $.ajax({
+            headers: {
+                'Accept': "multipart/form-data; charset=utf-8",
+                'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                'Sign': items
+            },
+            url: '@Url.Content("~/api/GXM/ProjectMstApi/PostSaveProject2")',
+            type: 'post',
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function (data, textstatus) {
+                console.log(data);
+                alert("上传成功");
+            },
+            error: function (xmlhttprequest, textstatus, errorThrown) {
+                alert("服务器未正常响应，请重试");
+            }
+        });
+    }
+</script>
+

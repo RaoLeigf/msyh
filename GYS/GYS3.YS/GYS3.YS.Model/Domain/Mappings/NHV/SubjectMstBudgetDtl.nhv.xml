@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+  <class name="SubjectMstBudgetDtlModel">
+    <property name="PhId" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="FName" >
+      <length min="0" max="100" message ="长度不超过100！"/>
+    </property>
+    <property name="FProjCode" >
+      <length min="0" max="40" message ="长度不超过40！"/>
+    </property>
+    <property name="FDeclarationUnit" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FDeclarationDept" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FBudgetDept" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FDtlCode" >
+      <length min="0" max="100" message ="长度不超过100！"/>
+    </property>
+    <property name="FMeasUnit" >
+      <length min="0" max="10" message ="长度不超过10！"/>
+    </property>
+    <property name="FOtherInstructions" >
+      <length min="0" max="400" message ="长度不超过400！"/>
+    </property>
+    <property name="FDtlName" >
+      <not-null />
+      <not-Empty />
+      <length min="0" max="500" message ="长度不超过500！"/>
+    </property>
+    <property name="NgInsertDt" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="NgUpdateDt" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="CurOrgId" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="Creator" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="Editor" >
+      <not-null />
+      <not-Empty />
+    </property>
+  </class>
+</nhv-mapping>

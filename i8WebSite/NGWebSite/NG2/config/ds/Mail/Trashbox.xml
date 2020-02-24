@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+  </Tables>
+  <Read>
+    <Where>
+      <exp Field="mailtype" Value="4" />
+    </Where>
+  </Read>
+</DataService>

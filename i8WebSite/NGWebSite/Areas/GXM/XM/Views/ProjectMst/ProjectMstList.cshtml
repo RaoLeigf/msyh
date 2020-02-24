@@ -1,0 +1,2611 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GXM/XM/ProjectMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/YJK.js") type="text/javascript" charset="utf-8"></script>
+
+    @*<script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QTIndividualInfoEdit.js") type="text/javascript" charset="utf-8"></script>*@
+
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+        var grid;
+        var ProjStatus = '@ViewBag.ProjStatus'; //页面进来的项目状态(1预立项,2立项)
+        var FApproveStatus = '@ViewBag.FApproveStatus'; //单据状态(待上报 FApproveStatus = 1)
+        var IndividualinfoBustype = "";
+        var IndividualinfoYLX = false; //选择模板界面显示哪列
+        var IndividualinfoXMLX = false;
+
+        var dataYear = sessionStorage.getItem("FYear");
+        var queryPanel = null;
+        var queryUnit='';
+        var queryDept='';
+        Ext.onReady(function () {
+            Ext.Ajax.request({
+                params: { 'userID': $user.id },
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                async: false,
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        var orgDept = resp.Msg;
+                        var orgDeptArray = orgDept.split(",");
+                        if(orgDeptArray[0]!=''){
+                            queryUnit=orgDeptArray[0];
+                            queryDept=orgDeptArray[1];
+                        }
+                    }
+                }
+            });
+            var rightName = "";
+            if (ProjStatus == "1") {
+                rightName = "ProjectMstList";
+                IndividualinfoBustype = "GHBudgetYLX";
+                IndividualinfoXMLX = true;
+            } else if (ProjStatus == "2") {
+                rightName = "ProjectMstList2";
+                IndividualinfoBustype = "GHBudgetXMLX";
+                IndividualinfoYLX = true;
+            }
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: rightName, //权限名称
+                showArrowBtn: false,
+                layout: {
+                    overflowHandler: 'Menu'
+                },
+                ngbuttons: [
+                    { itemId: "add1", id: "add1", text: "新增项目申报", width: this.itemWidth, iconCls: "icon-New", langkey: "add1"},
+                    { itemId: "XMreference", text: "已有项目申报", width: this.itemWidth, iconCls: "icon-New", langkey: "XMreference" },
+                    'edit', { itemId: "midEdit", id: "midEdit", text: "调整", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "midEdit"},
+                    'delete', 'view', '-', 'check', { itemId: "uncheck", id: "uncheck", text: "取消送审", width: this.itemWidth, iconCls: "icon-Unvalid", langkey: "uncheck"}, 'history', 'valid',
+                    { itemId: "budget",id: "budget", text: "生成预算", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "budget"},
+                    { itemId: "unvalid",id: "unvalid", text: "取消审批", width: this.itemWidth, iconCls: "icon-Unvalid", langkey: "unvalid" },
+                    { itemId: "saveToOldG6h",id: "saveToOldG6h", text: "同步数据", width: this.itemWidth, iconCls: "icon-Unvalid", langkey: "saveToOldG6h" },
+                    { itemId: "edithistory", id: "edithistory", text: "修改历史", width: this.itemWidth, iconCls: "icon-History", langkey: "edithistory" },
+                    { itemId: "memo", id: "memo", text: "备忘录", width: this.itemWidth, iconCls: "icon-Note", langkey: "memo" },
+                    { itemId: "batchbudget", id: "batchbudget", text: "批量生成预算", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "batchbudget" },
+                    { itemId: "memoRight", id: "memoRight", text: "批注", width: this.itemWidth, iconCls: "icon-Setup", langkey: "memoRight" },
+					{ itemId: "showAll", id: "showAll", text: "显示所有项目", width: this.itemWidth, iconCls: "icon-View", langkey: "showAll" },
+                    { itemId: "showDefault", id: "showDefault", text: "显示默认项目", width: this.itemWidth, iconCls: "icon-View", langkey: "showDefault" },
+                    { itemId: 'snapshot', iconCls: "icon-create", text: "快照", width: this.itemWidth, langkey: "snapshot"},
+                    { itemId: "batchsnapshot", text: "批量快照", width: this.itemWidth, iconCls: "icon-create", langkey: "batchsnapshot" },
+                    { itemId: "ShowTZ", text: "显示调整数据", width: this.itemWidth, iconCls: "icon-New", langkey: "ShowTZ" },
+                    { itemId: "midYearEdit", id: "midYearEdit", text: "年中调整", width: this.itemWidth, iconCls: "icon-Edit", langkey: "midYearEdit" },
+                    '->', 'print', 'close'
+                ]
+            });
+            ngToolbar.get('budget').hide();
+            ngToolbar.get('batchbudget').hide();
+            ngToolbar.get('saveToOldG6h').hide();
+			ngToolbar.get('showDefault').hide();
+            ngToolbar.get('ShowTZ').hide();
+            
+			ngToolbar.get('midYearEdit').hide();
+            //立项不能新增
+            if (ProjStatus == "2") {
+                ngToolbar.get('add1').hide();
+                ngToolbar.get('budget').show();
+                ngToolbar.get('batchbudget').show();
+                ngToolbar.get('midEdit').hide();
+                ngToolbar.get('saveToOldG6h').show();
+                
+			    ngToolbar.get('midYearEdit').show();
+                 //传入功能点标识和控制单据的组织，如果返回TRUE，则要进行控制
+			   
+                Ext.Ajax.request({
+                    params: { 'BZ': "G6HBLKZXmlx", 'DWDM': $appinfo.ocode },
+                    url: C_ROOT + 'GXM/XM/ProjectMst/FindQTControlSet',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var QTControlSet = resp.Msg;
+                            if (QTControlSet == "true") {
+                                ngToolbar.get('add1').show();
+                            } 
+                        }
+                    }
+                });
+
+            }
+            //查看界面(查看界面隐藏相关按钮)
+            if (!ProjStatus) {
+                ngToolbar.get('add1').hide();
+                ngToolbar.get('edit').hide();
+                ngToolbar.get('midEdit').hide();
+                ngToolbar.get('delete').hide();
+                ngToolbar.get('check').hide();
+                ngToolbar.get('valid').hide();
+                ngToolbar.get('unvalid').hide();
+                ngToolbar.get('budget').hide();
+                ngToolbar.get('batchbudget').hide();
+                ngToolbar.get('edithistory').hide();
+                ngToolbar.get('memo').hide();
+                ngToolbar.get('memoRight').hide();
+                ngToolbar.get('snapshot').hide();
+                ngToolbar.get('batchsnapshot').hide();
+                ngToolbar.get('XMreference').hide();
+                ngToolbar.get('uncheck').hide();
+                ngToolbar.get('history').hide();
+                
+			    ngToolbar.get('ShowTZ').show();
+            }
+
+			var fields = [
+              {
+                "name": "PhId",
+                "type": "string",
+                "mapping": "PhId"
+                },
+                {
+                    "name": "FIndividualinfophid",
+                    "type": "string",
+                    "mapping": "FIndividualinfophid"
+                },
+              {
+                "name": "FDeclarationUnit",
+                "type": "string",
+                "mapping": "FDeclarationUnit"
+              },
+              {
+                "name": "FDeclarationUnit_EXName",
+                "type": "string",
+                "mapping": "FDeclarationUnit_EXName"
+              },
+              {
+                "name": "FBudgetDept",
+                "type": "string",
+                "mapping": "FBudgetDept"
+              },
+              {
+                "name": "FBudgetDept_EXName",
+                "type": "string",
+                "mapping": "FBudgetDept_EXName"
+              },
+              {
+                "name": "FDeclarationDept",
+                "type": "string",
+                "mapping": "FDeclarationDept"
+              },
+              {
+                "name": "FDeclarationDept_EXName",
+                "type": "string",
+                "mapping": "FDeclarationDept_EXName"
+              },
+              {
+                "name": "FProjCode",
+                "type": "string",
+                "mapping": "FProjCode"
+              },
+              {
+                "name": "FProjName",
+                "type": "string",
+                "mapping": "FProjName"
+              },
+              {
+                "name": "FExpenseCategory",
+                "type": "string",
+                "mapping": "FExpenseCategory"
+              },
+              {
+                  "name": "FExpenseCategory_EXName",
+                  "type": "string",
+                  "mapping": "FExpenseCategory_EXName"
+              },
+              {
+                "name": "FProjAttr",
+                "type": "string",
+                "mapping": "FProjAttr"
+              },
+              {
+                "name": "FDuration",
+                "type": "string",
+                "mapping": "FDuration"
+              },
+              {
+                "name": "FProjStatus",
+                "type": "int",
+                "mapping": "FProjStatus"
+                },
+                {
+                    "name": "FType",
+                    "type": "string",
+                    "mapping": "FType"
+                },
+                {
+                    "name": "FApproveStatus",
+                    "type": "string",
+                    "mapping": "FApproveStatus"
+                },
+                {
+                    "name": "FNextApprove",
+                    "type": "string",
+                    "mapping": "FNextApprove"
+                },
+              {
+                "name": "FIfPerformanceAppraisal",
+                "type": "int",
+                "mapping": "FIfPerformanceAppraisal"
+              },
+              {
+                "name": "FProjAmount",
+                "type": "float",
+                "mapping": "FProjAmount"
+              },
+              {
+                "name": "FStartDate",
+                "type": "date",
+                "mapping": "FStartDate"
+              },
+              {
+                "name": "FEndDate",
+                "type": "datetime",
+                "mapping": "FEndDate"
+              },
+              {
+                "name": "FDateofDeclaration",
+                "type": "datetime",
+                "mapping": "FDateofDeclaration"
+              },
+              {
+                "name": "FDeclarer",
+                "type": "string",
+                "mapping": "FDeclarer"
+              },
+              {
+                  "name": "FApprover",
+                  "type": "string",
+                  "mapping": "FApprover"
+              },
+              {
+                  "name": "FApprover_EXName",
+                  "type": "string",
+                  "mapping": "FApprover_EXName"
+              },
+              {
+                  "name": "FApproveDate",
+                  "type": "datetime",
+                  "mapping": "FApproveDate"
+              },
+              {
+                  "name": "FBillType",
+                  "type": "string",
+                  "mapping": "FBillType"
+              },
+              {
+                  "name": "FSaveToOldG6h",
+                  "type": "int",
+                  "mapping": "FSaveToOldG6h"
+              }
+            ];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'billList');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+                autoLoad: true,//autoLoad: false
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstList?ProjStatus=' + ProjStatus + "&userId=" + $appinfo.logid + "&FApproveStatus=" + FApproveStatus 
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '10a60a52-5519-4968-abd3-924dde097ded',
+				buskey: 'PhId', //对应的业务表主键属性
+				//layout: {
+				//	type: 'hbox',
+				//	align: 'stretch'
+			    //},
+				//forceFit: true,
+				//scrollOffset: 0,
+				//viewConfig: {
+				//	forceFit: true,
+				//	scrollOffset: 0
+				//},
+				bbar: [pagingbar]
+			};
+
+			var gridConfig = Ext.apply(initConfig, individualInfo.grid['billList']);
+			//Ext.apply(gridConfig, { "viewConfig": { "forceFit": false }, "autoScroll":true });
+			grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+            queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                hidePanel:true,
+                pageid: "Web1:GHProjectMstList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 4 //每行5列
+            });
+
+            var items = queryPanel.getForm().getFields().items;
+            Ext.Array.each(items, function (f) {
+                /*if (f.fieldLabel == "项目年度") {
+                    if (f.value == '' || f.value == null) {
+                        if (sessionStorage.getItem("FYear") != null) {
+                            f.setValue(dataYear);
+                        } else {
+                            f.setValue('');
+                        }
+                    }
+                }*/
+                //11.12申报单位自动代入操作员默认申报单位
+                if (f.fieldLabel == "申报单位") {
+                    if (f.value == '' || f.value == null) {
+                        if(queryUnit!=''){
+                            f.setValue(queryUnit);
+                        }
+                    }else{
+                        queryUnit=f.value;
+                    }
+                }
+            });
+
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, queryPanel, grid]
+            });
+
+            //新增
+            ngToolbar.get('add1').on('click', function () {
+                Ext.Ajax.request({
+                    params: { 'FGoYear': sessionStorage.getItem("FYear")-1, 'dept': queryDept,'userId':$appinfo.logid},
+                    url: C_ROOT + 'GXM/XM/ProjectMst/JudegIfJx',
+                    async:false,
+                    success: function (response) {
+                        if(response.text=='false'){
+                            Ext.MessageBox.alert('提示', '当前部门还未对上年绩效项目进行自评上报，请先绩效自评！');
+                            return;
+                        }else{
+                            IndividualinfoPanelStore.load();
+                            IndividualinfoWin = Ext.create("Ext.ng.gh.baseWindow", {
+                                title: '选择模板',
+                                modal: true,
+                                height: 450,
+                                width: 1000,
+                                layout: 'border',
+                                items: [
+                                    IndividualinfoToolbar,
+                                    Individualinfogrid
+                                ]
+                            });
+                            
+
+                            if (IndividualinfoPanelStore.getCount() > 0) {
+                                if(IndividualinfoPanelStore.getCount()==1){
+                                    var IndividualinfoId = IndividualinfoPanelStore.getAt(0).get('PhId');
+                                    if(IndividualinfoYLX==false){
+                                        $OpenTab(pageName+'('+IndividualinfoPanelStore.getAt(0).get('YLXPhid_EXName')+')' + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                                    }else{
+                                        $OpenTab(pageName + '('+IndividualinfoPanelStore.getAt(0).get('XMLXPhid_EXName')+')' +'-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                                    }
+                                }else{
+                                    IndividualinfoWin.show();
+                                }
+                            } else {
+                                $OpenTab(pageName + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus);
+                            }
+                        }
+                    }
+                });
+                
+                //$OpenTab(pageName + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus);
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要修改的单据！");
+                    return null;
+                }
+                //预立项时,单据不是预立项状态不能修改
+                if (ProjStatus == "1" && (data[0].get('FProjStatus') != "1")) {
+                    Ext.MessageBox.alert('提示', "单据不处在预立项状态,不能修改！");
+                    return null;
+                }
+
+                if (data[0].get('FApproveStatus') == '2' || data[0].get('FApproveStatus') == '4') {
+                    Ext.MessageBox.alert('提示', "单据已在审批流程中！");
+                    return null;
+                }
+                if (data[0].get('FApproveStatus') == '3') {
+                    Ext.MessageBox.alert('提示', "单据已审批！");
+                    return null;
+                }
+              
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var IndividualinfoId = data[0].get('FIndividualinfophid');
+                    $OpenTab(pageName + '-修改', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + id + "&ProjStatus=" + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                }
+            });
+
+
+            //调整
+            ngToolbar.get('midEdit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要修改的单据！");
+                    return null;
+                }
+                //预立项时,单据不是预立项状态不能修改
+                if (ProjStatus == "1" && (data[0].get('FProjStatus') == "1")) {
+                    Ext.MessageBox.alert('提示', "单据处在预立项状态,不能调整！");
+                    return null;
+                }
+
+
+                if (data[0].get('FApproveStatus') == '2' || data[0].get('FApproveStatus') == '4') {
+                    Ext.MessageBox.alert('提示', "单据未审批完成！");
+                    return null;
+                }
+                if (data[0].get('FApproveStatus') == '1') {
+                    Ext.MessageBox.alert('提示', "单据未审批！");
+                    return null;
+                }
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var IndividualinfoId = data[0].get('FIndividualinfophid');
+                    $OpenTab(pageName + '-调整', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + id + "&ProjStatus=" + ProjStatus + "&midEdit=midEdit" + '&IndividualinfoId=' + IndividualinfoId);
+                }
+            });
+
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+
+
+                    //预立项时,单据不是预立项状态不能删除
+                    if (ProjStatus == "1" && (data[0].get('FProjStatus') != "1")) {
+                        Ext.MessageBox.alert('提示', "单据不处在预立项状态,不能删除！");
+                        return null;
+                    }
+
+                    if (data[0].get('FApproveStatus') == '2' || data[0].get('FApproveStatus') == '4') {
+                        Ext.MessageBox.alert('提示', "单据已在审批流程中！");
+                        return null;
+                    }
+                    if (data[0].get('FApproveStatus') == '3') {
+                        Ext.MessageBox.alert('提示', "单据已审批！");
+                        return null;
+                    }
+
+                    recoderefresh(data);
+
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId'), 'projcode': data[0].get('FProjCode') },
+                                url: C_ROOT + 'GXM/XM/ProjectMst/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var IndividualinfoId = data[0].get('FIndividualinfophid');
+                    if(data[0].get('FBillType')!="ys"){
+                        $OpenTab(pageName + '-查看', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=view&id=' + id + "&ProjStatus=" + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                    }else{
+                        $OpenTab('预算' + '-查看', C_ROOT + 'GYS/YS/BudgetMst/BudgetMstEdit?otype=view&id=' + id  + '&IndividualinfoId=' + IndividualinfoId);
+                    }
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });
+
+
+            //审批前检查
+            function preApproveCheck() {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要送审的单据！");
+                    return null;
+                }
+
+                //预立项时,单据不是预立项状态不能送审
+                if (ProjStatus == "1" && (data[0].get('FProjStatus') != "1")) {
+                    Ext.MessageBox.alert('提示', "单据不处在预立项状态,不能送审！");
+                    return null;
+                }
+
+
+                if (data[0].get('FApproveStatus') == '2' || data[0].get('FApproveStatus') == '4') {
+                    Ext.MessageBox.alert('提示', "单据已在审批流程中！");
+                    return null;
+                }
+                if (data[0].get('FApproveStatus') == '3') {
+                    Ext.MessageBox.alert('提示', "单据已审批！");
+                    return null;
+                }
+
+                return data;
+            }
+
+            //送审
+            ngToolbar.get("check").on('click', function () {
+                
+                Ext.Ajax.request({
+                    params: { 'userid': $appinfo.userID, 'MenoRemind': '0' },
+                    url: C_ROOT + 'GQT/QT/QTMemo/Remind',
+                    async: false,
+                    success: function (response) {
+                        //var resp = Ext.JSON.decode(response.responseText);
+                        if (response.text == "true") {
+                            Ext.MessageBox.confirm('提示', '系统检测到存在未处理的代办事项，是否立即前往【备忘录】办理？', callBack);
+
+                            function callBack(callBackid) {
+                                if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                                    ss();
+                                } else {
+                                    $OpenTab('备忘录', C_ROOT + 'GQT/QT/QTMemo/QTMemoList');
+                                }
+                            }
+                        } else {
+                            ss();
+                        }
+
+                    }
+                });
+
+                function ss() {
+                    var data = preApproveCheck();
+                    if (data == null) {
+                        return;
+                    }
+                    var data2 = grid.getSelectionModel().getSelection();
+                    if(+data2[0].get('FProjAmount')==0){
+                        Ext.MessageBox.alert('提示', "金额为0请进行单据的校验！");
+                        return;
+                    }
+
+                    if (ProjStatus == "2") {
+                        //传入功能点标识和控制单据的组织，如果返回TRUE，则要进行控制
+                        Ext.Ajax.request({
+                            params: { 'BZ': "G6HBLKZApprove", 'DWDM': data[0].get('FDeclarationUnit') },
+                            url: C_ROOT + 'GXM/XM/ProjectMst/FindQTControlSet',
+                            async: false,
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.Status === "success") {
+                                    var QTControlSet = resp.Msg;
+                                    if (QTControlSet == "true") {
+                                        //项目明细中预算科目或支出渠道必录项判断
+
+                                        var newIds = ""; //
+                                        Ext.Ajax.request({
+                                            params: { 'id': data[0].get('PhId') },
+                                            url: C_ROOT + 'GXM/XM/ProjectMst/GetMustInput',
+                                            async: false,
+                                            success: function (response) {
+                                                var resp = Ext.JSON.decode(response.responseText);
+                                                if (resp.Status === "success") {
+                                                    newIds = resp.Msg;
+                                                    if (newIds == "") {
+                                                        Ext.MessageBox.alert('提示', "项目明细中预算科目或支出渠道未录全,不能送审！");
+                                                        return;
+                                                    } else {
+                                                        //启动审批流
+                                                        $WorkFlow.startFlow("GHProject", data[0].get('PhId'), NG3Refresh);
+                                                    }
+
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        //启动审批流
+                                        $WorkFlow.startFlow("GHProject", data[0].get('PhId'), NG3Refresh);
+                                    }
+
+                                }
+                            }
+                        });
+                    } else {
+                        //启动审批流
+                        $WorkFlow.startFlow("GHProject", data[0].get('PhId'), NG3Refresh);
+                    }
+                }
+
+            });
+
+
+			//取消送审
+            ngToolbar.get('uncheck').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    if (data[0].get('FApproveStatus') == '1') {
+                        Ext.MessageBox.alert('提示', "单据未送审！");
+                        return;
+                    }
+					/*if (data[0].get('FApproveStatus') == '3') {
+                        Ext.MessageBox.alert('提示', "单据已审批！");
+                        return;
+                    }*/
+
+					var mst_id = data[0].get('PhId');
+					Ext.Ajax.request({
+						params: { 'approveCode': "GHProject", 'userId': mst_id },
+						url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+						async: false, //同步请求
+						success: function (response) {
+							var resp1 = Ext.JSON.decode(response.responseText);
+							if (resp1.Status === "success") {
+								var piid = resp1.Msg;
+								if (Ext.isEmpty(piid)) {
+									return;
+								}
+								Ext.Ajax.request({
+									async: false, //同步请求
+									params: { 'flowType': 'wf', 'piid': piid },
+									url: C_ROOT + 'WorkFlow3/FlowManager/CanDrawback',
+									success: function (response) {
+										var resp = Ext.JSON.decode(response.responseText);
+										if (resp && resp.candrawback) {
+											Ext.MessageBox.confirm('提示', '重新发起送审时会覆盖先前的审批记录，是否执行？', function (id) {
+												if (id.toString() == 'yes') {
+													Ext.Ajax.request({
+														params: { 'data': JSON.stringify({ "bizphid": data[0].get('PhId'), "biztype": "GHProject", "compId": "GHProject_edit", "remark: ": "取消送审", "piid": piid }) },
+														async: false,
+														url: C_ROOT + 'WorkFlow3/WorkFlow/FlowTerminate',
+														success: function (response) {
+															var resp = Ext.JSON.decode(response.responseText);
+                                                            if (resp.success) {
+                                                                //Ext.Ajax.request({
+                                                                //    params: { 'ID': mst_id, 'activeName': "", 'biztypeName': "GHProject" },
+                                                                //    url: C_ROOT + 'GXM/XM/ProjectMst/SaveNextApprove',
+                                                                //    async: false
+                                                                //});
+																NG3Refresh();
+																NGMsg.Info('取消送审成功！');
+															} else {
+																Ext.MessageBox.alert('取消送审失败', resp.errorMsg);
+															}
+														}
+													});
+												}
+											});
+										}
+										else {
+											var errMsg = '当前流程不允许取消送审！';
+											if (!Ext.isEmpty(resp.errorMsg)) {
+												errMsg += resp.errorMsg;
+											}
+											Ext.MessageBox.alert('提示', errMsg);
+											return;
+										}
+									}
+								});
+							} else {
+								Ext.MessageBox.alert('提示', "未找到审批数据！");
+								return;
+							}
+
+						}
+					});
+
+                }
+
+            });
+
+
+
+            //送审追踪
+            ngToolbar.get('history').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要查看的单据！");
+                    return;
+                }
+
+                //if (data[0].get('FApproveStatus') == '1') {
+                //    Ext.MessageBox.alert('提示', "单据未送审！");
+                //    return;
+                //}
+
+                $WorkFlow.showFlowInfo('GHProject', data[0].get('PhId')); //打开追踪信息窗口
+            });
+
+            //生成预算
+            ngToolbar.get('budget').on('click', function () {
+                ngToolbar.get('budget').disable();
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要生成的单据！");
+                    ngToolbar.get('budget').setDisabled(false);
+                    return;
+                }
+
+                if (data[0].get('FApproveStatus') != '3') {
+                    Ext.MessageBox.alert('提示', "审批未完成,不能生成预算！");
+                    ngToolbar.get('budget').setDisabled(false);
+                    return;
+                }
+                if (data[0].get('FProjStatus') == '3') {
+                    Ext.MessageBox.alert('提示', "已生成预算,不能重复生成！");
+                    ngToolbar.get('budget').setDisabled(false);
+                    return;
+                }
+
+                var FProcessStatus = ""; //预算申报进度
+                Ext.Ajax.request({
+                    params: { 'oCode': data[0].get('FDeclarationUnit'), 'deptCode': data[0].get('FBudgetDept'), 'FYear': sessionStorage.getItem("FYear") },
+                    url: C_ROOT + 'GYS/YS/BudgetMst/FindBudgetProcessCtrl',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            FProcessStatus = resp.Msg;
+
+                        }
+                    }
+                });
+                if (FProcessStatus == "2" || FProcessStatus == "4") {
+                    Ext.MessageBox.alert('提示', "不在预算初报和调整状态,不能生成！");
+                    ngToolbar.get('budget').setDisabled(false);
+                    return null;
+                }
+
+
+
+                var mst_id = data[0].get('PhId');
+
+                Ext.Ajax.request({
+
+                    params: { 'approveCode': "GHProject", 'userId': mst_id },
+                    url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp1 = Ext.JSON.decode(response.responseText);
+                        if (resp1.Status === "success") {
+                            var piid = resp1.Msg;
+                            if (Ext.isEmpty(piid)) {
+                                return;
+                            }
+                            Ext.Ajax.request({
+                                async: false, //同步请求
+                                params: { 'flowType': 'wf', 'piid': piid },
+                                url: C_ROOT + 'WorkFlow3/FlowManager/CanDrawback',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp && resp.candrawback) {
+                                        Ext.MessageBox.alert('提示', '审批流程没有结束，不能生成预算！');
+                                    }
+                                    else {
+                                        Ext.Ajax.request({
+                                            params: { 'id': data[0].get('PhId') },
+                                            url: C_ROOT + 'GXM/XM/ProjectMst/SaveBudgetMst',
+                                            success: function (response) {
+                                                var resp = Ext.JSON.decode(response.responseText);
+                                                if (resp.Status === "success") {
+                                                    Ext.MessageBox.alert('提示', '生成成功！');
+                                                    grid.store.reload();
+                                                    ngToolbar.get('budget').setDisabled(false);
+
+                                                } else {
+                                                    Ext.MessageBox.alert('提示', '生成失败！');
+                                                    ngToolbar.get('budget').setDisabled(false);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.alert('提示', "未找到审批数据！");
+                            ngToolbar.get('budget').setDisabled(false);
+                            return;
+                        }
+
+                    }
+                });
+
+
+                //Ext.Ajax.request({
+                //    params: { 'id': data[0].get('PhId') },
+                //    url: C_ROOT + 'GXM/XM/ProjectMst/SaveBudgetMst',
+                //    success: function (response) {
+                //        var resp = Ext.JSON.decode(response.responseText);
+                //        if (resp.Status === "success") {
+                //            Ext.MessageBox.alert('提示', '生成成功！');
+                //            grid.store.reload();
+
+                //        } else {
+                //            Ext.MessageBox.alert('提示', '生成失败！');
+                //        }
+                //    }
+                //});
+
+            });
+
+            //打开审批页面
+            ngToolbar.get('valid').on('click', function () {
+                Ext.Ajax.request({
+                    params: { 'userid': $appinfo.userID, 'MenoRemind': '1' },
+                    url: C_ROOT + 'GQT/QT/QTMemo/Remind',
+                    async: false,
+                    success: function (response) {
+                        //var resp = Ext.JSON.decode(response.responseText);
+                        if (response.text == "true") {
+                            Ext.MessageBox.confirm('提示', '系统检测到存在未处理的代办事项，是否立即前往【备忘录】办理？', callBack);
+
+                            function callBack(callBackid) {
+                                if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                                    sp();
+                                } else {
+                                    $OpenTab('备忘录', C_ROOT + 'GQT/QT/QTMemo/QTMemoList');
+                                    return;
+                                }
+                            }
+                        } else {
+                            sp();
+                        }
+
+                    }
+                });
+                function sp() {
+                    var data = grid.getSelectionModel().getSelection();
+                    if (data.length <= 0) {
+                        Ext.MessageBox.alert('提示', "请您先选择要审批的单据！");
+                        return;
+                    }
+
+                    if (data[0].get('FApproveStatus') == '1') {
+                        Ext.MessageBox.alert('提示', "单据未送审！");
+                        return;
+                    }
+
+                    if (data[0].get('FApproveStatus') == '3') {
+                        Ext.MessageBox.alert('提示', "单据已审批！");
+                        return;
+                    }
+
+                    var mst_id = data[0].get('PhId');
+
+                    Ext.Ajax.request({
+
+                        url: C_ROOT + 'WorkFlow3/FlowManager/GetPendingTaskByUser',
+                        async: false, //同步请求
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Record.length > 0) {
+                                for (var i = 0; i < resp.Record.length; i++) {
+                                    if (resp.Record[i].pkstr == mst_id) {
+                                        if (Ext.isEmpty(resp.Record[i].uitype) || resp.Record[i].uitype != 4) {
+                                            $WorkFlow.openWinFromPage(resp.Record[i].url, resp.Record[i].urlparam + "@@@@**IsWFTaskList=true&ProjStatus=" + ProjStatus, true);
+                                        }
+                                        else {
+                                            $OpenTab('工作流任务', C_ROOT + resp.Record[i].url + '&iswftasklist=true&ProjStatus=' + ProjStatus);
+                                        }
+
+                                        return;
+
+                                    }
+                                }
+                            } else {
+                                Ext.MessageBox.alert('提示', "未找到审批数据！");
+                                return;
+                            }
+
+                        }
+                    });
+                }
+
+            });
+
+            //取消审批
+            ngToolbar.get('unvalid').on('click', function () {
+                ngToolbar.get('unvalid').disable();
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要取消审批的单据！");
+                    ngToolbar.get('unvalid').setDisabled(false);
+                    return;
+                }
+
+                if (data[0].get('FApproveStatus') == '1') {
+                    Ext.MessageBox.alert('提示', "单据未送审！");
+                    ngToolbar.get('unvalid').setDisabled(false);
+                    return;
+                }
+
+                //if (data[0].get('FApproveStatus') == '3') {
+                //    Ext.MessageBox.alert('提示', "单据已审批！");
+                //    return;
+                //}
+
+                var mst_id = data[0].get('PhId');
+
+                Ext.Ajax.request({
+
+                    params: { 'approveCode': "GHProject", 'userId': mst_id },
+                    url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp1 = Ext.JSON.decode(response.responseText);
+                        if (resp1.Status === "success") {
+                            var piid = resp1.Msg;
+                            if (Ext.isEmpty(piid)) {
+                                ngToolbar.get('unvalid').setDisabled(false);
+                                return;
+                            }
+                            Ext.Ajax.request({
+                                async: false, //同步请求
+                                params: { 'flowType': 'wf', 'piid': piid },
+                                url: C_ROOT + 'WorkFlow3/FlowManager/CanDrawback',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp && resp.candrawback) {
+                                        Ext.MessageBox.confirm('提示', '是否执行撤回操作', function (id) {
+                                            if (id.toString() == 'yes') {
+                                                Ext.Ajax.request({
+                                                    async: false, //同步请求
+                                                    params: { 'flowType': 'wf', 'piid': piid },
+                                                    url: C_ROOT + 'WorkFlow3/FlowManager/Drawback',
+                                                    success: function (response) {
+                                                        var result = Ext.JSON.decode(response.responseText);
+                                                        if (result.result) {
+
+                                                            Ext.Ajax.request({
+                                                                params: { 'id': mst_id  },
+                                                                url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalid',
+                                                                async: false,
+                                                                success: function (response) {
+                                                                    var respData = Ext.JSON.decode(response.responseText);
+                                                                    if (respData.Status === "success") {
+
+                                                                        Ext.MessageBox.alert('提示', "撤回操作成功！");
+                                                                        store.load();
+                                                                        ngToolbar.get('unvalid').setDisabled(false);
+                                                                    }
+                                                                }
+                                                            });
+
+
+                                                        }
+                                                        else {
+                                                            Ext.MessageBox.alert('提示', "撤回操作失败，原因：" + result.msg);
+                                                            ngToolbar.get('unvalid').setDisabled(false);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        var errMsg = '当前流程不允许撤回！';
+                                        if (!Ext.isEmpty(resp.errorMsg)) {
+                                            errMsg += resp.errorMsg;
+                                        }
+                                        Ext.MessageBox.alert('提示', errMsg);
+                                        ngToolbar.get('unvalid').setDisabled(false);
+                                        return;
+                                    }
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.alert('提示', "未找到审批数据！");
+                            ngToolbar.get('unvalid').setDisabled(false);
+                            return;
+                        }
+
+                    }
+                });
+
+
+            });
+
+            //单据修改历史
+            ngToolbar.get("edithistory").on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    $OpenTab('单据修改历史', C_ROOT + 'GQT/QT/QTModify/QTModifyList?Unit=' + data[0].get('FDeclarationUnit') + '&Dept=' + data[0].get('FBudgetDept') + '&year=' + data[0].raw.FYear + '&projcode=' + data[0].get('FProjCode'));
+                } else {
+                    Ext.MessageBox.alert('提示', "请您先选择单据！");
+                }
+            });
+
+            //单据批注
+            ngToolbar.get("memoRight").on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要批注的单据！");
+                    return null;
+                }
+                if (data[0].get('FApproveStatus') == '3') {
+                    Ext.MessageBox.alert('提示', "单据已审批，不能进行批注！");
+                    return null;
+                }
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var IndividualinfoId = data[0].get('FIndividualinfophid');
+                    $OpenTab(pageName + '-批注', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + id + "&ProjStatus=" + ProjStatus + '&IndividualinfoId=' + IndividualinfoId + '&memoRight=memoRight');
+                }
+            });
+
+
+			//显示所有项目
+            ngToolbar.get('showAll').on('click', function () {
+				var params={'showAll':1};
+				Ext.apply(store.proxy.extraParams,params);
+				store.load(function(){
+					ngToolbar.get('showAll').hide();
+					ngToolbar.get('showDefault').show();
+				})
+
+			});
+			
+			//显示默认项目
+            ngToolbar.get('showDefault').on('click', function () {
+				var params={'showAll':0};
+				Ext.apply(store.proxy.extraParams,params);
+				store.load(function(){
+					ngToolbar.get('showDefault').hide();
+					ngToolbar.get('showAll').show();
+				})
+			});
+            
+            //快照
+            ngToolbar.get('snapshot').on('click', function () {
+				var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var IndividualinfoId = data[0].get('FIndividualinfophid');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=view&id=' + id + "&ProjStatus=" + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                }
+            });
+
+            ngToolbar.get('ShowTZ').on('click', function () {
+                if(ngToolbar.get('ShowTZ').getText()=='显示调整数据'){
+                    Ext.apply(store.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstList');
+                    if(ngToolbar.get('showAll').hidden==false){
+                        Ext.apply(store.proxy.extraParams, { 'userId':  $appinfo.logid , 'FYear': sessionStorage.getItem("FYear"), 'showAll': 0,'ShowTZ':1});
+                    }else{
+                        Ext.apply(store.proxy.extraParams, { 'userId':  $appinfo.logid , 'FYear': sessionStorage.getItem("FYear"), 'showAll': 1,'ShowTZ':1 });
+                    }
+                    //ImplPlanPanel_store.cachePageData = false;
+                    store.load();
+                    ngToolbar.get('ShowTZ').setText('不显示调整数据');
+                }else{
+                    Ext.apply(store.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstList');
+                    if(ngToolbar.get('showAll').hidden==false){
+                        Ext.apply(store.proxy.extraParams, { 'userId':  $appinfo.logid , 'FYear': sessionStorage.getItem("FYear"), 'showAll': 0});
+                    }else{
+                        Ext.apply(store.proxy.extraParams, { 'userId':  $appinfo.logid , 'FYear': sessionStorage.getItem("FYear"), 'showAll': 1 });
+                    }
+                    //ImplPlanPanel_store.cachePageData = false;
+                    store.load();
+                    ngToolbar.get('ShowTZ').setText('显示调整数据');
+                }
+                //ImplPlanPanel_store.cachePageData = true;
+
+				/*var params={'showAll':1};
+				Ext.apply(store.proxy.extraParams,params);
+				store.load(function(){
+					ngToolbar.get('showAll').hide();
+					ngToolbar.get('showDefault').show();
+				})*/
+
+            });
+            
+            ngToolbar.get('midYearEdit').on('click', function () {
+                $OpenTab('项目支出调整', C_ROOT + 'GYS/YS/BudgetMst/BudgetMstList?workType=z');
+                
+            }); 
+            
+
+            //代码转名称
+            grid.getColumn('FProjAttr').renderer = function (val) {
+                switch (val) {
+                    case "1":
+                        return "延续项目";
+                    case "2":
+                        return "新增项目";
+                }
+            };
+
+            grid.getColumn('FDuration').renderer = function (val) {
+                switch (val) {
+                    case "1":
+                        return "一次性项目";
+                    case "2":
+                        return "经常性项目";
+                    case "3":
+                        return "跨年度项目";
+                    case "4":
+                        return "结转资金";
+                }
+            };
+
+            grid.getColumn('FProjStatus').renderer = function (val) {
+                switch (val) {
+                    case 1:
+                        return "预立项";
+                    case 2:
+                        return "项目立项";
+                    case 3:
+                        return "项目执行";
+                    case 4:
+                        return "项目调整";
+                    case 5:
+                        return "项目暂停";
+                    case 6:
+                        return "项目终止";
+                    case 7:
+                        return "项目关闭";
+                }
+            };
+            grid.getColumn('FType').renderer = function (val) {
+                switch (val) {
+                    case "c":
+                        return "年初申报";
+                    case "z":
+                        return "年中新增";
+                }
+            };
+
+            grid.getColumn('FIfPerformanceAppraisal').renderer = function (val) {
+                switch (val) {
+                    case 1:
+                        return "是";
+                    case 2:
+                        return "否";
+                }
+            };
+
+            grid.getColumn('FApproveStatus').renderer = function (val) {
+                switch (val) {
+                    case "1":
+                        return "待上报";
+                    case "2":
+                        return "审批中";
+                    case "3":
+                        return "审批通过";
+                    case "4":
+                        return "已退回";
+                }
+            };
+
+            //grid.getColumn('FIfKeyEvaluation').renderer = function (val) {
+            //    switch (val) {
+            //        case 1:
+            //            return "是";
+            //        case 2:
+            //            return "否";
+            //    }
+            //};
+
+            grid.getColumn('FStartDate').renderer = function (val) {
+                if (val) {
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+            grid.getColumn('FEndDate').renderer = function (val) {
+                if (val) {
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+            grid.getColumn('FApproveDate').renderer = function (val) {
+                if (val) {
+                    val=new Date(Date.parse(val.replace(/-/g, "/")));//强转datetime
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+            grid.getColumn('FDateofDeclaration').renderer = function (val) {
+                if (val) {
+                    val=new Date(Date.parse(val.replace(/-/g, "/")));//强转datetime
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+
+            grid.getColumn('FProjAmount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+            grid.getColumn('FSaveToOldG6h').renderer = function (val) {
+                switch (val) {
+                    case 0:
+                        return "否";
+                    case 1:
+                        return "是";
+                }
+            };
+
+            //通用帮助设置条件
+            //按当前操作员过滤申报单位
+            queryPanel.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID });
+
+            //按当前申报单位过滤预算部门、支出类别
+            queryPanel.queryById("FDeclarationUnit").on("helpselected", function (obj) {
+                var unitCode = obj.code;
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                } else {
+                    filter = "(Z_QTDYGX2.DEF_STR1='" + $appinfo.uCode + "' )";
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                    queryPanel.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                }
+
+                //支出类别
+                if (filter2) {
+                    queryPanel.queryById("FExpenseCategory").setClientSqlFilter(filter2);
+                }
+
+            });
+
+            queryPanel.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+                var unitCode = queryPanel.queryById("FDeclarationUnit").getValue();
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                }
+                else {
+                    Ext.MessageBox.alert('请先选择申报单位');
+                    return false;
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                }
+                //支出类别
+                if (filter2) {
+                    queryPanel.queryById("FExpenseCategory").setClientSqlFilter(filter2);
+                }
+
+            });
+
+            queryPanel.queryById("FDeclarationDept").on("beforetriggerclick", function (str) {
+                var unitCode = queryPanel.queryById("FDeclarationUnit").getValue();
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                }
+                else {
+                    Ext.MessageBox.alert('提示', '请先选择申报单位!');
+                    return false;
+                }
+
+                //申报部门
+                if (filter) {
+                    queryPanel.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                }
+
+            });
+
+
+
+            var modelToOldG6H = $MergIndividualModelCol(fields, individualInfo, 'ListToOldG6h');//合并model
+
+            //定义模型
+            Ext.define('modelToOldG6H', {
+                extend: 'Ext.data.Model',
+                fields: modelToOldG6H
+            });
+
+            var storeToOldG6H = Ext.create('Ext.ng.JsonStore', {
+                model: 'modelToOldG6H',
+                pageSize: 25,
+                autoLoad: false,
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstListToSaveOldG6h?ProjStatus=' + ProjStatus + "&userId=" + $appinfo.logid + "&FApproveStatus=" + FApproveStatus
+            });
+            
+            storeToOldG6H.on('beforeload',function(){
+                Ext.apply(storeToOldG6H.proxy.extraParams, { 'FYear': sessionStorage.getItem("FYear") });
+            })
+
+            var pagingbarToOldG6H = Ext.create('Ext.ng.PagingBar', {
+                store: storeToOldG6H
+            });
+
+            var initConfigToOldG6H = {
+                region: 'center',
+                store: storeToOldG6H,
+                columnLines: true,
+                stateful: true,
+                stateId: '10a60a52-6666-4968-bvbv-924dde097ded',
+                buskey: 'PhId', //对应的业务表主键属性
+                //layout: {
+                //	type: 'hbox',
+                //	align: 'stretch'
+                //},
+                //forceFit: true,
+                //scrollOffset: 0,
+                //viewConfig: {
+                //	forceFit: true,
+                //	scrollOffset: 0
+                //},
+                bbar: [pagingbarToOldG6H],
+                selModel: Ext.create('Ext.selection.CheckboxModel', { mode: "SIMPLE" })
+            };
+
+            var gridConfigToOldG6h = Ext.apply(initConfigToOldG6H, individualInfo.grid['ListToOldG6h']);
+            //Ext.apply(gridConfig, { "viewConfig": { "forceFit": false }, "autoScroll":true });
+            gridToOldG6h = Ext.create('Ext.ng.GridPanel', gridConfigToOldG6h);
+
+            //定义窗口
+            Ext.define("Ext.ng.gh.baseWindow", {
+                extend: 'Ext.window.Window',
+                cancelback: Ext.emptyFn,
+                closeAction: 'close',
+                initComponent: function () {
+                    var me = this;
+                    me.callParent();
+                    me.on("close", Ext.bind(function (p, opts) {
+                        me.invokeCancelback();
+                    }, me));
+                },
+                invokeCancelback: function () {
+                    var me = this;
+                    //if (otype == $Otype.EDIT || otype == $Otype.ADD) {
+                    //    saveSubjectMstAmount(GHSubjectMstBudgetDtl_store);
+                    //}
+                    //GHSubjectMstBudgetDtl_store.clearFilter();
+                    if (!Ext.isEmpty(me.cancelback)) {
+                        me.cancelback();
+                    }
+                }
+            });
+            var projWin;
+            var projWinToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { id: "ok", text: "同步", width: this.itemWidth, iconCls: "icon-Confirm" },
+                ]
+            });
+            //弹出窗口
+            ngToolbar.get('saveToOldG6h').on('click', function () {
+
+                storeToOldG6H.load();
+
+                projWin = Ext.create("Ext.ng.gh.baseWindow", {
+                    title: '同步数据',
+                    modal: true,
+                    height: 450,
+                    width: 1000,
+                    layout: 'border',
+                    items: [
+                        projWinToolbar,
+                        gridToOldG6h
+                    ]
+                });
+                projWin.show();
+            });
+
+
+            projWinToolbar.items.get('ok').on('click', function () {
+                var data = gridToOldG6h.getSelectionModel().getSelection();
+                var ids = "";
+                if (data.length > 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        ids += data[i].get('PhId') + ",";
+                    }
+                    ids = ids.substring(0, ids.length - 1);
+                     Ext.Ajax.request({
+                         params: { 'id': ids },
+                         url: C_ROOT + 'GXM/XM/ProjectMst/AddData',
+                        async: false,
+                        success: function (response) {
+                            Ext.MessageBox.alert('提示', response.text);
+                            projWin.close();
+                        }
+                    });
+
+                }
+            });
+
+
+
+            Ext.define('IndividualinfoPanelModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        "name": "PhId",
+                        "type": "string",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "IndividualinfoPhid",
+                        "type": "string",
+                        "mapping": "IndividualinfoPhid"
+                    },
+                    {
+                        "name": "IndividualinfoPhid_EXName",
+                        "type": "string",
+                        "mapping": "IndividualinfoPhid_EXName"
+                    },
+                    {
+                        "name": "YLXPhid",
+                        "type": "string",
+                        "mapping": "YLXPhid"
+                    },
+                    {
+                        "name": "YLXPhid_EXName",
+                        "type": "string",
+                        "mapping": "YLXPhid_EXName"
+                    },
+                    {
+                        "name": "XMLXPhid",
+                        "type": "string",
+                        "mapping": "XMLXPhid"
+                    },
+                    {
+                        "name": "XMLXPhid_EXName",
+                        "type": "string",
+                        "mapping": "XMLXPhid_EXName"
+                    },
+                    {
+                        "name": "NZTXPhid",
+                        "type": "string",
+                        "mapping": "NZTXPhid"
+                    },
+                    {
+                        "name": "NZTXPhid_EXName",
+                        "type": "string",
+                        "mapping": "NZTXPhid_EXName"
+                    },
+                    {
+                        "name": "IndividualinfoName",
+                        "type": "string",
+                        "mapping": "IndividualinfoName"
+                    },
+                    {
+                        "name": "IndividualinfoBustype",
+                        "type": "string",
+                        "mapping": "IndividualinfoBustype"
+                    },
+                    {
+                        "name": "IndividualinfoBustypeName",
+                        "type": "string",
+                        "mapping": "IndividualinfoBustypeName"
+                    },
+                    {
+                        "name": "IndividualinfoAmount1",
+                        "type": "float",
+                        "mapping": "IndividualinfoAmount1"
+                    },
+                    {
+                        "name": "IndividualinfoAmount2",
+                        "type": "float",
+                        "mapping": "IndividualinfoAmount2"
+                    },
+                    {
+                        "name": "BZ",
+                        "type": "string",
+                        "mapping": "BZ"
+                    },
+                    {
+                        "name": "DEFSTR4",
+                        "type": "string",
+                        "mapping": "DEFSTR4"
+                    }
+                    
+                ]
+            });
+            var IndividualinfoPanelStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'IndividualinfoPanelModel',
+                async: false,
+                autoLoad: true,
+                url: C_ROOT + 'GQT/QT/QTIndividualInfo/GetQTIndividualInfoList?IndividualinfoBustype=' + IndividualinfoBustype+'&OrgCode='+$appinfo.ocode
+            })
+            var Individualinfogrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'west',
+                border: false,
+                frame: true,
+                width: 1000,
+                store: IndividualinfoPanelStore,
+                columnLines: true,
+                buskey: 'PhId', //对应的子表主键属性
+                columns: [
+                    {
+                        "xtype": "rownumberer",
+                        "stateId": "lineid",
+                        "text": "行号",
+                        "width": 50
+                    },
+                    {
+                        "LangKey": "PhId",
+                        "dataIndex": "PhId",
+                        "width": 100,
+                        "hidden": true,
+                        "header": "主键"
+                    },
+                    {
+                        "LangKey": "DEFSTR4",
+                        "dataIndex": "DEFSTR4",
+                        "width": 200,
+                        "header": "预算类型"
+                    },
+                    {
+                        "LangKey": "IndividualinfoName",
+                        "dataIndex": "IndividualinfoName",
+                        "width": 100,
+                        "hidden": true,
+                        "header": "自定义表单名称"
+                    },
+                    {
+                        "LangKey": "IndividualinfoBustype",
+                        "dataIndex": "IndividualinfoBustype",
+                        "width": 200,
+                        "header": "自定义表单类型",
+                        "hidden": true,
+                        "editor": {
+                            "xtype": "ngComboBox",
+                            "valueField": "code",
+                            "displayField": "name",
+                            "QueryMode": "local",
+                            "valueType": "int",
+                            "store": [["GHBudgetYLX", '预立项'], ["GHBudgetXMLX", '项目立项'], ["GHProjectBegin", '年中调整'], ["GHExpenseMst", '项目支出预算审批'], ["GHPerformanceMst", '绩效评价']]
+
+                        }
+                    },
+                    {
+                        "LangKey": "IndividualinfoBustypeName",
+                        "dataIndex": "IndividualinfoBustypeName",
+                        "width": 200,
+                        "header": "自定义表单类型名称",
+                        "editor": {
+                            "xtype": "ngComboBox",
+                            "valueField": "code",
+                            "displayField": "name",
+                            "QueryMode": "local",
+                            "valueType": "int",
+                            "store": [["GHBudgetYLX", '预立项'], ["GHBudgetXMLX", '项目立项'], ["GHProjectBegin", '年中调整'], ["GHExpenseMst", '项目支出预算审批'], ["GHPerformanceMst", '绩效评价']]
+
+                        },
+                        "hidden": true
+                    },
+
+                    {
+                        "LangKey": "IndividualinfoPhid",
+                        "dataIndex": "IndividualinfoPhid_EXName",
+                        "width": 200,
+                        "hidden": true,
+                        "header": "自定义表单名称",
+                        "editor": {
+                            "helpid": "GHQTindividualinfo",
+                            "valueField": "phid",
+                            "displayField": "name",
+                            "userCodeField": "phid",
+                            "ORMMode": false,
+                            "isInGrid": true,
+                            "helpResizable": true,
+                            "xtype": "ngRichHelp"
+                        }
+                    },
+                    {
+                        "LangKey": "YLXPhid",
+                        "dataIndex": "YLXPhid_EXName",
+                        "width": 200,
+                        "hidden": IndividualinfoYLX,
+                        "header": "预立项模板名称",
+                        "editor": {
+                            "helpid": "GHQTindividualinfo",
+                            "valueField": "phid",
+                            "displayField": "name",
+                            "userCodeField": "phid",
+                            "ORMMode": false,
+                            "isInGrid": true,
+                            "helpResizable": true,
+                            "xtype": "ngRichHelp"
+                        }
+                    },
+                    {
+                        "LangKey": "XMLXPhid",
+                        "dataIndex": "XMLXPhid_EXName",
+                        "width": 200,
+                        "hidden": IndividualinfoXMLX,
+                        "header": "项目立项",//项目立项模板名称
+                        "editor": {
+                            "helpid": "GHQTindividualinfo",
+                            "valueField": "phid",
+                            "displayField": "name",
+                            "userCodeField": "phid",
+                            "ORMMode": false,
+                            "isInGrid": true,
+                            "helpResizable": true,
+                            "xtype": "ngRichHelp"
+                        }
+                    },
+                    {
+                        "LangKey": "NZTXPhid",
+                        "dataIndex": "NZTZPhid_EXName",
+                        "width": 200,
+                        "hidden": true,
+                        "header": "年中调整模板名称",
+                        "editor": {
+                            "helpid": "GHQTindividualinfo",
+                            "valueField": "phid",
+                            "displayField": "name",
+                            "userCodeField": "phid",
+                            "ORMMode": false,
+                            "isInGrid": true,
+                            "helpResizable": true,
+                            "xtype": "ngRichHelp"
+                        }
+                    },
+                    {
+                        "LangKey": "IndividualinfoAmount1",
+                        "dataIndex": "IndividualinfoAmount1",
+                        "width": 220,
+                        "hidden": true,
+                        "header": "金额控制开始金额",
+                        "editor": {
+                            "xtype": "ngNumber"
+                        }
+                    },
+                    {
+                        "LangKey": "IndividualinfoAmount2",
+                        "dataIndex": "IndividualinfoAmount2",
+                        "width": 220,
+                        "hidden": true,
+                        "header": "金额控制结束金额",
+                        "editor": {
+                            "xtype": "ngNumber"
+                        }
+                    },
+                    {
+                        "LangKey": "BZ",
+                        "dataIndex": "BZ",
+                        "width": 400,
+                        "header": "模板说明",
+                        "editor": {
+                            "xtype": "ngText"
+                        }
+                    }
+                       
+                    
+                ],
+                listeners: {
+                    'itemdblclick': function (item, record, it, index, e, eOpts) {
+                        var data = Individualinfogrid.getSelectionModel().getSelection();
+
+                        if (data.length > 0) {
+                            var IndividualinfoId = data[0].get('PhId');
+                            if(IndividualinfoYLX==false){
+                                $OpenTab(pageName+'('+data[0].get('YLXPhid_EXName')+')' + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                            }else{
+                                $OpenTab(pageName + '('+data[0].get('XMLXPhid_EXName')+')' +'-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                            }
+                            // $OpenTab(pageName + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                            IndividualinfoWin.close();
+
+                        }
+                    }
+
+                }
+               
+
+            });
+
+
+            var IndividualinfoToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { id: "ok", text: "确定", width: this.itemWidth, iconCls: "icon-Confirm" },
+                ]
+            });
+
+            Individualinfogrid.getColumn('DEFSTR4').renderer = function (val) {
+                switch (val) {
+                    case "1":
+
+                        return "项目支出";
+                    case "2":
+
+                        return "基本支出-公用经费";
+                    case "3":
+
+                        return "基本支出-人员经费";
+                }
+            };
+
+            Individualinfogrid.getColumn('IndividualinfoBustypeName').renderer = function (val) {
+                switch (val) {
+                    case "GHProjectBegin":
+
+                        return "年中调整";
+
+                    case "GHBudgetYLX":
+
+                        return "预立项";
+
+                    case "GHBudgetXMLX":
+
+                        return "项目立项";
+
+                    case "GHExpenseMst":
+
+                        return "项目支出预算审批";
+
+                    case "GHPerformanceMst":
+
+                        return "绩效评价";
+                }
+            };
+
+            Individualinfogrid.getColumn('IndividualinfoAmount1').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+            Individualinfogrid.getColumn('IndividualinfoAmount2').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+
+            IndividualinfoToolbar.items.get('ok').on('click', function () {
+                var data = Individualinfogrid.getSelectionModel().getSelection();
+               
+                if (data.length > 0) {
+                    var IndividualinfoId = data[0].get('PhId');
+                    if(IndividualinfoYLX==false){
+                        $OpenTab(pageName+'('+data[0].get('YLXPhid_EXName')+')' + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                    }else{
+                        $OpenTab(pageName + '('+data[0].get('XMLXPhid_EXName')+')' +'-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                    }
+                    //$OpenTab(pageName + '-新增', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=add&ProjStatus=' + ProjStatus + '&IndividualinfoId=' + IndividualinfoId);
+                    IndividualinfoWin.close();
+
+                }
+            });
+
+            ////根据操作员id获取默认部门和默认组织
+            //var orgCode = "";
+            //var dept = "";
+            //Ext.Ajax.request({
+            //    params: { 'userID': $user.id },
+            //    url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+            //    async: false,
+            //    success: function (response) {
+            //        var resp = Ext.JSON.decode(response.responseText);
+            //        if (resp.Status === "success") {
+            //            var orgDept = resp.Msg;
+            //            var orgDeptArray = orgDept.split(",");
+            //            orgCode = orgDeptArray[0];
+            //            dept = orgDeptArray[1];
+            //        }
+            //    }
+            //});
+            //queryPanel.queryById("FDeclarationUnit").setValue(orgCode);
+            //queryPanel.queryById("FBudgetDept").setValue(dept);
+            ////代码转名称
+            //var codectl = [queryPanel.queryById('FDeclarationUnit'), queryPanel.queryById('FBudgetDept')]; //
+            //BatchBindCombox(codectl);
+
+            //mainPanel_form.queryById("FDeclarationUnit").setValue($appinfo.ocode);
+
+            //mainPanel_form.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+            //    //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+            //    var FDeclarationUnit = mainPanel_form.queryById("FDeclarationUnit").getValue();
+            //    if (!FDeclarationUnit) {
+            //        Ext.MessageBox.alert("提示", '申报单位不能为空');
+            //        return false;
+            //    }
+            //});
+
+            //备忘录
+            ngToolbar.get('memo').on('click', function () {
+                $OpenTab('备忘录', C_ROOT + 'GQT/QT/QTMemo/QTMemoList');
+            });
+
+
+
+            //批量生成预算
+            var batchbudgetmodel = $MergIndividualModelCol(fields, individualInfo, 'ListToBudget');//合并model
+
+            //定义模型
+            Ext.define('batchbudgetmodel', {
+                extend: 'Ext.data.Model',
+                fields: batchbudgetmodel
+            });
+
+            var store_batchbudget = Ext.create('Ext.ng.JsonStore', {
+                model: 'batchbudgetmodel',
+                pageSize: 25,
+                autoLoad: false,
+                url: C_ROOT + 'GXM/XM/ProjectMst/Getbatchbudget?ProjStatus=' + ProjStatus + "&userId=" + $appinfo.logid + "&FApproveStatus=" + FApproveStatus
+            });
+
+            var pagingbar_batchbudget = Ext.create('Ext.ng.PagingBar', {
+                store: store_batchbudget
+            });
+
+            var initConfig_batchbudget = {
+                region: 'center',
+                store: store_batchbudget,
+                columnLines: true,
+                stateful: true,
+                stateId: '10a60a52-6666-4968-bvbv-924dde097ded',
+                buskey: 'PhId', //对应的业务表主键属性
+                //layout: {
+                //	type: 'hbox',
+                //	align: 'stretch'
+                //},
+                //forceFit: true,
+                //scrollOffset: 0,
+                //viewConfig: {
+                //	forceFit: true,
+                //	scrollOffset: 0
+                //},
+                bbar: [pagingbar_batchbudget],
+                selModel: Ext.create('Ext.selection.CheckboxModel', { mode: "SIMPLE" })
+            };
+
+            var gridConfig_batchbudget = Ext.apply(initConfig_batchbudget, individualInfo.grid['ListToBudget']);
+            //Ext.apply(gridConfig, { "viewConfig": { "forceFit": false }, "autoScroll":true });
+            var grid_batchbudget = Ext.create('Ext.ng.GridPanel', gridConfig_batchbudget);
+
+            //var Win_batchbudget;
+            var Toolbar_batchbudget = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { id: "budget2", text: "生成预算", width: this.itemWidth, iconCls: "icon-Confirm" },
+                ]
+            });
+
+            ngToolbar.get('batchbudget').on('click', function () {
+                store_batchbudget.load();
+
+                var Win_batchbudget = Ext.create("Ext.ng.gh.baseWindow", {
+                    title: '批量生成预算',
+                    modal: true,
+                    height: 450,
+                    width: 1000,
+                    layout: 'border',
+                    items: [
+                        Toolbar_batchbudget,
+                        grid_batchbudget
+                    ]
+                });
+                Win_batchbudget.show();
+
+            });
+
+            Toolbar_batchbudget.items.get('budget2').on('click', function () {
+                Toolbar_batchbudget.get('budget2').disable();
+                var data = grid_batchbudget.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要生成的单据！");
+                    Toolbar_batchbudget.get('budget2').setDisabled(false);
+                    return;
+                } else {
+                    var errorData = [];
+                    var errorData2 = [];
+                    for (var i = 0; i < data.length; i++) {
+                        var mst_id = data[i].get('PhId');
+                        var mst_projcode = data[i].get('FProjCode');
+                        Ext.Ajax.request({
+                            params: { 'approveCode': "GHProject", 'userId': mst_id },
+                            url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+                            async: false, //同步请求
+                            success: function (response) {
+                                var resp1 = Ext.JSON.decode(response.responseText);
+                                if (resp1.Status === "success") {
+                                    var piid = resp1.Msg;
+                                    if (Ext.isEmpty(piid)) {
+                                        return;
+                                    }
+                                    Ext.Ajax.request({
+                                        async: false, //同步请求
+                                        params: { 'flowType': 'wf', 'piid': piid },
+                                        url: C_ROOT + 'WorkFlow3/FlowManager/CanDrawback',
+                                        success: function (response) {
+                                            var resp = Ext.JSON.decode(response.responseText);
+                                            if (resp && resp.candrawback) {
+                                                errorData2.push(mst_projcode);
+                                                //Ext.MessageBox.alert('提示', '项目编码为'+'审批流程没有结束，不能生成预算！');
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    errorData.push(mst_projcode);
+                                    //Ext.MessageBox.alert('提示', "未找到审批数据！");
+                                    //ngToolbar.get('budget').setDisabled(false);
+                                    //return;
+                                }
+
+                            }
+                        });
+                    }
+                    if (errorData.length > 0 || errorData2.length > 0) {
+                        var errorStr;
+                        if (errorData.length > 0) {
+                            for (var i = 0; i < errorData.length; i++) {
+                                errorStr = errorStr + '项目编码为' + errorData[i] + '的审批流程没有结束!';
+                            }
+                        }
+                        if (errorData2.length > 0) {
+                            for (var i = 0; i < errorData2.length; i++) {
+                                errorStr = errorStr + '未找到项目编码为' + errorData[i] + '的审批数据!';
+                            }
+                        }
+                        Ext.MessageBox.alert('提示', errorStr);
+                        Toolbar_batchbudget.get('budget2').setDisabled(false);
+                        return;
+                    } else {
+                        var errorStr;
+                        for (var i = 0; i < data.length; i++) {
+                            Ext.Ajax.request({
+                                params: { 'id': data[i].get('PhId') },
+                                url: C_ROOT + 'GXM/XM/ProjectMst/SaveBudgetMst',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+                                        //Ext.MessageBox.alert('提示', '生成成功！');
+                                        //grid.store.reload();
+                                        //ngToolbar.get('budget').setDisabled(false);
+
+                                    } else {
+                                        errorData.push(data[i].FProjCode);
+                                        //Ext.MessageBox.alert('提示', '生成失败！');
+                                        //ngToolbar.get('budget').setDisabled(false);
+                                    }
+                                }
+                            });
+                        }
+                        if (errorData.length > 0) {
+                            var errorStr;
+                            for (var i = 0; i < errorData.length; i++) {
+                                errorStr = errorStr + '项目编码为' + errorData[i] + '的生成失败!';
+                            }
+                            errorStr = errorStr + '其他生成成功!'
+                            Ext.MessageBox.alert('提示', errorStr);
+                            Toolbar_batchbudget.get('budget2').setDisabled(false);
+                        } else {
+                            Ext.MessageBox.alert('提示', '生成成功！');
+                            Toolbar_batchbudget.get('budget2').setDisabled(false);
+                        }
+                        grid.store.reload();
+                    }
+                }
+
+            });
+
+
+
+            //批量快照
+            var batchsnapshotmodel = $MergIndividualModelCol(fields, individualInfo, 'ListToBudget');//合并model
+
+            //定义模型
+            Ext.define('batchsnapshotmodel', {
+                extend: 'Ext.data.Model',
+                fields: batchsnapshotmodel
+            });
+
+            var store_batchsnapshot = Ext.create('Ext.ng.JsonStore', {
+                model: 'batchsnapshotmodel',
+                pageSize: 25,
+                autoLoad: false,
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstList?ProjStatus=' + ProjStatus + "&userId=" + $appinfo.logid + "&FApproveStatus=" + FApproveStatus
+            });
+            store_batchsnapshot.on('beforeload',function(){
+                Ext.apply(store_batchsnapshot.proxy.extraParams, { 'FYear': sessionStorage.getItem("FYear") });
+            })
+
+            var pagingbar_batchsnapshot = Ext.create('Ext.ng.PagingBar', {
+                store: store_batchsnapshot
+            });
+
+            var initConfig_batchsnapshot = {
+                region: 'center',
+                store: store_batchsnapshot,
+                columnLines: true,
+                stateful: true,
+                stateId: '10a60a52-6666-4968-bvbv-924dde097ded',
+                buskey: 'PhId', //对应的业务表主键属性
+                //layout: {
+                //	type: 'hbox',
+                //	align: 'stretch'
+                //},
+                //forceFit: true,
+                //scrollOffset: 0,
+                //viewConfig: {
+                //	forceFit: true,
+                //	scrollOffset: 0
+                //},
+                bbar: [pagingbar_batchsnapshot],
+                selModel: Ext.create('Ext.selection.CheckboxModel', { mode: "SIMPLE" })
+            };
+
+            var gridConfig_batchsnapshot = Ext.apply(initConfig_batchsnapshot, individualInfo.grid['ListToBudget']);
+            //Ext.apply(gridConfig, { "viewConfig": { "forceFit": false }, "autoScroll":true });
+            var grid_batchsnapshot = Ext.create('Ext.ng.GridPanel', gridConfig_batchsnapshot);
+            var snapshotDtl = new Ext.menu.Menu({
+                shadow: "drop",
+                allowOtherMenus: true,
+                items: [
+                ]
+            });
+            var storeDtlStage = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 14,
+				fields: [
+                {
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "Dm",
+                    "type": "string",
+                    "mapping": "Dm"
+                },
+                {
+                    "name": "Mc",
+                    "type": "string",
+                    "mapping": "Mc"
+                }
+				],
+				url: C_ROOT + 'GQT/QT/QtDtlStage/GetQtDtlStageList',
+				
+			});
+            storeDtlStage.load(function(){
+                for(var i=0;i<storeDtlStage.getCount();i++){
+                    snapshotDtl.add(
+                        new Ext.menu.Item({
+                            text: storeDtlStage.getAt(i).get('Mc'),
+                            value:storeDtlStage.getAt(i).get('Dm'),
+                            handler: function (e) {
+                                Toolbar_batchsnapshot.get('batchsnapshot2').disable();
+                                var data = grid_batchsnapshot.getSelectionModel().getSelection();
+                                if (data.length <= 0) {
+                                    Ext.MessageBox.alert('提示', "请您先选择要快照的单据！");
+                                    Toolbar_batchsnapshot.get('batchsnapshot2').setDisabled(false);
+                                    return;
+                                }else{
+                                    var errorData = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        //var mst_id = data[i].get('PhId');
+                                        Ext.Ajax.request({
+                                            params: { 'id': data[i].get('PhId'),'FDtlstage':e.value },
+                                            url: C_ROOT + 'GXM/XM/ProjectMst/SaveSnapshot',
+                                            success: function (response) {
+                                                var resp = Ext.JSON.decode(response.responseText);
+                                                if (resp.Status === "success") {
+                                                    //Ext.MessageBox.alert('提示', '生成成功！');
+                                                    //grid.store.reload();
+                                                    //ngToolbar.get('budget').setDisabled(false);
+
+                                                } else {
+                                                    errorData.push(data[i].FProjCode);
+                                                    //Ext.MessageBox.alert('提示', '生成失败！');
+                                                    //ngToolbar.get('budget').setDisabled(false);
+                                                }
+                                            }
+                                        });
+                                    }
+                                    if (errorData.length > 0) {
+                                        var errorStr;
+                                        for (var i = 0; i < errorData.length; i++) {
+                                            errorStr = errorStr + '项目编码为' + errorData[i] + '的生成快照失败!';
+                                        }
+                                        errorStr = errorStr + '其他生成快照成功!'
+                                        Ext.MessageBox.alert('提示', errorStr);
+                                        store_batchsnapshot.load();
+                                        Toolbar_batchsnapshot.get('batchsnapshot2').setDisabled(false);
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '生成快照成功！');
+                                        store_batchsnapshot.load();
+                                        Toolbar_batchsnapshot.get('batchsnapshot2').setDisabled(false);
+                                    }
+                                }
+                                // Ext.Ajax.request({
+                                //     params: { 'id': busid,'FDtlstage':e.value },
+                                //     url: C_ROOT + 'GXM/XM/ProjectMst/SaveSnapshot',
+                                //     async: false,
+                                //     success: function (response) {
+                                //         var resp = Ext.JSON.decode(response.responseText);
+                                //         if (resp.Status === "success") {
+                                //             Ext.MessageBox.alert('提示', '快照成功！');
+                                //         }else{
+                                //             Ext.MessageBox.alert('提示', resp.Msg);
+                                //         }
+                                //     }
+                                // });
+                            }
+                        })
+                    );
+                }
+            });
+            var Toolbar_batchsnapshot = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { id: "batchsnapshot2", text: "批量快照", width: this.itemWidth, iconCls: "icon-create",menu: snapshotDtl },
+                ]
+            });
+            //批量快照
+            ngToolbar.get('batchsnapshot').on('click', function () {
+                // var params={'ProjStatus':ProjStatus,'userId':$appinfo.logid,'FApproveStatus':FApproveStatus,'FYear':dataYear};
+				// Ext.apply(store_batchsnapshot.proxy.extraParams,params);
+				store_batchsnapshot.load(function(){
+					
+				})
+                var Win_batchsnapshot = Ext.create("Ext.ng.gh.baseWindow", {
+                    title: '批量快照',
+                    modal: true,
+                    height: 450,
+                    width: 1000,
+                    layout: 'border',
+                    items: [
+                        Toolbar_batchsnapshot,
+                        grid_batchsnapshot
+                    ]
+                });
+                Win_batchsnapshot.show();
+            });
+
+            //项目库引用
+            var XMreferencemodel = $MergIndividualModelCol(fields, individualInfo, 'ListToBudget');//合并model
+
+            //定义模型
+            Ext.define('XMreferencemodel', {
+                extend: 'Ext.data.Model',
+                fields: XMreferencemodel
+            });
+
+            var store_XMreference = Ext.create('Ext.ng.JsonStore', {
+                model: 'XMreferencemodel',
+                pageSize: 25,
+                autoLoad: false,
+                url: C_ROOT + 'GYS/YS/BudgetMst/GetReferenceXM?userId=' + $appinfo.logid 
+            });
+            
+            store_XMreference.on('beforeload',function(){
+                Ext.apply(store_XMreference.proxy.extraParams, { 'FGoYear': sessionStorage.getItem("FYear")-1 });
+            })
+
+            var pagingbar_XMreference = Ext.create('Ext.ng.PagingBar', {
+                store: store_XMreference
+            });
+
+            var initConfig_XMreference = {
+                region: 'center',
+                store: store_XMreference,
+                columnLines: true,
+                stateful: true,
+                stateId: '10a60a52-6666-4968-bvbv-924dde097ded',
+                buskey: 'PhId', //对应的业务表主键属性
+                //layout: {
+                //	type: 'hbox',
+                //	align: 'stretch'
+                //},
+                //forceFit: true,
+                //scrollOffset: 0,
+                //viewConfig: {
+                //	forceFit: true,
+                //	scrollOffset: 0
+                //},
+                bbar: [pagingbar_XMreference]
+                //selModel: Ext.create('Ext.selection.CheckboxModel', { mode: "SIMPLE" })
+            };
+
+            var gridConfig_XMreference = Ext.apply(initConfig_XMreference, individualInfo.grid['ListToBudget']);
+            //Ext.apply(gridConfig, { "viewConfig": { "forceFit": false }, "autoScroll":true });
+            var grid_XMreference = Ext.create('Ext.ng.GridPanel', gridConfig_XMreference);
+
+            
+            var XMreference_form = Ext.create('Ext.ng.TableLayoutForm',{
+                region: 'north',
+                columnsPerRow: 3,
+                fields: [
+                {
+                    fieldLabel: "申报单位",
+                    itemId: "FDeclarationUnit",
+                    name: "FDeclarationUnit",
+                    langKey: "FDeclarationUnit",
+                    helpid: "sb_orglist",
+                    valueField: "ocode",
+                    displayField: "oname",
+                    userCodeField: "ocode",
+                    ORMMode: false,
+                    xtype: 'ngRichHelp'
+                },
+                {
+                    fieldLabel: "预算部门",
+                    itemId: "FBudgetDept",
+                    name: "FBudgetDept",
+                    langKey: "FBudgetDept",
+                    helpid: "ys_orglist",
+                    valueField: "ocode",
+                    displayField: "oname",
+                    userCodeField: "ocode",
+                    ORMMode: false,
+                    xtype: 'ngRichHelp'
+                },
+                {
+                    fieldLabel: "申报部门",
+                    itemId: "FDeclarationDept",
+                    name: "FDeclarationDept",
+                    langKey: "FDeclarationDept",
+                    helpid: "ys_orglist2",
+                    valueField: "ocode",
+                    displayField: "oname",
+                    userCodeField: "ocode",
+                    ORMMode: false,
+                    xtype: 'ngRichHelp'
+                }]
+            });
+			//按当前操作员过滤申报单位
+            XMreference_form.queryById("FDeclarationUnit")&&XMreference_form.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID });
+            if (XMreference_form.queryById("FDeclarationUnit")) {
+                //按当前申报单位过滤预算部门、支出类别
+                XMreference_form.queryById("FDeclarationUnit").on("helpselected", function (obj) {
+                    var unitCode = obj.code;
+                    if (unitCode) {
+                        filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and  fg_orglist.ocode like '" + unitCode + "%')";
+                        XMreference_form.queryById("FBudgetDept")&&XMreference_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+                        XMreference_form.queryById("FDeclarationDept")&&XMreference_form.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                    } 
+                    XMreference_form.queryById("FBudgetDept")&&XMreference_form.queryById("FBudgetDept").setValue("");
+                    XMreference_form.queryById("FDeclarationDept")&&XMreference_form.queryById("FDeclarationDept").setValue("");
+                    var params={'FDeclarationUnit':obj.code,'FBudgetDept':'','FDeclarationDept':''};
+                    Ext.apply(store_XMreference.proxy.extraParams,params);
+                    store_XMreference.load(function(){
+
+                    })
+                });
+            }
+            if (XMreference_form.queryById("FBudgetDept")) {
+                XMreference_form.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+                    var unitCode = XMreference_form.queryById("FDeclarationUnit").getValue();
+                    if (unitCode) {
+                        filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                        XMreference_form.queryById("FBudgetDept")&&XMreference_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+                        XMreference_form.queryById("FDeclarationDept")&&XMreference_form.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                    }
+                    else {
+                        Ext.MessageBox.alert('提示', '请先选择申报单位');
+                        return false;
+                    }
+                });
+                XMreference_form.queryById("FBudgetDept").on("helpselected", function (obj) {
+                    var params={'FDeclarationUnit':XMreference_form.queryById("FDeclarationUnit").getValue(),'FBudgetDept':obj.code,'FDeclarationDept':XMreference_form.queryById("FDeclarationDept").getValue()};
+                    Ext.apply(store_XMreference.proxy.extraParams,params);
+                    store_XMreference.load(function(){
+
+                    })
+                });
+            }
+            if (XMreference_form.queryById("FDeclarationDept")) {
+                XMreference_form.queryById("FDeclarationDept").on("beforetriggerclick", function (str) {
+                    var unitCode = XMreference_form.queryById("FDeclarationUnit").getValue();
+                    if (unitCode) {
+                        filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                        XMreference_form.queryById("FBudgetDept")&&XMreference_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+                        XMreference_form.queryById("FDeclarationDept")&&XMreference_form.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                    }
+                    else {
+                        Ext.MessageBox.alert('提示', '请先选择申报单位');
+                        return false;
+                    }
+                });
+                XMreference_form.queryById("FDeclarationDept").on("helpselected", function (obj) {
+                    var params={'FDeclarationUnit':XMreference_form.queryById("FDeclarationUnit").getValue(),'FBudgetDept':XMreference_form.queryById("FBudgetDept").getValue(),'FDeclarationDept':obj.code};
+                    Ext.apply(store_XMreference.proxy.extraParams,params);
+                    store_XMreference.load(function(){
+
+                    })
+                });
+            }
+            
+            var Toolbar_XMreference = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { id: "XMreference2", text: "引用", width: this.itemWidth, iconCls: "icon-New"},
+                    { id: "ViewXM", text: "查询", width: this.itemWidth, iconCls: "icon-New"},
+                ]
+            });
+            var Win_XMreference;
+            //项目库引用
+            ngToolbar.get('XMreference').on('click', function () {
+                // var params={'ProjStatus':ProjStatus,'userId':$appinfo.logid,'FApproveStatus':FApproveStatus,'FYear':dataYear};
+                // Ext.apply(store_batchsnapshot.proxy.extraParams,params);
+                Ext.Ajax.request({
+                    params: { 'FGoYear': sessionStorage.getItem("FYear")-1, 'dept': queryDept,'userId':$appinfo.logid},
+                    url: C_ROOT + 'GXM/XM/ProjectMst/JudegIfJx',
+                    async:false,
+                    success: function (response) {
+                        if(response.text=='false'){
+                            Ext.MessageBox.alert('提示', '当前部门还未对上年绩效项目进行自评上报，请先绩效自评！');
+                            return;
+                        }else{
+                            var defaultDept;
+                            var defaultUnit;
+                            Ext.Ajax.request({
+                                params: { 'userID': $user.id },
+                                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                                async: false,
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+                                        var orgDept = resp.Msg;
+                                        var orgDeptArray = orgDept.split(",");
+                                        defaultUnit = orgDeptArray[0];
+                                        defaultDept = orgDeptArray[1];
+                                    }
+                                }
+                            });
+                            XMreference_form.queryById("FDeclarationUnit").setValue(defaultUnit);
+                            XMreference_form.queryById("FDeclarationDept").setValue(defaultDept);
+                            XMreference_form.queryById("FBudgetDept").setValue(defaultDept);
+
+                            var codectl = [
+                                XMreference_form.queryById('FDeclarationUnit'),
+                                XMreference_form.queryById('FBudgetDept'),
+                                XMreference_form.queryById('FDeclarationDept')
+                            ]; 
+                            BatchBindCombox(codectl);
+
+                            var params={'FDeclarationUnit':defaultUnit,'FBudgetDept':defaultDept,'FDeclarationDept':defaultDept};
+                            Ext.apply(store_XMreference.proxy.extraParams,params);
+                            store_XMreference.load(function(){
+
+                            })
+                            Win_XMreference = Ext.create("Ext.ng.gh.baseWindow", {
+                                title: '项目库引用',
+                                modal: true,
+                                height: 450,
+                                width: 1000,
+                                layout: 'border',
+                                items: [
+                                    Toolbar_XMreference,
+                                    XMreference_form,
+                                    grid_XMreference
+                                ]
+                            });
+                            Win_XMreference.show();
+                        }
+                    }
+                })
+            });
+            Toolbar_XMreference.get('XMreference2').on('click', function () {
+                var data = grid_XMreference.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    Toolbar_XMreference.get("XMreference2").disable();//禁用保存按钮
+                    var xmphid=data[0].get('PhId');
+                    Ext.Ajax.request({
+                        params: { 'id': xmphid, 'FGoYear': sessionStorage.getItem("FYear") },
+                        url: C_ROOT + 'GXM/XM/ProjectMst/SaveXMreference',
+                        async: false,
+                        success: function (response3) {
+                            var resp3 = Ext.JSON.decode(response3.responseText);
+                            if (resp3.Status === "success") {
+                                //Ext.MessageBox.alert('提示', '保存成功！');
+                                //var IndividualinfoId = data[0].get('FIndividualinfophid');
+                                /*Ext.Ajax.request({
+                                    params: { 'busType': 'GHBudgetYLX', 'id':  resp3.KeyCodes[0] },
+                                    url: C_ROOT + 'GXM/XM/ProjectMst/FindIndividualInfoById',
+                                    async: false,
+                                    success: function (response2) {
+                                        var resp2 = Ext.JSON.decode(response2.responseText);
+                                        var IndividualinfoId = resp2.Msg;
+                                        // if(IndividualinfoId!=''){
+                                            Toolbar_XMreference.get("XMreference2").enable();
+                                            $OpenTab(pageName + '-修改', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + resp3.KeyCodes[0] + '&ProjStatus=1&IndividualinfoId=' + IndividualinfoId);
+                                        // }else{
+                                        //     Toolbar_XMreference.get("XMreference2").enable();
+                                        //     Ext.MessageBox.alert('提示', '找不到对应金额的自定义表单！');
+                                        // }
+                                    }
+                                });*/
+                                Toolbar_XMreference.get("XMreference2").enable();
+                                NG3Refresh();
+                                /*if(resp3.Msg!=''){
+                                    Ext.MessageBox.alert('提示', resp3.Msg,callBack);
+                                    function callBack(id){
+                                        if(id.toString() =='ok'){
+                                            $OpenTab(pageName + '-修改', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + resp3.KeyCodes[0] + '&ProjStatus=1');
+                                            Win_XMreference.close();
+                                        }
+                                    }
+                                    // setTimeout(() => {
+                                    //     $OpenTab(pageName + '-修改', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + resp3.KeyCodes[0] + '&ProjStatus=1');
+                                    // }, 1000);
+                                }else{*/
+                                    $OpenTab(pageName + '-修改', C_ROOT + 'GXM/XM/ProjectMst/ProjectMstEdit?otype=edit&id=' + resp3.KeyCodes[0] + '&ProjStatus=1&XMreference=1');
+                                    Win_XMreference.close();
+                                //}     
+                                
+                            } else {
+                                Toolbar_XMreference.get("XMreference2").enable();
+                                Ext.MessageBox.alert('提示', resp3.Msg);
+                            }
+                        }
+                    });
+                }
+                
+            });
+            Toolbar_XMreference.get('ViewXM').on('click', function () {
+                var params={'FDeclarationUnit':XMreference_form.queryById("FDeclarationUnit").getValue(),'FBudgetDept':XMreference_form.queryById("FBudgetDept").getValue(),'FDeclarationDept':XMreference_form.queryById("FDeclarationDept").getValue()};
+                Ext.apply(store_XMreference.proxy.extraParams,params);
+                store_XMreference.load(function(){
+
+                })         
+            });
+
+            store.on('beforeload',function(){
+                var items = queryPanel.getForm().getFields().items;
+                Ext.Array.each(items, function (f) {
+                    /*if (f.fieldLabel == "项目年度") {
+                        //if (f.value == '' || f.value == null) {
+                        if (sessionStorage.getItem("FYear") != null) {
+                            f.setValue(sessionStorage.getItem("FYear"));
+                        } else {
+                            f.setValue('');
+                        }
+                        //}
+                    }*/
+                    //11.12申报单位自动代入操作员默认申报单位
+                    if (f.fieldLabel == "申报单位") {
+                        queryUnit=f.value;
+                    }
+
+                });
+                Ext.apply(store.proxy.extraParams, { 'FDeclarationUnit': queryUnit,'FYear':sessionStorage.getItem("FYear") });
+            })
+			//刷新列表中想修改或删除的行数据
+            function recoderefresh(data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstList?ProjStatus=' + ProjStatus + "&userId=" + $appinfo.logid + "&FApproveStatus=" + FApproveStatus ,
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+            //处理toolbar折叠，请在AllReady之后调用，
+            //确保实施挂载的toolbar事件在折叠下拉中也有效果
+            ngToolbar.dealOverFlowMenu();
+
+        });
+
+        function NG3Refresh() {
+            //var items = queryPanel.getForm().getFields().items;
+            //Ext.Array.each(items, function (f) {
+                /*if (f.fieldLabel == "项目年度") {
+                    //if (f.value == '' || f.value == null) {
+                    if (sessionStorage.getItem("FYear") != null) {
+                        f.setValue(sessionStorage.getItem("FYear"));
+                    } else {
+                        f.setValue('');
+                    }
+                    //}
+                }*/
+                //11.12申报单位自动代入操作员默认申报单位
+                /*if (f.fieldLabel == "申报单位") {
+                    if (f.value == '' || f.value == null) {
+                        if(queryUnit!=''){
+                            f.setValue(queryUnit);
+                        }
+                    }
+                        queryUnit=f.value;
+                    
+                }*/
+
+            //});
+            // grid.store.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstList?ProjStatus=' + ProjStatus + "&userId=" + $appinfo.logid + "&FApproveStatus=" + FApproveStatus ;
+            grid.store.reload();
+            //store.load();
+        }
+
+    </script>
+}
+
+

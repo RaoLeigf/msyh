@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="BankAccountModel" table="z_qtbankaccount">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="OrgPhid" column="org_phid" type="System.Int64" not-null="false" />
+		<property name="OrgCode" column="org_code" type="System.String" length="50" not-null="false" />
+		<property name="FBankname" column="f_bankname" type="System.String" length="100" not-null="false" />
+		<property name="FAccount" column="f_account" type="System.String" length="50" not-null="false" />
+		<property name="FBankcode" column="f_bankcode" type="System.String" length="50" not-null="false" />
+		<property name="FDescribe" column="f_describe" type="System.String" length="500" not-null="false" />
+		<property name="FCity" column="f_city" type="System.String" length="200" not-null="false" />
+		<property name="FLifecycle" column="f_lifecycle" type="System.Int32" not-null="false" />
+    <property name="FOpenAccount" column="f_openAccount" type="System.String" length="100" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="BankName" column="bankname" type="System.String" length="100" not-null="false" />
+  </class>
+</hibernate-mapping>

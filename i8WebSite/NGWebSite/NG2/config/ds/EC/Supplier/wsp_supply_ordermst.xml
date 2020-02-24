@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_ordermst">
+      <Field Name="orderid" IsKey="true" />
+      <Field Name="orderno"  />
+      <Field Name="ocode"/>
+      <Field Name="supcomp"/>
+      <Field Name="recordman"/>
+      <Field Name="recorddate"/>
+      <Field Name="sendflg"/>
+      <Field Name="verdtm"/>
+      <Field Name="relid"/>
+      <Field Name="relno"/>
+      <Field Name="remarks"/>
+      <Field Name="ordersum" />
+      <Field Name="orderstatus" />
+    </Table>
+    <Table Name="secuser" AsName="secuser1">
+      <Field Name="u_name" AsName="recordmanname"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join secuser secuser1 on secuser1.logid=[table].recordman
+      [where] [orderby]
+    </Sql>
+    <Where >
+      <Exp Field="supcomp" Target="AppInfo" Value="LoginID" />
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{recorddate}">
+      <Exp Field="recorddate" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="wsp_supply_ordermst">
+      <Values>
+
+      </Values>
+    </Table>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    <Table Name="wsp_supply_ordermst">
+      <Values>
+  
+      </Values>
+    </Table>
+  </Destroy>
+  <!--  -->
+  <GetOrderMstInfo>
+    <Sql>
+      select * from wsp_supply_ordermst [where]
+    </Sql>
+    <Query>
+      <Exp Field="orderid" Target="Client" value="orderid"/>
+    </Query>
+  </GetOrderMstInfo>
+  <OrderExcuteReport> 
+    <Sql>
+      select wsp_supply_ordermst.orderid,wsp_supply_ordermst.relid,wsp_supply_ordermst.recorddate,
+      wsp_supply_ordermst.deliverdate,wsp_supply_orderdtl.itemno,itemdata.itemname,itemdata.descript,
+      wsp_supply_orderdtl.msunit,msunit.msname,wsp_supply_orderdtl.qty,wsp_supply_orderdtl.price,
+      wsp_supply_orderdtl.ordersum,wsp_supply_orderdtl.qty,ec_recdtl.recid,
+      from wsp_supply_ordermst
+      inner join wsp_supply_orderdtl on wsp_supply_ordermst.orderid = wsp_supply_orderdtl.orderid
+      inner join itemdata on wsp_supply_orderdtl.itemno = itemdata.itemno  [where]
+    </Sql>
+    <Query>
+      <Exp Field="orderid" Target="Client" value="orderid"/>
+    </Query>
+  </OrderExcuteReport>
+  <GetOrderSchame>
+    <Sql>
+      select * from wsp_supply_ordermst where 1=2 
+    </Sql>
+  </GetOrderSchame>
+</DataService>

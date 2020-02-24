@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{54056ADB-BD2F-47C5-AC28-E463E9AEECD3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Enterprise3.WebApi.GQT3.QT.Controller</RootNamespace>
+    <AssemblyName>Enterprise3.WebApi.GQT3.QT.Controller</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Enterprise3.WebApi.GQT3.QT.Controller.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=1.0.0.4001, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.WebApi.ApiControllerBase">
+      <HintPath>..\..\BusinessDlls\Enterprise3.WebApi.ApiControllerBase.dll</HintPath>
+    </Reference>
+    <Reference Include="GQT3.QT.Service.Interface">
+      <HintPath>..\GQT3.QT.Service.Interface\bin\Debug\GQT3.QT.Service.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NG, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308">
+      <HintPath>..\..\BusinessDlls\NG.dll</HintPath>
+    </Reference>
+    <Reference Include="NG.Data">
+      <HintPath>..\..\BusinessDlls\NG.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="NG.KeepConn, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\NG.KeepConn.dll</HintPath>
+    </Reference>
+    <Reference Include="NG.UP.UC.UCP.DataEntity">
+      <HintPath>..\..\BusinessDlls\NG.UP.UC.UCP.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3">
+      <HintPath>..\..\BusinessDlls\NG3.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>..\..\BusinessDlls\NG3.Data.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base">
+      <HintPath>..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BankAccountApiController.cs" />
+    <Compile Include="BudgetAccountsApiController.cs" />
+    <Compile Include="common\DCHelper.cs" />
+    <Compile Include="CorrespondenceSettings2ApiController.cs" />
+    <Compile Include="CorrespondenceSettingsApiController.cs" />
+    <Compile Include="CoverUpForOrgApiController.cs" />
+    <Compile Include="ProjectThresholdApiController.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QtAttachmentApiController.cs" />
+    <Compile Include="QtNaviGationapiController.cs" />
+    <Compile Include="QTSysSetApiController.cs" />
+    <Compile Include="QtXmDistributeApiController.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SysSettingApiController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\GData\Common\GData3.Common.Model\GData3.Common.Model.csproj">
+      <Project>{38F33231-5A70-4374-BEB3-5D77138E8D46}</Project>
+      <Name>GData3.Common.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GSP\SP\GSP3.SP.Model\GSP3.SP.Model.csproj">
+      <Project>{259AD850-29EA-46A1-80C7-DCD20149220A}</Project>
+      <Name>GSP3.SP.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GSP\SP\GSP3.SP.Service.Interface\GSP3.SP.Service.Interface.csproj">
+      <Project>{BF6674C1-A5DE-476C-A9FB-E24F6DB0B7A1}</Project>
+      <Name>GSP3.SP.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GXM\GXM3.XM\GXM3.XM.Model\GXM3.XM.Model.csproj">
+      <Project>{229F2520-C7CA-4086-9DA9-CCCC9ABE0F75}</Project>
+      <Name>GXM3.XM.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GXM\GXM3.XM\GXM3.XM.Service.Interface\GXM3.XM.Service.Interface.csproj">
+      <Project>{1A34EDEF-EEC3-469F-A603-09EB6FF72363}</Project>
+      <Name>GXM3.XM.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GYS\GYS3.YS\GYS3.YS.Model\GYS3.YS.Model.csproj">
+      <Project>{DD639BB1-92FC-4DA9-A0A0-C5F1AC91B7F5}</Project>
+      <Name>GYS3.YS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GYS\GYS3.YS\GYS3.YS.Service.Interface\GYS3.YS.Service.Interface.csproj">
+      <Project>{3A283FB2-32B7-4114-B5D9-9DB4B265583E}</Project>
+      <Name>GYS3.YS.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Enterprise3.WebApi.GQT3.QT.Model\Enterprise3.WebApi.GQT3.QT.Model.csproj">
+      <Project>{24da844c-bda1-4c64-bc52-4adf71487b1b}</Project>
+      <Name>Enterprise3.WebApi.GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47ee9856-f415-4171-8609-b0531db86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Service\GQT3.QT.Service.csproj">
+      <Project>{3D439830-7810-4DEE-A0DF-5786F298E819}</Project>
+      <Name>GQT3.QT.Service</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

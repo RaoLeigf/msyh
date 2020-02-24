@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0813F25B-3AFB-47AF-8EF9-566ADC1E9AB8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GXM3.XM.Controller</RootNamespace>
+    <AssemblyName>GXM3.XM.Controller</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GXM3.XM.Controller.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNetCasClient, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\DotNetCasClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Controller, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Controller.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>...\..\..\BusinessDlls\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\NG.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\NG3.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data.Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL" />
+    <Reference Include="NG3.Web.Controller">
+      <HintPath>..\..\..\BusinessDlls\NG3.Web.Controller.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Web.Mvc">
+      <HintPath>..\..\..\BusinessDlls\NG3.Web.Mvc.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.WorkFlow.Rule, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\NG3.WorkFlow.Rule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL" />
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DefinedDeskController.cs" />
+    <Compile Include="LoginInfoController.cs" />
+    <Compile Include="ProjectMstController.cs" />
+    <Compile Include="ProjTreeBuilder.cs" />
+    <Compile Include="ProjTreeJSONBase.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XmReportMstController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GJX\GJX3.JX\GJX3.JX.Model\GJX3.JX.Model.csproj">
+      <Project>{B39F5A26-7C4D-4BAF-AB96-4CF43B4BE734}</Project>
+      <Name>GJX3.JX.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GJX\GJX3.JX\GJX3.JX.Service.Interface\GJX3.JX.Service.Interface.csproj">
+      <Project>{ABF5A1BF-FD77-4332-AD35-1838C0B3CA53}</Project>
+      <Name>GJX3.JX.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Service.Interface\GQT3.QT.Service.Interface.csproj">
+      <Project>{B481911F-AF15-4453-BBE8-D0E72B33A4CC}</Project>
+      <Name>GQT3.QT.Service.Interface</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\GYS3.YS.Model\GYS3.YS.Model.csproj">
+      <Project>{dd639bb1-92fc-4da9-a0a0-c5f1ac91b7f5}</Project>
+      <Name>GYS3.YS.Model</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\GYS3.YS.Service.Interface\GYS3.YS.Service.Interface.csproj">
+      <Project>{3a283fb2-32b7-4114-b5d9-9db4b265583e}</Project>
+      <Name>GYS3.YS.Service.Interface</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\GXM3.XM.Model\GXM3.XM.Model.csproj">
+      <Project>{229f2520-c7ca-4086-9da9-cccc9abe0f75}</Project>
+      <Name>GXM3.XM.Model</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\GXM3.XM.Service.Interface\GXM3.XM.Service.Interface.csproj">
+      <Project>{1a34edef-eec3-469f-a603-09eb6ff72363}</Project>
+      <Name>GXM3.XM.Service.Interface</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

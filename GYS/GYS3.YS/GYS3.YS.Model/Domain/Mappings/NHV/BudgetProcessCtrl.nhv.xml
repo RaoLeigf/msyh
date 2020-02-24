@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="BudgetProcessCtrlModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FOcode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FOname" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FDeptCode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FDeptName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FProcessStatus" >
+			<length min="0" max="2" message ="长度不超过2！"/>
+		</property>
+	</class>
+</nhv-mapping>

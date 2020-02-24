@@ -1,0 +1,1 @@
+sc create "政云动态监管服务" binPath= "%CD%\DMPService.exe start" displayname= "政云动态数据监管服务" start= auto

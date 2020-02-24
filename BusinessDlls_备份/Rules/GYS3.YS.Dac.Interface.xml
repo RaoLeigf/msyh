@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GYS3.YS.Dac.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GYS3.YS.Dac.Interface.IBuDeptReportDac">
+            <summary>
+            BudgetDtlBudgetDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlBudgetDtlDac">
+            <summary>
+            BudgetDtlBudgetDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlFundApplDac">
+            <summary>
+            BudgetDtlFundAppl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlImplPlanDac">
+            <summary>
+            BudgetDtlImplPlan数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlPerformTargetDac">
+            <summary>
+            BudgetDtlPerformTarget数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlPurchaseDtlDac">
+            <summary>
+            BudgetDtlPurchaseDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlPurDtl4SOFDac">
+            <summary>
+            BudgetDtlPurDtl4SOF数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetDtlTextContentDac">
+            <summary>
+            BudgetDtlTextContent数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetMstDac">
+            <summary>
+            BudgetMst数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IBudgetProcessCtrlDac">
+            <summary>
+            BudgetProcessCtrl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IExpenseDtlDac">
+            <summary>
+            ExpenseDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IExpenseMstDac">
+            <summary>
+            ExpenseMst数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.IGHSubjectDac">
+            <summary>
+            GHSubject数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.ISubjectMstBudgetDtlDac">
+            <summary>
+            SubjectMstBudgetDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.Interface.ISubjectMstDac">
+            <summary>
+            SubjectMst数据访问层接口
+            </summary>
+        </member>
+    </members>
+</doc>

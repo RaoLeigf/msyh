@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZC3.QCHZ.Service.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:ZC3.QCHZ.Service.Interface.INqmx04DtlService">
+            <summary>
+            Nqmx04Dtl服务组装层接口
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Service.Interface.INqmx04MstService">
+            <summary>
+            Nqmx04Mst服务组装层接口
+            </summary>
+        </member>
+        <member name="M:ZC3.QCHZ.Service.Interface.INqmx04MstService.SaveNqmx04Mst(ZC3.QCHZ.Model.Domain.Nqmx04MstModel,System.Collections.Generic.List{ZC3.QCHZ.Model.Domain.Nqmx04DtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="nqmx04MstEntity"></param>
+            <param name="nqmx04DtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ZC3.QCHZ.Service.Interface.INqmx04MstService.FindNqmx04DtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取Nqmx04Dtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="T:ZC3.QCHZ.Service.Interface.IUploadfileInfoService">
+            <summary>
+            UploadfileInfo服务组装层接口
+            </summary>
+        </member>
+    </members>
+</doc>

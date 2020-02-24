@@ -1,0 +1,25 @@
+﻿<#@ template language="C#" #>
+@{
+    Layout = "~/Views/Shared/_EFormLayout.cshtml";
+}
+
+@section Script
+{  
+	<script type="text/javascript">
+		var IsSso = '@ViewBag.IsSso';  //单点登录
+		var IsIad = '@ViewBag.IsIad';  //记账
+		var EditBySelf = '@ViewBag.EditBySelf';      //仅修改自己的单据
+		var DeleteBySelf = '@ViewBag.DeleteBySelf';  //仅删除自己的单据
+		var CheckBySelf = '@ViewBag.CheckBySelf';    //仅允许他人审核自己的单据
+		var EditAttach = '@ViewBag.EditAttach';      //单据审核后也允许修改附件
+
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+		var Lang = (Ext.isEmpty(langInfo) || langInfo=='null') ? {} : Ext.decode(langInfo);  //多语言
+		var IsApplyCheck = '@ViewBag.IsApplyCheck';  //打开自申请去审
+		var defaultPc = '@ViewBag.defaultPc';  //系统左侧菜单树的默认项目 
+	</script>
+
+<script src="~/NG3Resource/js/eformJs/<#= ClassName #>List.js?_v=<#= Common.GetJsVersion() #>" type="text/javascript" charset="gb2312"></script>
+<script src="~/NG3Resource/js/eformJs/<#= ClassName #>Ext.js?_v=<#= Common.GetJsVersion() #>" type="text/javascript" charset="gb2312"></script>
+
+}

@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_orderdtl">
+      <Field Name="orderid" IsKey="true" />
+      <Field Name="orderno" />
+      <Field Name="lineid"  IsKey="true"/>
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="ordersum"/>
+      <Field Name="remarks"/>
+      <Field Name="reqdate"/>
+      <Field Name="sendflg"/>
+      <Field Name="sendqty"/>
+      <Field Name="sendsum"/>
+      <Field Name="acptqty" />
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"/>
+      <Field Name="descript" />
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname"></Field>
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname"></Field>
+    </Table>
+    <Table Name="wsp_supply_ordermst">
+      <Field Name="supcomp"></Field>
+      <Field Name="relid"></Field>
+      <Field Name="relno" />
+      <Field Name="ocode" />
+    </Table>
+    <Table Name="ec_purmst">
+      <Field Name="appflg"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left outer join wsp_supply_ordermst on wsp_supply_ordermst.orderid = [table].orderid 
+      left outer join itemdata on itemdata.itemno = [table].itemno
+      left outer join ranks on ranks.ranks = [table].ranks
+      left outer join msunit on msunit.msunit = [table].msunit
+      [where] [orderby]
+    </Sql>
+    <Where >
+      <Exp Field="supcomp"  Target="AppInfo" Value="LoginId"/>
+    </Where>
+    <Query>
+      <Exp Field="orderid"  Target="Client" Value="orderid"/>
+    </Query>
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    <Values>
+
+    </Values>
+  </Destroy>
+  <!-- 获取表架构 -->
+  <GetOrderDtlSchame>
+    <Sql>
+      select * from wsp_supply_orderdtl where 1=2 
+    </Sql>
+  </GetOrderDtlSchame>
+  <!-- 获取销售订单明细数据（发货单来源于UIC销售订单用)-->
+  <GetSendDtlDataFromOrder>
+    <Sql>
+      select [table].orderid as relid,0 as lineid,[table].orderno as relno,[table].lineid as relmxid,[table].itemno,itemdata.itemname,itemdata.descript,
+      [table].ranks,[table].msunit,[table].qty,[table].price,[table].ordersum,wsp_supply_ordermst.relno as purno,wsp_supply_ordermst.relid as purid,[table].remarks,
+      msunit.msname,ranks.ranksname,[table].lineid as purmxid,wsp_supply_ordermst.ocode,fg_supplyfile.uicsendrate,[table].sendqty
+      from [table] inner join  wsp_supply_ordermst on wsp_supply_ordermst.orderid = [table].orderid
+      inner join ec_purmst on wsp_supply_ordermst.relid = ec_purmst.purid
+      inner join fg_supplyfile on fg_supplyfile.ocode = wsp_supply_ordermst.ocode and fg_supplyfile.compno = wsp_supply_ordermst.supcomp
+      left join itemdata on [table].itemno = itemdata.itemno
+      left join ranks on [table].ranks = ranks.ranks
+      left join msunit on [table].msunit = msunit.msunit  [where]
+    </Sql>
+    <Where format="{sendflg1} or {sendflg2}">
+      <Exp Field="wsp_supply_orderdtl.sendflg" ParamName="sendflg1" Oper="IsNull"></Exp>
+      <Exp Field="wsp_supply_orderdtl.sendflg" ParamName="sendflg2" Oper="NotEqual" Value="2"></Exp>
+      <Exp Field="ec_purmst.appflg" ParamName="appflg1" Value="1" />
+      <Exp Field="supcomp"  Target="AppInfo" Value="LoginId"/>
+      <Exp Field="ocode" Target="AppInfo" Value="OCode"/>
+    </Where>
+    <Query>
+      <Exp Field="key" Target="Client" Value="key" Type="Array">
+        <Exp Field="wsp_supply_orderdtl.orderid" ParamName ="orderid"  TypeKey="0"/>
+        <Exp Field="wsp_supply_orderdtl.lineid" ParamName="lineid" TypeKey="1" />
+      </Exp>
+      <!--<Exp Field="quotid"  Target="Client" Value="quotid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>-->
+    </Query>
+  </GetSendDtlDataFromOrder>
+  <!-- 获取订单发货情况 -->
+  <GetSendInfo>
+    <Sql>
+      select wsp_supply_orderdtl.sendflg,wsp_supply_orderdtl.orderid,wsp_supply_orderdtl.lineid,
+      wsp_supply_orderdtl.qty,wsp_supply_orderdtl.sendqty,fg_supplyfile.uicsendrate from
+      wsp_supply_orderdtl inner join wsp_supply_ordermst
+      on wsp_supply_orderdtl.orderid = wsp_supply_ordermst.orderid
+      inner join fg_supplyfile on wsp_supply_ordermst.supcomp = fg_supplyfile.compno
+      and wsp_supply_ordermst.ocode = fg_supplyfile.ocode [where]
+    </Sql>
+    <Query>
+        <Exp Field="orderid" ParamName ="orderid" Target="Client"  Value="orderid"/>
+        <Exp Field="lineid" ParamName ="lineid" Target="Client"   Value="lineid" />
+    </Query>
+  </GetSendInfo>
+  <!--获取订单明细发货标志-->
+  <GetOrderDtlSendFlgInfo>
+    <Sql>
+      select * from wsp_supply_orderdtl [where]
+    </Sql>
+    <Query>
+      <Exp Field="orderid"  Target="Client"  Value="orderid"/>
+    </Query>
+  </GetOrderDtlSendFlgInfo>
+</DataService>

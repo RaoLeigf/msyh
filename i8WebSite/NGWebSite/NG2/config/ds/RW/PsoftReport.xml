@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+//检索自定义报表列表,9999用角色编号代替
+SELECT report_list.code,   //报表主键
+       report_list.bill_no,//报表编号  
+       report_list.title   //报表名称	
+FROM   report_list
+WHERE report_list.code in (select sec_pub.obj_id1 from sec_pub where sec_pub.bill_type = 'report_list' and sec_pub.user_name ='9999')
+
+//打开自定义报表的消息接口,报表主键取report_list.code
+exe:[I6P][psoftENV]REP_CUSTOM:01:报表主键
+
+ //给报表按权限赋权
+//报表主键取report_list.code, 角色编码取角色编号,ocode取当前组织,其它值固定
+insert into sec_pub(bill_type,obj_id1,obj_id2,obj_id3,user_name,can_grant,grant_type,ocode)
+values('report_list','报表主键','-1','-1','角色编码','y','01','当前组织')
+-->
+<DataService>
+  <Tables>
+    <Table Name="report_list">
+      <Field Name="code" AsName="rep_id" IsKey="true"/>
+      <Field Name="bill_no" AsName="rep_code" />
+      <Field Name="title" AsName="rep_name" />      
+      <Field Name="title" AsName="rep_orgname"/>
+      <Field Name="ocode"/>
+      <Field Name="fmt"/>
+    </Table>
+    <Table Name="sec_pub">      
+      <Field Name="bill_type" />
+      <Field Name="obj_id1" />
+      <Field Name="user_name"/>
+    </Table>  
+  </Tables>
+  <Read>
+    <Sql>
+      select distinct [fields] from [table]
+      join sec_pub on sec_pub.bill_type='report_list' and [table].code=sec_pub.obj_id1 and [table].ocode=sec_pub.ocode 
+      [where] [orderby]
+    </Sql>
+    <Where>      
+    </Where>
+    <Query>      
+      <Exp Field="code" Target="Client" value="code"/>
+      <Exp Field="bill_no" paramName="rep_code_like" Target="Client"  Oper="Like" value="rep_code_like"/>
+      <Exp Field="title" paramName="rep_name_like" Target="Client"  Oper="Like" value="rep_name_like"/>
+      <Exp Field="user_name" Target="AppInfo" value="LoginID" />
+      <Exp Field="ocode" Target="AppInfo" value="OCode" />
+    </Query>
+    <OrderBy format="{bill_no}">
+      <Exp Field="bill_no" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="bill_no"  Target="Client" Value="bill_no" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="bill_no" Target="Client" Value="bill_no"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="bill_no" Target="Client" Value="bill_no"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+
+</DataService>
+
+

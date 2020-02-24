@@ -1,0 +1,52 @@
+﻿<#@ template language="C#" #>
+@{
+    Layout = "~/Views/Shared/_EFormLayout.cshtml";
+}
+<style type="text/css">
+   
+     .row-parentLevel .x-grid-cell .x-grid-cell-inner {
+		<#= SumRowStyle #>
+     }
+
+     .row-leafLevel .x-grid-cell .x-grid-cell-inner {
+		<#= NoSumRowStyle #>
+	 }
+
+	 .row-parentLevel .x-grid-cell {
+	    <#= SumRowStyle #>
+      }
+
+	 .row-leafLevel .x-grid-cell {
+	    <#= NoSumRowStyle #>
+      }
+</style>
+
+@section Script
+{  
+	<script type="text/javascript">
+		var IsSso = '@ViewBag.IsSso';  //单点登录
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+		var billno = '@ViewBag.BillNo';
+		var CurDate = '@ViewBag.CurDate';
+		var CurTime = '@ViewBag.CurTime';
+		var TreeOrgId = '@ViewBag.TreeOrgId';
+		var TreeProjId = '@ViewBag.TreeProjId';
+		var EditAttach = '@ViewBag.EditAttach';  //单据审核后也允许修改附件
+		var info = Ext.htmlDecode('@ViewBag.WorkFlowInfo');
+		var WorkFlowInfo = Ext.isEmpty(info) ? {} : Ext.decode(info);  //工作流对象
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+		var Lang = (Ext.isEmpty(langInfo) || langInfo=='null') ? {} : Ext.decode(langInfo);  //多语言
+		var IsApplyCheck = '@ViewBag.IsApplyCheck';  //打开自申请去审
+
+		var BusType = '@ViewBag.BusType';            //2: 来自任务分解的原汇总信息
+		var IDs = '@ViewBag.IDs';                    //任务分解下级单据id集合
+		var PhidWork = '@ViewBag.PhidWork';          //任务分解流程id
+		var PhidWorkNode = '@ViewBag.PhidWorkNode';  //任务分解节点id
+		var PhidTemplate = '@ViewBag.PhidTemplate';  //任务分解模板id
+	</script>
+
+<script src="~/NG3Resource/js/eformJs/<#= ClassName #>Edit.js?_v=<#= Common.GetJsVersion() #>" type="text/javascript" charset="gb2312"></script>
+<script src="~/NG3Resource/js/eformJs/<#= ClassName #>Ext.js?_v=<#= Common.GetJsVersion() #>" type="text/javascript" charset="gb2312"></script>
+
+}

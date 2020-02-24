@@ -1,0 +1,75 @@
+html {
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+
+}
+body{
+	overflow-x:hidden;
+	-webkit-overflow-x:hidden;
+	width:100%;
+	margin:0;
+	padding:0;
+	background-color:#FFF;
+	font: 14px/1.5 "Segoe UI","Lucida Grande",Helvetica,Arial,FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",Roboto,Arial,sans-serif  !important ;
+}
+body {
+	font-size: 62.5%;/*10 ÷ 16 × 100% = 62.5%*/
+}
+h1 {
+	font-size: 2.4rem; /*2.4em × 10 = 24px */
+}
+p {
+	font-size: 1.4rem; /*1.4em × 10 = 14px */
+}
+span {
+	font-size: 1.4rem; /*1.4em × 10 = 14px */
+}
+li {
+	font-size: 1.4rem; /*1.4 × ? = 14px ? */
+}
+body, html {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+ 
+}
+body{
+	margin:0;
+	padding:0;
+	background-color:#FFF;
+}
+a{
+	text-decoration:none !important;
+	color:inherit !important;
+	font-family:'微软雅黑';
+	font-size:14px;
+	display:block;
+}
+ul,li{
+	padding:0;
+	margin:0;
+	list-style:none;
+}
+body,h1,h2,h3,h4,p{
+	margin:0;padding:0;
+}
+p{
+	word-wrap: break-word;
+}
+body {
+	font-size: 62.5%;/*10 ÷ 16 × 100% = 62.5%*/
+}
+h1 {
+	font-size: 2.4rem; /*2.4em × 10 = 24px */
+}
+p {
+	font-size: 1.4rem; /*1.4em × 10 = 14px */
+}
+span {
+	font-size: 1.4rem; /*1.4em × 10 = 14px */
+}
+li {
+	font-size: 1.4rem; /*1.4 × ? = 14px ? */
+}
+
+
+

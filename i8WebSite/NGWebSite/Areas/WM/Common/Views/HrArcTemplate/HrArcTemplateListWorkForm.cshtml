@@ -1,0 +1,263 @@
+﻿@{
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
+        ViewBag.Title = "办文单模板";
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script type="text/javascript">
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+        var Title = '@ViewBag.Title';
+        var NG3Refresh = function () {
+            store.load();
+        };
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: 'HrArcTemplateListWorkForm', //权限名称
+                ngbuttons: [
+                    'add', 'edit', 'delete', 'view', { id: 'copy', text: '复制', iconCls: "icon-Copy" },
+                    '->',  'help','close'
+                ]
+            });
+
+            //定义模型
+            Ext.define('model', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+						name: 'PhId',
+						type: 'string',//因为页面不支持int64，所以这里做特殊处理
+						mapping: 'PhId'
+					},{
+						name: 'Cno',
+						type: 'string',
+						mapping: 'Cno'
+					},{
+						name: 'Cname',
+						type: 'string',
+						mapping: 'Cname'
+					},{
+						name: 'Ctext',
+						type: 'string',
+						mapping: 'Ctext'
+					},{
+						name: 'Remarks',
+						type: 'string',
+						mapping: 'Remarks'
+					},{
+						name: 'Cobject',
+						type: 'string',
+						mapping: 'Cobject'
+					},{
+						name: 'Type',
+						type: 'string',
+						mapping: 'Type'
+					},{
+						name: 'Filetype',
+						type: 'string',
+						mapping: 'Filetype'
+					},{
+						name: 'PhidOrg',
+						type: 'string',//因为页面不支持int64，所以这里做特殊处理
+						mapping: 'PhidOrg'
+					},{
+						name: 'PhidOrg_EXName',
+						type: 'string',
+						mapping: 'PhidOrg_EXName'
+					},{
+						name: 'PhidFiller',
+						type: 'string',//因为页面不支持int64，所以这里做特殊处理
+						mapping: 'PhidFiller'
+					},{
+						name: 'PhidFiller_EXName',
+						type: 'string',
+						mapping: 'PhidFiller_EXName'
+					},{
+						name: 'Issystem',
+						type: 'string',
+						mapping: 'Issystem'
+					}
+                ]
+            });
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+                autoLoad: false,
+                queryObj: { 'queryfilter': "{\"Type*str*eq*1\":\"" + 4 + "\"}" },
+                url: '../HrArcTemplate/GetHrArcTemplateList?type=4'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                //frame: true,
+                stateful: true,
+                stateId: 'WM3_Common_HrArcTemplateListWorkForm',
+                store: store,
+                buskey: 'PhId', //对应的业务表主键属性
+                columnLines: true,
+                columns: [{xtype :'rownumberer' ,text: '行号', width: 35 },
+					{
+						header: Lang.PhId || '物理主键',
+						dataIndex: 'PhId',
+						flex:1,
+						sortable: false,
+						hidden: true
+					},{
+						header: Lang.Cno || '模板编号',
+						dataIndex: 'Cno',
+						flex: 1,
+						sortable: false,
+						hidden: false
+					},{
+						header: Lang.Cname || '模板名称',
+						dataIndex: 'Cname',
+						flex: 1,
+						sortable: false,
+						hidden: false
+					}, {
+					    header: Lang.Filetype || '文档类型',
+					    dataIndex: 'Filetype',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false,
+					    renderer: function (value, metaData, record) {
+					        switch (value) {
+					            case "1": return "Word文档(*.doc)";
+					            case "2": return "Excel文档(*.xls)";
+					            case "3": return "WPS文档(*.wps)";
+					            case "4": return "WPS表格(*.et)";
+					            default: return value;
+
+					        }
+					    }
+					}, {
+                        header: Lang.Remarks || '备注',
+                        dataIndex: 'Remarks',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+					}
+				],
+                bbar: pagingbar
+            });
+
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+				pageid: "Web:HrArcTemplateList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 4 //每行4列
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, grid]
+            });
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab(Title+'-新增', C_ROOT + 'WM/Common/HrArcTemplate/HrArcTemplateEdit?otype=add&pageTitle=31&type=4');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(Title+'-修改', C_ROOT + 'WM/Common/HrArcTemplate/HrArcTemplateEdit?otype=edit&pageTitle=32&id=' + id);
+                }
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    //recoderefresh(data);
+
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: '@Url.Content("~/WM/Common/HrArcTemplate/Delete")',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+                                        grid.getView().refresh(true);
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(Title+'-查看', C_ROOT + 'WM/Common/HrArcTemplate/HrArcTemplateEdit?otype=view&pageTitle=33&id=' + id);
+                }
+            });
+
+            //帮助
+            ngToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('HrArcTemplateListWorkForm.cshtml', 'HrArcTemplateListWorkForm');
+            });
+
+            //复制
+            ngToolbar.get('copy').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    Ext.Ajax.request({
+                        params: { 'id': data[0].get('PhId') },
+                        url: '@Url.Content("~/WM/Common/HrArcTemplate/Copy")',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                NG3Refresh();
+                                grid.getView().refresh(true);
+                                Ext.MessageBox.alert('提示', '复制成功！');
+                            } else {
+                                Ext.MessageBox.alert('提示', '复制失败！');
+                            }
+                        }
+                    });
+                }
+            });
+
+
+        });
+
+    </script>
+}
+
+

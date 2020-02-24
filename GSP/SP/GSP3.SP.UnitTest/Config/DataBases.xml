@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="yes" ?>
+<Databases>
+  <Connect>
+    <ConnectType>3</ConnectType>
+    <Provider>SQLOLEDB</Provider>
+    <Driver />
+    <ServerName>10.0.15.106</ServerName>
+    <ByName>10.0.15.106</ByName>
+    <DataBase>NGDMC</DataBase>
+    <LogID>dmc</LogID>
+    <LogPass>123</LogPass>
+    <DataSource />
+    <DBParm />
+  </Connect>
+  <AccConfig>
+    <DefaultDataBase>NGDMC</DefaultDataBase>
+    <DefaultAccount>0059</DefaultAccount>
+    <SuperPasswd />
+    <ApplicationName>1icc8d9t/fiiti6iih/d2um1ixyjtxao05il12jx6/miti44b/2willbt/7lqiyyo9xienie4k9iptd5rdp/miy42ylsepkskery0rhqiiu7iiguic2yl7llxsixa000</ApplicationName>
+    <HostName></HostName>
+  </AccConfig>
+  <ConnectDB>
+    <LastDB>0</LastDB>
+  </ConnectDB>
+  <DBMSKind>
+    <dbID />
+    <dbStr />
+    <dbType />
+  </DBMSKind>
+</Databases>

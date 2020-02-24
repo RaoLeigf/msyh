@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="gl_acco">
+      <Field Name="qmye"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select sum(isnull(bf_bala,0)) + sum(isnull(de_sum,0)) + sum(isnull(de_ap00,0))+sum(isnull(de_ap01,0)) + sum(isnull(de_ap02,0)) + sum(isnull(de_ap03,0)) + sum(isnull(de_ap04,0)) + sum(isnull(de_ap05,0)) + sum(isnull(de_ap06,0)) +  sum(isnull(de_ap07,0)) +  sum(isnull(de_ap08,0)) +  sum(isnull(de_ap09,0)) +  sum(isnull(de_ap10,0)) +  sum(isnull(de_ap11,0)) +  sum(isnull(de_ap12,0)) +  sum(isnull(de_ap13,0)) +  sum(isnull(de_ap14,0))
+      -(sum(isnull(cr_sum,0)) +  sum(isnull(cr_ap00,0))+  sum(isnull(cr_ap01,0)) +  sum(isnull(cr_ap02,0))+  sum(isnull(cr_ap03,0))+  sum(isnull(cr_ap04,0)) +  sum(isnull(cr_ap05,0)) +  sum(isnull(cr_ap06,0)) +  sum(isnull(cr_ap07,0)) +  sum(isnull(cr_ap08,0)) +  sum(isnull(cr_ap09,0)) +  sum(isnull(cr_ap10,0)) +  sum(isnull(cr_ap11,0))+  sum(isnull(cr_ap12,0)) +  sum(isnull(cr_ap13,0))+  sum(isnull(cr_ap14,0))               ) as qmye
+      from [table] [where] 
+    </Sql>
+    <!--ac_code like '1002%' and ocode like '0001%'  and uyear = '2011'-->
+    <Where>
+      <Exp Field="ac_code" Oper="LikeRight" Target="Client" Value="ac_code"/>
+      <Exp Field="ocode" Oper="LikeRight" Target="Client" Value="ocode"/>
+      <Exp Field="uyear" Oper="Equal" Target="Client" Value="uyear"/>
+    </Where>
+  </Read>
+</DataService>

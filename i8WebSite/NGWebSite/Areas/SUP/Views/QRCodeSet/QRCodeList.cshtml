@@ -1,0 +1,187 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "二维码规则列表";
+}
+@section script
+{
+
+    <script type="text/javascript">
+
+
+        Ext.onReady(function () {
+            Ext.define('model', {
+                extend: 'Ext.data.Model',
+                fields: [
+                        {
+                            name: 'phid',
+                            type: 'Int64',
+                            mapping: 'phid'
+                        },
+                         {
+                             name: 'code',
+                             type: 'string',
+                             mapping: 'code'
+                         },
+                         {
+                             name: 'content',
+                             type: 'string',
+                             mapping: 'content'
+                         }
+                ] 
+            });
+                  
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 50,
+                url: '../QRCodeSet/GetList',
+            });
+            store.load();
+
+            var toolbar = Ext.create('Ext.Toolbar', {
+                region: 'north',
+                border: false,
+                //split: true,
+                height: 26,
+                minSize: 26,
+                maxSize: 26,
+                items: [
+                        //{
+                        //    id: "add",
+                        //    text: "新增",
+                        //    iconCls: 'icon-New'
+                        //},
+                        {
+                            id: "edit",
+                            text: "编辑",
+                            iconCls: 'icon-Edit'
+                        },
+                        //{
+                        //    id: "delete",
+                        //    text: "删除",
+                        //    iconCls: 'icon-delete'
+                        //},
+                        "->",
+                        {
+                            id: "close",
+                            text: "关闭",
+                            iconCls: 'icon-Exit',
+                            handler: function () { top.tabMain.remove(top.tabMain.getActiveTab()) }
+                        }
+                ]
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                frame: true,
+                store: store,
+                columnLines: true,
+                buskey: 'phid', //对应的业务表主键
+                enableColumnHide: false, //列选择功能去掉
+                layout: {
+                    type: 'hbox',
+                    align: 'stretch'
+                },
+                columns: [Ext.create('Ext.grid.RowNumberer', { header: '行号', width: 35 }),
+                {
+                    header: 'phid',
+                    hidden: true,
+                    sortable: true,
+                    dataIndex: 'phid',
+                    width: 200,
+                    //isNeedQueryField: true //是否需要查询
+                }, {
+                    header: '业务码',
+                    sortable: true,
+                    dataIndex: 'code',
+                    width: 200,
+                    isNeedQueryField: true //是否需要查询
+                },{
+                    header: '描述',
+                    sortable: true,
+                    flex: 1,
+                    dataIndex: 'content',
+                    isNeedQueryField: true, //是否需要查询
+                }],
+                bbar: pagingbar
+            });
+
+            var queryPanel = Ext.create('Ext.ng.QueryPanel', {
+                grid: grid,
+                columnsPerRow: 4
+            })
+
+            Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items:
+                 [
+                   toolbar, queryPanel, grid
+                 ]
+            });
+
+            // //新增
+            //toolbar.items.get('add').on('click', function () {
+            //    $OpenTab('二维码规则-新增', C_ROOT + 'SUP/QRCodeSet/QRCodeEdit?otype=add');
+            //});
+
+            //修改
+            toolbar.items.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('phid');
+                    $OpenTab('二维码规则-编辑', C_ROOT + 'SUP/QRCodeSet/QRCodeEdit?otype=edit&id=' + id);
+                }
+
+            });
+
+            //删除
+            @*toolbar.items.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length == 0) {
+                    return;
+                }
+                var masterid = data[0].get('phid');
+                Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack1);
+                function callBack1(id) {
+                    if (id.toString() == "no") {
+                        return;
+                    }
+                    else {
+                        Ext.Ajax.request({
+                            params: {
+                                'masterid': masterid
+                            },
+                            url: '@Url.Content("~/SUP/QRCodeSet/Delete")',
+                            success: function (response) {
+                                if (response.responseText != '' && response.responseText != null) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp > 0) {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        Ext.Msg.alert('操作', '删除成功');
+
+                                    } else {
+                                        Ext.Msg.alert('操作', '删除失败');
+                                    }
+                                }
+                                
+                            }
+                        });
+                    }
+                }
+            });*@
+     
+        });
+
+    </script>
+}

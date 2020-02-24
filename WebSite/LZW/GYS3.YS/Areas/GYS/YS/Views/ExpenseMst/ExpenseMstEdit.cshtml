@@ -1,0 +1,342 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{  
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/ExpenseMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+		//var busno = '@ViewBag.No';
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    'save', 'attachment', 'addrow', 'deleterow', '->', 'print', 'close'
+                ]
+            });
+
+			//定义mainPanel_form
+			var mainPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				buskey: 'phid', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var mainPanel_formConfig = mainPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(mainPanel_formConfig, individualInfo.form['mainPanel']);
+			}
+			var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm', mainPanel_formConfig);
+
+			//获取ExpensedtlGrid_grid自带model
+			var ExpensedtlGrid_modelFields = [
+  {
+    "name": "MstPhid",
+    "type": "string",
+    "mapping": "MstPhid"
+  },
+  {
+    "name": "FDtlcode",
+    "type": "string",
+    "mapping": "FDtlcode"
+  },
+  {
+    "name": "FName",
+    "type": "string",
+    "mapping": "FName"
+  },
+  {
+    "name": "FSourceoffunds",
+    "type": "string",
+    "mapping": "FSourceoffunds"
+  },
+  {
+    "name": "FSourceoffunds_EXName",
+    "type": "string",
+    "mapping": "FSourceoffunds_EXName"
+  },
+  {
+    "name": "FBudgetaccounts",
+    "type": "string",
+    "mapping": "FBudgetaccounts"
+  },
+  {
+    "name": "FBudgetaccounts_EXName",
+    "type": "string",
+    "mapping": "FBudgetaccounts_EXName"
+  },
+  {
+    "name": "FExpenseschannel",
+    "type": "string",
+    "mapping": "FExpenseschannel"
+  },
+  {
+    "name": "FExpenseschannel_EXName",
+    "type": "string",
+    "mapping": "FExpenseschannel_EXName"
+  },
+  {
+    "name": "FQty",
+    "type": "float",
+    "mapping": "FQty"
+  },
+  {
+    "name": "FPrice",
+    "type": "float",
+    "mapping": "FPrice"
+  },
+  {
+    "name": "FQty2",
+    "type": "float",
+    "mapping": "FQty2"
+  },
+  {
+    "name": "FAmount",
+    "type": "float",
+    "mapping": "FAmount"
+  },
+  {
+    "name": "FReturnamount",
+    "type": "float",
+    "mapping": "FReturnamount"
+  },
+  {
+    "name": "FOtherinstructions",
+    "type": "string",
+    "mapping": "FOtherinstructions"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+]
+			//调用$MergIndividualModelCol合并grid的Model
+			var ExpensedtlGrid_allFields = $MergIndividualModelCol(ExpensedtlGrid_modelFields, individualInfo, 'ExpensedtlGrid');
+			//定义模型
+			Ext.define('ExpensedtlGrid_model', {
+				extend: 'Ext.data.Model',
+				fields: ExpensedtlGrid_allFields
+			});
+			//定义ExpensedtlGrid_store
+			var ExpensedtlGrid_store = Ext.create('Ext.ng.JsonStore', {
+				model: 'ExpensedtlGrid_model',
+				pageSize: 20
+			});
+			//定义ExpensedtlGrid_cellEditing
+			var  ExpensedtlGrid_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+				clicksToEdit: 1    //单击编辑，单元格修改
+			});
+			//从自定义信息中获取到grid的配置
+			var ExpensedtlGrid_indvidualGrid = individualInfo.grid['ExpensedtlGrid'];
+			//动态内容的配置不能写在插件中 
+			var ExpensedtlGrid_gridInitialConfig = {
+				stateful: true,
+				region: 'center',
+				stateId: 'e74655a9-5fca-4145-91ba-df396dc85f0e', //这里请使用guid，防止冲突
+				store: ExpensedtlGrid_store,
+				otype: otype, //操作类型,add||edit
+				plugins: [ExpensedtlGrid_cellEditing]
+			}
+			//动态配置与静态配置合并
+			var ExpensedtlGrid_gridConfig = Ext.apply(ExpensedtlGrid_gridInitialConfig, ExpensedtlGrid_indvidualGrid);
+			//定义ExpensedtlGrid_grid
+			var ExpensedtlGrid_grid = Ext.create('Ext.ng.GridPanel', ExpensedtlGrid_gridConfig);
+
+			var tabItems = {
+				TabPage1:{
+					id: 'TabPage1',
+					layout: 'border',
+					title: '项目支出预算明细',
+					items: [ExpensedtlGrid_grid]
+				}
+			}
+
+			var tabArr = [];
+			var indTabItems = individualInfo.tabPanel['DtlPanel'].items;
+			for (var i = 0; i < indTabItems.length; i++) {
+				var tab = indTabItems[i];
+				if (!tab.hidden) {
+					tabArr.push(Ext.apply(tabItems[tab.id], tab));
+				}
+			}
+
+			var tabPanel = Ext.create('Ext.tab.Panel', {
+				layout: 'border',
+				region: 'center',
+				deferredRender: false,
+				plain: true,
+				activeTab: 0,
+				minHeight: 400,
+				minWidth: 600,
+				defaults: { bodyStyle: 'padding:3px' },
+				items: tabArr
+			});
+
+			Ext.create('Ext.container.Viewport', {
+				id: "viewPort",
+				layout: 'border',
+				items:
+				[
+					toolbar,
+					{
+						xtype: 'panel',
+						layout: 'border',
+						region: 'center',
+						autoScroll: true,
+						bodyStyle: 'padding-right:20px',
+						//style: 'overflow-y:scroll,padding-right:20px',
+						items: [ngToolbar, mainPanel_form, tabPanel]
+					}
+				]
+			});
+
+
+
+			//当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'expensemst' },
+                    url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstInfo',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mainPanel_form.getForm();
+                            mstformobj.setValues(resp.Data);
+
+							//mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstformobj.fireEvent('dataready', resp.Data);
+
+							//代码转名称
+                            var codectl = [];
+                            BatchBindCombox(codectl);
+
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                });
+
+                //ExpensedtlGrid明细
+				Ext.apply(ExpensedtlGrid_store.proxy.url = C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstInfo');
+                Ext.apply(ExpensedtlGrid_store.proxy.extraParams, { 'id': busid, 'tabtype': 'expensedtl' });
+                ExpensedtlGrid_store.cachePageData = false;
+                ExpensedtlGrid_store.load();
+                ExpensedtlGrid_store.cachePageData = true;
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+				//if (busno != undefined && busno != "") {
+                //    Ext.getCmp("No").userSetReadOnly(true);
+                //    Ext.getCmp("No").setValue(busno);
+                //}
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT) {
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+            }
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+
+				var mainPanel_formvf = mainPanel_form.isValid();
+				var ExpensedtlGrid_gridvf = ExpensedtlGrid_grid.isValid();
+				if (!mainPanel_formvf || !ExpensedtlGrid_gridvf)
+				{
+					return;
+				}
+
+				var flg;
+				//调用二次开发脚本的校验方法
+				if (typeof beforeSaveEdit === "function") {
+					flg = beforeSaveEdit();
+					if(!flg) return; 
+				} 
+
+				var mydata = {};
+				var expensemstformData = mainPanel_form.getFormData();
+				myData = Ext.apply(mydata, { 'expensemstformData': expensemstformData});
+				var expensedtlgridData = ExpensedtlGrid_grid.getChangeForEntity();
+				myData = Ext.apply(mydata, { 'expensedtlgridData': expensedtlgridData});
+
+				var extendData;
+				//调用二开代码获取二开需要保存的数据
+				if (typeof getExtendData === "function") {
+					extendData = getExtendData();
+					myData = Ext.apply(mydata, extendData);//合并
+				}
+
+                Ext.Ajax.request({
+                    params: mydata,
+                    url: C_ROOT + 'GYS/YS/ExpenseMst/save',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            NGMsg.Success("保存成功", 10, function () {
+
+                                if (window.external.RefreshWebListPage != undefined) {
+									window.external.RefreshWebListPage();
+								} else {
+									$NG3Refresh();
+								}
+
+                                $CloseTab();
+                            });
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                });
+            });
+
+            //附件
+            ngToolbar.get('attachment').on('click', function () {
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+            });
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+
+        });
+        
+    </script>
+}

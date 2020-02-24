@@ -1,0 +1,928 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "自定义流程树";
+}
+
+
+@section script
+{
+    @*<script src="~/NG3Resource/js/DMC/DMCCommon.js" type="text/javascript" charset="utf-8"></script>*@
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    <link href="~/NG3Resource/css/mainTreeTab.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+
+   var contextMenuOpType = ""; //右键菜单操作类型
+
+      
+
+       var custommenutree;//流程树
+       var custommenutreestore//
+       var StoreloadMarsk;
+
+       var nodeAdd = [];
+       var nodeDelete = [];
+       var nodeUpdate = [];
+       var newNodeItemId = '';
+       Ext.onReady(function () {
+
+            var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+            var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+
+            //通过节点node找到树的根节点
+            function findRoot(node) {
+                while (!node.isRoot()) {
+                    node = node.parentNode;
+                }
+                return node;
+            }
+
+            //展开根为root的树的所有节点
+            function expandTree(root) {
+                if (root.hasChildNodes()) {
+                    root.expand();
+                    for (var i = 0; i < root.childNodes.length; i++) {
+                        expandTree(root.childNodes[i]);
+                    }
+                }
+
+            }
+
+            //折叠根为root的树的所有节点
+            function collapseTree(root) {
+                if (root.hasChildNodes()) {
+                    //root.collapse();
+                    for (var i = 0; i < root.childNodes.length; i++) {
+                        if (root.childNodes[i].hasChildNodes()) {
+                            root.childNodes[i].collapse();
+                            collapseTree(root.childNodes[i]);
+                        }
+                    }
+                }
+            }
+
+        
+
+            //工具栏
+           var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+               region: 'north',
+               showArrowBtn: false,
+               //rightName: '', //权限名称
+               ngbuttons: [
+                   'save',
+                   {
+                       text: '删除',
+                       iconCls: 'icon-delete',
+                       itemId: 'deleteProcedure',
+                       handler: function () {
+                           //var checkNodes = custommenutree.getView().getChecked(); //选择的企业功能树菜单
+                           //Ext.Array.each(checkNodes, function (node) {
+                           //    var pNode = node.parentNode;
+                           //    if (pNode == null) {
+                           //        return;
+                           //    }
+                           //    node.remove();
+                           //    var I = pNode.childNodes.length;
+                           //    if (I == 0) {
+                           //        pNode.leaf = true; //置为叶子节点
+                           //    }
+                           //});
+
+                           var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                           if (custommenutreenode.length > 0) {
+                               if (custommenutreenode[0].childNodes.length > 0) {
+                                   Ext.Msg.show({
+                                       title: '提示',
+                                       msg: '该操作将同时删除被选中节点及下级节点，确定要删除吗',
+                                       buttons: Ext.Msg.YESNO,
+                                       icon: Ext.Msg.QUESTION,
+                                       fn: function (b, t) {
+                                           if (b == 'yes') {
+                                               deleteTreeNode(custommenutreenode[0]);
+                                           } else {
+                                               return;
+                                           }
+                                       }
+                                   });
+                               } else {
+                                   Ext.Msg.show({
+                                       title: '提示',
+                                       msg: '该操作将删除被选中节点及其流程图，确定要删除吗',
+                                       buttons: Ext.Msg.YESNO,
+                                       icon: Ext.Msg.QUESTION,
+                                       fn: function (b, t) {
+                                           if (b == 'yes') {
+                                               deleteTreeNode(custommenutreenode[0]);
+                                           } else {
+                                               return;
+                                           }
+                                       }
+                                   });
+                           }
+                           }
+                       }
+                   },
+                   {
+                       text: '增加节点',
+                       iconCls: 'icon-New',
+                       itemId: 'addNode',
+                       handler: function () {
+                           contextMenuOpType = "rootlevel";
+                           customMenuNodeTextWin.setTitle("增加节点");
+                           customMenuNodeTextWin.show();
+                       }
+                   }, {
+                       text: '增加同级节点',
+                       iconCls: 'icon-New',
+                       itemId: 'addBrother',
+                       hidden: true,
+                       handler: function () {
+                           //企业功能树菜单选择项
+                           var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                           //判断是否非按钮节点
+                           if (custommenutreenode.length == 0 || (custommenutreenode.length > 0 && custommenutreenode[0].data.leaf)) {
+                               Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                               return;
+                           }
+                           contextMenuOpType = "samelevel";
+                           customMenuNodeTextWin.setTitle("增加同级节点");
+                           customMenuNodeTextWin.show();
+                       }
+                   }, {
+                       text: '增加下级节点',
+                       iconCls: 'icon-New',
+                       itemId: 'addChild',
+                       hidden: true,
+                       handler: function () {
+                           //企业功能树菜单选择项
+                           var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                           //判断是否非按钮节点
+                           if (custommenutreenode.length == 0 || (custommenutreenode.length > 0 && custommenutreenode[0].data.leaf)) {
+                               Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                               return;
+                           }
+                           contextMenuOpType = "lowerlevel";
+                           customMenuNodeTextWin.setTitle("增加下级节点");
+                           customMenuNodeTextWin.show();
+                       }
+                   }, {
+                       text: '新建流程',
+                       iconCls: 'icon-New',
+                       itemId: 'addProcedure',
+                       hidden: true,
+                       handler: function () {
+                           //企业功能树菜单选择项
+                           var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                           //判断是否非按钮节点
+                           if (custommenutreenode.length == 0) {
+                               Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                               return;
+                           }
+                           contextMenuOpType = "addProcedure";
+                           customMenuNodeTextWin.setTitle("新建流程");
+                           customMenuNodeTextWin.show();
+                       }
+                   }, {
+                       text: '重命名',
+                       iconCls: 'icon-Edit',
+                       itemId: 'rename',
+                       handler: function () {
+                           contextMenuOpType = "rename";
+                           customMenuNodeTextWin.setTitle("重命名");
+                           customMenuNodeTextWin.show();
+                       }
+                   }, '->',
+                  { itemId: 'close1', text: "关闭", width: this.itemWidth, iconCls: "icon-Close" }
+               ]
+           })
+
+           //弹出winform时沉默页面
+            StoreloadMarsk = new Ext.LoadMask(document.body, {
+                msg: '节点维护',
+                disabled: false
+            });
+
+            var customEditToolbar = new Ext.panel.Panel({
+                region: 'north',
+                height: 30,
+                border: false,
+                style: 'margin-top:1px;margin-bottom:1px',
+                bodyStyle: "background-color:transparent",
+              
+                ////#dfe8f6
+                items: [{
+                    items: [{
+                        xtype: 'toolbar', text: '导航中心流程树',
+                        items: [{
+                            width: 180,
+                            xtype: 'textfield',
+                            itemId: 'queryKey',
+                            name: 'queryKey',
+                            emptyText: '定位节点',
+                            enableKeyEvents: true,
+                            listeners: {
+                                'keydown': function (el, e, eOpts) {
+                                    if (e.getKey() == e.ENTER) {
+                                        var toolbar = this.findParentByType('toolbar');//找到根节点
+                                        var condition = toolbar.items.items[0].value;
+                                        if (condition == '' || condition == null) {
+                                            alert('请输入定位关键字');
+                                            return;
+                                        }
+                                        findNodeByFuzzy(custommenutree, condition);
+                                        return false;
+                                    }
+                                }
+                            }
+                        },  {
+                            text: '定位',
+                            tooltip: '定位',
+                            itemId: 'query',
+                            iconCls: 'icon-Location',
+                            handler: function () {
+                                var toolbar = this.findParentByType('toolbar');//找到根节点
+                                var condition = toolbar.items.items[0].value;
+                                findNodeByFuzzy(custommenutree, condition);
+                            }
+                        }
+                        ]
+                    }]
+                }]
+            });
+
+            function stopEvent(evt) {
+                var evt = evt || window.event;
+                if (evt.preventDefault) {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                } else {
+                    evt.returnValue = false;
+                    evt.cancelBubble = true;
+                }
+            }
+
+            //定位节点函数
+            function findNodeByFuzzy(tree, value) {
+                if (value == "") { return; }
+                var me = tree, index = -1;
+                var firstFind = false;
+                if (isNaN(me.nodeIndex) || me.nodeIndex == null || me.value != value) {
+                    me.nodeIndex = -1;
+                    me.value = value;
+                }
+                var findNode = tree.getRootNode().findChildBy(function (node) {
+                    index++;
+                    //if (!node.data.root && index > me.nodeIndex && (node.data.text.indexOf(value) > -1 || node.data.bopomofo.indexOf(value.toUpperCase()) > -1)) {
+                    if (!node.data.root && index > me.nodeIndex && (node.data.text.indexOf(value) > -1)) {
+                        return true;
+                    }
+                }, null, true);
+                me.nodeIndex = index;
+                if (findNode) {
+                    tree.selectPath(findNode.getPath());
+                }
+                else {
+                    if (firstFind) {
+                        Ext.MessageBox.alert('', '没有匹配的树节点.');
+                    }
+                    me.nodeIndex = -1;
+                }
+            };
+            //右键菜单
+            var contextMenu1 = new Ext.menu.Menu({
+                items: [
+                    //{
+                    //    text: '全选',
+                    //    handler: function () {
+                    //        treeNodeCheckBoxSelected(custommenutreestore.getRootNode(), true);
+                    //    }
+                    //},
+                    //{
+                    //    text: '反选',
+                    //    handler: function () {
+                    //        treeNodeCheckBoxSelected(custommenutreestore.getRootNode(), false);
+                    //    }
+                    //}, '-',
+                    {
+                        text: '增加同级节点',
+                        handler: function () {
+                            //企业功能树菜单选择项
+                            var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                            //判断是否非按钮节点
+                            if (custommenutreenode.length == 0 || (custommenutreenode.length > 0 && custommenutreenode[0].data.leaf)) {
+                                Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                return;
+                            }
+                            contextMenuOpType = "samelevel";
+                            customMenuNodeTextWin.setTitle("增加同级节点");
+                            customMenuNodeTextWin.show();
+                        }
+                    },
+                    {
+                        text: '增加下级节点',
+                        handler: function () {
+                            //企业功能树菜单选择项
+                            var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                            //判断是否非按钮节点
+                            if (custommenutreenode.length == 0 || (custommenutreenode.length > 0 && custommenutreenode[0].data.leaf)) {
+                                Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                return;
+                            }
+                            contextMenuOpType = "lowerlevel";
+                            customMenuNodeTextWin.setTitle("增加下级节点");
+                            customMenuNodeTextWin.show();
+                        }
+                    },
+                    {
+                        text: '重命名',
+                        handler: function () {
+                            contextMenuOpType = "rename";
+                            customMenuNodeTextWin.setTitle("重命名");
+                            customMenuNodeTextWin.show();
+                        }
+                    }, {
+                        text: '新建流程',
+                        handler: function () {
+                            //企业功能树菜单选择项
+                            var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                            //判断是否非按钮节点
+                            if (custommenutreenode.length == 0) {
+                                Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                return;
+                            }
+                            contextMenuOpType = "addProcedure";
+                            customMenuNodeTextWin.setTitle("新建流程");
+                            customMenuNodeTextWin.show();
+                        }
+                    }
+                ]
+            });
+            var contextMenu2 = new Ext.menu.Menu({
+                items: [
+                    //{
+                    //    text: '全选',
+                    //    handler: function () {
+                    //        treeNodeCheckBoxSelected(custommenutreestore.getRootNode(), true);
+                    //    }
+                    //},
+                    //{
+                    //    text: '反选',
+                    //    handler: function () {
+                    //        treeNodeCheckBoxSelected(custommenutreestore.getRootNode(), false);
+                    //    }
+                    //}, '-',
+                    {
+                        text: '增加节点',
+                        handler: function () {
+                            ////企业功能树菜单选择项
+                            //var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                            ////判断是否非按钮节点
+                            //if (custommenutreenode.length == 0 || (custommenutreenode.length > 0 && custommenutreenode[0].data.leaf)) {
+                            //    Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                            //    return;
+                            //}
+                            contextMenuOpType = "rootlevel";
+                            customMenuNodeTextWin.setTitle("增加节点");
+                            customMenuNodeTextWin.show();
+                        }
+                    }
+                ]
+            });
+
+            //自定义功能树
+            custommenutreestore = Ext.create('Ext.data.TreeStore', {
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    idProperty: 'id',
+                    url: C_ROOT + 'SUP/NavigationCenter/LoadTree?type=edit',
+
+                },
+                //                                folderSort: true,
+                fields: [
+                    { name: 'phid', type: 'int' },
+                    { name: 'name', type: 'string' },
+                    { name: 'text', type: 'string' },
+                    { name: 'isleaf', type: 'int' },
+                { name: 'mypid', type: 'string' },
+                { name: 'myid', type: 'string' },               
+                { name: 'svgconfig', type: 'string' },
+                //{ name: 'checked', type: 'boolean', values: false },
+                { name: 'itemId', type: 'string' }]
+            });
+
+            custommenutree = Ext.create('Ext.tree.Panel', {
+                region: 'center',
+                store: custommenutreestore,
+                editToolbar:customEditToolbar,
+                rootVisible: false,
+                listeners: {
+                    'afterrender': function () {
+                        //this.expandAll();
+                    },
+                    'itemclick': function (view, rcd, item, idx, event, eOpts) {
+                        //this.editToolbar.queryById('addNode').hide();
+                        //this.editToolbar.queryById('addBrother').show();
+                        //this.editToolbar.queryById('addChild').show();
+                        //this.editToolbar.queryById('addProcedure').show();
+                        ngToolbar.queryById('addNode').hide();
+                        ngToolbar.queryById('addBrother').show();
+                        ngToolbar.queryById('addChild').show();
+                        ngToolbar.queryById('addProcedure').show();
+
+                    },
+                    'itemdblclick': function (view, rcd, item, idx, event, eOpts) {
+                    },
+                    'checkchange': function (node, checked) {
+                        setChildNodeChecked(node, checked); //同时选择下级
+                    },
+                    'itemcontextmenu': function (view, rec, node, index, e) {
+                        e.stopEvent();
+                        contextMenu1.showAt(e.getXY());
+                        return false;
+                    },
+                    'containercontextmenu': function (treeP, e, eOpts) {
+                        e.stopEvent();
+                        contextMenu2.showAt(e.getXY());
+                        return false;
+                    }},              
+            });
+
+            var customMenuNodeTextWin = Ext.create("Ext.window.Window", {
+                title: "节点维护",
+                modal: true,
+                width: 350,
+                height: 100,
+                closeable: true,
+                resizable: false,
+                closeAction: "hide",
+                items: [
+                {
+                    xtype: 'ngTableLayoutForm',
+                    id: 'customMenuNodeTextForm',
+                    frame: true,
+                    split: true,
+                    //buskey: 'PhId', //对应的业务表主键属性
+                    //otype: 'add', //操作类型,add||edit||view
+                    columnsPerRow: 1,
+                    padding: '0 5 0 5',
+                    fieldDefaults: {
+                        labelWidth: 70,
+                        anchor: '100%',
+                        margin: '0 -30 5 5',
+                        msgTarget: 'side'
+                    },
+                    fields: [
+					{
+					    xtype: 'ngText',
+					    fieldLabel: '节点名称',
+					    name: 'NodeText',
+					    id: 'NodeText',
+					    labelStyle: 'color:OrangeRed',
+					    readOnly: false,
+					    //mustInput: true,
+					    colspan: 1
+					}
+                    ]
+                }
+                ],
+                buttons: [
+                    "->",
+                    {
+                        text: '保 存',
+                        handler: function () {
+                            var nodetext = Ext.getCmp("NodeText").value;
+                            while (nodetext == '' || nodetext == null) {
+                                Ext.MessageBox.alert('提示' ,'节点名不能为空');
+                                return;
+                            }
+                            var obj = new Object();
+                            obj.isExist = false;
+                            IsNodeTextExist(custommenutree.getRootNode(), nodetext, obj);
+                            while (obj.isExist) {
+                                Ext.MessageBox.alert('提示', '节点名已存在');
+                                return;
+                            }
+                            switch (contextMenuOpType) {
+                                case "rootlevel":
+                                        var selectedNode = custommenutree.getRootNode();
+                                        var newChildNode = selectedNode.appendChild({
+                                            myid: guid(), //获取唯一值,
+                                            text: nodetext,
+                                            name: nodetext,
+                                            mypid: selectedNode.data.myid != '' ? selectedNode.data.myid : selectedNode.data.id,
+                                            leaf: 0,
+                                            isleaf: 0,
+                                            //checked: false,
+                                            children: [],
+                                            expanded: true,
+                                        });
+                                        //newChildNode.set('childNodes', null);
+                                        //newChildNode.select('childNodes', null);
+                                    break;
+                                case "samelevel":
+                                    //企业功能树菜单选择项
+                                    var selcustommenutree = custommenutree.getSelectionModel().getSelection();
+                                    //判断是否非按钮节点
+                                    if (selcustommenutree.length > 0 && !selcustommenutree[0].data.leaf) {
+                                        var selectedNode = selcustommenutree[0];
+                                        var selectedParentNode = selectedNode.parentNode;
+                                        var newChildNode = selectedParentNode.appendChild({
+                                            myid: guid(), //获取唯一值,
+                                            //MenuType:2,
+                                            text: nodetext,
+                                            name: nodetext,
+                                            mypid: selectedParentNode.data.myid != '' ? selectedParentNode.data.myid : selectedParentNode.data.id,
+                                            leaf: 0,
+                                            isleaf:0,
+                                            //checked: false,
+                                            expanded: false,
+                                            children: []
+                                        });
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                        return;
+                                    }
+                                    break;
+                                case "lowerlevel":
+                                    //企业功能树菜单选择项
+                                    var selcustommenutree = custommenutree.getSelectionModel().getSelection();
+                                    //判断是否非按钮节点
+                                    if (selcustommenutree.length > 0 && !selcustommenutree[0].data.leaf) {
+                                        var selectedNode = selcustommenutree[0];
+                                        //新增-下级节点（appendChild和insertBefore的区别）
+                                        selectedNode.data.leaf = false;
+                                        var newChildNode = selectedNode.appendChild({
+                                            myid: guid(), //获取唯一值,
+                                            text: nodetext,
+                                            name: nodetext,
+                                            mypid: selectedNode.data.myid != '' ? selectedNode.data.myid : selectedNode.data.id,
+                                            leaf: 0,
+                                            isleaf: 0,
+                                            //checked: false,
+                                            expanded: true,
+                                            children: []
+                                        });
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                        return;
+                                    }
+                                    break;
+                                case "rename":
+                                    var selcustommenutree = custommenutree.getSelectionModel().getSelection();
+                                    if (selcustommenutree.length > 0) {
+                                        //var nodeid = selcustommenutree[0].get("id");
+                                        //var selectedNode = custommenutreestore.getNodeById(nodeid);
+                                        var selectedNode = selcustommenutree[0];
+                                        selectedNode.set('text', nodetext);
+                                        selectedNode.set('name', nodetext);
+                                        selectedNode.commit();
+                                    }
+                                    break;
+                                case "addProcedure":
+                                    //树菜单选择项
+                                    var selcustommenutree = custommenutree.getSelectionModel().getSelection();
+                                    //判断是否非按钮节点
+                                    if (selcustommenutree.length > 0) {
+                                        var newChildNode;
+                                        var id = guid();
+                                        newNodeItemId = id;
+                                        if (!selcustommenutree[0].data.leaf) {
+                                            var selectedNode = selcustommenutree[0];
+                                            //新增-下级节点（appendChild和insertBefore的区别）
+                                            selectedNode.data.leaf = false;                                            
+                                            newChildNode = selectedNode.appendChild({
+                                                myid: id, //获取唯一值,
+                                                text: nodetext,
+                                                name: nodetext,
+                                                itemId:id,
+                                                mypid: selectedNode.data.myid != '' ? selectedNode.data.myid : selectedNode.data.id,
+                                                leaf: 1,
+                                                isleaf: 1,
+                                                //checked: false,
+                                                expanded: true
+                                            });
+                                        } else {
+                                            var selectedNode = selcustommenutree[0];
+                                            var selectedParentNode = selectedNode.parentNode;
+                                            newChildNode = selectedParentNode.appendChild({
+                                                myid: id, //获取唯一值,
+                                                text: nodetext,
+                                                name: nodetext,
+                                                mypid: selectedParentNode.data.myid != '' ? selectedParentNode.data.myid : selectedParentNode.data.id,
+                                                itemId: id,
+                                                leaf: 1,
+                                                isleaf: 1,
+                                                //checked: false,
+                                                expanded: true
+                                            });
+                                        }
+                                        $OpenTab(nodetext, C_ROOT + 'SUP/NavigationCenter/IndividualNavigationChart?currentNodePhid=0&text=' + nodetext + '&myid=' + id);
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                        return;
+                                    }
+                                    break;
+                            }
+                            Ext.getCmp("NodeText").setValue('');
+                            customMenuNodeTextWin.close();
+                        }
+                    },
+                    {
+                        text: '关 闭',
+                        handler: function () {
+                            Ext.getCmp("NodeText").setValue('');
+                            customMenuNodeTextWin.close();
+                        }
+                    }
+                ]
+            });
+
+            //自定义功能树panel
+            var custommenupnl = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                style: 'margin-left:2px;margin-right:2px',
+                //title: '企业功能树菜单',
+                layout: 'border',
+                border: 0,
+                items: [
+                    customEditToolbar,
+                    custommenutree]
+            });
+
+           //上下移动节点的按钮区域
+            var changeSeqForm = Ext.create('Ext.form.Panel', {
+                region: 'east',
+                style: 'margin-left:2px;margin-right:0px',
+                layout: 'border',
+                width: 40,
+                split: true,
+                autoScroll: true,
+                frame: false,
+                border: false,
+                columnsPerRow: 4,
+                fieldDefaults: {
+                    labelWidth: 40,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                items: [
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        id: 'upmove',
+                        text: '∧',
+                        margin: '170 0 0 0',
+                        width: 20,
+                        height: 20
+                    },
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        id: 'downmove',
+                        text: '∨',
+                        margin: '50 0 0 0',
+                        width: 20,
+                        height: 20
+                    }
+                ]
+            })
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [
+                  ngToolbar,
+                 //  sysmenupnl,
+                 //   choosecenterform,
+                 //custommenupnl
+                {
+                    id: 'myPanel',
+                    xtype: 'panel',
+                    //height: 500,
+                    //width: 600,
+                    region: 'center',
+                    //autoScroll: true,
+                    layout: 'border',
+                    //style: 'overflow-y:scroll,padding-right:20px',
+                    bodyStyle: "padding-right:5px",
+                    items: [
+                        //sysmenupnl,
+                        //choosecenterform,
+                        custommenupnl,
+                        changeSeqForm
+                    ]
+                }
+                ]
+            });
+
+           //
+
+
+            ngToolbar.get('save').on('click', function () {
+                //判断自定义套件有没有选择
+                //if (customsuitecmb.value == null) {
+                //    Ext.MessageBox.alert('提示', '请选择自定义套件！');
+                //    return;
+                //}
+
+                //重置Seq
+                var rootNode = custommenutree.getRootNode();
+                SetCustomTreeSeq(rootNode);
+                //获取所有节点数据
+                var custommenutreestore = custommenutree.getStore();
+                var newR = custommenutreestore.getNewRecords();
+                var updateR = custommenutreestore.getUpdatedRecords();
+                var deleteR = custommenutreestore.getRemovedRecords();
+                if (newR.length == 0)
+                { newR = [] }
+                if (updateR.length == 0)
+                { updateR = [] }
+                if (deleteR.length == 0)
+                { deleteR = [] }
+
+                for (var i = 0; i < newR.length; i++) {
+                    delUnUseProperty(newR[i].data);
+                }
+
+                for (var i = 0; i < updateR.length; i++) {
+                    delUnUseProperty(updateR[i].data);
+                }
+
+                var custommenutreeData = GetDatatableData(newR, updateR, deleteR, [], 'phid');
+                //alert(JSON.stringify(data));
+                var NavigationTree = Ext.JSON.encode(custommenutreeData);
+                Ext.Ajax.request({
+                    params: {
+                        'NavigationTree': NavigationTree,
+                        //'userid':userid
+                        //用户id作为属性传进来
+                        //'suite': customsuitecmb.value
+                    },
+                    url: C_ROOT + 'SUP/NavigationCenter/SaveTree',
+                    async: false, //同步
+                    success: function (response) {
+                        if (response.responseText == '' || response.responseText == null) {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                            return;
+                        }
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.status === "ok") {
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+                                resetTreeState(custommenutreestore.getRootNode()); //清树状态
+                                //window.external.RefreshFuncTree();
+                                window.external.RefreshWebListPageEx('tree');
+                                //window.close();
+                                $CloseTab();
+                            });
+                        } else {
+                            Ext.MessageBox.alert('提示', resp.messsage);
+                        }
+                    }
+                });
+            });
+                    
+            ngToolbar.get('close1').on('click', function () {
+                //获取所有节点数据
+                var custommenutreestore = custommenutree.getStore();
+                var newR = custommenutreestore.getNewRecords();
+                var updateR = custommenutreestore.getUpdatedRecords();
+                var deleteR = custommenutreestore.getRemovedRecords();
+              
+                if (newR.length != 0 || updateR.length != 0 || deleteR.length != 0) {
+                    Ext.Msg.show({
+                        title: '提示',
+                        msg: '当前页面尚未保存，您确定要退出吗',
+                        buttons: Ext.Msg.YESNO,
+                        icon: Ext.Msg.QUESTION,
+                        fn: function (b, t) {
+                            if (b == 'yes') {
+                                $CloseTab();
+                            } else {
+                                return;
+                            }
+                        }
+                    });
+                } else {
+                    $CloseTab();
+                }
+            });
+
+           //上移
+            changeSeqForm.items.get('upmove').on('click', function () {
+                var selectNodes = custommenutree.selModel.selected.items[0]; //选择的企业功能树菜单
+                var parentNodes = custommenutree.selModel.selected.items[0].parentNode;
+                var index = parentNodes.childNodes.indexOf(selectNodes);
+                if (index > 0) {
+                    var priviousNode = parentNodes.childNodes[index - 1];
+                    parentNodes.insertChild(index + 1, priviousNode);
+                    //parentNodes.childNodes[index - 1] = selectNodes;
+                    //parentNodes.childNodes[index] = priviousNode;
+                    //RefreshForm(true);
+                }
+            });
+
+           //下移
+            changeSeqForm.items.get('downmove').on('click', function () {
+                //var pNode = custommenutree.selModel.selected.items[0].parentNode;
+                //var dropIndex = childNodeIndex + 1;
+                //pNode.insertChild(dropIndex, record);
+
+                var selectNodes = custommenutree.selModel.selected.items[0]; //选择的企业功能树菜单
+                var parentNodes = custommenutree.selModel.selected.items[0].parentNode;
+                var index = parentNodes.childNodes.indexOf(selectNodes);
+                parentNodes.insertChild(index + 2, selectNodes);
+            });
+
+
+
+
+            //重置自定义功能树的Seq
+            function SetCustomTreeSeq(node) {
+                var childnodes = node.childNodes;
+                for (var i = 0; i < childnodes.length; i++) {
+                    childnodes[i].data.Seq = i;
+                    childnodes[i].dirty = true; //发生变化
+
+                    if (childnodes[i].childNodes.length > 0) {
+                        SetCustomTreeSeq(childnodes[i]);
+                    }
+                }
+            }
+       
+
+
+
+       });
+       //生成唯一值
+       function S4() {
+           return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+       }
+       function guid() {
+           return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+       }
+
+      function delUnUseProperty(data) {//树节点特有属性不需要传到服务端
+            delete data.allowDrag;
+            delete data.allowDrop;
+            delete data.children;
+            delete data.index;
+            delete data.depth;
+            delete data.expanded;
+            delete data.expandable;
+            //delete data.checked;
+            delete data.leaf;
+            delete data.cls;
+            delete data.iconCls;
+            delete data.icon;
+            delete data.root;
+            delete data.isLast;
+            delete data.isFirst;
+            delete data.loaded;
+            delete data.href;
+            delete data.hrefTarget;
+            delete data.qtip;
+            delete data.qtitle;
+            delete data.qshowDelay;
+            delete data.qtitle;
+      }
+
+      function NG3Refresh(param) {
+          var findNode = custommenutree.getRootNode().findChildBy(function (node) {             
+              if (node.data.myid == newNodeItemId) {
+                  return true;
+              }
+          }, null, true);
+          findNode.data.svgconfig = param;
+          return;
+      }
+
+      function deleteTreeNode(node) {         
+        while (node.childNodes.length > 0) {
+            deleteTreeNode(node.childNodes[0]);
+        }            
+        node.remove();
+      }
+
+      function IsNodeTextExist(root, text) {
+
+      }
+      function IsNodeTextExist(root, text, obj) {
+          for (var i = 0; i < root.childNodes.length; i++) {
+              IsNodeTextExist(root.childNodes[i], text , obj);
+          }
+          if (root.data.text == text) {
+              obj.isExist = true;
+          }
+          return ;
+      }
+
+    </script>
+
+
+}

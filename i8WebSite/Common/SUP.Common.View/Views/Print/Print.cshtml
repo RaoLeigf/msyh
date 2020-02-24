@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "打印";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+@section Script
+{
+    <script src="@Url.Content("~/NG3/supcan/dynaload.js")" type="text/javascript" charset="gb2312"></script>
+    <script type="text/javascript">
+        var pageid = '@ViewBag.PageId';
+        var filename = '@ViewBag.FileName';
+        var tempDir = '@ViewBag.TempDir';
+        var fileExists = -1;
+        function CheckPrintFileCreated() {
+            Ext.Ajax.request({
+                params: { "filename": filename },
+                url: '@Url.Content("~/SUP/Print/CheckPrintFileCreated")',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.status === "ok") {
+                        fileExists = 1;
+                    }
+                    else {
+                        fileExists = -1;
+                    }
+                }
+            });
+        }
+        //#region 3、报表控件的回调函数--OnReady
+        function OnReady(id) {
+            if (id == "AF") {
+                document.AF.func("SetSource",C_ROOT + 'ESB/DataServiceCenter/DataCenter');
+                var interId = setInterval(function () {
+                    if (fileExists == -1) {
+                        fileExists = 0;
+                        CheckPrintFileCreated();
+                        return;
+                    }
+                    if (fileExists == 1) {
+                        clearInterval(interId);
+                        document.AF.func("Build", $path(tempDir + "/" + filename + ".xml"));
+                        document.AF.func('SetSource', 'ds1\r\n' + $path(tempDir + "/" + filename + ".txt"));  //json字符串
+                        document.AF.func('Calc', '');
+                    }
+                }, 300);
+            }
+        }
+        //#endregion
+
+        //#region 4、报表控件相关操作的回调函数--OnEvent
+        function OnEvent(id, Event, p1, p2, p3, p4) {
+            if (Event === "PrintSetupBeforeUpdate") {
+                Ext.Ajax.request({
+                    url: '@Url.Content("~/SUP/Print/SetPrintSetup")',
+                    params: { ctype: pageid, PrintPage: p1 },
+                    success: function (res, opts) {
+                    }
+                });
+            }
+        }
+        //#endregion
+
+        //#region 5、页面自适应相关事件
+        window.onload = function () {
+            SetPrintDivHeight();
+        }
+
+        window.onresize = function () {         
+            SetPrintDivHeight();
+        }
+        function SetPrintDivHeight() {
+            var w = window, doc = document, de = 'documentElement';
+            var width = w.innerWidth ? w.innerWidth : (doc[de] && doc[de].clientWidth) ? doc[de].clientWidth : doc.body.offsetWidth;
+            var height = w.innerHeight ? w.innerHeight : (doc[de] && doc[de].clientHeight) ? doc[de].clientHeight : doc.body.offsetHeight;
+            document.getElementById("PrintDiv").style.height = height + "px";
+        }
+        //#endregion
+    </script>
+}
+<div id="PrintDiv" style="width: 100%; height: 20px; overflow: hidden;">
+    <script type="text/javascript">
+        insertReport('AF', 'Main=105,100,189,20,32,106,107;TabScrollBar=show;CollapseToolbar=true;print=11,216,18;TabScrollBar=outofsize;Form=110,162,164;Property=2,112,192,144,478,382,274');
+    </script>
+</div>

@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{ED033942-60EC-43E0-9A7B-289F6FB01867}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NG3.Report.Func.Core</RootNamespace>
+    <AssemblyName>NG3.Report.Func.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\..\..\tfstest\test\Ruleset\NGBaseRuleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NG">
+      <HintPath>..\..\BaseClass\dlls\NG.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3">
+      <HintPath>..\..\BaseClass\dlls\NG3.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Cache.Client">
+      <HintPath>..\..\BaseClass\dlls\NG3.Cache.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data">
+      <HintPath>..\..\BaseClass\dlls\NG3.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>..\..\BaseClass\dlls\NG3.Data.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cfg\FuncConfigure.cs" />
+    <Compile Include="Dac\ConfigureDac.cs" />
+    <Compile Include="Dac\DacSupport.cs" />
+    <Compile Include="Dac\IDacCallback.cs" />
+    <Compile Include="Dac\ObjectExtension.cs" />
+    <Compile Include="DefaultFunc.cs" />
+    <Compile Include="Entity\EnumFuncActionStatus.cs" />
+    <Compile Include="Entity\EnumFuncDataType.cs" />
+    <Compile Include="Entity\FuncInfo.cs" />
+    <Compile Include="Entity\FuncResolveResult.cs" />
+    <Compile Include="Entity\FuncTrackResult.cs" />
+    <Compile Include="FuncContext.cs" />
+    <Compile Include="FuncException.cs" />
+    <Compile Include="Interface\IFunction.cs" />
+    <Compile Include="Supcan\DropDownList.cs" />
+    <Compile Include="Supcan\XmlHelper.cs" />
+    <Compile Include="Util\FaultBuilder.cs" />
+    <Compile Include="Util\FuncCache.cs" />
+    <Compile Include="Util\FuncCalcTask.cs" />
+    <Compile Include="Entity\FuncRefInfo.cs" />
+    <Compile Include="FuncFactory.cs" />
+    <Compile Include="FuncManager.cs" />
+    <Compile Include="Entity\FuncParameter.cs" />
+    <Compile Include="Entity\FuncCalcResult.cs" />
+    <Compile Include="Entity\FuncFault.cs" />
+    <Compile Include="Interface\IFuncResolve.cs" />
+    <Compile Include="Interface\IFuncCalc.cs" />
+    <Compile Include="Interface\IFuncTrack.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

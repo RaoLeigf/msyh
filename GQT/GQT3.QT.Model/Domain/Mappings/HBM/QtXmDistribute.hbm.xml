@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QtXmDistributeModel" table="z_qtxmdistribute">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="FProjcode" column="f_projcode" type="System.String" length="255" not-null="false" />
+		<property name="FProjname" column="f_projname" type="System.String" length="255" not-null="false" />
+		<property name="Orgid" column="orgid" type="System.Int64" not-null="false" />
+		<property name="Orgcode" column="orgcode" type="System.String" length="50" not-null="false" />
+		<property name="Isactive" column="isactive" type="System.Byte" not-null="false" />
+		<property name="Distributeorgid" column="distributeorgid" type="System.Int64" not-null="false" />
+		<property name="Distributeuserid" column="distributeuserid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="FBusiness" column="f_business" type="System.String" length="100" not-null="false" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_calc_scheme">
+      <Field Name="rep_id" IsKey="true"/>
+      <Field Name="status" />
+      <Field Name="start_time"  />
+      <Field Name="end_time"  />
+      <Field Name="interval"  />
+      <Field Name="interval_value"  />
+      <Field Name="calc_summary"  />
+      <Field Name="create_date" />
+      <Field Name="userid"  />
+      <Field Name="ocode" />
+    </Table>
+    <Table Name="rw_report_main">
+      <Field Name="rep_id" AsName="rw_report_main_rep_id" />
+      <Field Name="rep_code" />
+      <Field Name="rep_name"  />
+      <Field Name="rep_xml"/>
+      <Field Name="rep_format"/>
+      <Field Name="catalog_id"/>
+      <Field Name="rep_classid"/>
+      <Field Name="rep_type"/>
+      <Field Name="rep_keys"/>
+      <Field Name="rep_summary"/>
+      <Field Name="rep_status"/>
+    </Table>
+    <Table Name="rw_data_catalog">
+      <Field Name="catalog_index" AsName="catalog_index"/>
+    </Table>
+    <Table Name="secuser" >
+      <Field Name="u_name" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join rw_report_main on [table].rep_id = rw_report_main.rep_id
+      left join rw_data_catalog on rw_data_catalog.id = rw_report_main.catalog_id
+      left join secuser on [table].userid = secuser.logid
+      [where]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="rep_id" Target="Client" Value="rep_id" />
+      <Exp Field="rep_code" Target="Client" Value="rep_code" />
+      <Exp Field="rep_name" Target="Client" Value="rep_name" />
+      <Exp Field="rep_format" Target="Client" Value="rep_format"/>
+      <Exp Field="rep_type" Target="Client" Value="rep_type" />
+      <Exp Field="rep_classid" Target="Client" Value="rep_classid"/>
+      <Exp Field="rep_keys" Target="Client" Value="rep_keys"/>
+      <Exp Field="rep_summary" Target="Client" Value="rep_summary"/>
+      <Exp Field="create_date" paramName="rep_createdate1" Target="Client" Oper="GreaterThanOrEqual" Value="rep_createdate1"/>
+      <Exp Field="create_date" paramName="rep_createdate2" Target="Client" Oper="LessThanOrEqual" Value="rep_createdate2"/>
+      <Exp Field="u_name" Target="Client"  Oper="LikeRight" Value="u_name"/>      
+      <Exp Field="catalog_index" paramName="catalog_index" Oper="LikeRight" Target="Client"  Value="catalog_index"/>
+      <Exp Field="rep_status" Target="Client" Value="rep_status" />
+    </Query>
+    <OrderBy format="{rw_calc_scheme.rep_id}">
+      <Exp Field="rw_calc_scheme.rep_id" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="rw_calc_scheme">
+      <Values>
+        <Exp Field="userid" Target="AppInfo" Value="LoginID"/>
+        <Exp Field="create_date" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+        <Exp Field="ocode" Target="AppInfo" Value="OCode"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <SelectAllRep>
+    <Sql>
+      select [fields] from rw_report_main
+      left join [table] on [table].rep_id = rw_report_main.rep_id
+      left join rw_data_catalog on rw_data_catalog.id = rw_report_main.catalog_id
+      left join secuser on [table].userid = secuser.logid
+      [where]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="rw_report_main_rep_id" Target="Client" Value="rep_id" />
+      <Exp Field="rep_code" Target="Client" Value="rep_code" />
+      <Exp Field="rep_name" Target="Client" Value="rep_name" />
+      <Exp Field="rep_format" Target="Client" Value="rep_format"/>
+      <Exp Field="rep_type" Target="Client" Value="rep_type" />
+      <Exp Field="rep_classid" Target="Client" Value="rep_classid"/>
+      <Exp Field="rep_keys" Target="Client" Value="rep_keys"/>
+      <Exp Field="rep_summary" Target="Client" Value="rep_summary"/>
+      <Exp Field="create_date" paramName="rep_createdate1" Target="Client" Oper="GreaterThanOrEqual" Value="rep_createdate1"/>
+      <Exp Field="create_date" paramName="rep_createdate2" Target="Client" Oper="LessThanOrEqual" Value="rep_createdate2"/>
+      <Exp Field="u_name" Target="Client"  Oper="LikeRight" Value="u_name"/>
+      <Exp Field="catalog_index" paramName="catalog_index" Oper="LikeRight" Target="Client"  Value="catalog_index"/>
+      <Exp Field="rep_status" Target="Client" Value="rep_status" />
+    </Query>
+    <OrderBy format="{rw_report_main.rep_id}">
+      <Exp Field="rw_report_main.rep_id" value="asc"/>
+    </OrderBy>
+  </SelectAllRep>
+
+</DataService>
+
+

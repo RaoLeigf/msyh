@@ -1,0 +1,57 @@
+
+	@media screen and (max-width:1920px) {
+		.kuang ul li {
+			width: 14%;
+			height: 84%;
+			float: left;
+			margin-top: 0.7%;
+			margin-left: 2%;
+		}
+
+		.zi {
+			width: 23px;
+			height: 134px;
+			font-size: 15px;
+			overflow: hidden;
+			margin: 21% auto 0;
+		}
+
+		.z1 {
+			margin-top: 9%;
+			font-size: 1.5rem;
+		}
+
+		.z2 {
+			font-size: 1.5rem;
+		}
+
+		.zi1 {
+			width: 100%;
+			font-size: 20px;
+			margin-left: 1%;
+			margin-top: 1%;
+		}
+
+		.biao li {
+			float: left;
+			margin-left: 4%;
+			width: 50px;
+			height: 50px;
+			background: #0f8bd8;
+			border-radius: 5px;
+		}
+
+		.nei p {
+			float: left;
+			margin-left: 5%;
+			font-size: 15px;
+		}
+
+		.gd {
+			color: #fff;
+			width: 20px;
+			font-size: 30px;
+			margin-left: 16px;
+			margin-top: 40%;
+		}
+	}

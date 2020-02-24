@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="ProjectMstApproveModel" table="act_ng_processtrace">
+    <id name="PhId" access="property" column="phid" >
+      <generator class="assigned">
+      </generator>
+    </id>
+    <property name="Startdt" column="startdt" type="System.DateTime" not-null="false" />
+    <property name="Instcode" column="instcode" type="System.String" length="80" not-null="false" />
+    <property name="Bizid" column="bizid" type="System.String" length="50" not-null="false" />
+    <property name="Pk1" column="pk1" type="System.String" length="50" not-null="false" />
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4B203B85-DF1D-4AA1-8943-2913A31FCB5C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP3.Log.Service</RootNamespace>
+    <AssemblyName>SUP3.Log.Service</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\SUP3.Log.Service.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.ExceptionHandling, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\BaseDlls\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base">
+      <HintPath>..\BaseDlls\Enterprise3.NHORM.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface">
+      <HintPath>..\BaseDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Service">
+      <HintPath>..\BaseDlls\Enterprise3.NHORM.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Exceptions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dlls\NG3.Exceptions.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\BaseDlls\SUP.Common.DataEntity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="LogCfgService.cs" />
+    <Compile Include="LogLogsService.cs" />
+    <Compile Include="LogOtherCfgService.cs" />
+    <Compile Include="LogPerfService.cs" />
+    <Compile Include="LogSortingMethodService.cs" />
+    <Compile Include="LogSortingSlowPerfService.cs" />
+    <Compile Include="LogSortingSlowSqlService.cs" />
+    <Compile Include="LogSqlService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SUP3.Log.Facade.Interface\SUP3.Log.Facade.Interface.csproj">
+      <Project>{3799ee90-a161-47e0-a078-9ebc9c2ef8dd}</Project>
+      <Name>SUP3.Log.Facade.Interface</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP3.Log.Model\SUP3.Log.Model.csproj">
+      <Project>{aef9f7d6-b8ac-4d8c-8247-836cf163c274}</Project>
+      <Name>SUP3.Log.Model</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP3.Log.Service.Interface\SUP3.Log.Service.Interface.csproj">
+      <Project>{503c9efe-0015-4674-b482-04d8d159c6f6}</Project>
+      <Name>SUP3.Log.Service.Interface</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\Rules</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

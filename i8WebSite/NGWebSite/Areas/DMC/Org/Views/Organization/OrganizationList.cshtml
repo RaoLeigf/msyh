@@ -1,0 +1,585 @@
+﻿@{
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
+        ViewBag.Title = "组织设置";
+    }
+    Layout = "~/Views/Shared/_DMCLayout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/DMC/Org/Org.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/NG3Resource/js/help/OrgHelp.js")" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+            //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+            @*var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+            var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+            //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+            var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+            if (Ext.isEmpty(defCustomInfo)) {
+                //数据库没有，取js模板的individualConfigInfo
+                defCustomInfo = individualConfigInfo;
+            }*@
+
+            //自定义信息与多语言合并
+            //var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+
+            //多语言
+            var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var languageInfo = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //多语言
+
+            var info = Ext.htmlDecode('@ViewBag.individualInfo');
+
+            var individualInfo = individualConfigInfo;//插件NewEmpInfoEdit中定义的UI信息默认值，每个插件都必须是这个值
+
+            //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+            if (!Ext.isEmpty(info)) {
+                individualInfo = $DealIndividualInfo(info, languageInfo);//自定义信息与多语言合并
+            }
+            else {
+                individualInfo = $DealIndividualInfo(individualInfo, languageInfo);//自定义信息与多语言合并
+            }
+    </script>
+    <script type="text/javascript">
+
+        var grid;
+        var store;
+        var wechatset = @ViewBag.WeChatSet;
+        var wechatmode = @ViewBag.WeChatMode;
+        var FunctionMode  = '@ViewBag.FunctionMode';
+        Ext.onReady(function () {
+
+            var splitBar = Ext.create('Ext.button.Split', {
+                text: '新增',
+                handler: function () {
+                },
+                iconCls: 'icon-New',
+                menu: new Ext.menu.Menu({
+                    items: [
+                        {
+                            text: '新增经营组织',
+                            iconCls: 'icon-AddBrother',
+                            itemId: 'add_cboo',
+                            handler: function () {
+                                $OpenTab('经营组织新增', C_ROOT + '/DMC/Org/Organization/OrganizationEdit?FunctionMode='+ FunctionMode+'&orgtype=Y&otype=add');
+                            }
+                        }, {
+                            text: '新增职能机构',
+                            iconCls: 'icon-AddChild',
+                            itemId: 'add_dept',
+                            handler: function () {
+                                $OpenTab('职能机构新增', C_ROOT + '/DMC/Org/Organization/OrganizationEdit?FunctionMode='+ FunctionMode+'&orgtype=N&otype=add');
+                            }
+                        }
+                    ]
+                })
+            });
+
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: 'FBD_Org_List', //权限名称
+                ngbuttons: [
+                    splitBar, 'edit', 'delete', 'view',
+                    {
+                        text: '引入',
+                        itemId: 'importent',
+                        iconCls: 'icon-Import'
+                    }, {
+                        text: '组织模块授权',
+                        itemId: 'orgmodulegrant',
+                        iconCls: 'icon-Import'
+                    }, {
+                        text: '人力组织同步微信',
+                        itemId: 'orgtowechat',
+                        iconCls: 'icon-create',
+                        hidden: !(wechatset&&(wechatmode=="0"))
+                    },{
+                        text: '微信与人力组织对应同步',
+                        itemId: 'wechattoorg',
+                        iconCls: 'icon-create',
+                        hidden: !(wechatset&&(wechatmode=="1"))
+                    },
+                    '->',
+                    'help',
+                    'print',
+                    'close'
+                ]
+            });
+
+            //定义模型
+            Ext.define('model', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'PhId',
+                        type: 'string',
+                        mapping: 'PhId'
+                    }, {
+                        name: 'OCode',
+                        type: 'string',
+                        mapping: 'OCode'
+                    }, {
+                        name: 'OName',
+                        type: 'string',
+                        mapping: 'OName'
+                    }, {
+                        name: 'IfCorp',
+                        type: 'string',
+                        mapping: 'IfCorp'
+                    }, {
+                        name: 'OTax',
+                        type: 'string',
+                        mapping: 'OTax'
+                    }, {
+                        name: 'OAddr',
+                        type: 'string',
+                        mapping: 'OAddr'
+                    }, {
+                        name: 'OZip',
+                        type: 'string',
+                        mapping: 'OZip'
+                    }, {
+                        name: 'OTel',
+                        type: 'string',
+                        mapping: 'OTel'
+                    }, {
+                        name: 'OFax',
+                        type: 'string',
+                        mapping: 'OFax'
+                    }, {
+                        name: 'OEmail',
+                        type: 'string',
+                        mapping: 'OEmail'
+                    }, {
+                        name: 'OMemo',
+                        type: 'string',
+                        mapping: 'OMemo'
+                    }, {
+                        name: 'OOwner',
+                        type: 'string',
+                        mapping: 'OOwner'
+                    }, {
+                        name: 'OCfo',
+                        type: 'string',
+                        mapping: 'OCfo'
+                    }, {
+                        name: 'OCbo',
+                        type: 'string',
+                        mapping: 'OCbo'
+                    }, {
+                        name: 'OCio',
+                        type: 'string',
+                        mapping: 'OCio'
+                    }, {
+                        name: 'Verdtm',
+                        type: 'string',
+                        mapping: 'Verdtm'
+                    }, {
+                        name: 'OrgType',
+                        type: 'string',
+                        mapping: 'OrgType'
+                    }, {
+                        name: 'EbDt',
+                        type: 'string',
+                        mapping: 'EbDt'
+                    }, {
+                        name: 'EeDt',
+                        type: 'string',
+                        mapping: 'EeDt'
+                    }, {
+                        name: 'IfLogin',
+                        type: 'string',
+                        mapping: 'IfLogin'
+                    }, {
+                        name: 'StationCode',
+                        type: 'string',
+                        mapping: 'StationCode'
+                    }, {
+                        name: 'EmpCode',
+                        type: 'string',
+                        mapping: 'EmpCode'
+                    }, {
+                        name: 'IsActive',
+                        type: 'string',
+                        mapping: 'IsActive'
+                    }, {
+                        name: 'OrgIndex',
+                        type: 'int',
+                        mapping: 'OrgIndex'
+                    }, {
+                        name: 'CreditNum',
+                        type: 'float',
+                        mapping: 'CreditNum'
+                    }, {
+                        name: 'CsaPriceCode',
+                        type: 'string',
+                        mapping: 'CsaPriceCode'
+                    }, {
+                        name: 'CodeValue',
+                        type: 'string',
+                        mapping: 'CodeValue'
+                    }, {
+                        name: 'RelProject',
+                        type: 'string',
+                        mapping: 'RelProject'
+                    }, {
+                        name: 'EnterpriseNo',
+                        type: 'string',
+                        mapping: 'EnterpriseNo'
+                    }, {
+                        name: 'OrgAttribute',
+                        type: 'string',
+                        mapping: 'OrgAttribute'
+                    }, {
+                        name: 'OrgXc',
+                        type: 'string',
+                        mapping: 'OrgXc'
+                    }, {
+                        name: 'OrgBs',
+                        type: 'string',
+                        mapping: 'OrgBs'
+                    }, {
+                        name: 'OrgKs',
+                        type: 'string',
+                        mapping: 'OrgKs'
+                    }, {
+                        name: 'OrgXmz',
+                        type: 'string',
+                        mapping: 'OrgXmz'
+                    }, {
+                        name: 'GfiImport',
+                        type: 'string',
+                        mapping: 'GfiImport'
+                    }, {
+                        name: 'PrStatus',
+                        type: 'string',
+                        mapping: 'PrStatus'
+                    }, {
+                        name: 'IsSalary',
+                        type: 'string',
+                        mapping: 'IsSalary'
+                    }, {
+                        name: 'FillEmp',
+                        type: 'string',
+                        mapping: 'FillEmp'
+                    }, {
+                        name: 'CloseOrgDt',
+                        type: 'string',
+                        mapping: 'CloseOrgDt'
+                    }, {
+                        name: 'Bopomofo',
+                        type: 'string',
+                        mapping: 'Bopomofo'
+                    }, {
+                        name: 'EnableFlg',
+                        type: 'string',
+                        mapping: 'EnableFlg'
+                    }, {
+                        name: 'TrainManager',
+                        type: 'string',
+                        mapping: 'TrainManager'
+                    }, {
+                        name: 'IsNfcShow',
+                        type: 'string',
+                        mapping: 'IsNfcShow'
+                    }, {
+                        name: 'Proj',
+                        type: 'string',
+                        mapping: 'Proj'
+                    }, {
+                        name: 'IsRatePay',
+                        type: 'string',
+                        mapping: 'IsRatePay'
+                    }, {
+                        name: 'RatePayOCode',
+                        type: 'int',
+                        mapping: 'RatePayOCode'
+                    }, {
+                        name: 'RatePayNum',
+                        type: 'float',
+                        mapping: 'RatePayNum'
+                    }, {
+                        name: 'RatePayLevel',
+                        type: 'string',
+                        mapping: 'RatePayLevel'
+                    }, {
+                        name: 'Creator',
+                        type: 'string',
+                        mapping: 'Creator'
+                    }, {
+                        name: 'Editor',
+                        type: 'string',
+                        mapping: 'Editor'
+                    }, {
+                        name: 'NgInsertDt',
+                        type: 'string',
+                        mapping: 'NgInsertDt'
+                    }, {
+                        name: 'NgUpdateDt',
+                        type: 'string',
+                        mapping: 'NgUpdateDt'
+                    }, {
+                        name: 'NgRecordVer',
+                        type: 'int',
+                        mapping: 'NgRecordVer'
+                    }, {
+                        name: 'ForeignFn',
+                        type: 'string',
+                        mapping: 'ForeignFn'
+                    }, {
+                        name: 'ForeignAb',
+                        type: 'string',
+                        mapping: 'ForeignAb'
+                    }, {
+                        name: 'IsStat',
+                        type: 'string',
+                        mapping: 'IsStat'
+                    }, {
+                        name: 'IsEnd',
+                        type: 'string',
+                        mapping: 'IsEnd'
+                    }
+                ]
+            });
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+                autoLoad: false,
+                url: C_ROOT + 'DMC/Org/Organization/GetOrganizationList',
+                remoteSort: true
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+            var otherconfig = {
+                region: 'center',
+                //frame: true,
+                stateful: true,
+                stateId: 'EnterpriseListnggrid',
+                store: store,
+                buskey: 'PhId', //对应的业务表主键属性
+                columnLines: true,
+                bbar: pagingbar
+            };
+            gridconfig = Ext.apply(individualInfo.grid["billList"], otherconfig);
+            var grid = Ext.create('Ext.ng.GridPanel', gridconfig);
+            grid.getColumn('OrgIndex').renderer = function (val, cell) {
+                switch (val) {
+                    case 0:
+                        return "";
+                    default:
+                        return val;
+                }
+            };
+            grid.getColumn('IfCorp').renderer = function (val, cell) {
+                switch (val) {
+                    case 'Y':
+                        return "组织";
+                    case 'N':
+                        return "职能机构";
+                }
+            };
+            grid.getColumn('IfLogin').renderer = function (val, cell) {
+                switch (val) {
+                    case '1':
+                        return "是";
+                    default:
+                        return "否";
+                }
+            };
+            grid.getColumn('EbDt').renderer = function (val, cell) {
+                return val.substring(0, 10);
+            };
+            grid.getColumn('EeDt').renderer = function (val, cell) {
+                return val.substring(0, 10);
+            };
+            grid.getColumn('IsActive').renderer = function (val, cell) {
+                switch (val) {
+                    case '1':
+                        return "活动";
+                    case '0':
+                        return "休眠";
+                }
+            }
+
+
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                pageid: "Web:OrganizationList", //对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 4 //每行4列
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, queryPanel, grid]
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var orgtype = data[0].get('OrgType');
+                    $OpenTab('组织列表-修改', C_ROOT + 'DMC/Org/Organization/OrganizationEdit?FunctionMode='+ FunctionMode+'&otype=edit&id=' + id + '&orgtype=' + orgtype);
+                }
+            });
+
+            //删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_PATH + 'Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    var orgtype = data[0].get('OrgType');
+                    $OpenTab('组织列表-查看', C_ROOT + 'DMC/Org/Organization/OrganizationEdit?FunctionMode='+ FunctionMode+'&otype=view&id=' + id + '&orgtype=' + orgtype);
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {;
+                $Print("OrganizationList", grid, '@ViewBag.Title');
+            });
+
+            //引入
+            ngToolbar.get('importent').on('click', function () {
+                var enthelp = Ext.create('Ext.ng.EnterpriseHelp', {
+                    isIncludeOrg:false,
+                    listeners: {
+                        change: function (_this, newValue) {
+                        },
+                        helpselected: function (obj) {
+                            $OpenTab('经营组织新增', C_ROOT + '/DMC/Org/Organization/OrganizationImport?orgcode='+ obj.data[0].data.CompNo + '&orgname=' +obj.data[0].data.CompName);
+                        }
+                    }
+                });
+                enthelp.showHelp();
+            });
+
+            ngToolbar.get('orgmodulegrant').on('click', function () {
+                /*if (window.external) {
+                    window.external.ShowManagerWithParm("ModuleRightsSettingManager", 1, null);
+                }*/
+				$OpenTab('组织模块授权', C_ROOT + '/GQT/QT/CorrespondenceSettings/ModuleRights');
+            });
+
+            ngToolbar.get('orgtowechat').on('click', function () {
+                $OpenTab('人力组织同步微信', C_ROOT + 'DMC/Org/OrgRelat/OrgToWeChatSet');
+            });
+
+            ngToolbar.get('wechattoorg').on('click', function () {
+                $OpenTab('微信与人力组织对应同步', C_ROOT + 'DMC/Org/OrgRelat/WeChatToOrgSet');
+            });
+
+            ngToolbar.get('help').on('click', function () {
+                if(FunctionMode == "HR")
+                {
+                    $OpenOnlineHelp('HROrganizationList.cshtml', '');
+                }else{
+                    $OpenOnlineHelp('DMCOrganizationList.cshtml', '');
+                }
+
+            });
+
+            //编辑窗口保存后回刷列表
+            var frame = $GetWFrame();
+            var listref = Ext.create('Ext.ng.ListRefresher');
+            if (frame) {
+                frame.ListObserver.add('OrganizationList', listref);
+                listref.on('refreshlist', function (data) {
+                    var curtab = window.frameElement.parentContainer; //获取tab页容器
+                    var actfunc = function () {
+                        var jsonStr = "{PhId:" + data.PhId + "}";
+                        Ext.Ajax.request({
+                            params: { 'queryfilter': jsonStr, 'limit': 1 },
+                            url: '@Url.Content("~/DMC/Org/Organization/GetOrganizationList")',
+                            async: false, //同步请求
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.Record.length === 1) {
+                                    var index = store.find("PhId", data.PhId);
+                                    if (index >= 0) {
+                                        Ext.apply(store.data.items[index].data, resp.Record[0]);
+                                    } else {
+                                        index = store.getCount();
+                                        store.insert(index, resp.Record[0]);
+                                    };
+                                    grid.getView().refresh(true);
+                                }
+                            }
+                        });
+                        curtab.un('activate', actfunc);
+                    };
+                    curtab.on('activate', actfunc);
+                });
+            }
+
+            //刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: '@Url.Content("~/DMC/Org/Organization/GetOrganizationList")',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+        });
+        var NG3Refresh = function () {
+            store.reload();
+        };
+
+    </script>
+}
+
+

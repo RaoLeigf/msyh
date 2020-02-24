@@ -1,0 +1,1109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="NG3Upload">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="asr_dbconn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="blob_data" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3UploadResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3UploadResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3Del">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dbconn" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="phid" type="s:long" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3DelResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3DelResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3Modify">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dbconn" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="phid" type="s:long" />
+            <s:element minOccurs="0" maxOccurs="1" name="blob_data" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3ModifyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3ModifyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3Get">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dbconn" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="phid" type="s:long" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3GetResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3GetResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3GetEx">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dbconn" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="phid" type="s:long" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3GetExResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3GetExResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3Copy">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="asr_attach_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_code" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fill" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fillname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_dbconn" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="oriphid" type="s:long" />
+            <s:element minOccurs="0" maxOccurs="1" name="ori_asr_table" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3CopyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3CopyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3CopyByAttachIds">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="asr_attach_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_code" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fill" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fillname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_dbconn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="attachids" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3CopyByAttachIdsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3CopyByAttachIdsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3MutilCopy">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="asr_attach_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_code" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fill" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fillname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_dbconn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="oriphids" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ori_asr_table" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3MutilCopyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3MutilCopyResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AyncNG3MutilCopyEx">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="copyjosn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fill" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fillname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_dbconn" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AyncNG3MutilCopyExResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AyncNG3MutilCopyExResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3MutilCopyEx">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="copyjosn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fill" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_fillname" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_dbconn" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3MutilCopyExResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3MutilCopyExResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3DelByAsrCode">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dbconn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_code" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_attach_table" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="asr_table" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3DelByAsrCodeResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3DelByAsrCodeResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3ImageLoad2AttachFolder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="dbconn" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="downinfo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NG3ImageLoad2AttachFolderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NG3ImageLoad2AttachFolderResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="base64Binary" nillable="true" type="s:base64Binary" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="NG3UploadSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3Upload" />
+  </wsdl:message>
+  <wsdl:message name="NG3UploadSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3UploadResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3Del" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3DelResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3ModifySoapIn">
+    <wsdl:part name="parameters" element="tns:NG3Modify" />
+  </wsdl:message>
+  <wsdl:message name="NG3ModifySoapOut">
+    <wsdl:part name="parameters" element="tns:NG3ModifyResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3Get" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3GetResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetExSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3GetEx" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetExSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3GetExResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopySoapIn">
+    <wsdl:part name="parameters" element="tns:NG3Copy" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopySoapOut">
+    <wsdl:part name="parameters" element="tns:NG3CopyResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyByAttachIdsSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3CopyByAttachIds" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyByAttachIdsSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3CopyByAttachIdsResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopySoapIn">
+    <wsdl:part name="parameters" element="tns:NG3MutilCopy" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopySoapOut">
+    <wsdl:part name="parameters" element="tns:NG3MutilCopyResponse" />
+  </wsdl:message>
+  <wsdl:message name="AyncNG3MutilCopyExSoapIn">
+    <wsdl:part name="parameters" element="tns:AyncNG3MutilCopyEx" />
+  </wsdl:message>
+  <wsdl:message name="AyncNG3MutilCopyExSoapOut">
+    <wsdl:part name="parameters" element="tns:AyncNG3MutilCopyExResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyExSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3MutilCopyEx" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyExSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3MutilCopyExResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelByAsrCodeSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3DelByAsrCode" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelByAsrCodeSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3DelByAsrCodeResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3ImageLoad2AttachFolderSoapIn">
+    <wsdl:part name="parameters" element="tns:NG3ImageLoad2AttachFolder" />
+  </wsdl:message>
+  <wsdl:message name="NG3ImageLoad2AttachFolderSoapOut">
+    <wsdl:part name="parameters" element="tns:NG3ImageLoad2AttachFolderResponse" />
+  </wsdl:message>
+  <wsdl:message name="NG3UploadHttpGetIn">
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="blob_data" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3UploadHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelHttpGetIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ModifyHttpGetIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+    <wsdl:part name="blob_data" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ModifyHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetHttpGetIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetExHttpGetIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetExHttpGetOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyHttpGetIn">
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="oriphid" type="s:string" />
+    <wsdl:part name="ori_asr_table" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyByAttachIdsHttpGetIn">
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="attachids" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyByAttachIdsHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyHttpGetIn">
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="oriphids" type="s:string" />
+    <wsdl:part name="ori_asr_table" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="AyncNG3MutilCopyExHttpGetIn">
+    <wsdl:part name="copyjosn" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="AyncNG3MutilCopyExHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyExHttpGetIn">
+    <wsdl:part name="copyjosn" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyExHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelByAsrCodeHttpGetIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelByAsrCodeHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ImageLoad2AttachFolderHttpGetIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="downinfo" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ImageLoad2AttachFolderHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3UploadHttpPostIn">
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="blob_data" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3UploadHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelHttpPostIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ModifyHttpPostIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+    <wsdl:part name="blob_data" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ModifyHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetHttpPostIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetExHttpPostIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="phid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3GetExHttpPostOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyHttpPostIn">
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="oriphid" type="s:string" />
+    <wsdl:part name="ori_asr_table" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyByAttachIdsHttpPostIn">
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="attachids" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3CopyByAttachIdsHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyHttpPostIn">
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+    <wsdl:part name="oriphids" type="s:string" />
+    <wsdl:part name="ori_asr_table" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="AyncNG3MutilCopyExHttpPostIn">
+    <wsdl:part name="copyjosn" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="AyncNG3MutilCopyExHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyExHttpPostIn">
+    <wsdl:part name="copyjosn" type="s:string" />
+    <wsdl:part name="asr_fill" type="s:string" />
+    <wsdl:part name="asr_fillname" type="s:string" />
+    <wsdl:part name="asr_dbconn" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3MutilCopyExHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelByAsrCodeHttpPostIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="asr_code" type="s:string" />
+    <wsdl:part name="asr_attach_table" type="s:string" />
+    <wsdl:part name="asr_table" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3DelByAsrCodeHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ImageLoad2AttachFolderHttpPostIn">
+    <wsdl:part name="dbconn" type="s:string" />
+    <wsdl:part name="downinfo" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="NG3ImageLoad2AttachFolderHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:portType name="NG3UploadFileSvcSoap">
+    <wsdl:operation name="NG3Upload">
+      <wsdl:input message="tns:NG3UploadSoapIn" />
+      <wsdl:output message="tns:NG3UploadSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <wsdl:input message="tns:NG3DelSoapIn" />
+      <wsdl:output message="tns:NG3DelSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <wsdl:input message="tns:NG3ModifySoapIn" />
+      <wsdl:output message="tns:NG3ModifySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <wsdl:input message="tns:NG3GetSoapIn" />
+      <wsdl:output message="tns:NG3GetSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <wsdl:input message="tns:NG3GetExSoapIn" />
+      <wsdl:output message="tns:NG3GetExSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <wsdl:input message="tns:NG3CopySoapIn" />
+      <wsdl:output message="tns:NG3CopySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <wsdl:input message="tns:NG3CopyByAttachIdsSoapIn" />
+      <wsdl:output message="tns:NG3CopyByAttachIdsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <wsdl:input message="tns:NG3MutilCopySoapIn" />
+      <wsdl:output message="tns:NG3MutilCopySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <wsdl:input message="tns:AyncNG3MutilCopyExSoapIn" />
+      <wsdl:output message="tns:AyncNG3MutilCopyExSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <wsdl:input message="tns:NG3MutilCopyExSoapIn" />
+      <wsdl:output message="tns:NG3MutilCopyExSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <wsdl:input message="tns:NG3DelByAsrCodeSoapIn" />
+      <wsdl:output message="tns:NG3DelByAsrCodeSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <wsdl:input message="tns:NG3ImageLoad2AttachFolderSoapIn" />
+      <wsdl:output message="tns:NG3ImageLoad2AttachFolderSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="NG3UploadFileSvcHttpGet">
+    <wsdl:operation name="NG3Upload">
+      <wsdl:input message="tns:NG3UploadHttpGetIn" />
+      <wsdl:output message="tns:NG3UploadHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <wsdl:input message="tns:NG3DelHttpGetIn" />
+      <wsdl:output message="tns:NG3DelHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <wsdl:input message="tns:NG3ModifyHttpGetIn" />
+      <wsdl:output message="tns:NG3ModifyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <wsdl:input message="tns:NG3GetHttpGetIn" />
+      <wsdl:output message="tns:NG3GetHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <wsdl:input message="tns:NG3GetExHttpGetIn" />
+      <wsdl:output message="tns:NG3GetExHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <wsdl:input message="tns:NG3CopyHttpGetIn" />
+      <wsdl:output message="tns:NG3CopyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <wsdl:input message="tns:NG3CopyByAttachIdsHttpGetIn" />
+      <wsdl:output message="tns:NG3CopyByAttachIdsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <wsdl:input message="tns:NG3MutilCopyHttpGetIn" />
+      <wsdl:output message="tns:NG3MutilCopyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <wsdl:input message="tns:AyncNG3MutilCopyExHttpGetIn" />
+      <wsdl:output message="tns:AyncNG3MutilCopyExHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <wsdl:input message="tns:NG3MutilCopyExHttpGetIn" />
+      <wsdl:output message="tns:NG3MutilCopyExHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <wsdl:input message="tns:NG3DelByAsrCodeHttpGetIn" />
+      <wsdl:output message="tns:NG3DelByAsrCodeHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <wsdl:input message="tns:NG3ImageLoad2AttachFolderHttpGetIn" />
+      <wsdl:output message="tns:NG3ImageLoad2AttachFolderHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="NG3UploadFileSvcHttpPost">
+    <wsdl:operation name="NG3Upload">
+      <wsdl:input message="tns:NG3UploadHttpPostIn" />
+      <wsdl:output message="tns:NG3UploadHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <wsdl:input message="tns:NG3DelHttpPostIn" />
+      <wsdl:output message="tns:NG3DelHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <wsdl:input message="tns:NG3ModifyHttpPostIn" />
+      <wsdl:output message="tns:NG3ModifyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <wsdl:input message="tns:NG3GetHttpPostIn" />
+      <wsdl:output message="tns:NG3GetHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <wsdl:input message="tns:NG3GetExHttpPostIn" />
+      <wsdl:output message="tns:NG3GetExHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <wsdl:input message="tns:NG3CopyHttpPostIn" />
+      <wsdl:output message="tns:NG3CopyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <wsdl:input message="tns:NG3CopyByAttachIdsHttpPostIn" />
+      <wsdl:output message="tns:NG3CopyByAttachIdsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <wsdl:input message="tns:NG3MutilCopyHttpPostIn" />
+      <wsdl:output message="tns:NG3MutilCopyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <wsdl:input message="tns:AyncNG3MutilCopyExHttpPostIn" />
+      <wsdl:output message="tns:AyncNG3MutilCopyExHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <wsdl:input message="tns:NG3MutilCopyExHttpPostIn" />
+      <wsdl:output message="tns:NG3MutilCopyExHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <wsdl:input message="tns:NG3DelByAsrCodeHttpPostIn" />
+      <wsdl:output message="tns:NG3DelByAsrCodeHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <wsdl:input message="tns:NG3ImageLoad2AttachFolderHttpPostIn" />
+      <wsdl:output message="tns:NG3ImageLoad2AttachFolderHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NG3UploadFileSvcSoap" type="tns:NG3UploadFileSvcSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="NG3Upload">
+      <soap:operation soapAction="http://tempuri.org/NG3Upload" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <soap:operation soapAction="http://tempuri.org/NG3Del" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <soap:operation soapAction="http://tempuri.org/NG3Modify" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <soap:operation soapAction="http://tempuri.org/NG3Get" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <soap:operation soapAction="http://tempuri.org/NG3GetEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <soap:operation soapAction="http://tempuri.org/NG3Copy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <soap:operation soapAction="http://tempuri.org/NG3CopyByAttachIds" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <soap:operation soapAction="http://tempuri.org/NG3MutilCopy" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <soap:operation soapAction="http://tempuri.org/AyncNG3MutilCopyEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <soap:operation soapAction="http://tempuri.org/NG3MutilCopyEx" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <soap:operation soapAction="http://tempuri.org/NG3DelByAsrCode" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <soap:operation soapAction="http://tempuri.org/NG3ImageLoad2AttachFolder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="NG3UploadFileSvcSoap12" type="tns:NG3UploadFileSvcSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="NG3Upload">
+      <soap12:operation soapAction="http://tempuri.org/NG3Upload" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <soap12:operation soapAction="http://tempuri.org/NG3Del" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <soap12:operation soapAction="http://tempuri.org/NG3Modify" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <soap12:operation soapAction="http://tempuri.org/NG3Get" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <soap12:operation soapAction="http://tempuri.org/NG3GetEx" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <soap12:operation soapAction="http://tempuri.org/NG3Copy" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <soap12:operation soapAction="http://tempuri.org/NG3CopyByAttachIds" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <soap12:operation soapAction="http://tempuri.org/NG3MutilCopy" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <soap12:operation soapAction="http://tempuri.org/AyncNG3MutilCopyEx" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <soap12:operation soapAction="http://tempuri.org/NG3MutilCopyEx" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <soap12:operation soapAction="http://tempuri.org/NG3DelByAsrCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <soap12:operation soapAction="http://tempuri.org/NG3ImageLoad2AttachFolder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="NG3UploadFileSvcHttpGet" type="tns:NG3UploadFileSvcHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="NG3Upload">
+      <http:operation location="/NG3Upload" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <http:operation location="/NG3Del" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <http:operation location="/NG3Modify" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <http:operation location="/NG3Get" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <http:operation location="/NG3GetEx" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <http:operation location="/NG3Copy" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <http:operation location="/NG3CopyByAttachIds" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <http:operation location="/NG3MutilCopy" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <http:operation location="/AyncNG3MutilCopyEx" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <http:operation location="/NG3MutilCopyEx" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <http:operation location="/NG3DelByAsrCode" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <http:operation location="/NG3ImageLoad2AttachFolder" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="NG3UploadFileSvcHttpPost" type="tns:NG3UploadFileSvcHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="NG3Upload">
+      <http:operation location="/NG3Upload" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Del">
+      <http:operation location="/NG3Del" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Modify">
+      <http:operation location="/NG3Modify" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Get">
+      <http:operation location="/NG3Get" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3GetEx">
+      <http:operation location="/NG3GetEx" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3Copy">
+      <http:operation location="/NG3Copy" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3CopyByAttachIds">
+      <http:operation location="/NG3CopyByAttachIds" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopy">
+      <http:operation location="/NG3MutilCopy" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AyncNG3MutilCopyEx">
+      <http:operation location="/AyncNG3MutilCopyEx" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3MutilCopyEx">
+      <http:operation location="/NG3MutilCopyEx" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3DelByAsrCode">
+      <http:operation location="/NG3DelByAsrCode" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NG3ImageLoad2AttachFolder">
+      <http:operation location="/NG3ImageLoad2AttachFolder" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="NG3UploadFileSvc">
+    <wsdl:port name="NG3UploadFileSvcSoap" binding="tns:NG3UploadFileSvcSoap">
+      <soap:address location="http://127.0.0.1/i6sfilesrv/NG3UploadFileSvc.asmx" />
+    </wsdl:port>
+    <wsdl:port name="NG3UploadFileSvcSoap12" binding="tns:NG3UploadFileSvcSoap12">
+      <soap12:address location="http://127.0.0.1/i6sfilesrv/NG3UploadFileSvc.asmx" />
+    </wsdl:port>
+    <wsdl:port name="NG3UploadFileSvcHttpGet" binding="tns:NG3UploadFileSvcHttpGet">
+      <http:address location="http://127.0.0.1/i6sfilesrv/NG3UploadFileSvc.asmx" />
+    </wsdl:port>
+    <wsdl:port name="NG3UploadFileSvcHttpPost" binding="tns:NG3UploadFileSvcHttpPost">
+      <http:address location="http://127.0.0.1/i6sfilesrv/NG3UploadFileSvc.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

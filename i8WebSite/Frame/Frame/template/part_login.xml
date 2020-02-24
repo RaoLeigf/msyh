@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Supcan Freeform -->
+<freeform>
+  <Properties>
+    <backGround bgColor="#E5EAFF,#FCFFFF"/>
+  </Properties>
+  <Fonts ref="">
+    <Font faceName="微软雅黑" size="-12"/>
+    <Font faceName="宋体" size="13"/>
+  </Fonts>
+  <Objects>
+    <TableLayout id="layout1" y="8" width="100%">
+      <col width="0.10"/>
+      <col width="6"/>
+      <col width="80"/>
+      <col width="180"/>
+      <col width="0.10"/>
+      <tr height="21">
+        <td/>
+        <td/>
+        <td>
+          <Input id="DDLServer" width="2" type="Droplist" tabOrder="1" align="left" leftText="服务器" leftTextAlign="left" droplistID="DDLServer"/>
+        </td>
+      </tr>
+      <tr height="5"/>
+      <tr height="21">
+        <td/>
+        <td/>
+        <td>
+          <Input id="DDLAcc" width="2" type="EditableDroplist" tabOrder="2" align="left" leftText="企业" leftTextAlign="left" droplistID="DDLAcc"/>
+        </td>
+      </tr>
+      <tr height="5"/>
+      <tr height="21">
+        <td/>
+        <td/>
+        <td>
+          <Input id="EditUser" width="2" type="Edit" tabOrder="3" align="left" leftText="用户" leftTextAlign="left"/>
+        </td>
+      </tr>
+      <tr height="5"/>
+      <tr height="21">
+        <td/>
+        <td/>
+        <td>
+          <Input id="EditPass" width="2" type="Password" tabOrder="4" align="left" leftText="密码" leftTextAlign="left"/>
+        </td>
+        <td/>
+        <td>
+          <Input id="EditMac" visible="false" type="Edit"/>
+        </td>
+      </tr>
+      <tr height="6"/>
+    </TableLayout>
+  </Objects>
+  <Droplists>
+    <Droplist id="DDLServer" dataCol="ByName" displayCol="ServerName">
+    </Droplist>
+    <Droplist id="DDLAcc" dataCol="ucode" displayCol="uname">
+    </Droplist>
+  </Droplists>
+</freeform>

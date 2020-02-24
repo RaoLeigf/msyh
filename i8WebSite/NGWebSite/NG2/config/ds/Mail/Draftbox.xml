@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Read>
+    <Where>
+      <exp Field="mailtype" Value="3" />
+    </Where>
+  </Read>
+  <Create>
+    <Values>
+      <exp Field="mailtype" Value="3" />
+      <exp Field="sender" Target="AppInfo" Value="email" />
+    </Values>
+  </Create>
+</DataService>

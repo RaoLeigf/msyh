@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_senddtl">
+      <Field Name="sendid" IsKey="true" />
+      <Field Name="sendno"  />
+      <Field Name="lineid" IsKey="true"/>
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="sendsum"/>
+      <Field Name="reqdate" />
+      <Field Name="batchno" />
+      <Field Name="remarks" />
+      <Field Name="scmacceptflg" />
+      <Field Name="scmacceptman" />
+      <Field Name="scmacceptdate" />
+      <Field Name="scmacceptqty" />
+      <Field Name="scmbackqty" />
+      <Field Name="checkqty" />
+      <Field Name="relid" />
+      <Field Name="relno" />
+      <Field Name="relmxid" />
+      <Field Name="purid" />
+      <Field Name="purmxid" />
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname" />
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname" />
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="descript"/>
+      <Field Name="itemname"/>
+    </Table>
+    <Table Name="secuser">
+      <Field Name="u_name" AsName="scmacceptmanname"></Field>
+    </Table>
+    <Table Name="wsp_supply_ordermst">
+      <Field Name="relno" AsName="purno"></Field>
+    </Table>
+    <Table Name="wsp_supply_sendmst">
+      <Field Name="supcomp"></Field>
+      <Field Name="ocode"></Field>
+      <Field Name="recorddate"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      inner join wsp_supply_sendmst on wsp_supply_sendmst.sendid = [table].sendid 
+      left join wsp_supply_ordermst on wsp_supply_ordermst.orderid = [table].relid
+      left join itemdata on itemdata.itemno=[table].itemno
+      left join msunit on msunit.msunit = [table].msunit
+      left join ranks on ranks.ranks = [table].ranks
+      left join secuser on secuser.logid = [table].scmacceptman
+      [where] [orderby]
+    </Sql>
+    <Where>
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+      <Exp Field="supcomp"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+    <Query>
+      <Exp Field="wsp_supply_senddtl.itemno" paramName="itemno" Target="Client" Value="itemno"></Exp>
+      <Exp Field="wsp_supply_senddtl.itemname" paramName="itemname" Target="Client" Value="itemname"></Exp>
+      <Exp Field="wsp_supply_sendmst.recorddate" paramName="recorddate1" Target="Client" Oper="GreaterThanOrEqual" Value="recorddate1"/>
+      <Exp Field="wsp_supply_sendmst.recorddate" paramName="recorddate2" Target="Client" Oper="LessThanOrEqual" Value="recorddate2" />
+      <Exp Field="wsp_supply_ordermst.relno" paramName="purno" Target="Client" Value="purno"/>
+      <Exp Field="wsp_supply_senddtl.descript" paramName="descript" Target="Client" Value="descript"/>
+      <Exp Field="wsp_supply_senddtl.sendno" paramName="sendno" Target="Client" Value="sendno"/>
+      <Exp Field="wsp_supply_senddtl.remarks" paramName="remarks" Target="Client" Value="remarks"/>
+    </Query>
+    <OrderBy format="{sendno}">
+      <Exp Field="sendno" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="wsp_supply_senddtl">
+      <Values>
+
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    
+  </Destroy>
+</DataService>

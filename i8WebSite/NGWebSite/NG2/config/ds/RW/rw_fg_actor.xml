@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_actor">
+      <Field Name="actorid" IsKey="true"/>
+      <Field Name="memo" />
+      <Field Name="actor_opt"  />
+      <Field Name="ocode"  />
+      <Field Name="usbval"  />
+      <Field Name="id"  />
+      <Field Name="parentid"/>
+      <Field Name="imageindex"/>
+      <Field Name="nodeindex"/>
+      <Field Name="allorg_projtrright"/>
+      <Field Name="relorg_projtrright"/>
+      <Field Name="sysflg"/>      
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] where 1=1 [query]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="actorid" paramName="actorid_like" Target="Client"  Oper="Like" value="actor_like"/>
+      <Exp Field="memo" paramName="memo_like" Target="Client"  Oper="Like" value="memo_like"/>
+      <Exp Field="actorid" Target="Client" Value="actorid" />
+      <Exp Field="parentid" Target="Client" value="parentid"/>
+      <Exp Field="nodeindex" Target="Client" value="nodeindex"/>
+    </Query>
+    <OrderBy format="{actorid}">
+      <Exp Field="actorid" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="actorid"  Target="Client" Value="actorid" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="id" Target="Client" Value="actorid"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="id" Target="Client" Value="actorid"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+
+</DataService>
+
+

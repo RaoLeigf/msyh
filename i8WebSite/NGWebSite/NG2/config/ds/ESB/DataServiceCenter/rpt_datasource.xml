@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="esb_report_datasource">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="ds_name"  />
+      <Field Name="pid"  />
+      <Field Name="ds_index"  />
+      <Field Name="ds_isfolder"  />
+      <Field Name="dsc_id"  />
+      <Field Name="ds_sys"  />
+    </Table>
+  </Tables>
+
+  <Read>
+    <Sql>
+      select [fields] from [table]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{ds_index}">
+      <Exp Field="ds_index" value="asc"/>
+    </OrderBy>
+  </Read>
+
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <Delete>
+    <Sql>
+      delete from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="id" Target="Client" value="id"></Exp>
+    </Where>
+  </Delete>
+
+  <SelectMaxID>
+    <Sql>
+      select max(id) from [table]
+    </Sql>
+  </SelectMaxID>
+
+  <SelectMaxIndex>
+    <Sql>
+      select max(ds_index) from [table] [where]
+    </Sql>
+    <Query>
+      <Exp Field="pid" Target="Client" Value="pid"></Exp>
+    </Query>
+  </SelectMaxIndex>
+
+  <DeleteDataSource>
+    <Sql>
+      delete from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="id" Target="Client" Value="id"></Exp>
+    </Where>
+  </DeleteDataSource>
+
+
+</DataService>
+
+

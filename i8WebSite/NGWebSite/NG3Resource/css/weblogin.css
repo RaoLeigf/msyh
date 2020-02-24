@@ -1,0 +1,274 @@
+﻿body {
+    margin: 0px;
+    padding: 0px;
+    font-size: 12px;
+    font-family: Tahoma,Verdana,微软雅黑,新宋体;
+}
+
+.container {
+    width: 652px;
+    margin: auto;
+}
+
+.header {
+    height: 60px;
+    top: 10px;
+    position: relative;
+    background-image: url("../../resource/pic/newgrand.gif");
+    background-repeat: no-repeat;
+}
+
+.content {
+    height: 402px;
+    position: relative;
+    background-image: url("../../NG3Resource/pic/web/webLogin.png");
+    background-repeat: no-repeat;
+}
+
+.rightsave {
+    z-index: 2;
+    position: absolute;
+    right: 65px;
+    top: 480px;
+    width: 386px;
+    height: 37px;
+}
+
+.logo {
+    z-index: 2;
+    position: absolute;
+    left: 65px;
+    top: 40px;
+    width: 457px;
+    height: 317px;
+}
+
+.login {
+    z-index: 2;
+    position: absolute;
+    right: 215px;
+    top: 125px;
+    width: 275px;
+}
+
+#dvUserName {
+    border-radius: 5px;
+    margin-bottom: -6px;
+    width: 320px;
+    height: 36px;
+}
+
+.passwordImg {
+    position: absolute;
+    left: 10px;
+    top: 60px;
+    width: 20px;
+    height: 20px;
+    background-image: url("../../Resource/pic/password-i8.png");
+    background-repeat: no-repeat;
+    background-clip: content-box;
+}
+
+.userImg {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    background-image: url("../../Resource/pic/user-i8.png");
+    background-repeat: no-repeat;
+    background-clip: content-box;
+}
+
+.passwordInput {
+    padding-left: 35px !important;
+    background-color: transparent;
+    width: 320px;
+    height: 36px;
+    font-size: 12px;
+    border: 1px solid #989898;
+    padding: 0 0 0 10px;
+    border-radius: 5px 5px 5px 5px;
+}
+
+#QRThumbnail {
+    position: absolute;
+    left: 492px;
+    top: 129px;
+    width: 27px;
+    height: 27px;
+    cursor: pointer;
+}
+
+#QRLoginDiv {
+    display: none;
+    position: absolute;
+    left: 492px;
+    top: 129px;
+    background-color: white;
+    margin-right: 12px;
+    margin-top: 3px;
+    width: 134px;
+    height: 134px;
+}
+
+.auxText {
+    height: 43px;
+    position: absolute;
+    left: 362px;
+    top: 220px;
+}
+
+.icon-right {
+    width: 62px;
+    height: 55px;
+    margin-left: 0px;
+    float: right;
+    cursor:default;
+}
+.icon-right:hover{
+    background-color:#C2E0FF;
+    border:1px solid #3399FF;
+}
+.image-right {
+    width: 27px;
+    height: 27px;
+    margin-left: 18px;
+    margin-top:5px;
+}
+
+.title-right {
+    width: 62px;
+    height: 20px;
+    margin-top: -5px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align:center;
+}
+.icon-left {
+    width: 90px;
+    height: 36px;
+    margin-left: 0px;
+    float: left;
+    cursor:default;
+}
+.icon-left:hover{
+    background-color:#C2E0FF;
+    border:1px solid #3399FF;
+}
+.image-left {
+    width: 26px;
+    height: 26px;
+    margin-left: 5px;
+    margin-top:5px;
+    float:left;
+}
+
+.title-left {
+    width: 57px;
+    height: 20px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align:center;
+    float:right;
+}
+/*此部分为关于页面的css*/
+.mainAbout{
+    width:400px;
+    height:470px;
+}
+.header-image{
+    height:75px;
+    border-bottom:1px solid black;
+}
+.about-title {
+    height:25px;
+    line-height:25px;
+    font-size:12px;
+    width:360px;
+    margin-left:20px;
+}
+/*.about-copyright {
+    height:25px;
+    line-height:25px;
+    font-size:13px;
+    width:360px;
+    margin-left:20px;
+}*/
+.legal-company{
+    height:25px;
+    line-height:25px;
+    font-size:12px;
+    width:360px;
+    margin-left:20px;
+    margin-top:10px;
+}
+.about-module{
+    width:380px;
+    border:1px solid gray;
+    height:104px;
+    margin-left:20px;
+    overflow-y:scroll;
+    /*overflow-x:hidden;*/
+}
+.about-module-list{
+    width:300px;
+    height:13px;
+    line-height:13px;
+    font-size:12px;
+}
+.about-link {
+    height:25px;
+    line-height:25px;
+    font-size:12px;
+    width:360px;
+    margin-left:20px;
+    margin-bottom:-5px;
+}
+.about-link a {
+    width:180px;
+    color:#0000FF;
+}
+.about-warning{
+    width:300px;
+    height:70px;
+    /*border:1px solid gray;*/
+    float:left;
+    margin-left:20px;
+}
+.about-warning-title{
+   height:25px;
+    line-height:25px;
+    font-size:12px;
+    width:360px;
+}
+.about-button{
+    width:75px;
+    height:70px;
+    /*border:1px solid gray;*/
+    float:left;
+    margin-left:0px;
+}
+.about-confirm{
+    margin-left:10px;
+    width:75px;
+    text-align:center;
+    height:23px;
+}
+.about-support{
+    margin-left:10px;
+    margin-top:10px;
+    width:75px;
+    text-align:center;
+    height:23px;
+}
+/*关于页面结束*/
+/*快捷功能下方的border*/
+.x-toolbar-footer-docked-bottom{
+    z-index:999;
+    border-bottom:1px solid #C0C0C0 !important;
+}
+

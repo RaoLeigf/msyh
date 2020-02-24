@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EB93289F-C1E3-47CE-BE84-31F1B2E9433A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP.Frame.Controller</RootNamespace>
+    <AssemblyName>SUP.Frame.Controller</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise.Common.UIP, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise.Common.UIP.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.WebApi.Client, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.WebApi.Client.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="I6.Base.Message, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\I6.Base.Message.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="i6.Biz.i6Base, Version=1.0.6527.31675, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\i6.Biz.i6Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="i6.UIProcess.MainFrame, Version=8.0.6717.20006, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\i6.UIProcess.MainFrame.dll</HintPath>
+    </Reference>
+    <Reference Include="i6Service, Version=1.0.6562.20467, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\i6Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MDP.BusObj.Facade, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\MDP.BusObj.Facade.dll</HintPath>
+    </Reference>
+    <Reference Include="MDP.BusObj.Model, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\MDP.BusObj.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Lib\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG.KeepConn, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\NG.KeepConn.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3">
+      <HintPath>..\..\Lib\NG3.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Aop">
+      <HintPath>..\..\Lib\NG3.Aop.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Base">
+      <HintPath>..\..\Lib\NG3.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Common">
+      <HintPath>..\..\Lib\NG3.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Data.Builder">
+      <HintPath>..\..\Lib\NG3.Data.Builder.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>..\..\Lib\NG3.Data.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.ESB">
+      <HintPath>..\..\Lib\NG3.ESB.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Log, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\NG3.Log.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.SUP.NSServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\dlls\bin\NG3.SUP.NSServer.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Web.Controller">
+      <HintPath>..\..\Lib\NG3.Web.Controller.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Web.Mvc">
+      <HintPath>..\..\Lib\NG3.Web.Mvc.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.Base">
+      <HintPath>..\..\Lib\SUP.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.Facade, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\SUP.Common.Facade.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.Rule, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\dlls\I6Rules\SUP.Common.Rule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\System.Web.Mvc.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WM3.KM.Model, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\WM3.KM.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WM3.KM.Service.Interface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\WM3.KM.Service.Interface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="zxing, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\zxing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\zxing.presentation.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppAutoAuthorizeController.cs" />
+    <Compile Include="ApplyCheckController.cs" />
+    <Compile Include="BillCodeRuleController.cs" />
+    <Compile Include="ChangePwdController.cs" />
+    <Compile Include="CheckCodeController.cs" />
+    <Compile Include="CustomFloatMenuController.cs" />
+    <Compile Include="EnFuncTreeController.cs" />
+    <Compile Include="ExcelImportController.cs" />
+    <Compile Include="FrameBaseController.cs" />
+    <Compile Include="FuncIconManagerController.cs" />
+    <Compile Include="HrRightApplyController.cs" />
+    <Compile Include="IMPPenetrationController.cs" />
+    <Compile Include="IndividualNavigationController.cs" />
+    <Compile Include="MypicturePreViewController.cs" />
+    <Compile Include="MyCommonFuncController.cs" />
+    <Compile Include="IndividualSettingController.cs" />
+    <Compile Include="LoginController.cs" />
+    <Compile Include="LoginPicManagerController.cs" />
+    <Compile Include="MainFrameController.cs" />
+    <Compile Include="MainTreeController.cs" />
+    <Compile Include="MenuConfigController.cs" />
+    <Compile Include="MyDesktopSetController.cs" />
+    <Compile Include="MyFuncTreeController.cs" />
+    <Compile Include="NavigationCenterController.cs" />
+    <Compile Include="OptionSettingController.cs" />
+    <Compile Include="ProductAboutController.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QRCodeSetController.cs" />
+    <Compile Include="ReportListController.cs" />
+    <Compile Include="SchemeAllocationController.cs" />
+    <Compile Include="ShortcutMenuController.cs" />
+    <Compile Include="SysMaintainCallController.cs" />
+    <Compile Include="UserController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\NG3.Bill.Base\NG3.Bill.Base.csproj">
+      <Project>{43a6dc3e-7b89-4e28-80cc-9cc300449e09}</Project>
+      <Name>NG3.Bill.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NG3.SUP.NNServer\NG3.SUP.NSServer.csproj">
+      <Project>{88199535-ef43-421b-a2a9-5bdc6446f75a}</Project>
+      <Name>NG3.SUP.NSServer</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Frame.DataEntity\SUP.Frame.DataEntity.csproj">
+      <Project>{5C8117DB-2C51-46CE-B712-5B7871AA84C1}</Project>
+      <Name>SUP.Frame.DataEntity</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Frame.Facade\SUP.Frame.Facade.csproj">
+      <Project>{E8A12A4E-5436-43FF-94CD-09E094CA7A6F}</Project>
+      <Name>SUP.Frame.Facade</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\bin</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

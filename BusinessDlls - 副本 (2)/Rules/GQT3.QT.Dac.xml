@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GQT3.QT.Dac</name>
+    </assembly>
+    <members>
+        <member name="T:GQT3.QT.Dac.BudgetAccountsDac">
+            <summary>
+            BudgetAccounts数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.CorrespondenceSettings2Dac">
+            <summary>
+            CorrespondenceSettings2数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.CorrespondenceSettingsDac">
+            <summary>
+            CorrespondenceSettings数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.ExpenseCategoryDac">
+            <summary>
+            ExpenseCategory数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.GHProjDtlShareDac">
+            <summary>
+            GHProjDtlShare数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.OrganizationDac">
+            <summary>
+            Organization数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.OrgRelatitem2Dac">
+            <summary>
+            OrgRelatitem数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.PaymentMethodDac">
+            <summary>
+            PaymentMethod数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.PerformEvalTargetClassDac">
+            <summary>
+            PerformEvalTargetClass数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.PerformEvalTargetDac">
+            <summary>
+            PerformEvalTarget数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.PerformEvalTargetTypeDac">
+            <summary>
+            PerformEvalTargetType数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.PerformEvalTypeDac">
+            <summary>
+            PerformEvalType数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.ProcurementCatalogDac">
+            <summary>
+            ProcurementCatalog数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.ProcurementProceduresDac">
+            <summary>
+            ProcurementProcedures数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.ProcurementTypeDac">
+            <summary>
+            ProcurementType数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.ProjectThresholdDac">
+            <summary>
+            ProjectThreshold数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.ProjLibProjDac">
+            <summary>
+            ProjLibProj数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QtBaseProjectDac">
+            <summary>
+            QtBaseProject数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QTControlSetDac">
+            <summary>
+            QTControlSet数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QTMemoDac">
+            <summary>
+            QTMemo数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QTModifyDac">
+            <summary>
+            QTModify数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QtOrgDygxDac">
+            <summary>
+            QtOrgDygx数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QTProductDac">
+            <summary>
+            QTProduct数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QTProductUserDac">
+            <summary>
+            QTProductUser数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QTProductUserDygxDac">
+            <summary>
+            QTProductUserDygx数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QtSysCodeSeqDac">
+            <summary>
+            QtSysCodeSeq数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QtYJKDac">
+            <summary>
+            QtYJK数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.QtZcgnflDac">
+            <summary>
+            QtZcgnfl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.RWReportDac">
+            <summary>
+            RWReport数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.SourceOfFundsDac">
+            <summary>
+            SourceOfFunds数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.UserDac">
+            <summary>
+            User数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.UserOrgDac">
+            <summary>
+            UserOrg数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.VCorrespondenceSetting2Dac">
+            <summary>
+            VCorrespondenceSetting2数据访问处理类
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,1586 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "个性化设置";
+}
+
+
+@section script
+{
+
+    <link href=@Url.Script("~/NG3Resource/css/mainTreeTab.css") rel="stylesheet" type="text/css" />
+    @*<link href=@Url.Script("~/NG3Resource/extjs/ux/css/TabScrollerMenu.css") rel="stylesheet" type="text/css" />
+    <script src=@Url.Script("~/NG3Resource/extjs/ux/TabScrollerMenu.js") type="text/javascript"></script>*@
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>
+
+    <style type="text/css">
+        /*按钮扁平化*/
+        .x-btn-default-small {
+            border-color: #C0C0C0;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var LoadEnFuncTreeRight = Ext.htmlDecode('@ViewBag.LoadEnFuncTreeRight');
+
+        var temp = Ext.htmlDecode('@ViewBag.BellItemsAll');
+        var BellItemsAll = Ext.isEmpty(temp) ? null : Ext.decode(temp); //小铃铛所有选项
+
+        var temp = Ext.htmlDecode('@ViewBag.BellItemsExist');
+        var BellItemsExist = Ext.isEmpty(temp) ? [] : Ext.decode(temp); //小铃铛的存在选项
+
+        var AllowUser = Ext.htmlDecode('@ViewBag.AllowUser');
+
+        var UserType = Ext.htmlDecode('@ViewBag.UserType');
+
+        var UITheme = Ext.htmlDecode('@ViewBag.UITheme');
+
+        var frame1;
+
+        //Ext.Loader.setConfig({ enabled: true });
+        Ext.onReady(function () {
+        //Ext.tip.QuickTipManager.init();
+        //工具栏
+        var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+            region: 'north',
+            //rightName: '', //权限名称
+            ngbuttons: [
+                'save', '->', 'close'
+            ]
+        })
+
+        /////////////////////
+        //tabpanel的第一个item
+        ////////////////////
+
+        Ext.define('editParmModel', {
+            extend: 'Ext.data.Model',
+            fields: [{
+                name: 'name',
+                type: 'string',
+                mapping: 'Name'
+            }, {
+                name: 'description',
+                type: 'string',
+                mapping: 'Description'
+            }, {
+                name: 'currentValue',
+                type: 'string',
+                mapping: 'CurrentValue'
+            }]
+        });
+        var editParmStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+            model: 'editParmModel',
+            autoLoad: true,
+            proxy: { //读取原始数据的途径
+                type: 'ajax',
+                url: C_ROOT + 'SUP/MainTree/LoadEditParm'
+            }
+        });
+
+        Ext.define('Ext.ng.editParmWin', {
+            extend: 'Ext.window.Window',
+            alias: 'widget.ngEditParmWin', //别名,可通过设置xtype构建,或者通过Ext.widget()方法构建
+            title: '参数编辑',
+            height: 500,
+            width: 400,
+            modal: true,
+            closeable: true,
+            resizable: false,
+            closeAction: "hide",
+            father: '',
+            fieldDefaults: {
+                //labelAlign: 'top',
+                msgTarget: 'side'
+            },
+            defaults: {
+                anchor: '100%'
+            },
+            items: [{
+                xtype: 'container',
+                layout: 'auto',
+                border: false,
+                items: [{
+                    xtype: 'toolbar',
+                    anchor: '100%',
+                    items: [
+                        "->",
+                        {
+                            text: '保存',
+                            iconCls: 'icon-save',
+                            handler: function () {
+                                var window = this.findParentByType('window');
+                                var textArea = window.items.items[0].items.items[1];
+                                var data = textArea.value;
+                                window.father.items.items[0].items.items[2].items.items[0].items.items[0].items.items[0].setValue(data);
+                                window.close();
+                            }
+                        },
+                        {
+                            text: '取消',
+                            iconCls: 'icon-Cancel',
+                            handler: function () {
+                                var window = this.findParentByType('window');
+                                window.close();
+                            }
+                        }
+                    ]
+                }, {
+                    emptyText: '添加宏参数',
+                    height: 200,
+                    width: 390,
+                    itemId: 'parmArea',
+                    xtype: 'ngTextArea',
+                    grow: true,
+                    anchor: '100%'
+                }, {
+                    xtype: 'grid',
+                    anchor: '100%',
+                    height: 200,
+                    isVisible: true,
+                    itemId: 'pramGrid',
+                    store: editParmStore,
+                    columns: [
+                        { text: '宏', dataIndex: 'name', flex: 1 },
+                        { text: '描述', dataIndex: 'description', flex: 1 },
+                        { text: '当前值', dataIndex: 'currentValue', flex: 1 }
+                    ]
+                }]
+            }],
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                items: [
+                     "->", {
+                         text: '插入',
+                         handler: function () {
+                             var window = this.findParentByType('window');
+                             var data = window.items.items[0].items.items[2].getSelectionModel().lastSelected.data.name;
+                             data = '№*№' + data + '№*№';
+                             var textArea = window.items.items[0].items.items[1];
+                             var rawValue = textArea.rawValue;
+                             textArea.setValue(rawValue + data);
+                         }
+                     },
+            {
+                text: '宏',
+                handler: function () {
+                    var window = this.findParentByType('window');
+                    if (window.height > 300) {
+                        window.setHeight(300);
+                    } else {
+                        window.setHeight(500);
+                    }
+                }
+            }
+                ]
+            }]
+        });
+
+        Ext.define("Ext.ng.importUrlWin", {
+            extend: 'Ext.window.Window',
+            alias: 'widget.ngImportUrlWin',
+            title: "节点维护",
+            modal: true,
+            width: 500,
+            height: 170,
+            closeable: true,
+            resizable: false,
+            closeAction: "hide",
+            winType: '',
+            items: [
+            {
+                xtype: 'ngTableLayoutForm',
+                //id: 'customMenuNodeTextForm',
+                frame: true,
+                split: true,
+                columnsPerRow: 1,
+                padding: '0 0 0 0',
+                fieldDefaults: {
+                    labelWidth: 70,
+                    anchor: '100%',
+                    margin: '3 3 3 3',
+                    msgTarget: 'side'
+                },
+                fields: [
+                {
+                    xtype: 'ngText',
+                    fieldLabel: '链接名称',
+                    itemId: 'name',
+                    name: 'NodeText',
+                    readOnly: false,
+                    mustInput: true,
+                    colspan: 1
+                }, {
+                    xtype: 'ngText',
+                    itemId: 'addr',
+                    fieldLabel: '链接地址',
+                    labelStyle: 'color:OrangeRed',
+                    name: 'NodeAddr',
+                    readOnly: false,
+                    mustInput: true,
+                    colspan: 1
+                }, {
+                    xtype: 'fieldset',
+                    name: 'NodeEdit',
+                    itemId: 'editContainer',
+                    padding: '0,0,0,0',
+                    layout: 'column',
+                    border: false,
+                    colspan: 1,
+                    items: [{
+                        xtype: 'ngText',
+                        itemId: 'edit',
+                        fieldLabel: '链接编辑',
+                        readOnly: true,
+                        width: 380,
+                        mustInput: false
+                    }, {
+                        xtype: 'button',
+                        itemId: 'btn',
+                        text: '...',
+                        handler: function () {
+                            var fatherWindow = this.findParentByType('window');
+                            var editWin = Ext.create('Ext.ng.editParmWin', {
+                                father: fatherWindow
+                            });
+                            var parm = fatherWindow.queryById('edit').value;
+                            editWin.queryById('parmArea').setValue(parm);
+                            //editWin.queryById('parmArea').focus(true,true);
+                            editWin.show();
+                        }
+                    }]
+                }
+                ]
+            }
+            ],
+            buttons: [
+                "->",
+                {
+                    text: '保 存',
+                    itemId: 'save',
+                    handler: function () {
+                        //var win = this.findParentByType('window');
+                        //qurrybyid
+                        var nodetext = this.findParentByType('ngImportUrlWin').items.items[0].items.items[0].items.items[0].items.items[0].lastValue;
+                        var nodeaddr = this.findParentByType('ngImportUrlWin').items.items[0].items.items[1].items.items[0].items.items[0].lastValue;
+                        var nodeedit = this.findParentByType('ngImportUrlWin').items.items[0].items.items[2].items.items[0].items.items[0].items.items[0].lastValue;
+                        //nodeaddr = 'WebBrowseIndividualManager№,№Caption№=№' + nodetext + '№,№Url№=№' + nodeaddr;
+                        while (nodetext == '' || nodetext == null) {
+                            //alert('链接名称不能为空');
+                            Ext.MessageBox.alert('提示', '链接名称不能为空');
+                            return;
+                        };
+                        while (nodeaddr == '' || nodeaddr == null) {
+                            //alert('链接地址不能为空');
+                            Ext.MessageBox.alert('提示', '链接地址不能为空');
+                            return;
+                        };
+                        //企业功能树菜单选择项
+                        var selectedNode = custommenutree.getSelectionModel().getSelection()[0];
+
+                        if (this.findParentByType('ngImportUrlWin').winType == 'add') {
+                            if (selectedNode == null)
+                                selectedNode = custommenutree.getRootNode();
+                            if (selectedNode.data.leaf == true) {
+                                selectedNode = selectedNode.parentNode;
+                            }
+                            //判断是否非按钮节点
+                            if (!selectedNode.data.leaf) {
+                                var newChildNode = selectedNode.appendChild({
+                                    id: guid(), //获取唯一值,
+                                    //MenuType:2,
+                                    text: nodetext,
+                                    name: nodetext,
+                                    url: nodeaddr,
+                                    urlparm: nodeedit,
+                                    pid: selectedNode.data.id,
+                                    leaf: true,
+                                    checked: false,
+                                    originalcode: "",
+                                    expanded: true
+                                });
+                            }
+                            else {
+                                Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                            };
+                        } else {
+                            selectedNode.set('text', nodetext);
+                            selectedNode.set('name', nodetext);
+                            selectedNode.set('url', nodeaddr);
+                            selectedNode.set('urlparm', nodeedit);
+                        }
+                        this.findParentByType('ngImportUrlWin').close();
+                    }
+                },
+                {
+                    text: '关 闭',
+                    itemId: 'close',
+                    handler: function () {
+                        this.findParentByType('ngImportUrlWin').close();
+                    }
+                }
+            ]
+        });
+
+        /////编辑窗体
+        var customEditToolbar = new Ext.panel.Panel({
+            region: 'north',
+            height: 30,
+            border: false,
+            //style: 'margin-top:1px;margin-bottom:1px',
+            bodyStyle: "background-color:transparent", //#dfe8f6
+            items: [{
+                //layout: {
+                //    type: 'hbox',
+                //    padding: '0',
+                //    pack: 'start',
+                //    align: 'middle'
+                //},
+                //border: false,
+                //defaults: { margins: '0 5 0 0' },
+                //bodyStyle: "background-color:transparent", //#dfe8f6
+                items: [{
+                    xtype: 'toolbar', text: '我的功能树',
+                    items: [{
+                        text: '导入网址',
+                        iconCls: 'icon-Import',
+                        itemId: 'importUrl',
+                        handler: function () {
+                            var importUrlWin = Ext.create("Ext.ng.importUrlWin", {
+                                winType: 'add'
+                            });
+                            importUrlWin.queryById('addr').setValue('http://');
+                            importUrlWin.show();
+
+                        }
+                    }, {
+                        text: '编辑',
+                        iconCls: 'cog_edit',
+                        itemId: 'edit',
+                        hidden: true,
+                        handler: function () {
+                            var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                            var arr = custommenutreenode[0].raw.url.split('.');
+                            var tp = false;
+                            switch (arr[arr.length - 1].toLowerCase()) {
+                                case 'exe':
+                                case 'doc':
+                                case 'docx':
+                                case 'xls':
+                                case 'xlsx':
+                                case 'ppt':
+                                case 'pptx': tp = true;
+                            }
+
+                            if (tp == true) {
+                                var editWin = Ext.create("Ext.ng.importDocWin", {
+                                    winType: 'edit',
+                                    editFileField: custommenutreenode[0].data.url
+                                });
+
+                                //editWin.queryById('addr').setValue(custommenutreenode[0].raw.url);
+
+                                editWin.queryById('addr').on('afterrender', function (fileField) {
+                                    var input = editWin.queryById('addr').el.down('input').dom;
+                                    input.value = custommenutreenode[0].data.url;
+                                });
+
+                                editWin.queryById('name').setValue(custommenutreenode[0].data.text);
+                                editWin.queryById('edit').setValue(custommenutreenode[0].data.urlparm);
+                            } else {
+                                var editWin = Ext.create("Ext.ng.importUrlWin", {
+                                    winType: 'edit'
+                                });
+                                editWin.queryById('name').setValue(custommenutreenode[0].data.text);
+                                editWin.queryById('addr').setValue(custommenutreenode[0].data.url);
+                                editWin.queryById('edit').setValue(custommenutreenode[0].data.urlparm);
+                            }
+                            editWin.show();
+                        }
+                    }]
+                }]
+            }]
+        });
+
+        if (LoadEnFuncTreeRight.substr(0, 1) == 1 && UserType != 'SYSTEM') {//第一个字符为1，启用企业功能树
+            var sysmenupnl = Ext.create('Ext.ng.enFuncTree', {
+                region: 'west',
+                itemId: 'enFuncTree',
+                width: 300,
+                hasRightClickMenu: true,
+            });//新建企业功能树
+        } else {
+            var sysmenupnl = Ext.create('Ext.ng.sysFuncTree', {
+                region: 'west',
+                width: 300,
+                itemId: 'sysFuncTree',
+                hasRightClickMenu: true,
+            });//新建系统功能树
+        }
+
+        var choosecenterform = Ext.create('Ext.form.Panel', {
+            region: 'west',
+            style: 'margin-left:2px;margin-right:0px',
+            layout: 'border',
+            width: 40,
+            split: true,
+            autoScroll: true,
+            frame: false,
+            border: false,
+            columnsPerRow: 4,
+            fieldDefaults: {
+                labelWidth: 40,
+                anchor: '100%',
+                margin: '0 10 5 0',
+                msgTarget: 'side'
+            },
+            items: [
+                {
+                    region: 'north',
+                    xtype: 'button',
+                    id: 'rightmove',
+                    text: '>',
+                    margin: '170 0 0 0',
+                    width: 20,
+                    height: 20
+                },
+                {
+                    region: 'north',
+                    xtype: 'button',
+                    id: 'leftmove',
+                    text: '<',
+                    margin: '50 0 0 0',
+                    width: 20,
+                    height: 20
+                }
+            ]
+        })
+
+        var custommenutreestore = Ext.create('Ext.data.TreeStore', {
+            autoLoad: false,
+            proxy: {
+                type: 'ajax',
+                idProperty: 'id',
+                url: C_ROOT + 'SUP/IndividualSetting/LoadDefaultOpenTab',
+            },
+            //                                folderSort: true,
+            fields: [{ name: 'text', type: 'string' },
+                { name: 'phid', type: 'int' },
+                { name: 'originalcode', type: 'string' },
+                { name: 'name', type: 'string' },
+            { name: 'originalid', type: 'string' },
+            { name: 'pid', type: 'string' },
+            { name: 'url', type: 'string' },
+            { name: 'userid', type: 'int' },
+            { name: 'urlparm', type: 'string' },
+            { name: 'checked', type: 'boolean', values: false }],
+
+        });
+
+        var custommenutree = Ext.create('Ext.tree.Panel', {
+            region: 'center',
+            store: custommenutreestore,
+            rootVisible: false,
+            editToolbar: customEditToolbar,
+            listeners: {
+                'afterrender': function () {
+                },
+                'itemclick': function (view, rcd, item, idx, event, eOpts) {
+                    var selectedNode = custommenutree.getSelectionModel().getSelection()[0];
+                    if (selectedNode.raw.originalcode != '') {
+                        this.editToolbar.queryById('edit').hide();
+                    } else {
+                        this.editToolbar.queryById('edit').show();
+                    }
+                },
+                'itemdblclick': function (view, rcd, item, idx, event, eOpts) {
+                },
+                'checkchange': function (node, checked) {
+                    setChildNodeChecked(node, checked); //同时选择下级
+                },
+                'itemcontextmenu': function (view, rec, node, index, e) {
+                    e.stopEvent();
+                    contextMenu1.showAt(e.getXY());
+                    return false;
+                },
+                'containercontextmenu': function (treeP, e, eOpts) {
+                    e.stopEvent();
+                    contextMenu2.showAt(e.getXY());
+                    return false;
+                }
+            }
+        });
+
+        var custommenupnl = Ext.create('Ext.panel.Panel', {
+            region: 'center',
+            style: 'margin-left:2px;margin-right:2px',
+            //title: '企业功能树菜单',
+            layout: 'border',
+            border: 0,
+            items: [
+                customEditToolbar,
+                custommenutree]
+        });
+        //保存
+        ngToolbar.get('save').on('click', function () {
+            //重置Seq
+            var rootNode = custommenutree.getRootNode();
+            SetCustomTreeSeq(rootNode);
+            //获取所有节点数据
+            var updateR = custommenutreestore.getUpdatedRecords();
+            //格式化
+            for (var i = 0; i < updateR.length; i++) {
+                delete updateR[i].data.allowDrag;
+                delete updateR[i].data.allowDrop;
+                delete updateR[i].data.children;
+            }
+            var custommenutreeData = GetDatatableData(updateR, [], [], [], 'PhId');
+            //alert(JSON.stringify(data));
+            var defaultOpenTab = Ext.JSON.encode(custommenutreeData);
+
+            //存储个性化设置
+            var individualSetting = [];
+            if (SysSetting.items.items[0].lastValue.isMax == null || SysSetting.items.items[0].lastValue.isMax == '') {
+                individualSetting[0] = '1';
+            } else {
+                individualSetting[0] = SysSetting.items.items[0].lastValue.isMax;
+            }
+            if (SysSetting.items.items[1].lastValue.hasMessage == null || SysSetting.items.items[1].lastValue.hasMessage == '') {
+                individualSetting[1] = '1';
+            } else {
+                individualSetting[1] = SysSetting.items.items[1].lastValue.hasMessage;
+            }
+            if (SysSetting.items.items[2].value == null || SysSetting.items.items[2].value == '') {
+                individualSetting[2] = '15';
+            } else {
+                individualSetting[2] = SysSetting.items.items[2].value;
+            }
+            if (SysSetting.items.items[3].lastValue.dbclickCloseTab == null || SysSetting.items.items[3].lastValue.dbclickCloseTab == '') {
+                individualSetting[3] = '1';
+            } else {
+                individualSetting[3] = SysSetting.items.items[3].lastValue.dbclickCloseTab;
+            }
+            if (SysSetting.items.items[4].lastValue.URLPath == null || SysSetting.items.items[4].lastValue.URLPath == '') {
+                individualSetting[4] = '1';
+            } else {
+                individualSetting[4] = SysSetting.items.items[4].lastValue.URLPath;
+            }
+            if (SysSetting.items.items[5].lastValue.workFlow == null || SysSetting.items.items[5].lastValue.workFlow == '') {
+                individualSetting[5] = '1';
+            } else {
+                individualSetting[5] = SysSetting.items.items[5].lastValue.workFlow;
+            }
+            if (SysSetting.items.items[6].lastValue.hasUpdateTip == null || SysSetting.items.items[6].lastValue.hasUpdateTip == '') {
+                individualSetting[6] = '1';
+            } else {
+                individualSetting[6] = SysSetting.items.items[6].lastValue.hasUpdateTip;
+            }
+            if (SysSetting.items.items[7].lastValue.openMyDesk == null || SysSetting.items.items[7].lastValue.openMyDesk == '') {
+                individualSetting[7] = '1';
+            } else {
+                individualSetting[7] = SysSetting.items.items[7].lastValue.openMyDesk;
+            }
+            if (SysSetting.items.items[8].value == null || SysSetting.items.items[8].value == '') {
+                individualSetting[8] = '0';
+            } else {
+                individualSetting[8] = SysSetting.items.items[8].value;
+            }
+
+            //换肤字段单独存在，单独存储
+            var uitheme;
+            if (SysSetting.items.items[9].lastValue.uitheme == null || SysSetting.items.items[9].lastValue.uitheme == '') {
+                uitheme = '0';
+            } else {
+                uitheme = SysSetting.items.items[9].lastValue.uitheme;
+                uitheme = (uitheme == 'gray') ? '0' : '1';
+            }
+
+            //存储应用服务器设置
+            var ServerIpAndNetWorkIpConfig = ServerSetting.getForm().getValues();
+            //存储显示设置
+            var DisplaySettingData = DisplaySetting.getForm().getValues();
+
+            //存储小铃铛设置???注释是旧的
+
+            //var AlertItemSave = [];
+            //for (var i = 0; i < remindWindowSetting.getStore().getCount(); i++) {
+            //    if (remindWindowSetting.getStore().getAt(i).data.forbidRemindWindow == true) {
+            //        AlertItemSave.push(remindWindowSetting.getStore().getAt(i).data.buskey);
+            //    }
+            //}
+            //var AlertItemSave = remindWindowSetting.getAllGridData();
+            //var jsonAlertItems = [];
+            //var alertItems = remindWindowSetting.getStore().data.items;
+            //for (var i = 0; i < alertItems.length; i++) {
+            //    if (alertItems[i].data.forbidRemindWindow != alertItems[i].raw.forbidRemindWindow) {
+            //        jsonAlertItems.push({
+            //            id: i,
+            //            value: alertItems[i].data.forbidRemindWindow
+            //        });
+             //   }
+            //}
+            //存储登陆组织信息
+            //var SSOOrgValue = SSOOrgSetting.SSOOrgValue;
+
+            var AlertItemSave = '{';
+            if (remindWindowSetting.getStore().getCount() > 0) {
+                AlertItemSave += (remindWindowSetting.getStore().getAt(0).data.buskey + ':' + !remindWindowSetting.getStore().getAt(0).data.forbidRemindWindow);
+                for (var i = 1; i < remindWindowSetting.getStore().getCount() ; i++) {
+                    AlertItemSave += (',' + remindWindowSetting.getStore().getAt(i).data.buskey + ':' + !remindWindowSetting.getStore().getAt(i).data.forbidRemindWindow)
+                }
+                AlertItemSave += '}';
+            }
+
+            if (frame1 != undefined && frame1.contentWindow != null) {
+                frame1.contentWindow.save();
+            }
+
+            Ext.Ajax.request({
+                params: {
+                    'defaultOpenTab': defaultOpenTab,
+                    'individualSetting': individualSetting,
+                    'ServerIpAndNetWorkIpConfig': ServerIpAndNetWorkIpConfig,
+                    'DisplaySetting': DisplaySettingData,
+                    'alertconfig': AlertItemSave,
+                    'uitheme': uitheme,
+                    'APPlogo': Ext.getCmp("picPath").getValue()
+                   // 'SSOOrgValue': SSOOrgValue,
+                },
+                url: C_ROOT + 'SUP/IndividualSetting/SaveDefaultOpenTab',//同时保存默认tab和设置选项
+                //url: C_ROOT + 'SUP/IndividualSetting/LoadServerSetting',
+                async: false, //同步
+                success: function (response) {
+                    if (response.responseText == '' || response.responseText == null) {
+                        Ext.MessageBox.alert('提示', '保存失败');
+                        return;
+                    }
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.status === "ok") {
+                        Ext.MessageBox.alert('提示', "保存成功", function () {
+                            if (window.external.IsInWebBrowser == undefined) {
+                                resetTreeState(custommenutreestore.getRootNode()); //清树状态
+                                return;
+                            }
+                            window.external.RefreshAlertconfig();
+                            resetTreeState(custommenutreestore.getRootNode()); //清树状态
+                            window.external.ReloadMainFormConfigInfo();
+                        });
+                    } else {
+                        if (resp.msg && resp.msg != '') {
+                            Ext.MessageBox.alert('提示', '保存失败,' + resp.msg);
+                        } else {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                }
+            });
+        });
+
+
+        //判断根root下是否存在node
+        function isNodeExist(node, root) {
+            if (node.raw.exist) {
+                return;
+            }
+            //console.info('isNodeRepeat');
+            if (node.raw.code == root.raw.originalcode) {
+                node.raw.exist = true;//js
+                //myflag = true;
+            }
+            else {
+                if (root.hasChildNodes()) {
+                    root.eachChild(function (child) {
+                        isNodeExist(node, child)
+                    });
+                }
+            }
+            //return flag;
+        }
+
+        //右移
+        choosecenterform.items.get('rightmove').on('click', function () {
+            var selectNodes = sysmenupnl.currentTree.selModel.selected.items[0];
+            if (selectNodes == '' || selectNodes == null) {
+                title: '提示',
+                Ext.MessageBox.alert('提示', '请选择系统节点！');
+                return;
+            }
+            if (selectNodes.data.leaf == false) {
+                title: '提示',
+                Ext.MessageBox.alert('提示', '请选择叶子节点！');
+                return;
+            }
+            var root = custommenutree.getRootNode();
+            var exist = false;
+            selectNodes.raw.exist = false;
+            //判断树中是否已存在node节点
+            Ext.Array.each(root, function (node3) {
+                if (selectNodes.raw.exist != true) {
+                    isNodeExist(selectNodes, node3);
+                }
+            });
+            if (selectNodes.raw.exist == true) {
+                exist = true;
+            }
+            if (exist == true) {
+                title: '提示',
+                Ext.MessageBox.alert('提示', '节点已存在！');
+                return;
+            }
+            //如果默认tab多于一个，弹出选择框，是:继续保持，否：返回
+            if (root.childNodes.length > 0) {
+                Ext.Msg.show({
+                    title: '提示',
+                    msg: '您选择的默认打开功能大于1个，可能造成性能损失，您要保存么？',
+                    buttons: Ext.Msg.YESNO,
+                    icon: Ext.Msg.QUESTION,
+                    fn: function callback(btn, text) {
+                        if (btn == "yes") {
+                            AddSystemMenuToCustomMenu(root.data.id, selectNodes)
+                        }
+                    }
+                });
+            } else {
+                AddSystemMenuToCustomMenu(root.data.id, selectNodes)
+            }
+        });
+
+        //左移
+        choosecenterform.items.get('leftmove').on('click', function () {
+            var checkNodes = custommenutree.getView().getChecked(); //选择的企业功能树菜单
+            Ext.Array.each(checkNodes, function (node) {
+                var pNode = node.parentNode;
+                if (pNode == null) {
+                    return;
+                }
+                node.remove();
+                var I = pNode.childNodes.length;
+                if (I == 0) {
+                    pNode.leaf = true; //置为叶子节点
+                }
+            });
+        });
+
+
+        //重置自定义功能树的Seq
+        function SetCustomTreeSeq(node) {
+            var childnodes = node.childNodes;
+            for (var i = 0; i < childnodes.length; i++) {
+                childnodes[i].data.Seq = i;
+                childnodes[i].dirty = true; //发生变化
+
+                if (childnodes[i].childNodes.length > 0) {
+                    SetCustomTreeSeq(childnodes[i]);
+                }
+            }
+        }
+
+        //自定义功能树加载节点
+        function AddSystemMenuToCustomMenu(pNodeId, node) {
+            var customPNode = custommenutreestore.getNodeById(pNodeId);
+            var nodeguid = guid(); //获取唯一值
+            customPNode.appendChild({
+                id: nodeguid,
+                text: node.data.text,
+                leaf: node.data.leaf,
+                checked: false,
+                urlparm: null,
+                originalcode: node.raw.code,
+                name: node.data.text,
+                pid: pNodeId,
+                url: node.raw.url
+            });
+        }
+
+        //生成唯一值
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        function guid() {
+            return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+        }
+
+        var FirstTabPanel = Ext.create('Ext.container.Container', {
+            title: '默认打开功能',
+            //width: 600,
+            //height:400,
+            layout: 'border',
+            items: [
+               {
+                   xtype: 'panel',
+                   region: 'center',
+                   layout: 'border',
+                   bodyStyle: "padding-right:5px",
+                   items: [
+                       sysmenupnl,
+                       choosecenterform,
+                       custommenupnl]
+               }
+            ]
+        });//页面总布局
+
+        //////////////////
+        //tabpanel的第二个item
+         ///////////////////
+
+        var filefield = Ext.create('Ext.form.field.File', {
+            name: 'addPic',
+            buttonText: '...',
+            allowBlank: false,
+            x: 140,
+            y: -0.5,
+            listeners: {
+                afterrender: function () {
+                    filefield.el.down('input').dom.style.display = 'none';
+                },
+                change: function (obj) {
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        form.submit({
+                            url: C_ROOT + 'SUP/IndividualSetting/AddPicUpload',
+                            success: function (fp, o) {
+                                if (o.result.success) {
+                                    Ext.getCmp("picPath").setValue(o.result.filename);
+                                }
+                            },
+                            failure: function (fp, o) {
+                                Ext.MessageBox.alert('提示', o.result.message);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+        //系统设置
+        Ext.define('Ext.ng.SysSetting', {
+            //extend: 'Ext.panel.Panel',
+            extend: 'Ext.form.Panel',
+            bodyPadding: 5,
+            layout: 'auto',
+            width: 600,
+            defaults: {
+                margin: '10 0 3 0',
+                labelWidth: 200,
+                xtype: 'radiogroup',
+            },
+            items: [
+                {
+                    fieldLabel: '非宽屏工作区域最大化',
+                    defaultType: 'radio',
+                    itemId: 'isMax',
+                    value:'0',
+                    defaults: {
+                        name: 'isMax',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    items: [
+                        {
+                            boxLabel: '是',
+                            inputValue: '1',
+                            checked: true
+                        }, {
+                            boxLabel: '否',
+                            inputValue: '0',
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '消息提醒方式',
+                    defaultType: 'radiofield',
+                    defaults: {
+                        name: 'hasMessage',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    items: [
+                        {
+                            boxLabel: '弹出窗口',
+                            inputValue: '1',
+                            checked: true
+                        }, {
+                            boxLabel: '手工查看',
+                            inputValue: '0'
+                        }
+                    ]
+                },
+                {
+                    //layout: 'hbox',
+                    itemId: 'closeTime',
+                    name: 'closeTime',
+                    emptyText: '15',
+                    minValue: 4,
+                    xtype: 'numberfield',
+                    fieldLabel: '消息框自动关闭时间(秒)'
+                },
+                {
+                    xtype: 'radiogroup',
+                    fieldLabel: '禁止双击关闭tab页',
+                    defaultType: 'radiofield',
+                    defaults: {
+                        name: 'dbclickCloseTab',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    items: [
+                        {
+                            boxLabel: '是',
+                            inputValue: '1',
+                            checked: true
+                        }, {
+                            boxLabel: '否',
+                            inputValue: '0',
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '外部网址打开方式',
+                    defaultType: 'radiofield',
+                    defaults: {
+                        name: 'URLPath',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    items: [
+                        {
+                            boxLabel: '内置浏览器',
+                            inputValue: '1',
+                            checked: true
+                        }, {
+                            boxLabel: '外部浏览器',
+                            inputValue: '0'
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '工作流任务连续审批',
+                    defaultType: 'radiofield',
+                    defaults: {
+                        name: 'workFlow',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '是',
+                            inputValue: '1',
+                            checked: true
+                        }, {
+                            boxLabel: '否',
+                            inputValue: '0',
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '版本新增功能提示',
+                    defaultType: 'radiofield',
+                    hidden:true,
+                    defaults: {
+                        name: 'hasUpdateTip',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '是',
+                            inputValue: '1',
+                            checked: true,
+                        }, {
+                            boxLabel: '否',
+                            inputValue: '0',
+                            width: 50
+                        }, {
+                            xtype: 'text',
+                            text: '注：版本更新后自动设置为提醒',
+                            width: 200
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '默认打开我的桌面',
+                    defaultType: 'radiofield',
+                    hidden: UserType == 'SYSTEM' ? true : false,
+                    defaults: {
+                        name: 'openMyDesk',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '是',
+                            inputValue: '1',
+                            checked: true
+                        }, {
+                            boxLabel: '否',
+                            inputValue: '0',
+                        }
+                    ]
+                },
+                {
+                    //layout: 'hbox',
+                    itemId: 'topBlank',
+                    name: 'topBlank',
+                    emptyText: '0',
+                    minValue: 0,
+                    maxValue: 50,
+                    xtype: 'numberfield',
+                    fieldLabel: '顶部留白（0-50px）',
+                    isValid: function () {
+                        var me = this;
+                        var valid = true;
+                        if (me.value > 50 || me.value < 0) {
+                            Ext.create('Ext.ng.MessageBox').Error("设置范围应为0到50之间");
+                            me.setValue(0);
+                            return false;
+                        }
+                    }
+                },
+                {
+                    fieldLabel: '更换特定页面主题',
+                    defaultType: 'radiofield',
+                    //name: 'IfUserCheckCode',
+                    defaults: {
+                        name: 'uitheme',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '灰',
+                            inputValue: 'gray',
+                            checked: true
+                        }, {
+                            boxLabel: '蓝',
+                            inputValue: 'blue'
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: 'APP启动页Logo',
+                    items: [
+                         {
+                             xtype: 'form',
+                             border: false,
+                             layout: 'absolute',
+                             height: 30,
+                             items: [
+                                 {
+                                     xtype: 'textfield',
+                                     readOnly: true,
+                                     id: 'picPath',
+                                     width: 144,
+                                     height: 26
+                                 },
+                                 filefield,
+                                 {
+                                     xtype: 'label',
+                                     text: '请上传300*300的png图片',
+                                     x: 185,
+                                     y: 5
+                                 }
+                             ]
+                         }
+                    ]
+                }
+            ],
+            initComponent: function () {
+                this.callParent();
+                var text;
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/IndividualSetting/LoadSysSetting',
+                    async: false,//请求同步
+                    success: function (response) {
+                        //text = response.responseText;
+                        if (response.responseText != '' && response.responseText != null) {
+                            try {
+                                text = Ext.decode(response.responseText);//注意，这里要是不decode就是个纯string，取值很费劲
+                            } catch (e) {
+                                text = null;
+                            }
+                        } else {
+                            text = null;
+                        }
+
+                        //alert(text);
+                    }
+                });
+                //this.items.items[0].lastValue.isMax.setValue(text[0]);
+                if (text != null) {
+                    if (text.IndividualSetting != null) {
+                        var individualsetting = text.IndividualSetting;
+                        this.items.items[0].setValue({ isMax: individualsetting[0] });
+                        this.items.items[1].setValue({ hasMessage: individualsetting[1] });
+                        this.queryById('closeTime').setValue(individualsetting[2]);
+                        this.items.items[3].setValue({ dbclickCloseTab: individualsetting[3] });
+                        this.items.items[4].setValue({ URLPath: individualsetting[4] });
+                        this.items.items[5].setValue({ workFlow: individualsetting[5] });
+                        this.items.items[6].setValue({ hasUpdateTip: individualsetting[6] });
+                        this.items.items[7].setValue({ openMyDesk: individualsetting[7] });
+                        this.queryById('topBlank').setValue(individualsetting[8]);
+                        this.items.items[9].setValue({ uitheme: UITheme });
+                    }
+                    if (text.ApplogoName != null) {
+                        Ext.getCmp("picPath").setValue(text.ApplogoName);
+                    }
+                }
+            }
+        });
+        var SysSetting = Ext.create('Ext.ng.SysSetting', {
+            border: 0
+        });
+        //显示设置（管理员）
+        Ext.define('Ext.ng.DisplaySetting', {
+            extend: 'Ext.form.Panel',
+            bodyPadding: 5,
+            layout: 'auto',
+            width: 600,
+            items: [
+                {
+                    itemId: 'mainFrameTitle',
+                    //emptyText: '15',
+                    xtype: 'textfield',
+                    fieldLabel: '主页面标题设置',
+                    name: 'title',
+                    mapping: 'title'
+                },
+                {
+                    xtype: 'radiogroup',
+                    fieldLabel: '是否内存检测',
+                    defaultType: 'radiofield',
+                    //name: 'CheckedPhysicalMemory',
+                    defaults: {
+                        name: 'CheckedPhysicalMemory',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '关闭',
+                            inputValue: '0'
+                        }, {
+                            boxLabel: '开启',
+                            inputValue: '1'
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '只对合法用户显示账套',
+                    defaultType: 'radiofield',
+                    //name: 'codeShowId',
+                    defaults: {
+                        name: 'codeShowId',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '关闭',
+                            inputValue: '0'
+                        }, {
+                            boxLabel: '开启',
+                            inputValue: '1'
+                        }
+                    ]
+                },
+                {
+                    fieldLabel: '登录验证码',
+                    defaultType: 'radiofield',
+                    //name: 'IfUserCheckCode',
+                    defaults: {
+                        name: 'IfUserCheckCode',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: '关闭',
+                            inputValue: '0'
+                        }, {
+                            boxLabel: '开启',
+                            inputValue: '1'
+                        }
+                    ]
+                }
+            ],
+            initComponent: function () {
+                var me = this;
+                me.callParent();
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/IndividualSetting/LoadDisplaySetting',
+                    success: function (response) {
+                        //alert(response.responseText);
+                        var serverData = Ext.decode(response.responseText);
+                        me.getForm().setValues(serverData);
+                    }
+                })
+            },
+            defaults: {
+                margin: '10 0 3 0',
+                labelWidth: 200,
+                xtype: 'radiogroup',
+            }
+        });
+        var DisplaySetting = Ext.create('Ext.ng.DisplaySetting', {
+            //title: 'DisplaySetting',
+            border: 0
+        });
+
+        //路由地址设置（管理员）
+        Ext.define('Ext.ng.ServerSetting', {
+            extend: 'Ext.form.Panel',
+            bodyPadding: 5,
+            //layout: 'fit',
+            width: 600,
+            border: 0,
+            items: [
+                {
+                    layout: 'column',
+                    width: 600,
+                    border: 0,
+                    //height: 250,
+                    items: [{
+                        columnWidth: 0.5,
+                        border: 0,
+                        defaults: {
+                            margin: '10 0 0 0',
+                            //labelWidth: 200,
+                            border: 0,
+                            xtype: 'textfield',
+                        },
+                        items: [
+                        {
+                            itemId: 'IP1',
+                            name: 'IP1',
+                            //mapping: 'ipaddress2',
+                            fieldLabel: '公网IP/域名1：'
+                        }, {
+                            itemId: 'IP2',
+                            name: 'IP2',
+                            //mapping: 'ipaddress3',
+                            fieldLabel: '公网IP/域名2'
+                        }, {
+                            itemId: 'IP3',
+                            name: 'IP3',
+                            //mapping: 'ipaddress4',
+                            fieldLabel: '公网IP/域名3'
+                        }, {
+                            itemId: 'IP4',
+                            name: 'IP4',
+                            //mapping: 'ipaddress1',
+                            fieldLabel: '内网IP/域名'
+                        }
+                        ]
+                    }, {
+                        columnWidth: 0.5,
+                        border: 0,
+                        defaults: {
+                            margin: '10 0 0 0',
+                            //labelWidth: 200,
+                            border: 0,
+                            xtype: 'textfield'
+                        },
+                        items: [
+                        {
+                            itemId: 'name1',
+                            name: 'name1',
+                            fieldLabel: '名称'
+                        }, {
+                            itemId: 'name2',
+                            name: 'name2',
+                            fieldLabel: '名称'
+                        }, {
+                            itemId: 'name3',
+                            name: 'name3',
+                            fieldLabel: '名称'
+                        }, {
+                            itemId: 'name4',
+                            name: 'name4',
+                            fieldLabel: '名称'
+                        }
+                        ]
+                    }]
+                }, {
+                    margin: '10 0 0 0',
+                    xtype: 'textfield',
+                    name: 'port',
+                    itemId: 'port',
+                    fieldLabel: '端口'
+                }, {
+                    margin: '10 0 0 0',
+                    xtype: 'radiogroup',
+                    fieldLabel: '内网默认连接',
+                    defaultType: 'radiofield',
+                    //name: 'connectType',
+                    //mapping: 'connectType',
+                    defaults: {
+                        name: 'connectType',
+                        bodyPadding: 10,
+                        width: 100
+                    },
+                    //layout: 'hbox',
+                    items: [
+                        {
+                            boxLabel: 'TCP',
+                            inputValue: '0'
+                        }, {
+                            boxLabel: 'HTTP',
+                            inputValue: '1'
+                        }
+                    ]
+                }
+            ],
+            initComponent: function () {
+                var me = this;
+                me.callParent();
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/IndividualSetting/LoadServerIpAndNetWorkIpConfig',
+                    success: function (response) {
+                        //alert(response.responseText);
+                        var serverData = Ext.decode(response.responseText);
+                        me.getForm().setValues(serverData);
+                    }
+                })
+            },
+            defaults: {
+            }
+        });
+        var ServerSetting = Ext.create('Ext.ng.ServerSetting', {
+            //title: 'ServerSetting',
+            border: 0
+        });
+
+        //首页信息块设置（管理员）
+        var homepageInfoSettingStore = Ext.create('Ext.data.Store', {
+            fields: ['name', 'forbidDisplay', 'forbidRemove', 'forbidShrink'],
+            data: {
+                items: [
+                    { name: '自定义网页', forbidDisplay: false, forbidRemove: true, forbidShrink: true },
+                    { name: '报表仓库', forbidDisplay: true, forbidRemove: false, forbidShrink: true },
+                    { name: '新闻公告', forbidDisplay: true, forbidRemove: true, forbidShrink: false },
+                    { name: '数据窗口', forbidDisplay: false, forbidRemove: true, forbidShrink: true }
+                ]
+            },
+            proxy: {
+                type: 'memory',
+                reader: {
+                    type: 'json',
+                    root: 'items'
+                }
+            }
+        });
+        Ext.define('Ext.ng.homepageInfoSetting', {
+            extend: 'Ext.grid.Panel',
+            //title: 'Simpsons',
+            height: 400,
+            width: 600,
+            store: homepageInfoSettingStore,
+            columns: [
+                { text: '信息面板', dataIndex: 'name', flex: 1 },
+                { xtype: 'checkcolumn', text: '禁止显示', dataIndex: 'forbidDisplay', flex: 1 },
+                { xtype: 'checkcolumn', text: '禁止移除', dataIndex: 'forbidRemove', flex: 1 },
+                { xtype: 'checkcolumn', text: '禁止收缩', dataIndex: 'forbidShrink', flex: 1 }
+            ]
+        });
+        var homepageInfoSetting = Ext.create('Ext.ng.homepageInfoSetting', {
+            border: 0,
+            title: 'homepageInfoSetting',
+        });
+
+        //构建小铃铛页面选项，取全部选项和存在选项??? 注释的是旧的，下面的是新的
+
+        var remindWindowItem = [];
+        if (BellItemsExist == null || BellItemsExist == '') {
+            for (var i = 0; i < BellItemsAll.Record.length; i++) {
+                if (BellItemsAll.Record[i].buskey == '' || BellItemsAll.Record[i].buskey == null) {
+                    continue;
+                }
+                remindWindowItem.push({
+                    name: BellItemsAll.Record[i].Name,
+                    forbidRemindWindow: BellItemsAll.Record[i].Alert == 'false' ? true : false,
+                    buskey: BellItemsAll.Record[i].buskey,
+                })
+            }
+        } else {
+            for (var i = 0; i < BellItemsAll.Record.length; i++) {
+                if (BellItemsAll.Record[i].buskey == '' || BellItemsAll.Record[i].buskey == null) {
+                    continue;
+                }
+                var flag = true;
+                var itemTemp = BellItemsAll.Record[i].buskey;
+                if (BellItemsExist[itemTemp] == true || BellItemsExist[itemTemp] == false) {
+                    flag = !BellItemsExist[itemTemp];
+                } else {
+                    flag = BellItemsAll.Record[i].Alert == 'false' ? true : false;
+                }
+                remindWindowItem.push({
+                    name: BellItemsAll.Record[i].Name,
+                    forbidRemindWindow: flag,
+                    buskey: BellItemsAll.Record[i].buskey,
+                })
+            }
+        }
+
+        //var remindWindowItem = [];
+        //for (var i = 0; i < BellItemsAll.Record.length; i++) {
+        //    //var j = 0;
+        //    //var flag = false;
+        //    //if (BellItemsExist.length > 0) {
+        //    //    while (BellItemsExist[j] != BellItemsAll.Record[i].CtrlId && j != BellItemsExist.length) {
+        //    //        j++;
+        //    //    }
+        //    //    if (j != BellItemsExist.length) {
+        //    //        flag = true;
+        //    //    }
+        //    //}
+        //    remindWindowItem.push({
+        //        name: BellItemsAll.Record[i].Name,
+        //        forbidRemindWindow: BellItemsAll.Record[i].Alert == 'false',
+        //        ctrlId: BellItemsAll.Record[i].CtrlId,
+        //    })
+        //}
+
+        var remindWindowSettingStore = Ext.create('Ext.data.Store', {
+            fields: ['name', 'forbidRemindWindow', 'buskey'],
+            data: {
+                items: remindWindowItem
+            },
+            proxy: {
+                type: 'memory',
+                reader: {
+                    type: 'json',
+                    root: 'items'
+                }
+            }
+        });
+        Ext.define('Ext.ng.remindWindowSetting', {
+            extend: 'Ext.grid.Panel',
+            //extend: 'Ext.ng.GridPanel',
+            //title: 'Simpsons',
+            //layout: 'border',
+            //minWidth: 200,
+            height: 600,
+            //minHeight: 200,
+            width: 400,
+            store: remindWindowSettingStore,
+            columns: [
+                { text: '名称', dataIndex: 'name', flex: 1 },
+                { xtype: 'checkcolumn', text: '禁止弹窗', dataIndex: 'forbidRemindWindow', flex: 1 }
+            ]
+        });
+        var remindWindowSetting = Ext.create('Ext.ng.remindWindowSetting', {
+            border: 0
+            //renderTo: Ext.getBody()
+        });
+
+        ////登陆组织设置（管理员）
+        //Ext.define('Ext.ng.SSOOrgSetting', {
+        //    extend: 'Ext.form.Panel',
+        //    bodyPadding: 10,
+        //    layout: 'auto',
+        //    //width: 600,
+        //    SSOOrgValue: '',
+        //    border: 0,
+        //    items: [{
+        //        xtype: 'ngText',
+        //        itemId: 'SSOOrgValue',
+        //        labelWidth: 120,
+        //        fieldLabel: '单点信息归属组织'
+        //    }],
+        //    initComponent: function () {
+        //        var me = this;
+        //        me.callParent();
+        //        Ext.Ajax.request({
+        //            url: C_ROOT + 'SUP/IndividualSetting/GetSSOOrg',
+        //            success: function (response) {
+        //                //alert(response.responseText);
+        //                //var serverData = Ext.decode(response.responseText);
+        //                //var SSOOrgValue = response.responseText;
+        //                //me.queryById('SSOOrgValue').setValues(SSOOrgValue);
+        //                //me.SSOOrgValue = SSOOrgValue;
+        //            }
+        //        })
+        //    },
+
+        //});
+        //var SSOOrgSetting = Ext.create('Ext.ng.SSOOrgSetting', {
+
+            //})
+
+            //登陆设置的tab页
+
+
+        var individualSetTabPanelItems;
+        if (UserType == 'OrgUser') {
+            if (AllowUser == '1') {
+                frame1 = document.createElement("IFRAME");
+                frame1.frameBorder = 0;
+                frame1.src = C_ROOT + 'SUP/LoginPicManager/Index?individualconfig=1';
+                frame1.height = "100%";
+                frame1.width = "100%";
+
+                var loginPictureSetPanel = Ext.create("Ext.Panel", {
+                    title: '登录界面设置',
+                    itemId: 'loginPictureSetPanel',
+                    closable: false,
+                    contentEl: frame1
+                });
+
+                individualSetTabPanelItems = [FirstTabPanel,
+                { title: '系统设置', xtype: 'container', items: [SysSetting] },
+                { title: '小铃铛弹窗设置', xtype: 'container', items: [remindWindowSetting] },
+                loginPictureSetPanel
+                ]
+            } else {
+                individualSetTabPanelItems = [FirstTabPanel,
+                    { title: '系统设置', xtype: 'container', items: [SysSetting] },
+                { title: '小铃铛弹窗设置', xtype: 'container', items: [remindWindowSetting] }
+                ]
+            }
+
+        } else if (UserType == 'SYSTEM') {
+            individualSetTabPanelItems = [FirstTabPanel,
+                { title: '系统设置', xtype: 'container', items: [SysSetting] },
+            { title: '显示设置', xtype: 'container', items: [DisplaySetting] },
+            { title: '应用服务器网址设置', xtype: 'container', items: [ServerSetting], },
+            //{ title: '首页信息块控制', xtype: 'container', items: [homepageInfoSetting] }
+            //{ title: '单点信息归属组织设置', xtype: 'container', items: [SSOOrgSetting] }
+            ]
+        }
+
+
+        var individualSetTabPanel = Ext.create('Ext.tab.Panel', {
+            //width: 600,
+            //height: 400,
+            region: 'center',
+            //plugins: [{
+            //    ptype: 'tabscrollermenu',
+            //    maxText: 15,
+            //    pageSize: 50
+            //}],
+            items: individualSetTabPanelItems
+        });
+
+
+        var viewport = Ext.create('Ext.container.Viewport', {
+            id: "viewPort",
+            layout: 'border',
+            items: [
+                ngToolbar,
+                individualSetTabPanel
+            ]
+        });
+
+    });
+    </script>
+}

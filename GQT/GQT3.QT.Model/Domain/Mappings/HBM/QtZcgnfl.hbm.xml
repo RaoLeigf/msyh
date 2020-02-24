@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QtZcgnflModel" table="Z_QTZCGNFl">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="KMDM" column="KMDM" type="System.String" length="20" not-null="false" />
+		<property name="KMMC" column="KMMC" type="System.String" length="100" not-null="false" />
+		<property name="KMLB" column="KMLB" type="System.String" not-null="false" />
+		<property name="KMXZ" column="KMXZ" type="System.String" not-null="false" />
+		<property name="YEFX" column="YEFX" type="System.String" not-null="false" />
+		<property name="SF" column="SF" type="System.Byte" not-null="false" />
+		<property name="JM" column="JM" type="System.String" length="6" not-null="false" />
+		<property name="BM" column="BM" type="System.Byte" not-null="false" />
+		<property name="HB" column="HB" type="System.String" not-null="false" />
+		<property name="DEFSTR1" column="DEF_STR1" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR2" column="DEF_STR2" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR3" column="DEF_STR3" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR4" column="DEF_STR4" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR5" column="DEF_STR5" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR6" column="DEF_STR6" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR7" column="DEF_STR7" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR8" column="DEF_STR8" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR9" column="DEF_STR9" type="System.String" length="20" not-null="false" />
+		<property name="DEFSTR10" column="DEF_STR10" type="System.String" length="20" not-null="false" />
+		<property name="Ocode" column="ocode" type="System.String" length="50" not-null="false" />
+		<property name="Orgid" column="orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="Isactive" column="isactive" type="System.Byte" not-null="false" />
+    <property name="FRemark" column="f_Remark" type="System.String" length="100" not-null="false" />
+    <property name="Issystem" column="issystem" type="System.Byte" not-null="false" />
+	</class>
+</hibernate-mapping>

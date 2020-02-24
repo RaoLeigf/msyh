@@ -1,0 +1,392 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_DTQD.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add', '->', 
+                    '->',  'close'
+                ]
+            });
+
+            var url = C_ROOT + 'GQT/QT/VCorrespondenceSetting2/GetVCorrespondenceSetting2List';
+			
+            var storeDYGX2 = Ext.create('Ext.ng.JsonStore', {
+                autoLoad: false,
+				//pageSize: 14,
+                fields: [{
+                    "name": "DWDM",
+                    "type": "string",
+                    "mapping": "DWDM"
+                },{
+                    "name": "DYDM",
+                "type": "string",
+                    "mapping": "DYDM"
+              },
+              {
+                  "name": "Dymc",
+                "type": "string",
+                  "mapping": "Dymc"
+              }],
+                url: C_ROOT + 'GQT/QT/VCorrespondenceSetting2/GetVCorrespondenceSetting2List',
+                autoLoad: false 
+			});
+			gridDYGX2 = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+                height: 700,
+				store: storeDYGX2,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+                columns: [{
+                    header: '单位代码',
+                    flex: 1,
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+                    dataIndex: 'DWDM',
+                    hidden: true
+                }, {
+					header: '渠道代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+                    dataIndex: 'DYDM'
+				}, {
+					header: '渠道名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+                    dataIndex: 'Dymc'
+				}],
+				listeners: {
+					
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+					
+					}
+				
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});
+			
+
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 14,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+                    },
+                    {
+                        "name": "OrgType",
+                        "type": "string",
+                        "mapping": "OrgType"
+
+                    }],
+                //url: C_ROOT + 'DMC/Org/Organization/GetOrganizationList',
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+				autoLoad:false
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height: 700,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+                    }, {
+                        header: '组织类型',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        dataIndex: 'OrgType',
+                        hidden:true
+                    }],
+				listeners: {
+                    'itemdblclick': function (item) {
+                        
+					//	var data = gridOrg.getSelectionModel().getSelection();
+					//	var datacode=data[0].data.OCode;
+					//	var dataPhid=data[0].data.PhId;
+					//	storeDYGX2.clearFilter();
+					//	storeDYGX2.filter('Dwdm',dataPhid);
+					//	storeDYGX2.filter('DefStr1',datacode);
+					//	storeDYGX2.filter('Dylx','08');
+					//	storeDYGX2.load(function(){
+					//		for(var i=0;i<storeDYGX2.getCount();i++){
+					//			var ZCLBDYDM=storeDYGX2.getAt(i).get('Dydm');
+					//			var zclbindex=storeZCLB.find('Dm',ZCLBDYDM);
+					//			var ZCLBMC=storeZCLB.getAt(zclbindex).get('Mc');
+					//			var ZCLBBZ=storeZCLB.getAt(zclbindex).get('Bz');
+					//			storeDYGX2.getAt(i).set('Mc',ZCLBMC);
+					//			storeDYGX2.getAt(i).set('Bz',ZCLBBZ);
+					//		};
+					//	})
+						
+                    },
+                    'itemclick': function () {
+                        var data = gridOrg.getSelectionModel().getSelection()[0].data;
+                        ////storeDYGX2.clearFilter();
+                        ////storeDYGX2.filter('DWDM', data.PhId)
+                        //storeDYGX2.url = C_ROOT + 'GQT/QT/VCorrespondenceSetting2/GetVCorrespondenceSetting2List?dwdm=' + data.OCode;
+                        //Ext.Ajax.request({
+                        //    url: C_ROOT + 'GQT/QT/VCorrespondenceSetting2/GetVCorrespondenceSetting2List?dwdm=' + data.OCode,
+                        //    success: function (response)
+                        //    {
+                        //        var JsonResult = Ext.JSON.decode(response.responseText);
+                        //        storeDYGX2.loadData(JsonResult);
+                        //        storeDYGX2.load();
+                        //    }
+                        //})
+                        //storeDYGX2 = Ext.create('Ext.ng.JsonStore', {
+                        //    autoLoad: false,
+                        //    //pageSize: 14,
+                        //    fields: [{
+                        //        "name": "DWDM",
+                        //        "type": "string",
+                        //        "mapping": "DWDM"
+                        //    }, {
+                        //        "name": "DYDM",
+                        //        "type": "string",
+                        //        "mapping": "DYDM"
+                        //    },
+                        //    {
+                        //        "name": "Dymc",
+                        //        "type": "string",
+                        //        "mapping": "Dymc"
+                        //    }],
+                        //    url: C_ROOT + 'GQT/QT/VCorrespondenceSetting2/GetVCorrespondenceSetting2List?dwdm=' + data.OCode,
+                        //    autoLoad: false
+                        //});
+                        //storeDYGX2.clearFilter();
+                        var ocode = data.OCode;
+                        //storeDYGX2.filter('DWDM', ocode);
+                        
+                        var params = { 'dwdm': ocode };
+                        Ext.apply(storeDYGX2.proxy.extraParams, params);
+                        storeDYGX2.load();
+                    }
+
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});			
+            storeOrg.clearFilter();
+            storeOrg.filter('OrgType', "Y");
+            storeOrg.load();
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridOrg],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridDYGX2],
+				
+				}]
+            });
+
+            //新增
+    //        ngToolbar.get('add').on('click', function () {
+    //            //$OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/CorrespondenceSettings2/CorrespondenceSettings2Edit?otype=add');
+				//var data = gridOrg.getSelectionModel().getSelection();
+				//if(data.length > 0){
+				//	var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+					
+				//	});
+				//	win.show();
+				//}
+    //        });
+
+            ngToolbar.get('add').on('click', function () {
+                var data = gridOrg.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+                    });
+                    win.show();
+                } else {
+                    alert("请选择一行数据");
+                }
+            });
+            //修改
+            //ngToolbar.get('edit').on('click', function () {
+            //    var datas = gridOrg.getSelectionModel().getSelection();
+            //    var data;
+            //    if (datas.length > 0) {
+            //        data = datas[0].data;
+            //    }
+            //    if (data != null) {
+            //        $OpenTab(data.OName+'对应渠道修改', C_ROOT + 'GQT/QT/VCorrespondenceSetting2/RelationZCQDSet?dwdm='+data.OCode);
+            //    } else {
+            //        alert("请选择一行数据");
+            //    }
+            //    //var data = grid.getSelectionModel().getSelection();
+                
+            //    //if (data.length > 0) {
+            //    //    var id = data[0].get('PhId');
+            //    //    $OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/CorrespondenceSettings2/CorrespondenceSettings2Edit?otype=edit&id=' + id);
+            //    //}
+            //});
+
+			//删除
+          //  ngToolbar.get('delete').on('click', function () {
+          //      var data = gridDYGX2.getSelectionModel().getSelection();
+
+          //      if (data.length > 0) {
+          //          //recoderefresh(data);
+                
+          //          Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+          //          function callBack(callBackid) {
+          //              if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+          //                  return;
+          //              } else {
+          //                  Ext.Ajax.request({
+          //                      params: { 'id': data[0].get('PhId') },
+          //                      url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/Delete',
+          //                      success: function (response) {
+          //                          var resp = Ext.JSON.decode(response.responseText);
+          //                          if (resp.Status === "success") {
+
+          //                              Ext.Array.each(data, function (record) {
+          //                                  storeDYGX2.remove(record); //前端删除
+          //                              });
+
+          //                              Ext.MessageBox.alert('提示', '删除成功！');
+										//storeDYGX2.load(function(){
+										//	for(var i=0;i<storeDYGX2.getCount();i++){
+										//		var ZCLBDYDM=storeDYGX2.getAt(i).get('Dydm');
+										//		var zclbindex=storeZCLB.find('Dm',ZCLBDYDM);
+										//		var ZCLBMC=storeZCLB.getAt(zclbindex).get('Mc');
+										//		var ZCLBBZ=storeZCLB.getAt(zclbindex).get('Bz');
+										//		storeDYGX2.getAt(i).set('Mc',ZCLBMC);
+										//		storeDYGX2.getAt(i).set('Bz',ZCLBBZ);
+										//	};
+										//})
+          //                          } else {
+          //                              //NGMsg.Info('删除失败！');
+										//Ext.MessageBox.alert('提示', '删除失败！');
+          //                          }
+          //                      }
+          //                  });
+          //              }
+          //          }
+          //      }
+          //  });
+
+            //查看
+            /*ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/CorrespondenceSettings2/CorrespondenceSettings2Edit?otype=view&id=' + id);
+                }
+            });*/
+
+            //打印
+            /*ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });*/
+
+			//刷新列表中想修改或删除的行数据
+            /*var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetCorrespondenceSettings2List',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };*/
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

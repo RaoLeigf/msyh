@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="SUP3.Log.Model.Domain" assembly="SUP3.Log.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="LogOtherCfgModel">
+		<property name="Phid" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CfgKey" >
+			<not-null />
+			<not-Empty />
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="CfgName" >
+			<not-null />
+			<not-Empty />
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="CfgValue" >
+			<not-null />
+			<not-Empty />
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="NgInsertDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="NgUpdateDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CurOrgId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Creator" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Editor" >
+			<not-null />
+			<not-Empty />
+		</property>
+	</class>
+</nhv-mapping>

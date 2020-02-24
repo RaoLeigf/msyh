@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="SUP3.Log.Model.Domain" assembly="SUP3.Log.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="LogSqlModel" table="log_sql">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="LogId" column="logid" type="System.String" length="20" not-null="false" />
+		<property name="SessionId" column="sessionid" type="System.String" length="40" not-null="false" />
+		<property name="CreateDt" column="create_dt" type="System.DateTime" not-null="false" />
+		<property name="Url" column="url" type="System.String" length="100" not-null="false" />
+		<property name="SqlText" column="sqltext" type="System.String" length="4000" not-null="false" />
+		<property name="Duration" column="duration" type="System.Int64" not-null="false" />
+		<property name="ClientIp" column="clientip" type="System.String" length="20" not-null="false" />
+		<property name="CollectType" column="collect_type" type="System.String" length="10" not-null="false" />
+	</class>
+</hibernate-mapping>

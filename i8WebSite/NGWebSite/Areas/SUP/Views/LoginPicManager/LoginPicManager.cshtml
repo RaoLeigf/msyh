@@ -1,0 +1,640 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+
+    <script>
+
+        var nodeaddtype;
+        var bgshowtype = 0;
+        var tempfiles = [];//待删除的服务端预览图片
+        var lastfilename = '';
+        var showpic = '';
+        var showpicid = '';
+        var flag = true;
+        var usertype;
+        var showlogo;
+        var allowuser;
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { itemId: "addrootnode", text: "新增根节点", iconCls: "add" },
+                    { itemId: "addchildnode", text: "新增子节点", iconCls: "add" },
+                    { itemId: "upload", text: "上传", iconCls: "icon-New" },
+                    'delete',
+                    { itemId: "preview", text: "预览", iconCls: "icon-View" },
+                    'save', '->', 'help', 'close'
+                ]
+            });
+
+            var treeStore = Ext.create('Ext.data.TreeStore', {
+                autoLoad: false,//此配置为true自动发出请求
+                root: {
+                    expanded: true //此配置默认值为true，也会调用store.load发出请求
+                },
+                fields: [
+                    {
+                        name: 'text',
+                        type: 'string',
+                        mapping: 'text'
+                    },
+                    {
+                        name: 'type',
+                        type: 'string',
+                        mapping: 'type'
+                    }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/LoginPicManager/GetTree'
+                }
+            });
+
+            var tree = Ext.create('Ext.tree.Panel', {
+                region: 'center',
+                store: treeStore,
+                rootVisible: false,
+                columnLines: true,
+                columns: [
+                    {
+                        xtype: 'treecolumn',
+                        header: '分类',
+                        dataIndex: 'text',
+                        width: '60%',
+                        sortable: false,
+                        hidden: false
+                    },
+                    {
+                        header: '显示',
+                        dataIndex: 'type',
+                        width: '40%',
+                        sortable: false,
+                        hidden: false,
+                        renderer: function (v, m) {
+                            if (bgshowtype == 0) {
+                                if (v == "1") {
+                                    var html = '<input type = "radio" align = "center" name = "radio"';
+                                    if (showpic == m.record.data.id) {
+                                        html += 'checked = true';
+                                    }
+                                    html += ' onclick=showPicChange("' + m.record.data.id + '")>';
+                                    return html;
+                                }
+                            } else if (bgshowtype == 1) {
+                                if (v == "1") {
+                                    var html = '<input type = "checkbox" align = "center" name = "checkbox"';
+                                    if (showpic.indexOf(m.record.data.id) > -1) {
+                                        html += 'checked = true';
+                                    }
+                                    html += ' onclick=showPicChange("' + m.record.data.id + '")>';
+                                    showpicid += m.record.data.id + ';';
+                                    return html;
+                                }
+                            }
+                        }
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected.length == 0) return;
+                        else {
+                            var select = selected[0];
+                            if (select.raw.type == '0') {
+                                Ext.getCmp("picview").hide();
+                            } else if (select.raw.type == '1') {
+                                Ext.getCmp("picview").show();
+                                Ext.getCmp("picview").getEl().dom.src = C_ROOT + select.raw.src;
+                            }
+                        }
+                    }
+                }
+            });
+
+            showlogo = Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: "展示产品标识",
+                checked: true
+            });
+
+            allowuser = Ext.create('Ext.form.field.Checkbox', {
+                xtype: "checkbox",
+                boxLabel: "允许操作员自定义背景"
+            });
+
+            var optionpanel = Ext.create('Ext.panel.Panel', {
+                region: 'north',
+                height: 40,
+                layout: 'hbox',
+                defaults: {
+                    margin: '6 0 0 10'
+                },
+                items: [
+                    {
+                        xtype: 'label',
+                        margin: '12 0 0 10',
+                        text: '背景展示方式'
+                    },
+                    {
+                        xtype: 'combo',
+                        store: [
+                                ['0', '固定展示一张'],
+                                ['1', '随机展示']
+                        ],
+                        value: '0',
+                        id: 'showtype',
+                        listeners: {
+                            'select': function (combo, records, eOpts) {
+                                if (combo.value == '0') {
+                                    bgshowtype = 0;
+                                    Ext.Ajax.request({
+                                        params: { 'showtype': bgshowtype, 'showpic': showpic },
+                                        url: C_ROOT + 'SUP/LoginPicManager/ChangeShowType',
+                                        success: function (response) {
+                                            showpic = response.responseText;
+                                            treeStore.load();
+                                        }
+                                    });
+                                } else if (combo.value == '1') {
+                                    bgshowtype = 1;
+                                    Ext.Ajax.request({
+                                        params: { 'showtype': bgshowtype, 'showpic': showpic },
+                                        url: C_ROOT + 'SUP/LoginPicManager/ChangeShowType',
+                                        success: function (response) {
+                                            showpic = response.responseText;
+                                            treeStore.load();
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    },
+                    showlogo, allowuser
+                ]
+            });
+
+            var treepanel = Ext.create('Ext.panel.Panel', {
+                region: 'west',
+                width: '45%',
+                layout: 'border',
+                items: [optionpanel, tree]
+            });
+
+            var picpanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                autoScroll: true,
+                items: [
+                    {
+                        xtype: 'component',
+                        id: 'picview',
+                        autoEl: {
+                            tag: 'img',
+                            src: ''
+                        }
+                    }
+                ]
+            });
+
+            var nodeWin = Ext.create('Ext.window.Window', {
+                title: '新增节点',
+                height: 95,
+                width: 400,
+                modal: true,
+                closeAction: 'hide',
+                layout: 'column',
+                items: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '名称',
+                        id: 'nodeName',
+                        labelWidth: 50,
+                        width: 240,
+                        margin: '20 10 20 50'
+                    },
+                    {
+                        xtype: 'button',
+                        height: 23,
+                        margin: '20 10 20 0',
+                        text: '确定',
+                        id: 'nodeBtn',
+                        handler: function () {
+                            if (Ext.getCmp('nodeName').getValue() != '') {
+                                Ext.getCmp('nodeBtn').disable();//禁用按钮
+                                var myMask = new Ext.LoadMask(document.body, { msg: "正在新增节点,请稍候..." });
+                                myMask.show();//锁屏
+                                if (nodeaddtype == 0) {
+                                    Ext.Ajax.request({
+                                        params: { 'name': Ext.getCmp('nodeName').getValue(), 'id': '' },
+                                        url: C_ROOT + 'SUP/LoginPicManager/AddNode',
+                                        success: function () {
+                                            myMask.hide();//停止锁屏
+                                            Ext.getCmp('nodeBtn').enable();
+                                            treeStore.load();
+                                            nodeWin.hide();
+                                        },
+                                        failure: function () {
+                                            myMask.hide();//停止锁屏
+                                            Ext.getCmp('nodeBtn').enable();//按钮设置为可用
+                                        }
+                                    });
+                                } else if (nodeaddtype == 1) {
+                                    var node = tree.getSelectionModel().getSelection()[0];
+                                    Ext.Ajax.request({
+                                        params: { 'name': Ext.getCmp('nodeName').getValue(), 'id': node.data.id },
+                                        url: C_ROOT + 'SUP/LoginPicManager/AddNode',
+                                        success: function () {
+                                            myMask.hide();//停止锁屏
+                                            Ext.getCmp('nodeBtn').enable();
+                                            treeStore.load();
+                                            nodeWin.hide();
+                                        },
+                                        failure: function () {
+                                            myMask.hide();//停止锁屏
+                                            Ext.getCmp('nodeBtn').enable();//按钮设置为可用
+                                        }
+                                    });
+                                }
+                            } else {
+                                Ext.MessageBox.alert("提示", "请输入名称!");
+                            }
+                        }
+                    }
+                ]
+            });
+
+            var filefield = Ext.create('Ext.form.field.File', {
+                name: 'addPic',
+                buttonText: '...',
+                msgTarget: 'side',
+                allowBlank: false,
+                x: 590,
+                y: 405,
+                validator: function (value) {
+                    //jpg jpeg gif bmp png
+                    if (!Ext.isEmpty(value)) {
+                        var arr = value.split('.');
+                        var tp = false;
+                        switch (arr[arr.length - 1].toLowerCase()) {
+                            case 'jpg':
+                            case 'jpeg':
+                            case 'gif':
+                            case 'bmp':
+                            case 'png': tp = true;
+                        }
+                        if (tp) {
+                            return true;
+                        }
+                        return "请选择图片";
+                    }
+                    return true;
+                },
+                listeners: {
+                    afterrender: function () {
+                        filefield.el.down('input').dom.style.display = 'none';
+                    },
+                    change: function (obj) {
+                        var path = obj.value;
+                        var form = this.up('form').getForm();
+                        if (form.isValid()) {
+                            form.submit({
+                                url: C_ROOT + 'SUP/LoginPicManager/AddPicUpload',
+                                success: function (fp, o) {
+                                    if (o.result.success) {
+                                        Ext.getCmp("picUpload").getEl().dom.src = C_ROOT + 'NG3Resource/LoginPic/' + o.result.filename;
+                                        Ext.getCmp("picPath").setValue(path);
+                                        Ext.Array.include(tempfiles, o.result.filename);
+                                        lastfilename = o.result.filename;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            var addPicPanel = Ext.create("Ext.form.Panel", {
+                layout: 'absolute',
+                border: false,
+                items: [
+                    {
+                        xtype: 'component',
+                        x: 0,
+                        y: 0,
+                        width: 650,
+                        height: 400,                       
+                        id: 'picUpload',
+                        autoEl: {
+                            tag: 'img',
+                            src: ''
+                        }
+                    },
+                    {
+                        xtype: 'label',
+                        x: 20,
+                        y: 412,
+                        text: '文件选择:'
+                    },
+                    {
+                        xtype: 'textfield',
+                        x: 80,
+                        y: 405,
+                        width: 508,
+                        readOnly: true,
+                        id: 'picPath'
+                    },
+                    filefield,
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '分类名称',
+                        id: 'picName',
+                        x: 20,
+                        y: 440,
+                        width: 280,
+                        labelWidth: 55
+                    },
+                    {
+                        xtype: 'label',
+                        x: 318,
+                        y: 445,
+                        text: '建议上传650*400分辨率的图片'
+                    },
+                    {
+                        xtype: 'button',
+                        x: 496,
+                        y: 440,
+                        width: 64,
+                        height: 23,
+                        text: '确定',
+                        id: 'picBtn',
+                        handler: function () {
+                            if (Ext.getCmp("picName").getValue() == '') {
+                                Ext.MessageBox.alert("提示", "请输入分类名称!");
+                            } else {
+                                Ext.getCmp('picBtn').disable();//禁用按钮
+                                var myMask = new Ext.LoadMask(document.body, { msg: "正在上传图片,请稍候..." });
+                                myMask.show();//锁屏
+                                Ext.Array.remove(tempfiles, lastfilename);
+                                var deletefiles = '';
+                                Ext.Array.each(tempfiles, function (tempfile) {
+                                    deletefiles += (tempfile + '|');
+                                });
+                                Ext.Ajax.request({
+                                    params: {
+                                        'name': Ext.getCmp("picName").getValue(),
+                                        'id': tree.getSelectionModel().getSelection()[0].data.id,
+                                        'src': lastfilename,
+                                        'deletefiles': deletefiles
+                                    },
+                                    url: C_ROOT + 'SUP/LoginPicManager/SavePicUpload',
+                                    success: function () {
+                                        myMask.hide();//停止锁屏
+                                        Ext.getCmp('picBtn').enable();
+                                        treeStore.load();
+                                        addPicWin.hide();
+                                    },
+                                    failure: function () {
+                                        myMask.hide();//停止锁屏
+                                        Ext.getCmp('picBtn').enable();//按钮设置为可用
+                                    }
+                                });
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'button',
+                        x: 566,
+                        y: 440,                       
+                        width: 64,
+                        height: 23,
+                        text: '取消',
+                        handler: function () {
+                            var deletefiles = '';
+                            Ext.Array.each(tempfiles, function (tempfile) {
+                                deletefiles += (tempfile + '|');
+                            });
+                            Ext.Ajax.request({
+                                params: { 'deletefiles': deletefiles },
+                                url: C_ROOT + 'SUP/LoginPicManager/CancelPicUpload',
+                                success: function () {
+                                    addPicWin.hide();
+                                }
+                            });
+                        }
+                    }
+                ]
+            });
+
+            var addPicWin = Ext.create('Ext.window.Window', {
+                title: '登录背景导入',
+                layout: 'fit',
+                width: 650,
+                height: 505,
+                modal: true,
+                closeAction: 'hide',
+                items: [addPicPanel],
+                listeners: {
+                    show: function () {
+                        Ext.getCmp("picUpload").getEl().dom.src = '';
+                    }
+                }
+            });
+
+            var viewPicPanel = Ext.create("Ext.form.Panel", {
+                border: false,
+                layout: 'fit'
+            });
+
+            var viewPicWin = Ext.create('Ext.window.Window', {
+                title: '登录背景预览',
+                layout: 'fit',
+                height: 432,
+                width: 662,
+                modal: true,
+                closeAction: 'hide',
+                resizable : false,
+                items: [viewPicPanel],
+                listeners: {
+                    show: function () {
+                        viewPicPanel.el.dom.innerHTML = '';
+                        var html = '<div style = "width:650px;height:400px;background-image:url(' + C_ROOT + 'NG3Resource/pic/login.png)';
+                        if (showlogo.getValue() == true) {
+                            html += ',url(' + C_ROOT + 'NG3Resource/pic/logo.png)';
+                        }
+                        html += ',url(' + C_ROOT + tree.getSelectionModel().getSelection()[0].raw.src + ');background-size:100% 100%"></div>';
+                        viewPicPanel.el.dom.innerHTML = html;
+                    }
+                }
+            });
+            
+            ngToolbar.get('addrootnode').on('click', function () {
+                nodeaddtype = 0;
+                Ext.getCmp('nodeName').setValue('');
+                nodeWin.show();
+            });
+
+            ngToolbar.get('addchildnode').on('click', function () {
+                if (typeof (tree.getSelectionModel().getSelection()[0]) == "undefined") {
+                    Ext.MessageBox.alert("提示", "请选择一个想要添加子节点的节点!");
+                } else {
+                    nodeaddtype = 1;
+                    Ext.getCmp('nodeName').setValue('');
+                    nodeWin.show();
+                }
+            });
+
+            ngToolbar.get('upload').on('click', function () {
+                if (typeof (tree.getSelectionModel().getSelection()[0]) == "undefined") {
+                    Ext.MessageBox.alert("提示", "请选择一个节点!");
+                } else {
+                    Ext.getCmp("picName").setValue('');
+                    Ext.getCmp("picPath").setValue('');
+                    lastfilename = '';
+                    tempfiles = [];
+                    addPicWin.show();
+                }
+            });
+
+            ngToolbar.get('delete').on('click', function () {
+                var node = tree.getSelectionModel().getSelection()[0];
+                if (typeof (node) == "undefined") {
+                    Ext.MessageBox.alert("提示", "请选择一个想要删除的节点!");
+                } else if (node.childNodes.length > 0) {
+                    Ext.MessageBox.alert("提示", "不能删除有子节点的节点!");
+                } else if (node.raw.sysflg == "1") {
+                    Ext.MessageBox.alert("提示", "系统默认设置的节点不能删除!");
+                } else if (node.raw.userid != '' && node.raw.userid != $appinfo.userID) {
+                    Ext.MessageBox.alert("提示", "只能删除自己添加的节点!");
+                } else {
+                    Ext.Ajax.request({
+                        params: { 'phid': node.raw.phid },
+                        url: C_ROOT + 'SUP/LoginPicManager/DelNode',
+                        success: function () {
+                            Ext.MessageBox.alert("提示", "删除成功!");
+                            treeStore.load();
+                        }
+                    });
+                }
+            });
+            
+            ngToolbar.get('preview').on('click', function () {
+                var node = tree.getSelectionModel().getSelection()[0];
+                if (typeof (node) != "undefined" && node.raw.src != '') {
+                    viewPicWin.show();
+                } else {
+                    Ext.MessageBox.alert("提示", "请选择一个图片节点!");
+                }
+            });
+            
+            ngToolbar.get('save').on('click', function () {
+                save();
+            });
+
+            ngToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('LoginPicManager.cshtml');
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, treepanel, picpanel]
+            });           
+
+            Ext.defer(function () {
+                Ext.Ajax.request({                    
+                    url: C_ROOT + 'SUP/LoginPicManager/GetLoginPicSet',
+                    success: function (response) {
+                        var json = Ext.JSON.decode(response.responseText);
+                        var result = json.LoginPicSet;
+                        if (result.length > 0) {
+                            var set = result[0];
+                            bgshowtype = set.showtype;
+                            Ext.getCmp("showtype").setValue(bgshowtype == 0 ? '0' : '1');
+                            showlogo.setValue(set.showlogo == 1 ? true : false);
+                            allowuser.setValue(set.allowuser == 1 ? true : false);
+                            if (bgshowtype == 0 && set.showpic != null) {
+                                showpic = set.showpic;
+                            } else if (bgshowtype == 1 && set.showpic2 != null) {
+                                showpic = set.showpic2;
+                            }
+                            treeStore.load();
+                        }
+
+                        usertype = json.UserType;
+                        if (usertype != 'SYSTEM') {
+                            allowuser.hide();
+                            ngToolbar.get('close').hide();
+                            ngToolbar.get('save').hide();
+                        }
+                    }
+                });
+
+                Ext.getCmp('picview').getEl().on('dblclick', function () {
+                    var node = tree.getSelectionModel().getSelection()[0];
+                    if (typeof (node) != "undefined" && node.raw.src != '') {
+                        viewPicWin.show();
+                    }
+                });
+
+                Ext.getCmp("picview").hide();
+            });
+
+            Ext.getDoc().on('contextmenu', function (e) {
+                e.stopEvent();
+            });
+
+        });
+
+        function showPicChange(id) {
+            if (flag && bgshowtype == 1) {
+                var showpics = showpic.split(';');
+                if (showpics.length > showpicid.split(';').length) {
+                    for (var i = 0; i < showpics.length - 1; i++) {
+                        if (showpicid.indexOf(showpics[i] + ';') == -1) {
+                            showpic = showpic.replace(showpics[i] + ';', '');
+                        }
+                    }
+                }
+                flag = false;
+            }
+
+            if (bgshowtype == 0) {
+                if (showpic != id) {
+                    showpic = id;
+                } else{
+                    showpic = '';
+                    var radios = document.getElementsByName('radio');
+                    for (var i = 0; i < radios.length; i++) {
+                        if (radios[i].checked) {
+                            radios[i].checked = false;
+                        }
+                    }
+                }
+            } else if (bgshowtype == 1) {
+                if (showpic.indexOf(id + ';') > -1) {
+                    showpic = showpic.replace(id + ';', '');
+                } else {
+                    showpic += (id + ';');
+                }
+            }
+        }
+
+        function save() {
+            Ext.Ajax.request({
+                params: {
+                    'showtype': bgshowtype, 'showlogo': showlogo.getValue() ? 1 : 0,
+                    'allowuser': allowuser.getValue() ? 1 : 0, 'showpic': showpic
+                },
+                url: C_ROOT + 'SUP/LoginPicManager/SaveLoginPicSet',
+                success: function (response) {
+                    if (usertype == 'SYSTEM') {
+                        Ext.MessageBox.alert("提示", "保存成功!");
+                    }
+                }
+            });
+        }
+
+    </script>
+
+}

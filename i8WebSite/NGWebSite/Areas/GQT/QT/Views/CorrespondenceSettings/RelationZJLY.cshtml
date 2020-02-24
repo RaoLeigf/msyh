@@ -1,0 +1,300 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+	<script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_ZJLY.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript">
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add', 'delete', 
+                    '->',  'close'
+                ]
+            });
+
+
+			
+			var storeZJLY = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 200,
+				fields: [
+				
+				{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+
+  
+    "name": "DM",
+    "type": "string",
+    "mapping": "DM"
+  },
+  {
+    "name": "MC",
+    "type": "string",
+    "mapping": "MC"
+  },
+  {
+    "name": "BZ",
+    "type": "string",
+    "mapping": "BZ"
+
+				}],
+				//url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetCorrespondenceSettingsList_org',
+				url: C_ROOT + 'GQT/QT/SourceOfFunds/GetSourceOfFundsListDYGXdtl',
+				//params:{'id': data[0].get('PhId') }
+				
+				//url: C_ROOT + 'GQT/QT/SourceOfFunds/GetSourceOfFundsList',
+				autoLoad:false 
+				/*{
+					callBack:function(){
+						alert(storeZJLY.getCount());
+					}
+				}*/
+			});
+			
+			
+			
+			gridZJLY = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				//height: 390,
+				height:document.documentElement.clientHeight-28,
+				store: storeZJLY,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [ {
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DM'
+				}, {
+					header: '名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'MC'
+				}, {
+					header: '备注',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'BZ'
+				
+				}],
+				listeners: {
+					
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					}
+				
+					
+					
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				}*/
+			});
+			
+
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+				}],
+				//url: C_ROOT + 'DMC/Org/Organization/GetOrganizationList',
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+				//url: C_ROOT + 'GQT/QT/SourceOfFunds/GetSourceOfFundsList',
+				autoLoad:true
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				//height: 390,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+					//renderer: function (value, parm, record) {
+					//    if (record.data.ctype == "1") {
+					//        return me.getEmpName(value, record.data.assigntype);
+					//    }
+					//    return value;
+					//}
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						var params={'Dwdm':record.get('PhId')};
+						Ext.apply(storeZJLY.proxy.extraParams,params);
+						storeZJLY.load(function(){
+							
+						})
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				},*/
+			});
+			
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridOrg],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridZJLY],
+				
+				}]
+            });
+            //新增
+            ngToolbar.get('add').on('click', function () {
+				var data = gridOrg.getSelectionModel().getSelection();
+				if(data.length > 0){
+					var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {				   
+					});
+					win.show();
+				}
+            });
+
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = gridZJLY.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    //recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            storeZJLY.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+										var data = gridOrg.getSelectionModel().getSelection();
+										var dataPhid=data[0].data.PhId;
+										var params={'Dwdm':dataPhid};
+										Ext.apply(storeZJLY.proxy.extraParams,params);
+										storeZJLY.load(function(){
+											
+										})
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+        });
+		
+		function findStoreIndex(store,name,value){
+			for(var i=0;i<store.getCount();i++){
+				if(store.getAt(i).get(name)==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+
+
+    </script>
+}
+
+

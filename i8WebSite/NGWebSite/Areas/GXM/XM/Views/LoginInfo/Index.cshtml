@@ -1,0 +1,42 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge,IE=11,IE=10,IE=9,IE=8" />
+    <script type="text/javascript" src="~/NG3Resource/Desk/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+
+        }
+    </script>
+    <script>
+
+        $(function () {
+            $.ajax({
+                url: "@Url.Content("~/GXM/XM/LoginInfo/getUserInfo")",
+                type: 'POST',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.Status == "success") {
+                        //alert(res.Data.logid + "," + res.Data.pwd);
+                        ///web/NG3WebLogin/SignLogin?logid=0000&pwd=&orgid=&openUrl=web/Home/Index&urlTitle=
+
+                        window.location.href = '@Url.Content("~/web/NG3WebLogin/SignLogin")' + '?logid=' + res.Data.logid + '&pwd=' + res.Data.pwd + '&orgid=&openUrl=web/Home/Index&urlTitle='
+                    } else {
+                        alert(res.Msg);
+                    }
+                }
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <div class="box">
+        CAS跳转登陆页面
+    </div>
+</body>
+</html>

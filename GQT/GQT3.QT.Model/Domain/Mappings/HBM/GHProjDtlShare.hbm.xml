@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GHProjDtlShareModel" table="JJ_FXGL">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MK" column="MK" type="System.String" length="20" not-null="false" />
+		<property name="XMDM" column="XMDM" type="System.String" length="255" not-null="false" />
+		<property name="DM" column="DM" type="System.String" length="255" not-null="false" />
+		<property name="MC" column="MC" type="System.String" length="200" not-null="false" />
+		<property name="STR1" column="STR1" type="System.String" length="20" not-null="false" />
+		<property name="STR2" column="STR2" type="System.String" length="20" not-null="false" />
+		<property name="STR3" column="STR3" type="System.String" length="20" not-null="false" />
+		<property name="STR4" column="STR4" type="System.String" length="20" not-null="false" />
+		<property name="STR5" column="STR5" type="System.String" length="20" not-null="false" />
+		<property name="STR6" column="STR6" type="System.String" length="255" not-null="false" />
+		<property name="STR7" column="STR7" type="System.String" length="40" not-null="false" />
+		<property name="STR8" column="STR8" type="System.String" length="40" not-null="false" />
+		<property name="STR9" column="STR9" type="System.String" length="40" not-null="false" />
+		<property name="STR10" column="STR10" type="System.String" length="40" not-null="false" />
+		<property name="STR11" column="STR11" type="System.String" length="60" not-null="false" />
+		<property name="STR12" column="STR12" type="System.String" length="60" not-null="false" />
+		<property name="STR13" column="STR13" type="System.String" length="60" not-null="false" />
+		<property name="STR14" column="STR14" type="System.String" length="60" not-null="false" />
+		<property name="STR15" column="STR15" type="System.String" length="60" not-null="false" />
+		<property name="STR16" column="STR16" type="System.String" length="60" not-null="false" />
+		<property name="STR17" column="STR17" type="System.String" length="100" not-null="false" />
+		<property name="STR18" column="STR18" type="System.String" length="100" not-null="false" />
+		<property name="STR19" column="STR19" type="System.String" length="250" not-null="false" />
+		<property name="STR20" column="STR20" type="System.String" length="250" not-null="false" />
+		<property name="MONEY1" column="MONEY1" type="System.Decimal" not-null="false" />
+		<property name="MONEY2" column="MONEY2" type="System.Decimal" not-null="false" />
+		<property name="MONEY3" column="MONEY3" type="System.Decimal" not-null="false" />
+		<property name="MONEY4" column="MONEY4" type="System.Decimal" not-null="false" />
+		<property name="MONEY5" column="MONEY5" type="System.Decimal" not-null="false" />
+		<property name="MONEY6" column="MONEY6" type="System.Decimal" not-null="false" />
+		<property name="MONEY7" column="MONEY7" type="System.Decimal" not-null="false" />
+		<property name="MONEY8" column="MONEY8" type="System.Decimal" not-null="false" />
+		<property name="MONEY9" column="MONEY9" type="System.Decimal" not-null="false" />
+		<property name="MONEY10" column="MONEY10" type="System.Decimal" not-null="false" />
+		<property name="INT1" column="INT1" type="System.Int32" not-null="false" />
+		<property name="INT2" column="INT2" type="System.Int32" not-null="false" />
+		<property name="INT3" column="INT3" type="System.Int32" not-null="false" />
+		<property name="INT4" column="INT4" type="System.Int32" not-null="false" />
+		<property name="INT5" column="INT5" type="System.Int32" not-null="false" />
+		<property name="INT6" column="INT6" type="System.Int32" not-null="false" />
+		<property name="INT7" column="INT7" type="System.Int32" not-null="false" />
+		<property name="INT8" column="INT8" type="System.Int32" not-null="false" />
+		<property name="INT9" column="INT9" type="System.Int32" not-null="false" />
+		<property name="INT10" column="INT10" type="System.Int32" not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+	</class>
+</hibernate-mapping>

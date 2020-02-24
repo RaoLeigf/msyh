@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{259AD850-29EA-46A1-80C7-DCD20149220A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GSP3.SP.Model</RootNamespace>
+    <AssemblyName>GSP3.SP.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GSP3.SP.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\GenerateCodes\GAppvalPost4OperModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GAppvalPostModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GAppvalProc4PostModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GAppvalProcCondsModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GAppvalProcModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GAppvalRecordModel.cs" />
+    <Compile Include="Enums\Approval.cs" />
+    <Compile Include="Enums\BillType.cs" />
+    <Compile Include="Enums\EnumYesNo.cs" />
+    <Compile Include="Enums\ModeType.cs" />
+    <Compile Include="Extra\GAppvalPost4OperModel.cs" />
+    <Compile Include="Extra\GAppvalPostAndOpersModel.cs" />
+    <Compile Include="Extra\GAppvalPostModel.cs" />
+    <Compile Include="Extra\GAppvalProcModel.cs" />
+    <Compile Include="Extra\GAppvalRecordModel.cs" />
+    <Compile Include="Extra\Organize.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Domain\Mappings\NHV\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\GAppvalPost.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\GAppvalPost4Oper.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\GAppvalProc.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\GAppvalProc4Post.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\GAppvalProcConds.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\GAppvalRecord.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

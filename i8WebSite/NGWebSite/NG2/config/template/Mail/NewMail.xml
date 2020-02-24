@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<!-- 这是一个UI模板测试文件 -->
+<freeform>
+  <Properties bgColor="#ffffff"></Properties>
+  <Objects>
+    <input id="id" iskey="true" visible="false"/>
+    <input id="receiver" LeftText="收件人    " x="10" y="20" width="95%" leftSize="80"/>
+    <input id="copyto" LeftText="抄送    " x=".left" y=".bottom+4" width="95%" leftSize="80"/>
+    <input id="subject" LeftText="主题    " x=".left" y=".bottom+4" width="95%" leftSize="80"/>
+    <input id="body" type="MultiLineEdit"  LeftText="正文    " x=".left" y=".bottom+4" width="95%" height="80%" leftSize="80"/>
+  </Objects>
+</freeform>

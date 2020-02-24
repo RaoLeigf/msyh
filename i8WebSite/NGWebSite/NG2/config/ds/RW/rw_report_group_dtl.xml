@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_report_group_dtl">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="group_id" />
+      <Field Name="group_dtlid"/>
+      <Field Name="rep_type"/>
+      <Field Name="rep_id"/>
+      <Field Name="rep_name"/>
+      <Field Name="suite"/>
+      <Field Name="rep_orgname"/>
+      <Field Name="rel_key"/>
+    </Table>
+    <Table Name="rw_report_main">
+       <Field Name="rep_classid"/>
+    </Table>
+    <Table Name="rw_report_class">
+      <Field Name="class_name"/>
+    </Table>
+    <Table Name="fg_menu">
+      <Field Name="apptype"/>
+      <Field Name="url"/>
+      <Field Name="managername"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select distinct [fields] from [table]
+      left join rw_report_main on [table].rep_type=0 and [table].rep_id = rw_report_main.rep_id
+      left join rw_report_class on rw_report_main.rep_classid = rw_report_class.class_id
+      left join fg_menu on [table].rep_type=3 and [table].rel_key = fg_menu.code
+      left join rw_report_group_rights on [table].group_id = rw_report_group_rights.group_id
+      left join fg_useractor on rw_report_group_rights.actor_id = fg_useractor.actorid     
+      where 1=1 [query]
+      order by [table].group_id,rw_report_group_dtl.rep_type,group_dtlid,rw_report_group_dtl.rep_name
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="fg_useractor.userid" paramName="logid" Target="Client" Value="logid"/>
+      <Exp Field="fg_useractor.ocode" paramName="ocode" Target="Client" Value="ocode"/>
+    </Query>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>      
+    </Values>
+    <where>
+      <Exp Field="group_id" Target="Client" Value="group_id" />
+    </where>
+  </Record>
+  <Create>
+    <Table Name="rw_report_group_dtl">
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table Name="rw_report_group_dtl">
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <RecordByRef>
+    <Sql>
+      select 1 from rw_report_group_rights [where]
+    </Sql>
+    <Where >
+      <Exp Field="group_id" Target="Client" Value="group_id"/>
+    </Where>
+  </RecordByRef>
+
+  <SelectMaxID>
+    <Sql>
+      select max(id) from rw_report_group_dtl
+    </Sql>
+  </SelectMaxID>
+
+  <SelectMaxDtlID>
+    <Sql>
+      select max(group_dtlid) from rw_report_group_dtl [where]
+    </Sql>
+    <where>
+      <Exp Field="group_id" Target="Client" Value="group_id" />
+    </where>
+  </SelectMaxDtlID>
+
+  <DeleteGroupDtl>
+    <Sql>
+      delete from rw_report_group_dtl [where]
+    </Sql>
+    <Where >
+      <Exp Field="group_id" Target="Client" Value="group_id"/>
+    </Where>
+  </DeleteGroupDtl>
+  
+</DataService>
+

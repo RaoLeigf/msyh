@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GSP3.SP.Model.Domain" assembly="GSP3.SP.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GAppvalPostModel" table="sp3_appval_post">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="OrgPhid" column="org_phid" type="System.Int64" not-null="false" />
+		<property name="OrgCode" column="org_code" type="System.String" length="50" not-null="false" />
+		<property name="FCode" column="f_code" type="System.String" length="50" not-null="false" />
+		<property name="FName" column="f_name" type="System.String" length="50" not-null="false" />
+		<property name="FDescribe" column="f_describe" type="System.String" length="500" not-null="false" />
+		<property name="FEnable" column="f_enable" type="System.Byte" not-null="true" />
+    <property name="IsSystem" column="issystem" type="System.Byte" not-null="true" />   
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

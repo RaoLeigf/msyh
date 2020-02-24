@@ -1,0 +1,392 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_3.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/ProjLibProjEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add',  'delete', 
+                    '->',  'close'
+                ]
+            });
+			
+			
+			var storeYSK = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 14,
+				fields: [{
+
+  
+    "name": "DM",
+    "type": "string",
+    "mapping": "DM"
+  },
+  {
+    "name": "MC",
+    "type": "string",
+    "mapping": "MC"
+	
+
+				}],
+				url: C_ROOT + 'GQT/QT/ProjLibProj/GetProjLibProjList',
+				autoLoad:false
+			});
+			storeYSK.load();
+			gridYSK = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height: 390,
+				store: storeYSK,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DM',
+					//hidden:true
+				}, {
+					header: '名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'MC'
+				
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});
+			
+			
+			var storeDYGX = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 14,
+				fields: [{
+
+  
+    "name": "Dwdm",
+    "type": "string",
+    "mapping": "Dwdm"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "Dydm",
+    "type": "string",
+    "mapping": "Dydm"
+  },
+  {
+    "name": "Dylx",
+    "type": "string",
+    "mapping": "Dylx"
+	},
+  {
+    "name": "DefStr1",
+    "type": "string",
+    "mapping": "DefStr1"
+  },
+  {
+    "name": "MC",
+    "type": "string",
+    "mapping": "MC"
+ 
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetCorrespondenceSettingsList',
+				autoLoad:false 
+			});
+			
+			gridDYGX = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height: 390,
+				store: storeDYGX,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '单位代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Dwdm',
+					hidden:true
+				}, {
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Dydm'
+				}, {
+					header: '对应类型',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Dylx',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'DefStr1',
+					hidden:true
+				}, {
+					header: '名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'MC'
+				
+				
+				}],
+				listeners: {
+					
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+					
+					}
+				
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});
+			
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+				}],
+				url: C_ROOT + 'DMC/Org/Organization/GetOrganizationList',
+				autoLoad:true
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height: 390,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						var data = gridOrg.getSelectionModel().getSelection();
+						var datacode=data[0].data.OCode;
+						var dataPhid=data[0].data.PhId;
+						storeDYGX.clearFilter();
+						storeDYGX.filter('Dwdm',dataPhid);
+						storeDYGX.filter('DefStr1',datacode);
+						storeDYGX.filter('Dylx','03');
+						storeDYGX.load(function(){
+							for(var i=0;i<storeDYGX.getCount();i++){
+								var YSKDM=storeDYGX.getAt(i).get('Dydm');
+								var YSKindex=storeYSK.find('DM',YSKDM);
+								var YSKMC=storeYSK.getAt(YSKindex).get('MC');
+								//var YSKBZ=storeYSK.getAt(YSKindex).get('BZ');
+								storeDYGX.getAt(i).set('MC',YSKMC);
+								//storeDYGX.getAt(i).set('BZ',ZJBZ);
+							};
+						})
+						//alert(storeZJLY.getCount());
+						/*for(var i=0;i<storeZJLY.getCount();i++){
+							storeZJLY.getAt(i).set('Dydm','dm');
+							alert(storeZJLY.getAt(i).get('Dydm'));
+						};*/
+						//storeZJLY.reload();
+						//alert(listZJ);
+						
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				},
+			});
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridOrg],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridDYGX],
+				
+				}]
+            });
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                var data = gridOrg.getSelectionModel().getSelection();
+				if(data.length > 0){
+					var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+					   
+					});
+					win.show();
+				}
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = gridDYGX.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    //recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            storeDYGX.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+										storeDYGX.load(function(){
+											for(var i=0;i<storeDYGX.getCount();i++){
+												var YSKDM=storeDYGX.getAt(i).get('Dydm');
+												var YSKindex=storeYSK.find('DM',YSKDM);
+												var YSKMC=storeYSK.getAt(YSKindex).get('MC');
+												//var YSKBZ=storeYSK.getAt(YSKindex).get('BZ');
+												storeDYGX.getAt(i).set('MC',YSKMC);
+												//storeDYGX.getAt(i).set('BZ',ZJBZ);
+											};
+										})
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+		});	
+
+    </script>
+}
+
+

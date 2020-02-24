@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- u_sort: '01' 用户 , '02' 用户组, '04' 角色。  与权限中心secuerrgt同步 -->
+<DataService>
+  <Tables>
+    <Table Name="rw_report_rights">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="rep_id" />
+      <Field Name="userid" />
+      <Field Name="u_sort"  />
+      <Field Name="rightstr"  />
+      <Field Name="ocode"  />
+      <Field Name="user_name" format="' '" asname="user_name" />
+    </Table>
+    <Table Name ="secuser">
+      <Field Name="u_name" asname="username" />
+    </Table>
+    <Table Name ="fg_actor">
+      <Field Name="memo" asname="actorname" />
+    </Table>
+    <Table Name ="fg_ugroup">
+      <Field Name="g_name" asname="groupname" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join secuser on [table].u_sort='01' and secuser.logid = [table].userid
+      left join fg_actor on [table].u_sort='04' and fg_actor.actorid = [table].userid
+      left join fg_ugroup on [table].u_sort='02' and fg_ugroup.g_code = [table].userid
+      [where] [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="rep_id"  Target="Client" Value="rep_id" Type="Array">
+        <Exp Field="rw_report_rights.rep_id" ParamName ="rep_id"  TypeKey="0"/>
+      </Exp>
+      <Exp Field="u_sort" Target="Client" value="u_sort"/> 
+      <Exp Field="userid" Target="Client" value="userid" Type="Array">
+        <Exp Field="rw_report_rights.userid" ParamName ="userid"  TypeKey="0"/>
+      </Exp>
+    </Query>
+    <OrderBy format="{u_sort},{userid}">
+      <Exp Field="u_sort" value="asc"/>
+      <Exp Field="userid" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="rep_id"  Target="Client" Value="rep_id" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="ocode" Target="AppInfo" Value="OCode"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+
+      </Values>
+    </Table>
+  </Update>
+  <Destroy >
+    <Table>
+      <Values>
+
+      </Values>
+    </Table>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <SelectMaxID>
+    <Sql>
+      select max(id) from rw_report_rights
+    </Sql>
+  </SelectMaxID>
+
+  <GetRepListByUserID>
+    <Sql>
+      select rep_id,max(rightstr) rt  from rw_report_rights
+      where u_sort ='01' and userid = @userid and rightstr >= '1'
+      group by rep_id
+      union all
+      select rep_id,max(rightstr) rt from rw_report_rights
+      where u_sort='04' and userid in(
+      select actorid from fg_useractor
+      where userid = @userid and ocode =@ocode) and rightstr >= '1'
+      group by rep_id
+      union all
+      select rep_id,max(rightstr) rt from rw_report_rights
+      where u_sort='02' and userid in(
+      select g_code from fg_guser
+      where g_id = @userid and ocode = @ocode) and rightstr >= '1'
+      group by rep_id
+      order by rep_id,rt desc
+    </Sql>
+    <Where>
+      <Exp Field="userid" Target="Client"  Value="userid"/>
+      <Exp Field="ocode" Target="Client"  Value="ocode"/>
+    </Where>
+  </GetRepListByUserID>
+  
+</DataService>
+
+

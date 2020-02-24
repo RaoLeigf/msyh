@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    //ViewBag.Title = @ViewBag.Text;
+    ViewBag.Title = "小铃铛提示";
+}
+
+
+@section script
+{
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    @*<script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>*@
+
+    @*<script src=@Url.Script("~/NG3Resource/raphael-master/raphael.js") type="text/javascript" charset="utf-8"></script>
+        <script src=@Url.Script("~/NG3Resource/raphael-master/node_modules/jquery/dist/jquery.js") type="text/javascript" charset="utf-8"></script>
+        <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/dragNode.js") type="text/javascript" charset="utf-8"></script>*@
+
+    <link href="~/NG3Resource/css/mainTreeTab.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+
+        @*var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义*@
+            
+        var text = Ext.htmlDecode('@ViewBag.text');
+        Ext.onReady(function () {
+
+            var alertPanel = Ext.create('Ext.panel.Panel', {
+                //title: 'Hello',
+                //width: 200,
+                //height:150,
+                region: 'center',
+                border: 0,
+                layout: 'fit',
+                html: '<p>您收到了新的<<strong>' + text + '</strong>>!</p>'
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [
+                   alertPanel
+                ]
+            });
+        });
+
+     
+    </script>
+
+
+}

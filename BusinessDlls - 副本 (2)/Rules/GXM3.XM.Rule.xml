@@ -1,0 +1,269 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Rule</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Rule.ProjectDtlBudgetDtlRule">
+            <summary>
+            ProjectDtlBudgetDtl业务逻辑处理类
+            </summary>ProjectDtlPurchaseDtl
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlBudgetDtlRule.ProjectDtlBudgetDtlDac">
+            <summary>
+            ProjectDtlBudgetDtl数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlBudgetDtlRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlBudgetDtlRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectDtlFundApplRule">
+            <summary>
+            ProjectDtlFundAppl业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlFundApplRule.ProjectDtlFundApplDac">
+            <summary>
+            ProjectDtlFundAppl数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlFundApplRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlFundApplRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlFundApplModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectDtlImplPlanRule">
+            <summary>
+            ProjectDtlImplPlan业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlImplPlanRule.ProjectDtlImplPlanDac">
+            <summary>
+            ProjectDtlImplPlan数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlImplPlanRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlImplPlanRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectDtlPerformTargetRule">
+            <summary>
+            ProjectDtlPerformTarget业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlPerformTargetRule.ProjectDtlPerformTargetDac">
+            <summary>
+            ProjectDtlPerformTarget数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlPerformTargetRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlPerformTargetRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectDtlPurchaseDtlRule">
+            <summary>
+            ProjectDtlPurchaseDtl业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlPurchaseDtlRule.ProjectDtlPurchaseDtlDac">
+            <summary>
+            ProjectDtlPurchaseDtl数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlPurchaseDtlRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlPurchaseDtlRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectDtlPurDtl4SOFRule">
+            <summary>
+            ProjectDtlPurDtl4SOF业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlPurDtl4SOFRule.ProjectDtlPurDtl4SOFDac">
+            <summary>
+            ProjectDtlPurDtl4SOF数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlPurDtl4SOFRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlPurDtl4SOFRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectDtlTextContentRule">
+            <summary>
+            ProjectDtlTextContent业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectDtlTextContentRule.ProjectDtlTextContentDac">
+            <summary>
+            ProjectDtlTextContent数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlTextContentRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectDtlTextContentRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectDtlTextContentModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.ProjectMstRule">
+            <summary>
+            ProjectMst业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.ProjectMstRule.ProjectMstDac">
+            <summary>
+            ProjectMst数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectMstRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectMstRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="M:GXM3.XM.Rule.ProjectMstRule.ApproveAddData(System.String,System.String,System.Collections.Generic.List{System.String},System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Nullable{System.DateTime}},System.String,System.String,System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            审批时同步项目数据
+            </summary>
+            <param name="userConn"></param>
+            <param name="zbly_dm"></param>
+            <param name="valuesqlList"></param>
+            <param name="mstSql"></param>
+            <param name="dtlSqlList"></param>
+            <param name="DJRQList"></param>
+            <param name="DEF_BZ1"></param>
+            <param name="mstCode"></param>
+            <param name="dtlcodeList"></param>
+            <param name="DJH"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GXM3.XM.Rule.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.Resources.Culture">
+            <summary>
+              使用此强类型资源类，为所有资源查找
+              重写当前线程的 CurrentUICulture 属性。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.Resources.InitializeObject">
+            <summary>
+              查找类似 对象初始化失败！ 的本地化字符串。
+            </summary>
+        </member>
+    </members>
+</doc>

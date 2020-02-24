@@ -1,0 +1,905 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <style type="text/css">
+
+        .evalgrid .x-grid-row .x-grid-cell {
+            height: 50px;
+            line-height: 50px;
+            vertical-align: middle;
+        }
+    </style>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GJX/JX/PerformanceMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/ExMergeGrid.js") type="text/javascript" charset="utf-8"></script>
+    @*<script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>*@
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        var ysmstphid = '@ViewBag.YSMstPhId';
+        //var busno = '@ViewBag.No';
+        var DtlBuDtlPanel_store, DtlBuDtlPanel_grid;
+
+        var attachGuid = '';
+        var attachment;
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    'save', 'attachment', '->', 'print', 'close'
+                ]
+            });
+
+			//定义mainPanel_form
+			var mainPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var mainPanel_formConfig = mainPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(mainPanel_formConfig, individualInfo.form['mainPanel']);
+			}
+			var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm', mainPanel_formConfig);
+
+            //定义DtlEvalPanel_form
+            //var DtlEvalPanel_formInitialConfig = {
+            //    region: 'north',
+            //    frame: true,
+            //    split: true,
+            //    minWidth: 600,
+            //    buskey: 'PhId', //对应的业务表主键
+            //    otype: otype //操作类型,add||edit
+            //};
+            //var DtlEvalPanel_formConfig = DtlEvalPanel_formInitialConfig;
+            //if (individualInfo.form) {
+            //    Ext.apply(DtlEvalPanel_formConfig, individualInfo.form['DtlEvalForm']);
+            //}
+            //var DtlEvalPanel_form = Ext.create('Ext.ng.TableLayoutForm', DtlEvalPanel_formConfig);
+
+            //获取DtlEvalPanel_grid自带model
+            var DtlEvalPanel_modelFields = [
+                {
+                    "name": "FName",
+                    "type": "string",
+                    "mapping": "FName"
+                },
+                {
+                    "name": "FContent",
+                    "type": "string",
+                    "mapping": "FContent"
+                },
+                {
+                    "name": "FWeight",
+                    "type": "float",
+                    "mapping": "FWeight"
+                },
+                {
+                    "name": "FScore",
+                    "type": "float",
+                    "mapping": "FScore"
+                },
+                {
+                    "name": "PhId",
+                    "type": "float",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "NgRecordVer",
+                    "type": "int",
+                    "mapping": "NgRecordVer"
+                }
+            ];
+            //调用$MergIndividualModelCol合并grid的Model
+            var DtlEvalPanel_allFields = $MergIndividualModelCol(DtlEvalPanel_modelFields, individualInfo, 'DtlEvalPanel');
+            //定义模型
+            Ext.define('DtlEvalPanel_model', {
+                extend: 'Ext.data.Model',
+                fields: DtlEvalPanel_allFields
+            });
+            //定义DtlEvalPanel_store
+            var DtlEvalPanel_store = Ext.create('Ext.ng.JsonStore', {
+                model: 'DtlEvalPanel_model',
+                pageSize: 20
+            });
+            //定义DtlEvalPanel_cellEditing
+            var DtlEvalPanel_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1    //单击编辑，单元格修改
+            });
+            //从自定义信息中获取到grid的配置
+            var DtlEvalPanel_indvidualGrid = individualInfo.grid['DtlEvalPanel'];
+            //动态内容的配置不能写在插件中
+            var DtlEvalPanel_gridInitialConfig = {
+                stateful: true,
+                cls:'evalgrid',
+                region: 'center',
+                stateId: 'e282ac5c-48e7-413b-a6c5-2f3b66c922a9', //这里请使用guid，防止冲突
+                store: DtlEvalPanel_store,
+                otype: otype, //操作类型,add||edit
+                plugins: [DtlEvalPanel_cellEditing],
+                features: [{
+                    ftype: 'summary'
+                }]
+            }
+            //动态配置与静态配置合并
+            var DtlEvalPanel_gridConfig = Ext.apply(DtlEvalPanel_gridInitialConfig, DtlEvalPanel_indvidualGrid);
+            //定义DtlEvalPanel_grid
+            var DtlEvalPanel_grid = Ext.create('Ext.ng.GridPanel', DtlEvalPanel_gridConfig);
+
+            DtlEvalPanel_grid.on('edit', function (editor, context) {
+
+                var row = context.rowIdx;
+                var thisStore = this.getStore();
+
+                var data_0 = thisStore.getAt(0).data;
+                var data_1 = thisStore.getAt(1).data;
+
+                if (context.field === "FWeight") {
+                    if (data_0.FWeight + data_1.FWeight > 100) {
+                        Ext.MessageBox.alert("提示", "权重之和大于100,请重新分配");
+
+                        if (row === 0) {
+                            data_0.FWeight = 100 - data_1.FWeight;
+                            Ext.apply(thisStore.getAt(0).data, data_0);
+                            this.getView().refresh(true);
+
+                        } else if (row === 1) {
+                            data_1.FWeight = 100 - data_0.FWeight;
+                            Ext.apply(thisStore.getAt(1).data, data_1);
+                            this.getView().refresh(true);
+                        }
+                        return;
+                    }
+                } else if (context.field === "FScore") {
+                    if (data_0.FScore > data_0.FWeight) {
+                        Ext.MessageBox.alert("提示", "自评得分不能大于权重值");
+                        data_0.FScore = data_0.FWeight;
+
+                        Ext.apply(thisStore.getAt(0).data, data_0);
+                        this.getView().refresh(true);
+                        return;
+                    }
+
+                    if (data_1.FScore > data_1.FWeight) {
+                        Ext.MessageBox.alert("提示", "自评得分不能大于权重值");
+                        data_1.FScore = data_1.FWeight;
+
+                        Ext.apply(thisStore.getAt(1).data, data_1);
+                        this.getView().refresh(true);
+                        return;
+                    }
+                }
+            });
+
+			//定义DtlTextContPanel_form
+			var DtlTextContPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				buskey: 'PhId', //对应的业务表主键,
+				otype: otype //操作类型,add||edit
+			};
+			var DtlTextContPanel_formConfig = DtlTextContPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(DtlTextContPanel_formConfig, individualInfo.form['DtlTextContPanel']);
+			}
+			var DtlTextContPanel_form = Ext.create('Ext.ng.TableLayoutForm', DtlTextContPanel_formConfig);
+
+			//获取DtlBuDtlPanel_grid自带model
+            var DtlBuDtlPanel_modelFields = [
+                {
+                    "name": "FDtlCode",
+                    "type": "string",
+                    "mapping": "FDtlCode"
+                },
+                {
+                    "name": "FName",
+                    "type": "string",
+                    "mapping": "FName"
+                },
+                {
+                    "name": "FSourceOfFunds",
+                    "type": "string",
+                    "mapping": "FSourceOfFunds"
+                },
+                {
+                    "name": "FSourceOfFunds_EXName",
+                    "type": "string",
+                    "mapping": "FSourceOfFunds_EXName"
+                },
+                {
+                    "name": "FExpensesChannel_EXName",
+                    "type": "string",
+                    "mapping": "FExpensesChannel_EXName"
+                },
+                {
+                    "name": "FBudgetAmount",
+                    "type": "float",
+                    "mapping": "FBudgetAmount"
+                },
+                {
+                    "name": "FActualAmount",
+                    "type": "float",
+                    "mapping": "FActualAmount"
+                },
+                {
+                    "name": "FBalanceAmount",
+                    "type": "float",
+                    "mapping": "FBalanceAmount"
+                },
+                {
+                    "name": "FImplRate",
+                    "type": "string",
+                    "mapping": "FImplRate"
+                },
+                {
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "DelPhid",
+                    "type": "string",
+                    "mapping": "DelPhid"
+                },
+                {
+                    "name": "NgRecordVer",
+                    "type": "int",
+                    "mapping": "NgRecordVer"
+                }
+            ];
+			//调用$MergIndividualModelCol合并grid的Model
+			var DtlBuDtlPanel_allFields = $MergIndividualModelCol(DtlBuDtlPanel_modelFields, individualInfo, 'DtlBuDtlPanel');
+
+			//定义模型
+			Ext.define('DtlBuDtlPanel_model', {
+				extend: 'Ext.data.Model',
+                fields: DtlBuDtlPanel_allFields
+			});
+			//定义DtlBuDtlPanel_store
+		    DtlBuDtlPanel_store = Ext.create('Ext.ng.JsonStore', {
+				model: 'DtlBuDtlPanel_model',
+				pageSize: 20
+			});
+			//定义DtlBuDtlPanel_cellEditing
+			var  DtlBuDtlPanel_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+				clicksToEdit: 1    //单击编辑，单元格修改
+			});
+			//从自定义信息中获取到grid的配置
+			var DtlBuDtlPanel_indvidualGrid = individualInfo.grid['DtlBuDtlPanel'];
+			//动态内容的配置不能写在插件中
+			var DtlBuDtlPanel_gridInitialConfig = {
+				stateful: true,
+				region: 'center',
+				stateId: 'a60924b4-6e30-4aca-b377-2e12e12f9051', //这里请使用guid，防止冲突
+				store: DtlBuDtlPanel_store,
+				otype: otype, //操作类型,add||edit
+                plugins: [DtlBuDtlPanel_cellEditing],
+                features: [{
+                    ftype: 'summary'
+                }]
+			}
+			//动态配置与静态配置合并
+            var DtlBuDtlPanel_gridConfig = Ext.apply(DtlBuDtlPanel_gridInitialConfig, DtlBuDtlPanel_indvidualGrid);
+			//定义DtlBuDtlPanel_grid
+            DtlBuDtlPanel_grid = Ext.create('Ext.ng.GridPanel', DtlBuDtlPanel_gridInitialConfig);
+
+            DtlBuDtlPanel_grid.on('edit', function (ditor, context) {
+                var row = context.rowIdx;
+
+                var upDate = this.getStore().getAt(row).data;
+                //结余金额
+                var jyje = parseFloat(upDate.FBudgetAmount) - parseFloat(upDate.FActualAmount);
+                //执行率
+                var zxl = parseFloat(upDate.FBudgetAmount) === 0 ? 0 : ((parseFloat(upDate.FActualAmount) / parseFloat(upDate.FBudgetAmount)) * 100).toFixed(2);
+
+                upDate.FBalanceAmount = jyje;
+                upDate.FImplRate = zxl;
+
+                Ext.apply(DtlBuDtlPanel_grid.getStore().getAt(row).data, upDate);
+
+                this.getView().refresh(true);
+
+            });
+
+            //获取DtlTarImpl_grid自带model
+            var DtlTarImpl_modelFields = [
+                {
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "XmPhid",
+                    "type": "string",
+                    "mapping": "XmPhid"
+                },
+                {
+                    "name": "FTargetCode",
+                    "type": "string",
+                    "mapping": "FTargetCode"
+                },
+                {
+                    "name": "FTargetTypeCode",
+                    "type": "string",
+                    "mapping": "FTargetTypeCode"
+                },
+                {
+                    "name": "FTargetClassCode",
+                    "type": "string",
+                    "mapping": "FTargetClassCode"
+                },
+                {
+                    "name": "FTargetContent",
+                    "type": "string",
+                    "mapping": "FTargetContent"
+                },
+                {
+                    "name": "FTargetName",
+                    "type": "string",
+                    "mapping": "FTargetName"
+                },
+                {
+                    "name": "FTargetValue",
+                    "type": "string",
+                    "mapping": "FTargetValue"
+                },
+                {
+                    "name": "FTargetWeight",
+                    "type": "float",
+                    "mapping": "FTargetWeight"
+                },
+                {
+                    "name": "FCompletionValue",
+                    "type": "string",
+                    "mapping": "FCompletionValue"
+                },
+                {
+                    "name": "FScore",
+                    "type": "float",
+                    "mapping": "FScore"
+                },
+                {
+                    "name": "FTargetDescribe",
+                    "type": "string",
+                    "mapping": "FTargetDescribe"
+                }
+            ]
+            //调用$MergIndividualModelCol合并grid的Model
+            var DtlTarImpl_allFields = $MergIndividualModelCol(DtlTarImpl_modelFields, individualInfo, 'DtlTarImpl');
+            //定义模型
+            Ext.define('DtlTarImpl_model', {
+                extend: 'Ext.data.Model',
+                fields: DtlTarImpl_allFields
+            });
+            //定义DtlTarImpl_store
+            var DtlTarImpl_store = Ext.create('Ext.ng.JsonStore', {
+                sorters: [
+                    { property: 'FTargetTypeCode', direction: 'asc' },
+                    { property: 'FTargetClassCode', direction: 'asc' },
+                    { property: 'FTargetCode', direction: 'asc' }
+                ],
+                model: 'DtlTarImpl_model',
+                pageSize: 20
+            });
+            //定义DtlTarImpl_cellEditing
+            var DtlTarImpl_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1    //单击编辑，单元格修改
+            });
+            //从自定义信息中获取到grid的配置
+            var DtlTarImpl_indvidualGrid = individualInfo.grid['DtlTarImpl'];
+            //动态内容的配置不能写在插件中 
+            var DtlTarImpl_gridInitialConfig = {
+                stateful: true,
+                region: 'center',
+                stateId: 'eb5ea892-5a92-4ab2-a99b-4c335176f4e5', //这里请使用guid，防止冲突
+                store: DtlTarImpl_store,
+                otype: otype, //操作类型,add||edit
+                plugins: [DtlTarImpl_cellEditing]
+            }
+            //动态配置与静态配置合并
+            var DtlTarImpl_gridConfig = Ext.apply(DtlTarImpl_gridInitialConfig, DtlTarImpl_indvidualGrid);
+            //定义DtlTarImpl_grid
+            var DtlTarImpl_grid = Ext.create('Ext.ng.GridPanel', DtlTarImpl_gridConfig);
+
+            DtlTarImpl_grid.on('edit', function (editor, context) {
+                var weight = context.record.data.FTargetWeight;
+                if (context.field == "FScore") {
+                    var score = context.value;
+                    if (score > weight) {
+                        Ext.MessageBox.alert("提示", "自评得分不能大于权重值");
+                        context.record.data.FScore = weight;
+                        this.getView().refresh(true);
+
+                        //debugger;
+                    }
+                    var sumScore = SocreSummary(DtlTarImpl_grid).toFixed(2);
+                    Ext.getCmp("FEvaluationScore").setValue(sumScore);
+                    if (sumScore >= 95) {
+                        Ext.getCmp("FEvaluationResult").setValue("好");
+                    }
+                    if (sumScore >= 85 && sumScore < 95) {
+                        Ext.getCmp("FEvaluationResult").setValue("较好");
+                    }
+                    if (sumScore >= 60 && sumScore < 85) {
+                        Ext.getCmp("FEvaluationResult").setValue("一般");
+                    }
+                    if (sumScore >= 0 && sumScore < 60) {
+                        Ext.getCmp("FEvaluationResult").setValue("差");
+                    }
+                }
+                //debugger;
+            });
+            function SocreSummary(DtlTarImpl_grid) {
+                var sum = 0;
+                DtlTarImpl_grid.store.each(function (record) {
+                    sum += Number(record.data.FScore);
+                });
+                return sum;
+            }
+
+
+			var tabItems = {
+				TabPage1:{
+					id: 'TabPage1',
+					layout: 'border',
+					title: 'TabPage1',
+                    items: [DtlTarImpl_grid]
+				},
+				TabPage2:{
+					id: 'TabPage2',
+					layout: 'border',
+					title: 'TabPage2',
+					items: [DtlTextContPanel_form]
+				},
+				TabPage3:{
+					id: 'TabPage3',
+					layout: 'border',
+					title: 'TabPage3',
+					items: [DtlBuDtlPanel_grid]
+				}
+			}
+
+			var tabArr = [];
+			var indTabItems = individualInfo.tabPanel['DtlPanel'].items;
+			for (var i = 0; i < indTabItems.length; i++) {
+				var tab = indTabItems[i];
+				if (!tab.hidden) {
+					tabArr.push(Ext.apply(tabItems[tab.id], tab));
+				}
+			}
+
+			var tabPanel = Ext.create('Ext.tab.Panel', {
+				layout: 'border',
+				region: 'center',
+				deferredRender: false,
+				plain: true,
+				activeTab: 0,
+				minHeight: 400,
+				minWidth: 600,
+				defaults: { bodyStyle: 'padding:3px' },
+				items: tabArr
+			});
+
+			Ext.create('Ext.container.Viewport', {
+				id: "viewPort",
+				layout: 'border',
+				items:
+				[
+					{
+						xtype: 'panel',
+						layout: 'border',
+						region: 'center',
+						autoScroll: true,
+						bodyStyle: 'padding-right:20px',
+						//style: 'overflow-y:scroll,padding-right:20px',
+						items: [ngToolbar, mainPanel_form, tabPanel]
+					}
+				]
+			});
+
+
+
+			//当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'performancemst' },
+                    url: C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstInfo',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mainPanel_form.getForm();
+                            mstformobj.setValues(resp.Data);
+
+							//mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstformobj.fireEvent('dataready', resp.Data);
+
+							//代码转名称
+                            var codectl = [mainPanel_form.queryById('FDeclarationUnit'), mainPanel_form.queryById('FBudgetDept'), mainPanel_form.queryById('FInformant')];
+                            BatchBindCombox(codectl);
+
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                });
+
+                //DtlTextContPanel_form 通过 performancedtltextcont 获取
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'performancedtltextcont' },
+                    url: C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstInfo',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (response.statusText === "OK") {
+                            var deltextfromObj = DtlTextContPanel_form.getForm();
+                            deltextfromObj.setValues(resp);
+
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                });
+
+                //DtlEvalPanel明细
+                //Ext.apply(DtlEvalPanel_store.proxy.url = C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstInfo');
+                //Ext.apply(DtlEvalPanel_store.proxy.extraParams, { 'id': busid, 'tabtype': 'performancedtleval' });
+                //DtlEvalPanel_store.cachePageData = false;
+                //DtlEvalPanel_store.load();
+                //DtlEvalPanel_store.cachePageData = true;
+
+                //DtlBuDtlPanel明细
+				Ext.apply(DtlBuDtlPanel_store.proxy.url = C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstInfo');
+                Ext.apply(DtlBuDtlPanel_store.proxy.extraParams, { 'id': busid, 'tabtype': 'performancedtlbudtl' });
+                DtlBuDtlPanel_store.cachePageData = false;
+                DtlBuDtlPanel_store.load();
+                DtlBuDtlPanel_store.cachePageData = true;
+
+                //DtlTarImpl明细
+                Ext.apply(DtlTarImpl_store.proxy.url = C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstInfo');
+                Ext.apply(DtlTarImpl_store.proxy.extraParams, { 'id': busid, 'tabtype': 'performancedtltarimpl' });
+                DtlTarImpl_store.cachePageData = false;
+                //DtlTarImpl_store.load();
+                DtlTarImpl_store.load({
+                    callback: function (records, operation, success) {
+                        //合并单元格
+                        ExMergeGrid(DtlTarImpl_grid, [3, 4], false); // 最后一个参数为false逐个列合并
+                    }
+                });
+                DtlTarImpl_store.cachePageData = true;
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+                if (ysmstphid != undefined && ysmstphid != "") {
+                    Ext.Ajax.request({
+                        params: { 'id': ysmstphid, 'tabtype': 'budgetmst' },
+                        url: C_ROOT + 'GJX/JX/PerformanceMst/GetBudgetMstInfo',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                var mstformobj = mainPanel_form.getForm();
+                                resp.Data.FInformant = $appinfo.userID;
+                                mstformobj.setValues(resp.Data);
+
+                                //mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                                mstformobj.fireEvent('dataready', resp.Data);
+
+                                //代码转名称
+                                var codectl = [mainPanel_form.queryById('FDeclarationUnit'), mainPanel_form.queryById('FBudgetDept'), mainPanel_form.queryById('FInformant')];
+                                BatchBindCombox(codectl);
+
+                            } else {
+                                NGMsg.Error(resp.Msg);
+                            }
+                        }
+                    });
+
+
+
+                    //DtlEvalPanel明细
+                    /*var data = [
+                        { FName: "项目完成情况", FContent: "", FWeight: 50, FScore: 0 },
+                        { FName: "达到的效果", FContent: "", FWeight: 50, FScore: 0 },
+                    ];
+                    DtlEvalPanel_store.cachePageData = false;
+                    DtlEvalPanel_store.loadData(data);
+                    DtlEvalPanel_store.cachePageData = true;*/
+
+                    //DtlEvalPanel_grid.stratEditing(2, 2);
+
+                    //项目预算明细
+
+                    Ext.Ajax.request({
+                        params: { 'id': ysmstphid, 'tabtype': 'budgetdtlbudgetdtl' },
+                        url: C_ROOT + 'GJX/JX/PerformanceMst/GetBudgetMstInfo',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.totalRows > 0) {
+
+
+                                var delData = [];
+
+                                for (var i = 0; i < resp.Record.length; i++) {
+                                    delData.push({
+                                        FSourceOfFunds: resp.Record[i].FSourceOfFunds,
+                                        FSourceOfFunds_EXName: resp.Record[i].FSourceOfFunds_EXName,
+                                        FExpensesChannel_EXName: resp.Record[i].FExpensesChannel_EXName,
+                                        FBudgetAmount: resp.Record[i].FBudgetAmount,
+                                        FActualAmount: resp.Record[i].FActualAmount,
+                                        FBalanceAmount: resp.Record[i].FBalanceAmount,
+                                        FImplRate: resp.Record[i].FImplRate,
+                                        FName: resp.Record[i].FName,
+                                        FDtlCode: resp.Record[i].FDtlCode,
+                                        DelPhid: resp.Record[i].DelPhid
+                                    });
+                                }
+
+                                DtlBuDtlPanel_store.cachePageData = false;
+                                DtlBuDtlPanel_store.loadData(delData);
+                                DtlBuDtlPanel_store.cachePageData = true;
+
+                            } else {
+                                NGMsg.Error(resp.Msg);
+                            }
+                        }
+                    });
+
+
+                    //Ext.apply(DtlBuDtlPanel_store.proxy.url = C_ROOT + 'GJX/JX/PerformanceMst/GetBudgetMstInfo');
+                    //Ext.apply(DtlBuDtlPanel_store.proxy.extraParams, { 'id': ysmstphid, 'tabtype': 'budgetdtlbudgetdtl' });
+                    //DtlBuDtlPanel_store.cachePageData = false;
+                    //DtlBuDtlPanel_store.load();
+                    //DtlBuDtlPanel_store.cachePageData = true;
+
+
+                    Ext.Ajax.request({
+                        params: { 'id': ysmstphid, 'tabtype': 'performancedtltarimpl' },
+                        url: C_ROOT + 'GJX/JX/PerformanceMst/GetBudgetMstInfo',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.totalRows > 0) {
+
+                                var delData = [];
+
+                                for (var i = 0; i < resp.Record.length; i++) {
+                                    delData.push({
+                                        FTargetTypeCode: resp.Record[i].FTargetTypeCode,
+                                        FTargetClassCode: resp.Record[i].FTargetClassCode,
+                                        FTargetContent: resp.Record[i].FTargetContent,
+                                        FTargetName: resp.Record[i].FTargetName,
+                                        FTargetValue: resp.Record[i].FTargetValue,
+                                        FTargetWeight: resp.Record[i].FTargetWeight,
+                                        FCompletionValue: resp.Record[i].FCompletionValue,
+                                        FScore: resp.Record[i].FScore,
+                                        FTargetDescribe: resp.Record[i].FTargetDescribe,
+                                        XmPhid: resp.Record[i].XmPhid,
+                                        FTargetCode: resp.Record[i].FTargetCode
+                                    });
+                                }
+
+                                DtlTarImpl_store.cachePageData = false;
+                                DtlTarImpl_store.loadData(delData);
+                                //合并单元格
+                                ExMergeGrid(DtlTarImpl_grid, [3, 4], false); // 最后一个参数为false逐个列合并
+                                DtlTarImpl_store.cachePageData = true;
+
+                            } else {
+                                NGMsg.Error(resp.Msg);
+                            }
+                        }
+                    });
+
+                }
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT) {
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+            }
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+
+                ngToolbar.get('save').disable();
+                save();
+                ngToolbar.get('save').setDisabled(false);
+            });
+
+            //附件
+            ngToolbar.get('attachment').on('click', function () {
+                OpenAttachment();
+            });
+
+            //附件方法
+            function OpenAttachment(buscode) {
+                var param = {
+                    product: "", //传相应产品，i6、i6s、i6P、A3、GE，可为空
+                    attachguid: attachGuid, //会话guid,可传空生成方法cs代码:Guid.NewGuid().ToString()
+                    attachTName: "c_pfc_attachment",
+                    busTName: "jx3_PerformanceMst", //传相应业务表
+                    busid: busid, //传相应产品业务单据phid
+                    bustypecode: "GHPerformanceInfo"//业务类型编码
+                };
+                var result = LoadAttach.InitBeforeOpen(param);
+                var obj = eval(result);
+                if (obj) {
+                    if (obj.status == "success") //初始化成功
+                    {
+                        attachGuid = obj.msg;
+                    } else {
+                        Ext.MessageBox.alert('提示', "附件初始化失败");
+                        return;
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', "附件初始化失败");
+                    return;
+                }
+                var opt = {
+                    product: "", //传相应产品，可为空
+                    mode: "NG3", //固定传NG3
+                    openbymianframe: "1", //通过主框架打开附件 0或空否  1 是固定传1
+                    oper: "winfrom", //web、pb、winfrom、progress（进度条模式）,固定传 winfrom
+                    asr_tbl: "c_pfc_attachment",
+                    tbl: "xm3_ProjectMst", //传相应业务表
+                    fill: $appinfo.logid, //传相应操作员id
+                    fillname: $appinfo.username, //传相应操作员姓名
+                    chkSign: "0", //默认传0
+                    chkCheckIn: "0", //默认传0
+                    btnAdd: "1", //新增按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    addserverstuts: "0", //导入按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnScan: "1", //扫描按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnDelete: "1", //删除按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnEdit: "1", //编辑按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnView: "1", //查看按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnDownload: "1", //下载按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnCancel: "1", //取消按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnOk: "1", //确定按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnWebAdd: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                    btnWebOk: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                    archivestuts: "2", //归档按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    status: otype, //add 新增模式，view 查看模式， edit 编辑模式
+                    showlist: "1", //显示文件列表 0 不显示 1显示
+                    zip: "0", //附件压缩 0 不压缩 1 压缩
+                    filenum: "", //附件上传数量限制 0或空不限制附件上传数量
+                    filetype: "", //附件上传类型限制目前仅支持传入"image",如果传了"image"附件控件就只能上传图片
+                    guid: attachGuid //传第二步附件初始化获得的guid
+                };
+                LoadAttach.Init(opt);
+            }
+
+            //保存
+            function save(callback) {
+                var mainPanel_formvf = mainPanel_form.isValid();
+                //var DtlEvalPanel_gridvf = DtlEvalPanel_grid.isValid();
+                var DtlTextContPanel_formvf = DtlTextContPanel_form.isValid();
+                var DtlBuDtlPanel_gridvf = DtlBuDtlPanel_grid.isValid();
+                var DtlTarImpl_gridvf = DtlTarImpl_grid.isValid();
+                if (!mainPanel_formvf || !DtlTextContPanel_formvf || !DtlBuDtlPanel_gridvf || !DtlTarImpl_gridvf) {
+                    return;
+                }
+
+                var flg;
+                //调用二次开发脚本的校验方法
+                if (typeof beforeSaveEdit === "function") {
+                    flg = beforeSaveEdit();
+                    if (!flg) return;
+                }
+
+                var mydata = {};
+                var performancemstformData = mainPanel_form.getFormData();
+                myData = Ext.apply(mydata, { 'performancemstformData': performancemstformData });
+
+                //var performancedtlevalgridData = DtlEvalPanel_grid.getChangeForEntity();
+                //myData = Ext.apply(mydata, { 'performancedtlevalgridData': performancedtlevalgridData });
+
+                var performancedtltextcontformData = DtlTextContPanel_form.getFormData();
+                myData = Ext.apply(mydata, { 'performancedtltextcontformData': performancedtltextcontformData });
+
+                var performancedtlbudtlgridData = DtlBuDtlPanel_grid.getChangeForEntity();
+                myData = Ext.apply(mydata, { 'performancedtlbudtlgridData': performancedtlbudtlgridData });
+
+                var performancedtltarimplgridData;
+                if (otype == $Otype.EDIT) {
+                    performancedtltarimplgridData = DtlTarImpl_grid.getChangeForEntity();
+                }
+                if (otype == $Otype.ADD) {
+                    performancedtltarimplgridData = DtlTarImpl_grid.getChangeForEntity();
+                }
+                myData = Ext.apply(mydata, { 'performancedtltarimplgridData': performancedtltarimplgridData });
+                myData = Ext.apply(mydata, { 'id': ysmstphid });
+
+                var extendData;
+                //调用二开代码获取二开需要保存的数据
+                if (typeof getExtendData === "function") {
+                    extendData = getExtendData();
+                    myData = Ext.apply(mydata, extendData);//合并
+                }
+                Ext.MessageBox.wait("正在处理，请稍后...", "等待");
+                Ext.Ajax.request({
+                    params: mydata,
+                    url: C_ROOT + 'GJX/JX/PerformanceMst/save',
+                    success: function (response) {
+                        Ext.MessageBox.close();
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            LoadAttach.Save("", attachGuid, resp.KeyCodes[0]);//保存附件
+
+                            if (callback) {
+                                callback();
+                            } else {
+
+                                Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                    if (window.external.RefreshWebListPage != undefined) {
+                                        window.external.RefreshWebListPage();
+                                    } else {
+                                        $NG3Refresh();
+                                    }
+
+                                    $CloseTab();
+                                });
+                            }
+
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+            };
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+
+                var forms = [mainPanel_form, DtlTextContPanel_form];
+                var grids = [DtlBuDtlPanel_grid, DtlEvalPanel_grid, DtlEvalPanel_grid, DtlTarImpl_grid];
+                var titles = ['绩效评价', '其他说明的问题', '支出明细情况', '未启用1', '未启用2','绩效目标实现情况'];
+                //$PrintForm("ProjectMstEdit", forms, grids, titles);
+
+                $PrintHelp("BPM_GHBuPerformAssertForMe", 'BPM_GHBuPerformAssertForMe', forms, grids, titles);
+            });
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+
+            mainPanel_form.queryById("FInformant").on("beforetriggerclick", function (str) {
+                var fileter = "(fg3_user.status='1')";
+                mainPanel_form.queryById("FInformant").setClientSqlFilter(fileter);
+            });
+        });
+
+    </script>
+}

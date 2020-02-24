@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Attachment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+
+ <script type="text/javascript" src="@Url.Content("~/Resource/attach/js/loadattach.js")"></script>
+<script>
+
+    var product = '@ViewBag.product';
+    var fill = '@ViewBag.fill';
+    var fillname = '@ViewBag.fillname';
+    var btnAdd = '@ViewBag.btnAdd';
+    var status = '@ViewBag.status';
+    var guid = '@ViewBag.guid';
+    var btnwebok = '@ViewBag.btnwebok';
+    var autosave = '@ViewBag.autosave';
+    var fileNum = '@ViewBag.fileNum';
+    var height = '@ViewBag.Height';
+
+    var btnScan = '@ViewBag.btnScan';
+    var btnDelete = '@ViewBag.btnDelete';
+    var btnEdit = '@ViewBag.btnEdit';
+    var btnView = '@ViewBag.btnView';
+    var btnDownload = '@ViewBag.btnDownload';
+
+    Ext.onReady(function () {
+
+        var opt = {
+            product: product, //"I6p", //
+            oper: "web", //
+            fill: fill, //
+            fillname: fillname, //
+            btnWebAdd: btnAdd, //"1", //
+            btnScan: btnScan,
+            btnDelete: btnDelete,
+            btnEdit: btnEdit,
+            btnView: btnView,
+            btnDownload: btnDownload,
+            status: status, //"edit", //
+            mode: 'NG3',
+            btnWebOk: btnwebok,
+            autoSave: autosave,
+            filenum: fileNum,
+            closeContainer: CloseMe,
+            guid: guid//"9dad9999-5ae3-4865-ae6a-4a15654bd56b"//
+        };
+
+        document.getElementById('iframewapper').style.height = height + "px";//设置高度
+
+        var win = this.frameElement.parentContainer;
+
+        function CloseMe() {
+            win.close();
+        }
+
+        LoadAttach.Init(opt);
+
+    })
+</script>
+
+}
+
+<div id="iframewapper" style="width:100%; height:268px;"></div>

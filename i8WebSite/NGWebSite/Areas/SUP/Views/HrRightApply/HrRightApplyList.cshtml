@@ -1,0 +1,288 @@
+﻿@{
+    Layout = "~/Views/Shared/_GCLayout.cshtml";
+}
+
+@section Script
+{  
+
+    <script>
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: ['add', 'edit', 'view', 'delete', 'check', 'history', '->', '', 'print', 'help', 'close']
+            });
+           
+            Ext.define('gridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'phid', type: 'string', mapping: 'phid' },
+                    { name: 'rowno', type: 'string', mapping: 'rowno' },
+                    { name: 'checkstate', type: 'string', mapping: 'checkstate' },
+                    { name: 'billno', type: 'string', mapping: 'billno' },
+                    { name: 'billname', type: 'string', mapping: 'billname' },
+                    { name: 'fillpsnid', type: 'string', mapping: 'fillpsnid' },
+                    { name: 'fillpsnname', type: 'string', mapping: 'fillpsnname' },
+                    { name: 'filldate', type: 'string', mapping: 'filldate' },
+                    { name: 'ischeck', type: 'String', mapping: 'ischeck' },
+                    { name: 'checkpsn', type: 'string', mapping: 'checkpsn' },
+                    { name: 'checkdate', type: 'string', mapping: 'checkdate' },
+                    { name: 'remark', type: 'string', mapping: 'remark' }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'gridmodel',
+                autoLoad: false,
+                url: '../HrRightApply/GetHrRightApply'
+            });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: gridStore,
+                buskey: 'phid', //对应的业务表主键属性
+                columnLines: true,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'phid',
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '行号',
+                        dataIndex: 'rowno',
+                        width: '6%',
+                        sortable: false
+                    },
+                    {
+                        xtype: 'gcWFColumn',
+                        header: '工作流',
+                        dataIndex: 'checkstate',
+                        width: '6%',
+                        sortable: false,
+                        checkedVal: '1',
+                        unCheckedVal: '0'                       
+                    },
+                    {
+                        header: '申请单编码',
+                        dataIndex: 'billno',
+                        width: '10%',
+                        sortable: false
+                    },
+                    {
+                        header: '申请单名称',
+                        dataIndex: 'billname',
+                        width: '15%',
+                        sortable: false
+                    },
+                    {
+                        header: '录入人Id',
+                        dataIndex: 'fillpsnid',
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '录入人',
+                        dataIndex: 'fillpsnname',
+                        width: '9%',
+                        sortable: false
+                    },
+                    {
+                        header: '录入日期',
+                        dataIndex: 'filldate',
+                        width: '10%',
+                        sortable: false
+                    },
+                    {
+                        xtype: 'ngcheckcolumn',
+                        header: '审核',
+                        dataIndex: 'ischeck',
+                        width: '7%',
+                        sortable: false,
+                        checkedVal: '1',
+                        unCheckedVal: '0',
+                        listeners: {
+                            'beforecheckchange': function (chk, rowIndex, checked, eOpts) { return false; }
+                        }
+                    },
+                    {
+                        header: '审核人',
+                        dataIndex: 'checkpsn',
+                        width: '9%',
+                        sortable: false
+                    },
+                    {
+                        header: '审核日期',
+                        dataIndex: 'checkdate',
+                        width: '12%',
+                        sortable: false
+                    },
+                    {
+                        header: '补充说明',
+                        dataIndex: 'remark',
+                        width: '15%',
+                        sortable: false
+                    }
+                ]
+            });
+
+            grid.getColumn('checkstate').on('dblclick', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    $WorkFlow.showFlowInfo('HrRightApply', select.raw.phid);
+                }
+            });
+
+            grid.on('itemdblclick', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    $OpenTab('员工权限申请-查看', C_ROOT + 'SUP/HrRightApply/Edit?otype=view&phid=' + select.raw.phid + '&billno=' + select.raw.billno + '&billname=' + select.raw.billname
+                        + '&fillpsnid=' + select.raw.fillpsnid + '&fillpsnname=' + select.raw.fillpsnname + '&filldate=' + select.raw.filldate + '&remark=' + select.raw.remark);
+                }
+            });
+
+            //内嵌查询panel
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                pageid: "Web:HrRightApply", //对应内嵌查询业务点标识
+                grid: grid,
+                queryAutoLoad: false, //自动load
+                columnsPerRow: 4 //每行4列
+            });
+
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab('员工权限申请-新增', C_ROOT + 'SUP/HrRightApply/Edit?otype=add');
+            });
+
+            ngToolbar.get('edit').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.checkstate == '0' && select.raw.ischeck == "0") {
+                        $OpenTab('员工权限申请-修改', C_ROOT + 'SUP/HrRightApply/Edit?otype=edit&phid=' + select.raw.phid + '&billno=' + select.raw.billno + '&billname=' + select.raw.billname
+                            + '&fillpsnid=' + select.raw.fillpsnid + '&fillpsnname=' + select.raw.fillpsnname + '&filldate=' + select.raw.filldate + '&remark=' + select.raw.remark);
+                    } else {
+                        Ext.MessageBox.alert('提示', '已送审/已审核的单据不能修改！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要修改的单据！');
+                }
+            });
+
+            ngToolbar.get('view').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    $OpenTab('员工权限申请-查看', C_ROOT + 'SUP/HrRightApply/Edit?otype=view&phid=' + select.raw.phid + '&billno=' + select.raw.billno + '&billname=' + select.raw.billname
+                        + '&fillpsnid=' + select.raw.fillpsnid + '&fillpsnname=' + select.raw.fillpsnname + '&filldate=' + select.raw.filldate + '&remark=' + select.raw.remark);
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要查看的单据！');
+                }
+            });
+
+            ngToolbar.get('delete').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.checkstate == '0' && select.raw.ischeck == "0") {
+                        ngToolbar.get('delete').disable();//禁用按钮
+                        var myMask = new Ext.LoadMask(document.body, { msg: "正在删除单据,请稍候..." });
+                        myMask.show();//锁屏
+                        Ext.Ajax.request({
+                            params: { 'billno': select.raw.billno },
+                            url: '../HrRightApply/DeleteHrRightApply',
+                            success: function (response) {
+                                myMask.hide();//停止锁屏
+                                ngToolbar.get('delete').enable();//按钮设置为可用
+                                gridStore.load();
+                                Ext.MessageBox.alert("提示", "删除成功");
+                            },
+                            failure: function (response) {
+                                myMask.hide();//停止锁屏
+                                ngToolbar.get('delete').enable();//按钮设置为可用
+                            }
+                        });
+                    } else {
+                        Ext.MessageBox.alert('提示', '已送审/已审核的单据不能删除！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要删除的单据！');
+                }
+            });
+
+            ngToolbar.get('check').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.checkstate == '0' && select.raw.ischeck == "0") {
+                        $WorkFlow.startFlow('HrRightApply', select.raw.phid, function () { gridStore.load(); });
+                    } else {
+                        Ext.MessageBox.alert('提示', '已送审/已审核的单据不能再次送审！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要送审的单据！');
+                }
+            });
+
+            ngToolbar.get('history').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    $WorkFlow.showFlowInfo('HrRightApply', select.raw.phid);
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要送审的单据！');
+                }
+            });
+
+            ngToolbar.get('print').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    var formdata = {};
+                    formdata.billno = select.raw.billno;
+                    formdata.billname = select.raw.billname;
+                    formdata.fillpsn = select.raw.fillpsnname;
+                    formdata.filldate = select.raw.filldate;
+                    formdata.remark = select.raw.remark;
+                    Ext.Ajax.request({
+                        params: { 'billno': select.raw.billno },
+                        url: '../HrRightApply/GetHrRightApplyPrintInfo',
+                        success: function (response) {
+                            var result = Ext.JSON.decode(response.responseText);
+                            var griddatas = [];
+                            griddatas.push(result.Record);
+                            $PrintHelpData('HrRightApply', 'PUB_HrRightApply', formdata, griddatas, ['员工权限申请单']);
+                        }
+                    });
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要打印的单据！');
+                }
+            });
+
+            ngToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('');
+            });
+
+            Ext.defer(function () {
+                gridStore.load();
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items:
+                [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        layout: 'border',
+                        items: [queryPanel, grid]
+                    }
+                ]
+            });
+            
+        });
+
+        function NG3Refresh() {
+            window.location.reload();
+        }
+
+    </script>
+
+}

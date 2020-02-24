@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QtAttachmentModel" table="z_qt_attachment">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="BTable" column="b_table" type="System.String" length="80" not-null="false" />
+		<property name="RelPhid" column="rel_phid" type="System.Int64" not-null="false" />
+		<property name="BName" column="b_name" type="System.String" length="200" not-null="false" />
+		<property name="BType" column="b_type" type="System.String" length="50" not-null="false" />
+		<property name="BSize" column="b_size" type="System.Decimal" not-null="false" />
+		<property name="BFilebody" column="b_filebody" type="System.Byte[]" not-null="false" />
+		<property name="BUrlpath" column="b_urlpath" type="System.String" length="100" not-null="false" />
+		<property name="BRemark" column="b_remark" type="System.String" length="500" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

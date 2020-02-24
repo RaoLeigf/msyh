@@ -1,0 +1,1131 @@
+﻿---------------------------------------------2019 10 29以前 王冠冠  之前所加 ---------------------------------------------------------
+
+新增字段（用来区分公私有）
+alter table SP3_APPVAL_PROC add isSystem NUMBER(4) default 0 或者 alter table SP3_APPVAL_PROC add isSystem TINYINT default 0 
+
+alter table SP3_APPVAL_POST add isSystem NUMBER(4) default 0 或者 alter table SP3_APPVAL_POST add isSystem TINYINT default 0 
+
+删除字段
+alter table BK3_PAYMENT_MST add F_Delete NUMBER(4) default 0  或者 alter table BK3_PAYMENT_MST add F_Delete TINYINT default 0
+
+alter table GK3_PAYMENT_MST add F_Delete NUMBER(4) default 0  或者 alter table GK3_PAYMENT_MST add F_Delete TINYINT default 0
+
+//ALTER TABLE SP3_APPVAL_PROC DROP COLUMN issystem
+
+alter table BK3_PAYMENT_XM add F_Seq NUMBER(11) default 0  或者 alter table BK3_PAYMENT_XM add F_Seq int default 0 
+
+alter table BK3_PAYMENT_XM add F_Delete NUMBER(4) default 0  或者 alter table BK3_PAYMENT_XM add F_Delete TINYINT default 0 
+
+alter table BK3_PAYMENT_DTL add F_Delete NUMBER(4) default 0  或者 alter table BK3_PAYMENT_DTL add F_Delete TINYINT default 0 
+
+
+绩效表新增字段
+alter table Z_QTPERFORMEVALTARGETTYPE add orgid NUMBER(17)  或者 alter table Z_QTPERFORMEVALTARGETTYPE add orgid BIGINT
+
+alter table Z_QTPERFORMEVALTARGETTYPE add orgcode varchar2(50)  或者 alter table Z_QTPERFORMEVALTARGETTYPE add orgcode varchar(50)
+
+
+alter table Z_QTPERFORMEVALTARGET add orgid NUMBER(17)  或者  alter table Z_QTPERFORMEVALTARGET add orgid BIGINT
+
+alter table Z_QTPERFORMEVALTARGET add orgcode varchar2(50)  或者 alter table Z_QTPERFORMEVALTARGET add orgcode varchar(50)
+
+
+alter table Z_QTPERFORMEVALTARGETCLASS add orgid NUMBER(17)  或者  alter table Z_QTPERFORMEVALTARGETCLASS add orgid BIGINT
+
+alter table Z_QTPERFORMEVALTARGETCLASS add orgcode varchar2(50)  或者  alter table Z_QTPERFORMEVALTARGETCLASS add orgcode varchar(50)
+
+
+alter table Z_QTPERFORMEVALTYPE add orgid NUMBER(17)  或者  alter table Z_QTPERFORMEVALTYPE add orgid BIGINT
+
+alter table Z_QTPERFORMEVALTYPE add orgcode varchar2(50) 或者 alter table Z_QTPERFORMEVALTYPE add orgcode varchar(50)
+
+采购基础数据
+
+
+alter table Z_QTPROCUREMENTCATALOG add orgid NUMBER(17)  或者  alter table Z_QTPROCUREMENTCATALOG add orgid BIGINT
+
+alter table Z_QTPROCUREMENTCATALOG add orgcode varchar2(50) 或者 alter table Z_QTPROCUREMENTCATALOG add orgcode varchar(50)
+
+
+alter table Z_QTPROCUREMENTPROCEDURES add orgid NUMBER(17)  或者 alter table Z_QTPROCUREMENTPROCEDURES add orgid BIGINT
+
+alter table Z_QTPROCUREMENTPROCEDURES add orgcode varchar2(50)  或者  alter table Z_QTPROCUREMENTPROCEDURES add orgcode varchar(50)
+
+
+alter table Z_QTPROCUREMENTTYPE add orgid NUMBER(17)   或者  alter table Z_QTPROCUREMENTTYPE add orgid BIGINT
+
+alter table Z_QTPROCUREMENTTYPE add orgcode varchar2(50)  或者 alter table Z_QTPROCUREMENTTYPE add orgcode varchar(50)
+
+
+alter table Z_QTPROCUREMENTCATALOG add isactive NUMBER(4) default 0 或者  alter table Z_QTPROCUREMENTCATALOG add isactive tinyint default 0
+
+alter table Z_QTPROCUREMENTPROCEDURES add isactive NUMBER(4) default 0  或者 alter table Z_QTPROCUREMENTPROCEDURES add isactive tinyint default 0
+
+alter table Z_QTPROCUREMENTTYPE add isactive NUMBER(4) default 0  或者  alter table Z_QTPROCUREMENTTYPE add isactive tinyint default 0
+
+支出功能分类
+
+
+alter table Z_QTZCGNFL add isactive NUMBER(4) default 0  或者 alter table Z_QTZCGNFL add isactive tinyint default 0 
+
+
+alter table Z_QTZCGNFL add F_Remark VARCHAR2(100)  或者 alter table Z_QTZCGNFL add F_Remark VARCHAR(100)
+
+
+alter table Z_QTPERFORMEVALTARGETCLASS add isactive NUMBER(4) default 0  或者 alter table Z_QTPERFORMEVALTARGETCLASS add isactive tinyint default 0 
+
+alter table Z_QTPERFORMEVALTARGET add isactive NUMBER(4) default 0  或者 alter table Z_QTPERFORMEVALTARGET add isactive tinyint default 0
+
+是否内置字段
+
+alter table Z_QTPerformEvalTargetClass add Issystem NUMBER(4) default 0 或者 alter table Z_QTPerformEvalTargetClass add Issystem tinyint default 0 
+
+alter table Z_QTPROCUREMENTCATALOG add Issystem NUMBER(4) default 0  或者 alter table Z_QTPROCUREMENTCATALOG add Issystem tinyint default 0 
+
+alter table Z_QTPROCUREMENTPROCEDURES add Issystem NUMBER(4) default 0  或者 alter table Z_QTPROCUREMENTPROCEDURES add Issystem tinyint default 0 
+
+alter table Z_QTPROCUREMENTTYPE add Issystem NUMBER(4) default 0  或者 alter table Z_QTPROCUREMENTTYPE add Issystem tinyint default 0
+
+alter table Z_QTZCGNFL add Issystem NUMBER(4) default 0  或者  alter table Z_QTZCGNFL add Issystem tinyint default 0
+
+
+工作流相关
+CREATE TABLE z_qtIfApprove
+	(
+	phid                NUMBER(17) NOT NULL,
+	f_code           	VARCHAR2 (255) NULL,
+	f_name           	VARCHAR2 (255) NULL,
+	f_ifuse          	NUMBER(4) NULL,
+	bz					VARCHAR2 (255) NULL,
+	orgid				NUMBER(17) NULL,
+	orgcode				VARCHAR2 (255) NULL,
+	creator             NUMBER(17) NULL,
+	editor              NUMBER(17) NULL,
+	cur_orgid           NUMBER(17) NULL,
+	ng_insert_dt        DATE NULL,
+	ng_update_dt        DATE NULL,
+	ng_record_ver       NUMBER(11) NULL,
+	CONSTRAINT pk_z_qtIfApprove PRIMARY KEY (phid)
+	)
+GO
+
+或者
+CREATE TABLE z_qtIfApprove
+	(
+	phid                bigint NOT NULL,
+	f_code           	VARCHAR (255) NULL,
+	f_name           	VARCHAR (255) NULL,
+	f_ifuse          	TINYINT NULL,
+	bz					VARCHAR (255) NULL,
+	orgid				bigint NULL,
+	orgcode				VARCHAR (255) NULL,
+	creator             bigint NULL,
+	editor              bigint NULL,
+	cur_orgid           bigint NULL,
+	ng_insert_dt        DATEtime NULL,
+	ng_update_dt        DATEtime NULL,
+	ng_record_ver       int NULL,
+	CONSTRAINT pk_z_qtIfApprove PRIMARY KEY (phid)
+	)
+GO
+
+
+年中调整
+alter table YS3_BUDGETMST add F_LEVEL varchar2(50)   或者  alter table YS3_BUDGETMST add F_LEVEL varchar(50) 
+
+alter table YS3_BUDGETMST add F_AdjustType varchar2(50)  或者  alter table YS3_BUDGETMST add F_AdjustType varchar(50)
+
+预决算相关
+预算管理主表建表语句
+1、sql
+CREATE TABLE dbo.YS3_ACCOUNTMST
+	(
+	phid               BIGINT NOT NULL,
+	orgid              BIGINT,
+	orgcode            VARCHAR (50),
+	uyear              VARCHAR (4),
+	verify_start       INT,
+	verify_start_time  DATETIME,
+	verify_middle      INT,
+	verify_middle_time DATETIME,
+	verify_end         INT,
+	verify_end_time    DATETIME,
+	description_start  TEXT,
+	description_middle TEXT,
+	description_end    TEXT,
+	creator            BIGINT,
+	editor             BIGINT,
+	cur_orgid          BIGINT,
+	ng_insert_dt       DATETIME,
+	ng_update_dt       DATETIME,
+	ng_record_ver      INT,
+	startReportMan     VARCHAR (50),
+	startReportDate    DATETIME,
+	middleReportMan    VARCHAR (50),
+	middleReportDate   DATETIME,
+	endReportMan       VARCHAR (50),
+	endReportDate      DATETIME,
+	CONSTRAINT pk_YS3_ACCOUNTMST PRIMARY KEY NONCLUSTERED (phid)
+	)
+GO;
+CREATE TABLE ys3_account
+	(
+	PHID                 BIGINT NOT NULL,
+	PHID_SUBJECT         BIGINT NULL,
+	SUBJECTCODE          VARCHAR (50) NULL,
+	ORGID                BIGINT NULL,
+	ORGCODE              VARCHAR (50) NULL,
+	UYEAR                VARCHAR (4) NULL,
+	FINALACCOUNTS_TOTAL  NUMERIC (18,2) NULL,
+	BUDGET_TOTAL         NUMERIC (18,2) NULL,
+	ADJUSTMENT           NUMERIC (18,2) NULL,
+	APPROVEDBUDGET_TOTAL NUMERIC (18,2) NULL,
+	Thisaccounts_Total   NUMERIC (18,2) NULL,
+	COMPLETE             NUMERIC (18,2) NULL,
+	DESCRIPTION          VARCHAR (500) NULL,
+	CREATOR              BIGINT NULL,
+	EDITOR               BIGINT NULL,
+	CUR_ORGID            BIGINT NULL,
+	NG_INSERT_DT         DATEtime NULL,
+	NG_UPDATE_DT         DATEtime NULL,
+	NG_RECORD_VER        INT NULL,
+	VERIFY_START         INT NULL,
+	VERIFY_MIDDLE        INT NULL,
+	VERIFY_END           INT,
+	VERIFY_START_TIME    DATEtime NULL,
+	VERIFY_MIDDLE_TIME   DATEtime NULL,
+	VERIFY_END_TIME      DATEtime NULL,
+	PHID_MST             BIGINT NULL,
+	DESCRIPTION_MIDDLE   VARCHAR (500) NULL,
+	DESCRIPTION_END      VARCHAR (500)NULL,
+	CONSTRAINT PK_ys3_account PRIMARY KEY (PHID)
+	)
+	GO;
+2、orl
+CREATE TABLE YS3_ACCOUNTMST
+	(
+	PHID               NUMBER (17) NOT NULL,
+	ORGID              NUMBER (17),
+	ORGCODE            VARCHAR2 (50),
+	UYEAR              VARCHAR2 (4),
+	VERIFY_START       NUMBER (11),
+	VERIFY_START_TIME  DATE,
+	VERIFY_MIDDLE      NUMBER (11),
+	VERIFY_MIDDLE_TIME DATE,
+	VERIFY_END         NUMBER (11),
+	VERIFY_END_TIME    DATE,
+	DESCRIPTION_START  CLOB,
+	DESCRIPTION_MIDDLE CLOB,
+	DESCRIPTION_END    CLOB,
+	CREATOR            NUMBER (17),
+	EDITOR             NUMBER (17),
+	CUR_ORGID          NUMBER (17),
+	NG_INSERT_DT       DATE,
+	NG_UPDATE_DT       DATE,
+	NG_RECORD_VER      NUMBER (11),
+	STARTREPORTMAN     VARCHAR2 (50),
+	STARTREPORTDATE    DATE,
+	MIDDLEREPORTMAN    VARCHAR2 (50),
+	MIDDLEREPORTDATE   DATE,
+	ENDREPORTMAN       VARCHAR2 (50),
+	ENDREPORTDATE      DATE,
+	SAVESTART          NUMBER (11),
+	SAVEMIDDLE         NUMBER (11),
+	SAVEEND            NUMBER (11),
+	CONSTRAINT PK_YS3_ACCOUNTMST PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+
+--子表
+CREATE TABLE YS3_ACCOUNT
+	(
+	PHID                 NUMBER (17) NOT NULL,
+	PHID_SUBJECT         NUMBER (17),
+	SUBJECTCODE          VARCHAR2 (50),
+	ORGID                NUMBER (17),
+	ORGCODE              VARCHAR2 (50),
+	UYEAR                VARCHAR2 (4),
+	FINALACCOUNTS_TOTAL  NUMBER (18,2),
+	BUDGET_TOTAL         NUMBER (18,2),
+	ADJUSTMENT           NUMBER (18,2),
+	APPROVEDBUDGET_TOTAL NUMBER (18,2),
+	THISACCOUNTS_TOTAL   NUMBER (18,2),
+	COMPLETE             NUMBER (18,2),
+	DESCRIPTION          VARCHAR2 (500),
+	CREATOR              NUMBER (17),
+	EDITOR               NUMBER (17),
+	CUR_ORGID            NUMBER (17),
+	NG_INSERT_DT         DATE,
+	NG_UPDATE_DT         DATE,
+	NG_RECORD_VER        NUMBER (11),
+	VERIFY_START         NUMBER (11),
+	VERIFY_MIDDLE        NUMBER (11),
+	VERIFY_END           NUMBER (11),
+	VERIFY_START_TIME    DATE,
+	VERIFY_MIDDLE_TIME   DATE,
+	VERIFY_END_TIME      DATE,
+	PHID_MST             NUMBER (17),
+	DESCRIPTION_MIDDLE   VARCHAR2 (500),
+	DESCRIPTION_END      VARCHAR2 (500),
+	BUDGETCOMPLETE       NUMBER (18,2),
+	CONSTRAINT PK_YS3_ACCOUNT PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+	
+
+
+ALTER TABLE YS3_ACCOUNT ALTER COLUMN complete numeric(18, 2)  或者 ALTER TABLE YS3_ACCOUNT modify(complete DECIMAL(18, 2))
+
+alter table YS3_ACCOUNT add BudgetComplete numeric(18, 2) 或者 alter table YS3_ACCOUNT add BudgetComplete DECIMAL(18, 2)
+
+
+---------------------------------------------2019 10 29 王冠冠  套打模式打印相关 ---------------------------------------------------------
+
+套打格式内置数据
+create table z_qtCoverUpData (
+   phid                 bigint               not null,
+   enCode               varchar(50)          null,
+   name                 varchar(100)         null,
+   sortCode             int                  null,
+   enabledMark          tinyint              null,
+   description          varchar(500)         null,
+   isSystem             tinyint              null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_Z_QTCOVERUPDATA primary key (phid)
+)
+go
+或者
+CREATE TABLE Z_QTCOVERUPDATA
+	(
+	PHID          NUMBER (17) NOT NULL,
+	ENCODE        VARCHAR2 (50),
+	NAME          VARCHAR2 (100),
+	SORTCODE      NUMBER (11),
+	ENABLEDMARK   NUMBER (4),
+	DESCRIPTION   VARCHAR2 (500),
+	ISSYSTEM      NUMBER (4),
+	CREATOR       NUMBER (17),
+	EDITOR        NUMBER (17),
+	CUR_ORGID     NUMBER (17),
+	NG_INSERT_DT  DATE,
+	NG_UPDATE_DT  DATE,
+	NG_RECORD_VER NUMBER (11),
+	TYPENUMBER    NUMBER (11),
+	TYPENAME      VARCHAR2 (100),
+	CONSTRAINT PK_Z_QTCOVERUPDATA PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+
+组织启用的套打格式
+create table z_qtCoverUpForOrg (
+   phid                 bigint               not null,
+   orgId                bigint               null,
+   orgCode              varchar(50)          null,
+   tempLateId           bigint               null,
+   tempLateCode         varchar(50)          null,
+   tempLateName         varchar(100)         null,
+   sortCode             int                  null,
+   enabledMark          tinyint              null,
+   description          varchar(500)         null,
+   processCode          varchar(50)          null,
+   processName          varchar(100)         null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_Z_QTCOVERUPFORORG primary key (phid)
+)
+go
+或者
+CREATE TABLE Z_QTCOVERUPFORORG
+	(
+	PHID          NUMBER (17) NOT NULL,
+	ORGID         NUMBER (17),
+	ORGCODE       VARCHAR2 (50),
+	TEMPLATEID    NUMBER (17),
+	TEMPLATECODE  VARCHAR2 (50),
+	TEMPLATENAME  VARCHAR2 (100),
+	SORTCODE      NUMBER (11),
+	ENABLEDMARK   NUMBER (4),
+	DESCRIPTION   VARCHAR2 (500),
+	PROCESSCODE   VARCHAR2 (50),
+	PROCESSNAME   VARCHAR2 (100),
+	CREATOR       NUMBER (17),
+	EDITOR        NUMBER (17),
+	CUR_ORGID     NUMBER (17),
+	NG_INSERT_DT  DATE,
+	NG_UPDATE_DT  DATE,
+	NG_RECORD_VER NUMBER (11),
+	CONSTRAINT PK_Z_QTCOVERUPFORORG PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+
+
+alter table z_qtcoverupdata add typenumber NUMBER(11) 或者 alter table z_qtcoverupdata add typenumber int
+
+alter table z_qtcoverupdata add typename varchar2(100)  或者 alter table z_qtcoverupdata add typename varchar(100) 
+
+内置的模板数据
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (1, '001', '广东省总工会', 1, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (2, '002', '广东省总工会', 2, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 2, '申报表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (3, '003', '江门市总', 3, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (4, '004', '江门市总', 4, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 2, '申报表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (5, '005', '湛江市总', 5, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (6, '006', '湛江市总', 6, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 2, '申报表');
+
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (7, '007', '珠海市工会', 7, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (8, '008', '珠海市工会', 8, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, to_date ('2019-09-24 16:18:35', 'YYYY-MM-DD HH24:MI:SS'), to_date ('2019-10-29 22:57:03', 'YYYY-MM-DD HH24:MI:SS'), 19, 2, '申报表');
+
+或者sql:
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (1, '001', '广东省总工会', 1, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (2, '002', '广东省总工会', 2, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 2, '申报表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (3, '003', '江门市总', 3, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (4, '004', '江门市总', 4, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 2, '申报表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (5, '005', '湛江市总', 5, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (6, '006', '湛江市总', 6, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 2, '申报表');
+
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (7, '007', '珠海市工会', 7, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 1, '汇总表');
+
+INSERT INTO Z_QTCOVERUPDATA (PHID, ENCODE, NAME, SORTCODE, ENABLEDMARK, DESCRIPTION, ISSYSTEM, CREATOR, EDITOR, CUR_ORGID, NG_INSERT_DT, NG_UPDATE_DT, NG_RECORD_VER, TYPENUMBER, TYPENAME)
+VALUES (8, '008', '珠海市工会', 8, 0, NULL, 1, 488181024000001, 488181024000001, 488181024000002, '2019-09-24 16:18:35', '2019-10-29 22:57:03', 19, 2, '申报表');
+
+---------------------------------------------2019 11 01 王冠冠  上报保存标志 -------------------------------------------
+
+alter table ys3_accountmst add savestart NUMBER(11) 或者 alter table ys3_accountmst add savestart int
+alter table ys3_accountmst add savemiddle NUMBER(11) 或者 alter table ys3_accountmst add savemiddle int
+alter table ys3_accountmst add saveend NUMBER(11) 或者 alter table ys3_accountmst add saveend int
+
+---------------------------------------------2019 11 14 王冠冠  资金拨付新增预算部门字段 -------------------------------------------
+
+alter table BK3_PAYMENT_MST add f_budphid NUMBER(17)  或者 alter table BK3_PAYMENT_MST add f_budphid BIGINT
+alter table BK3_PAYMENT_MST add f_budcode varchar2(50)  或者 alter table BK3_PAYMENT_MST add f_budcode varchar(50)
+alter table BK3_PAYMENT_MST add f_budname varchar2(100)  或者 alter table BK3_PAYMENT_MST add f_budname varchar(100)
+
+---------------------------------------------2019 11 14 王冠冠  绩效新增第三方评价字段 -------------------------------------------
+
+oracle:
+ALTER TABLE JX3_PERFORMANCEDTL_TEXTCONT ADD f_ThirdCheckConclusion VARCHAR2(1000);
+
+ALTER TABLE JX3_PERFORMANCEDTL_TARIMPL ADD f_ThirdCheckCompletionValue VARCHAR2(100);
+
+ALTER TABLE JX3_PERFORMANCEDTL_TARIMPL ADD f_ThirdCheckScore DECIMAL(18,2);
+
+ALTER TABLE JX3_PERFORMANCEMST ADD f_ThirdCheckEvaluationResult VARCHAR2(10);
+
+ALTER TABLE JX3_PERFORMANCEMST ADD f_ThirdCheckEvaluationScore DECIMAL(18,2);
+
+sql:
+ALTER TABLE JX3_PERFORMANCEDTL_TEXTCONT ADD f_ThirdCheckConclusion VARCHAR(1000);
+
+ALTER TABLE JX3_PERFORMANCEDTL_TARIMPL ADD f_ThirdCheckCompletionValue VARCHAR(100);
+
+ALTER TABLE JX3_PERFORMANCEDTL_TARIMPL ADD f_ThirdCheckScore numeric(18,2);
+
+ALTER TABLE JX3_PERFORMANCEMST ADD f_ThirdCheckEvaluationResult VARCHAR(10);
+
+ALTER TABLE JX3_PERFORMANCEMST ADD f_ThirdCheckEvaluationScore numeric(18,2);
+
+
+
+---------------------------------------------2019 11 18 张宇  区域按钮自定义排序 -------------------------------------------
+--sqlserver
+CREATE TABLE z_qtnavigation
+	(
+	phid          BIGINT NOT NULL,
+	buttoncode    VARCHAR (50) NULL,
+	sortvalue     INT NULL,
+	invisible     INT NULL,
+	operator      BIGINT NULL,
+	creator       BIGINT NULL,
+	editor        BIGINT NULL,
+	cur_orgid     BIGINT NULL,
+	ng_insert_dt  DATETIME NULL,
+	ng_update_dt  DATETIME NULL,
+	ng_record_ver BIGINT NULL,
+	name		  VARCHAR (50) NULL,
+	menu		  VARCHAR (50) NULL,
+	srcs		  VARCHAR (50) NULL,
+	createtime	  DATETIME NULL,
+	modifier	  BIGINT NULL,
+	modifiertime  DATETIME NULL,
+	CONSTRAINT PK_z_qtnavigation PRIMARY KEY (phid)
+	)
+GO
+或者
+--oracle
+CREATE TABLE Z_QTNAVIGATION
+	(
+	PHID          NUMBER (17) NOT NULL,
+	BUTTONCODE    VARCHAR2 (50),
+	SORTVALUE     INTEGER,
+	OPERATOR      NUMBER (17),
+	CREATOR       NUMBER (17),
+	EDITOR        NUMBER (17),
+	CUR_ORGID     NUMBER (17),
+	NG_INSERT_DT  DATE,
+	NG_UPDATE_DT  DATE,
+	NG_RECORD_VER NUMBER (11),
+	MODIFIER      NUMBER (17),
+	MODIFIERTIME  DATE,
+	CREATETIME    DATE,
+	INVISIBLE     INTEGER,
+	NAME          VARCHAR2 (50),
+	MENU          VARCHAR2 (50),
+	SRCS          VARCHAR2 (50),
+	CONSTRAINT PK_Z_QTNAVIGATION PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+
+--oracle
+alter table z_qtbankaccount add bankname VARCHAR2(100);
+--sqlserver
+alter table z_qtbankaccount add bankname VARCHAR(100);
+
+
+--sqlserver
+CREATE TABLE gk3_bankvauit
+	(
+	phid         BIGINT NOT NULL,
+	name         VARCHAR (50) NULL,
+	address      VARCHAR (100) NULL,
+	createtime   DATETIME NULL,
+	modifier     BIGINT NULL,
+	modifiertime DATETIME NULL,
+	ng_insert_dt DATETIME NULL,
+	ng_update_dt DATETIME NULL,
+	cur_orgid    BIGINT NULL,
+	creator      BIGINT NULL,
+	editor       BIGINT NULL,
+	orgid        BIGINT NULL,
+	ng_record_ver BIGINT NULL,
+	CONSTRAINT PK_gk3_bankvauit PRIMARY KEY (phid)
+	)
+GO
+--oracle
+CREATE TABLE GK3_BANKVAUIT
+	(
+	PHID          NUMBER (17) NOT NULL,
+	NAME          VARCHAR2 (50),
+	ADDRESS       VARCHAR2 (100),
+	CREATETIME    DATE,
+	MODIFIER      NUMBER (17),
+	MODIFIERTIME  DATE,
+	NG_INSERT_DT  DATE,
+	NG_UPDATE_DT  DATE,
+	CUR_ORGID     NUMBER (17),
+	CREATOR       NUMBER (17),
+	EDITOR        NUMBER (17),
+	NG_RECORD_VER NUMBER (11),
+	ORGID         NUMBER (17),
+	CONSTRAINT PK_GK3_BANKVAUIT PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+
+------------------------2019.11.17 刘杭
+--oracle
+--主表增加年结标志 明细表增加上年预算金额列
+ALTER TABLE XM3_PROJECTMST ADD (f_Reference VARCHAR2 (10));
+ALTER TABLE XM3_PROJECTDTL_BUDGETDTL ADD (f_LastYearAmount NUMBER(18,2));
+ALTER TABLE YS3_BUDGETMST ADD (f_Reference VARCHAR2 (10));
+ALTER TABLE YS3_BUDGETDTL_BUDGETDTL ADD (f_LastYearAmount NUMBER(18,2));
+--基本支出、收入预算分年度
+ALTER TABLE Z_QTBASEPROJECT ADD (f_year VARCHAR2 (4));
+--sqlserver
+--主表增加年结标志 明细表增加上年预算金额列
+ALTER TABLE XM3_PROJECTMST ADD f_Reference VARCHAR (10);
+ALTER TABLE XM3_PROJECTDTL_BUDGETDTL ADD f_LastYearAmount NUMERIC(18,2);
+ALTER TABLE YS3_BUDGETMST ADD f_Reference VARCHAR (10);
+ALTER TABLE YS3_BUDGETDTL_BUDGETDTL ADD f_LastYearAmount NUMERIC(18,2);
+--基本支出、收入预算分年度
+ALTER TABLE Z_QTBASEPROJECT ADD f_year VARCHAR (4);
+
+---------------------------------------------2019 11 27 王冠冠  表格自定义 -------------------------------------------
+表格自定义显示表：
+SQL：
+create table Z_QTTableCustomize (
+   phid                 bigint               not null,
+   userId               bigint               null,
+   userCode             varchar(50)          null,
+   tableCode            varchar(50)          null,
+   tableName            varchar(50)          null,
+   columnCode           varchar(50)          null,
+   columnName           varchar(50)          null,
+   enabledMark          tinyint              null,
+   columnSort           int                  null,
+   description          varchar(500)         null,
+   contentSort          int                  null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   isnumber             tinyint              null,
+   align                varchar(50)          null,
+   width                int                  null,
+   contentType          int                  null,
+   constraint PK_Z_QTTABLECUSTOMIZE primary key (phid)
+)
+go
+
+oracle:
+create table Z_QTTableCustomize (
+   phid                 NUMBER(17)               not null,
+   userId               NUMBER(17)               null,
+   userCode             varchar2(50)          null,
+   tableCode            varchar2(50)          null,
+   tableName            varchar2(50)          null,
+   columnCode           varchar2(50)          null,
+   columnName           varchar2(50)          null,
+   enabledMark          NUMBER(4)              null,
+   columnSort           NUMBER(11)                  null,
+   description          varchar2(500)         null,
+   contentSort          NUMBER(11)                  null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   isnumber             NUMBER(4)              null,
+   align                varchar2(50)          null,
+   width                NUMBER(11)                  null,
+   contentType          NUMBER(11)                  null,
+   constraint PK_Z_QTTABLECUSTOMIZE primary key (phid)
+)
+go
+
+---------------------------------------------2019 12 31 王冠冠  民生银行相关 -------------------------------------------
+--四张表分别为：收入预算主表，收入预算子表，预算人员分摊，项目人员分摊表
+--sql
+create table ys3_incomemst (
+   Phid                 bigint               not null,
+   F_orgID              bigint               null,
+   F_Orgcode            varchar(100)         null,
+   f_year               varchar(4)           null,
+   f_approval           tinyint              null,
+   F_Isbudget           tinyint              null,
+   F_budgeter           bigint               null,
+   F_Isreport           tinyint              null,
+   F_reporttime         datetime             null,
+   F_budgettime         datetime             null,
+   F_DeclareTime         datetime             null,
+   F_DeclareAmount       numeric(18,2)        null,
+   F_reporter           bigint               null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_YS3_INCOMEMST primary key (Phid)
+)
+go
+
+create table ys3_incomedtl (
+   Phid                 bigint               not null,
+   Mst_Phid              bigint               null,
+   F_subjectCode        varchar(100)         null,
+   F_subjectname        varchar(100)         null,
+   F_Subitemid          bigint               null,
+   F_SubitemCode        varchar(100)         null,
+   F_SubitemName        varchar(100)         null,
+   F_budgetamount       numeric(18,2)        null,
+   F_budgetid           bigint               null,
+   F_budgetcode         varchar(100)         null,
+   F_formation          varchar(100)         null,
+   F_ProcessStatus      varchar(100)         null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_YS3_INCOMEDTL primary key (Phid)
+)
+go
+
+create table YS3_BudgetDtl_Personnel (
+   Phid                 bigint               not null,
+   Mst_Phid              bigint               null,
+   Xm_Phid              bigint               null,
+   F_usercode           varchar(100)         null,
+   F_usename            varchar(100)         null,
+   F_amount             numeric(18,2)        null,
+   sortcode             int                  null,
+   Def_str1             varchar(200)         null,
+   Def_int1             int                  null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_YS3_BUDGETDTL_PERSONNEL primary key (Phid)
+)
+go
+
+create table XM3_ProjectDtl_Personnel (
+   Phid                 bigint               not null,
+   Mst_Phid              bigint               null,
+   F_usercode           varchar(100)         null,
+   F_usename            varchar(100)         null,
+   F_amount             numeric(18,2)        null,
+   sortcode             int                  null,
+   Def_str1             varchar(200)         null,
+   Def_int1             int                  null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_XM3_PROJECTDTL_PERSONNEL primary key (Phid)
+)
+go
+
+create table XM3_ProjectDtl_PersonName (
+   PhId                 bigint               not null,
+   mst_phid             bigint               null,
+   f_userId             bigint               null,
+   f_userCode           varchar(100)         null,
+   f_orgId              bigint               null,
+   f_orgCode            varchar(100)         null,
+   sortCode             int                  null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_XM3_PROJECTDTL_PERSONNAME primary key (PhId)
+)
+go
+
+create table YS3_BUDGETDTL_PersonName (
+   PhId                 bigint               not null,
+   mst_phid             bigint               null,
+   Xm_Phid              bigint               null,
+   f_userId             bigint               null,
+   f_userCode           varchar(100)         null,
+   f_orgId              bigint               null,
+   f_orgCode            varchar(100)         null,
+   sortCode             int                  null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_YS3_BUDGETDTL_PERSONNAME primary key (PhId)
+)
+go
+--签报单相关
+create table XM3_ReportMst (
+   Phid                 bigint               not null,
+   f_title              varchar(100)         null,
+   f_code              varchar(100)         null,
+   xm_phid             bigint               null,
+   F_BusinessCode       varchar(100)         null,
+   f_reason             varchar(500)         null,
+   f_time               datetime             null,
+   F_DeclarerId         bigint               null,
+   f_phone              varchar(100)         null,
+   f_sumAmount          numeric(18,2)        null,
+   f_surplusAmount      numeric(18,2)        null,
+   f_opinion            varchar(500)         null,
+   f_url                varchar(100)         null,
+   f_Approve            tinyint              null,
+   f_approveAmount      numeric(18,2)        null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   F_IsDraft        int                  null,
+   constraint PK_XM3_REPORTMST primary key (Phid)
+)
+go
+
+create table XM3_ReportDtl (
+   Phid                 bigint               not null,
+   mst_phid             bigint               null,
+   xm_phid              bigint               null,
+   xm_name              varchar(500)         null,
+   f_num                int                  null,
+   f_price              numeric(18,2)        null,
+   f_amount             numeric(18,2)        null,
+   f_isCost             int                  null,
+   f_remark             varchar(500)         null,
+   creator              bigint               null,
+   editor               bigint               null,
+   cur_orgid            bigint               null,
+   ng_insert_dt         datetime             null,
+   ng_update_dt         datetime             null,
+   ng_record_ver        int                  null,
+   constraint PK_XM3_REPORTDTL primary key (Phid)
+)
+go
+
+--oracle
+create table ys3_incomemst (
+   Phid                 NUMBER(17)               not null,
+   F_orgID              NUMBER(17)               null,
+   F_Orgcode            varchar2(100)         null,
+   f_year               varchar2(4)           null,
+   f_approval           NUMBER(4)              null,
+   F_Isbudget           NUMBER(4)              null,
+   F_budgeter           NUMBER(17)               null,
+   F_Isreport           NUMBER(4)              null,
+   F_reporttime         date             null,
+   F_DeclareTime         date             null,
+   F_DeclareAmount       NUMBER(18,2)        null,
+   F_budgettime         date             null,
+   F_reporter           NUMBER(17)               null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_YS3_INCOMEMST primary key (Phid)
+)
+go
+
+create table ys3_incomedtl (
+   Phid                 NUMBER(17)               not null,
+   Mst_Phid             NUMBER(17)               null,
+   F_subjectCode        varchar2(100)         null,
+   F_subjectname        varchar2(100)         null,
+   F_Subitemid          NUMBER(17)               null,
+   F_SubitemCode        varchar2(100)         null,
+   F_SubitemName        varchar2(100)         null,
+   F_budgetamount       NUMBER(18,2)        null,
+   F_budgetid           NUMBER(17)               null,
+   F_budgetcode         varchar2(100)         null,
+   F_formation          varchar2(100)         null,
+   F_ProcessStatus      varchar2(100)         null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_YS3_INCOMEDTL primary key (Phid)
+)
+go
+
+create table YS3_BudgetDtl_Personnel (
+   Phid                 NUMBER(17)               not null,
+   Mst_Phid              NUMBER(17)               null,
+   Xm_Phid              NUMBER(17)               null,
+   F_usercode           varchar2(100)         null,
+   F_usename            varchar2(100)         null,
+   F_amount             NUMBER(18,2)        null,
+   sortcode             NUMBER(11)                  null,
+   Def_str1             varchar2(200)         null,
+   Def_int1             NUMBER(11)                  null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_YS3_BUDGETDTL_PERSONNEL primary key (Phid)
+)
+go
+
+create table XM3_ProjectDtl_Personnel (
+   Phid                 NUMBER(17)               not null,
+   Mst_Phid              NUMBER(17)               null,
+   F_usercode           varchar2(100)         null,
+   F_usename            varchar2(100)         null,
+   F_amount             NUMBER(18,2)        null,
+   sortcode             NUMBER(11)                  null,
+   Def_str1             varchar2(200)         null,
+   Def_int1             NUMBER(11)                  null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_XM3_PROJECTDTL_PERSONNEL primary key (Phid)
+)
+go
+
+create table XM3_ProjectDtl_PersonName (
+   PhId                 NUMBER(17)               not null,
+   mst_phid             NUMBER(17)               null,
+   f_userId             NUMBER(17)               null,
+   f_userCode           varchar2(100)         null,
+   f_orgId              NUMBER(17)               null,
+   f_orgCode            varchar2(100)         null,
+   sortCode             NUMBER(11)                  null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_XM3_PROJECTDTL_PERSONNAME primary key (PhId)
+)
+go
+
+create table YS3_BUDGETDTL_PersonName (
+   PhId                 NUMBER(17)               not null,
+   mst_phid             NUMBER(17)               null,
+   Xm_Phid              NUMBER(17)               null,
+   f_userId             NUMBER(17)               null,
+   f_userCode           varchar2(100)         null,
+   f_orgId              NUMBER(17)               null,
+   f_orgCode            varchar2(100)         null,
+   sortCode             NUMBER(11)                  null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_YS3_BUDGETDTL_PERSONNAME primary key (PhId)
+)
+go
+--签报单相关
+create table XM3_ReportMst (
+   Phid                 NUMBER(17)               not null,
+   f_title              varchar2(100)         null,
+   f_code              varchar2(100)         null,
+   xm_phid             NUMBER(17)               null,
+   F_BusinessCode       varchar2(100)         null,
+   f_reason             varchar2(500)         null,
+   f_time               date             null,
+   F_DeclarerId         NUMBER(17)               null,
+   f_phone              varchar2(100)         null,
+   f_sumAmount          NUMBER(18,2)        null,
+   f_surplusAmount      NUMBER(18,2)        null,
+   f_opinion            varchar2(500)         null,
+   f_url                varchar2(100)         null,
+   f_Approve            NUMBER(4)              null,
+   f_approveAmount      NUMBER(18,2)        null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   F_IsDraft        NUMBER(11)                  null,
+   constraint PK_XM3_REPORTMST primary key (Phid)
+)
+go
+
+
+create table XM3_ReportDtl (
+   Phid                 NUMBER(17)               not null,
+   mst_phid             NUMBER(17)               null,
+   xm_phid              NUMBER(17)               null,
+   xm_name              varchar2(500)         null,
+   f_num                NUMBER(11)                  null,
+   f_price              NUMBER(18,2)        null,
+   f_amount             NUMBER(18,2)        null,
+   f_isCost             NUMBER(11)                  null,
+   f_remark             varchar2(500)         null,
+   creator              NUMBER(17)               null,
+   editor               NUMBER(17)               null,
+   cur_orgid            NUMBER(17)               null,
+   ng_insert_dt         date             null,
+   ng_update_dt         date             null,
+   ng_record_ver        NUMBER(11)                  null,
+   constraint PK_XM3_REPORTDTL primary key (Phid)
+)
+go
+
+
+
+--项目预算单据相关：
+--oracle
+--项目主表
+alter table XM3_PROJECTMST add f_businessid NUMBER(17);
+alter table XM3_PROJECTMST add f_businesscode VARCHAR2(100);
+alter table XM3_PROJECTMST add f_isapply NUMBER(4);
+alter table XM3_PROJECTMST add f_ispurchase NUMBER(4);
+alter table XM3_PROJECTMST add f_isreport NUMBER(4);
+alter table XM3_PROJECTMST add f_isresolution NUMBER(4);
+alter table XM3_PROJECTMST add f_isshare NUMBER(4);
+alter table XM3_PROJECTMST add f_declarerid NUMBER(17);
+alter table XM3_PROJECTMST add f_deletemark NUMBER(4);
+--项目子表
+alter table XM3_PROJECTDTL_BUDGETDTL add f_subitemid NUMBER(17);
+alter table XM3_PROJECTDTL_BUDGETDTL add f_subitemcode VARCHAR2(100);
+alter table XM3_PROJECTDTL_BUDGETDTL add f_subitemname VARCHAR2(100);
+--项目会议表
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_MeetingTime Date;
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_MeetiingSummaryNo VARCHAR2(100);
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_year VARCHAR2(4);
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_declarationunit VARCHAR2(200);
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_declarerid NUMBER(17);
+--预算主表
+alter table YS3_BUDGETMST add f_businessid NUMBER(17);
+alter table YS3_BUDGETMST add f_businesscode VARCHAR2(100);
+alter table YS3_BUDGETMST add f_isapply NUMBER(4);
+alter table YS3_BUDGETMST add f_ispurchase NUMBER(4);
+alter table YS3_BUDGETMST add f_isreport NUMBER(4);
+alter table YS3_BUDGETMST add f_isresolution NUMBER(4);
+alter table YS3_BUDGETMST add f_isshare NUMBER(4);
+alter table YS3_BUDGETMST add f_declarerid NUMBER(17);
+alter table YS3_BUDGETMST add f_deletemark NUMBER(4);
+--预算子表
+alter table YS3_BUDGETDTL_BUDGETDTL add f_subitemid NUMBER(17);
+alter table YS3_BUDGETDTL_BUDGETDTL add f_subitemcode VARCHAR2(100);
+alter table YS3_BUDGETDTL_BUDGETDTL add f_subitemname VARCHAR2(100);
+--预算会议表
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_MeetingTime Date;
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_MeetiingSummaryNo VARCHAR2(100);
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_year VARCHAR2(4);
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_declarationunit VARCHAR2(200);
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_declarerid NUMBER(17);
+
+
+--sql
+--项目主表
+alter table XM3_PROJECTMST add f_businessid bigint;
+alter table XM3_PROJECTMST add f_businesscode VARCHAR(100);
+alter table XM3_PROJECTMST add f_isapply tinyint;
+alter table XM3_PROJECTMST add f_ispurchase tinyint;
+alter table XM3_PROJECTMST add f_isreport tinyint;
+alter table XM3_PROJECTMST add f_isresolution tinyint;
+alter table XM3_PROJECTMST add f_isshare tinyint;
+alter table XM3_PROJECTMST add f_declarerid bigint;
+alter table XM3_PROJECTMST add f_deletemark tinyint;
+--项目子表
+alter table XM3_PROJECTDTL_BUDGETDTL add f_subitemid bigint;
+alter table XM3_PROJECTDTL_BUDGETDTL add f_subitemcode VARCHAR(100);
+alter table XM3_PROJECTDTL_BUDGETDTL add f_subitemname VARCHAR(100);
+--项目会议表
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_MeetingTime DATETIME;
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_MeetiingSummaryNo VARCHAR(100);
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_year VARCHAR(4);
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_declarationunit VARCHAR(200);
+alter table XM3_PROJECTDTL_TEXTCONTENT add f_declarerid bigint;
+--预算主表
+alter table YS3_BUDGETMST add f_businessid bigint;
+alter table YS3_BUDGETMST add f_businesscode VARCHAR(100);
+alter table YS3_BUDGETMST add f_isapply tinyint;
+alter table YS3_BUDGETMST add f_ispurchase tinyint;
+alter table YS3_BUDGETMST add f_isreport tinyint;
+alter table YS3_BUDGETMST add f_isresolution tinyint;
+alter table YS3_BUDGETMST add f_isshare tinyint;
+alter table YS3_BUDGETMST add f_declarerid bigint;
+alter table YS3_BUDGETMST add f_deletemark tinyint;
+--预算子表
+alter table YS3_BUDGETDTL_BUDGETDTL add f_subitemid bigint;
+alter table YS3_BUDGETDTL_BUDGETDTL add f_subitemcode VARCHAR(100);
+alter table YS3_BUDGETDTL_BUDGETDTL add f_subitemname VARCHAR(100);
+--预算会议表
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_MeetingTime DATETIME;
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_MeetiingSummaryNo VARCHAR(100);
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_year VARCHAR(4);
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_declarationunit VARCHAR(200);
+alter table YS3_BUDGETDTL_TEXTCONTENT add f_declarerid bigint;
+
+--项目分发表
+--oracle
+CREATE TABLE Z_QTXMDISTRIBUTE
+	(
+	PHID             NUMBER (17) NOT NULL,
+	F_PROJCODE       VARCHAR2 (255),
+	F_PROJNAME       VARCHAR2 (255),
+	ORGID            NUMBER (17),
+	ORGCODE          VARCHAR2 (50),
+	ISACTIVE         NUMBER (4),
+	DISTRIBUTEORGID  NUMBER (17),
+	DISTRIBUTEUSERID NUMBER (17),
+	CREATOR          NUMBER (17),
+	EDITOR           NUMBER (17),
+	CUR_ORGID        NUMBER (17),
+	NG_INSERT_DT     DATE,
+	NG_UPDATE_DT     DATE,
+	NG_RECORD_VER    NUMBER (11),
+	F_BUSINESS       VARCHAR2 (100),
+	CONSTRAINT PK_Z_QTXMDISTRIBUTE PRIMARY KEY (PHID)
+	)
+	TABLESPACE USERS
+	LOGGING
+	NOCACHE
+	STORAGE (BUFFER_POOL DEFAULT);
+--sqlserver
+CREATE TABLE dbo.z_qtxmdistribute
+	(
+	phid             BIGINT NOT NULL,
+	f_projcode       VARCHAR (255) NULL,
+	f_projname       VARCHAR (255) NULL,
+	orgid            BIGINT NULL,
+	orgcode          VARCHAR (50) NULL,
+	isactive         TINYINT NULL,
+	distributeorgid  BIGINT NULL,
+	distributeuserid BIGINT NULL,
+	creator          BIGINT NULL,
+	editor           BIGINT NULL,
+	cur_orgid        BIGINT NULL,
+	ng_insert_dt     DATETIME NULL,
+	ng_update_dt     DATETIME NULL,
+	ng_record_ver    INT NULL,
+	f_business       VARCHAR (100) NULL,
+	CONSTRAINT pk_z_qtxmdistribute PRIMARY KEY (phid)
+	)
+GO
+

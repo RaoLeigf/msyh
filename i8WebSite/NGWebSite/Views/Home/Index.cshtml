@@ -1,0 +1,179 @@
+﻿@{
+    ViewBag.Title = "工会预算项目库管理系统";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+    <script type="text/javascript">
+        var C_OCode = '@ViewBag.OCode';
+        var C_OrgName = '@ViewBag.OrgName';
+        var C_LoginID = '@ViewBag.LoginID';
+        var C_LoginName = '@ViewBag.LoginName';
+        var C_DataBase = '@ViewBag.DataBase';
+        var C_DataBaseName = '@ViewBag.DataBaseName';
+        var C_OpenUrl = Ext.htmlDecode('@ViewBag.OpenUrl');
+        var C_UrlTitle = '@ViewBag.UrlTitle';
+        var C_UserID = '@ViewBag.UserID';
+        var C_UserType = '@ViewBag.UserType';
+        var C_Project = '@ViewBag.Project';
+    </script>
+    @*<script src="@Url.Content("~/NG3Resource/js/webMainFrameTree.js")" type="text/javascript"></script>*@
+    <link href="@Url.Content("~/NG3Resource/css/weblogin.css")" rel="stylesheet" />
+    <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/TabCloseMenu.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/js/webMainFrame.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        Ext.QuickTips.init();
+        var frame = $GetWFrame();
+        frame.LogID = C_UserID;
+        frame.sysAlertConfig = null;//小铃铛弹窗xml配置文件
+        frame.userAlertConfig = null;//小铃铛弹窗用户个性化配置
+        Ext.onReady(function () {
+            MainFrame.init();
+            Cookie.set("EditUserName", C_LoginID);
+            frame.OpenTab = MainFrame.Center.openTab;
+            Ext.get(window).on('resize', function () {
+                window.ShortcutsRefrech();
+            });
+            Ext.defer(function () {
+                Ext.Ajax.request({
+                    url: C_ROOT + "SUP/Login/GetSysMaintainCallMsg",
+                    async: false,
+                    success: function (response) {
+                        if (response.text != '') {
+                            Ext.MessageBox.alert("提示", response.text);
+                        }
+                    }
+                });
+            });
+        });
+        window.ShortcutsRefrech = MainFrame.Shortcuts.Refrech;
+        window.AlertView = MainFrame.AlertView;
+        window.showAbout = MainFrame.ProductAbout;     
+
+        if (C_OpenUrl != null && C_OpenUrl != "")
+            setTimeout(function () {
+                $OpenTab(C_UrlTitle, C_OpenUrl)
+            }, 1000);
+
+        //跨域监听事件
+        window.addEventListener("message", function (message) {
+            if (!message.data)
+                return;
+            
+            if (message.data.indexOf("time out") == 0) return;
+
+            var data = Ext.JSON.decode(message.data);
+            if (!Ext.isEmpty(data)) {
+                if (data.msgtype == 'opentab') {
+                    $OpenTab(data.title, data.url);
+                }
+                else if (data.msgtype == 'closetab') {
+                    $CloseTab();
+                }
+            }
+        }, false);
+
+        window.onmessage = function (e) {
+            //alert(e.data);
+            //console.log(e.data);
+            if (e.data && e.data.search("time out") < 0) {
+                var result = Ext.JSON.decode(e.data);
+                if (result.ID == "SysMaintainCall") {
+                    Ext.MessageBox.alert("提示", result.MsgContent);
+                } else if (result.ID == "KillLoginUser") {
+                    Ext.MessageBox.alert("提示", result.MsgContent, function () {
+                        Ext.Ajax.request({
+                            url: C_ROOT + 'SUP/Login/LoginOut',
+                            success: function (res, opts) {
+                                location.href = C_ROOT + 'web';
+                            }
+                        })
+                    });
+                } else {
+                    if (Ext.getCmp("mainHome").contentEl.contentWindow != null) {
+                        Ext.getCmp("mainHome").contentEl.contentWindow.refreshPortal(result.ID, '');
+                    }
+                    //如果小铃铛弹窗配置没取过，取一遍
+                    if (frame.sysAlertConfig == '' || frame.sysAlertConfig == null) {
+                        Ext.Ajax.request({
+                            url: C_ROOT + "SUP/MainTree/WebAlertView",
+                            async: false,
+                            success: function (response) {
+                                if (response.responseText != '' && response.responseText != null && response.responseText != undefined) {
+
+                                    var item = Ext.JSON.decode(response.responseText);
+                                    frame.sysAlertConfig = Ext.JSON.decode(item.sysAlertConfig).Record;
+                                    frame.userAlertConfig = Ext.JSON.decode(item.userAlertConfig);
+                                }
+                            }
+                        });
+                    }
+                    //已取到小铃铛弹窗，判断是否弹窗
+                    //用户没有配置过则全部弹窗,取配置文件的默认是否弹出
+                    if (frame.userAlertConfig == null || frame.userAlertConfig == '') {
+                        for (var i = 0; i < frame.sysAlertConfig.length; i++) {
+                            if (frame.sysAlertConfig[i].buskey == result.ID) {
+                                if (frame.sysAlertConfig[i].Alert == 'true' || frame.sysAlertConfig[i].Alert == 'True') {
+                                    alertView(frame.sysAlertConfig[i].Name);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        //用户配置过弹窗,先取用户个性化配置，如果个性化里没有，再取配置文件的默认是否弹出
+                        if (frame.userAlertConfig[result.ID] != undefined) {
+                            if (frame.userAlertConfig[result.ID]) {
+                                for (var i = 0; i < frame.sysAlertConfig.length; i++) {
+                                    if (frame.sysAlertConfig[i].buskey == result.ID) {
+                                        alertView(frame.sysAlertConfig[i].Name);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            for (var i = 0; i < frame.sysAlertConfig.length; i++) {
+                                if (frame.sysAlertConfig[i].buskey == result.ID) {
+                                    if (frame.sysAlertConfig[i].Alert == 'true' || frame.sysAlertConfig[i].Alert == 'True') {
+                                        alertView(frame.sysAlertConfig[i].Name);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+        }
+
+        window.onload = function () {
+            //web版消息推送url
+            document.getElementById('desktopMsgClient').src = window.location.protocol + "//" + window.location.host + "/DesktopMsgServer/MsgSubscriber.htm";
+        }
+
+        //G6H单点登录，故关闭业务时不注销登录
+        //window.onbeforeunload = function () {
+        //    Ext.Ajax.request({
+        //        url: C_ROOT + 'SUP/Login/LoginOut'
+        //    });
+        //}
+        function ykjhCount() {
+            MainFrame.Shortcuts.Refrech(true);
+        }
+    </script>
+    <style>
+        .icon-left {
+            float:right;
+        }
+    </style>
+}
+
+<!DOCTYPE html>
+<html>
+<body>
+    <iframe id="desktopMsgClient" src="" style="display: none"></iframe>
+</body>
+</html>

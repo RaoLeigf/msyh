@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_calc_cache">
+      <Field Name="cacheid" IsKey="true"/>
+      <Field Name="cache_xml"/>
+      <Field Name="last_calctime"/>
+      <Field Name="rep_id"/>
+      <Field Name="u_sort"/>
+      <Field Name="userid"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="cacheid" Target="Client" Value="cacheid" />
+    </Query>
+    <OrderBy format="{cacheid}">
+      <Exp Field="cacheid" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="cacheid"  Target="Client" Value="cacheid" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="last_calctime" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="last_calctime" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      </Values>
+      <Where>
+        <Exp Field="cacheid" Target="client" Value="cacheid"/>
+      </Where>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+</DataService>
+
+

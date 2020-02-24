@@ -1,0 +1,59 @@
+
+	@media screen and (max-width:1440px) {
+		.zi {
+			width: 23px;
+			height: 134px;
+			font-size: 13px;
+			overflow: hidden;
+			margin: 21% 24% 0;
+		}
+
+		.z1 {
+			margin-top: 14%;
+			font-size: 1.2rem;
+		}
+
+		.z2 {
+			font-size: 1.2rem;
+		}
+
+		.zi1 {
+			width: 100%;
+			font-size: 17px;
+			margin-left: 1%;
+			margin-top: 1%;
+		}
+
+		.nei p {
+			float: left;
+			margin-left: 5%;
+			font-size: 15px;
+		}
+
+		.kuang ul li {
+			width: 14%;
+			height: 81%;
+			float: left;
+			margin-left: 2%;
+			/*margin-top: 1%;*/
+		}
+
+		.gd {
+			color: #fff;
+			width: 20px;
+			font-size: 20px;
+			margin-left: 16px;
+			margin-top: 40%;
+		}
+
+		.tou {
+			width: 27%;
+			height: 37%;
+			/* border-radius: 50%; */
+			position: absolute;
+			left: 50%;
+			margin-left: -13.5%;
+			top: 80%;
+			z-index: 10;
+		}
+	}

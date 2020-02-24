@@ -1,0 +1,232 @@
+﻿@{
+    ViewBag.Title = "AddinAssemblyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script type="text/javascript">
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo)? {} : Ext.decode(langInfo); //自定义
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add', 'edit', 'delete', 'view', 
+                    '->', 'print', 'close'
+                ]
+            });
+
+            //定义模型
+            Ext.define('model', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+						name: 'Phid',
+						type: 'string',//因为页面不支持int64，所以这里做特殊处理
+						mapping: 'Phid'
+					},{
+						name: 'MstPhid',
+						type: 'string',
+						mapping: 'MstPhid'
+					},{
+						name: 'AssemblyName',
+						type: 'string',
+						mapping: 'AssemblyName'
+					},{
+						name: 'ClassName',
+						type: 'string',
+						mapping: 'ClassName'
+					}
+                ]
+            });
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: '../AddinAssembly/GetAddinAssemblyList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                //frame: true,                  
+                stateful: true,
+                stateId: 'nggrid',
+                store: store,
+                buskey: 'Phid', //对应的业务表主键属性               
+                columnLines: true,
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+						header: Lang.Phid || 'Phid',
+						dataIndex: 'Phid',
+						width: 100,
+						sortable: false,
+						hidden: true
+					},{
+						header: Lang.MstPhid || '主表PHID',
+						dataIndex: 'MstPhid',
+						width: 100,
+						sortable: false,
+						hidden: true
+					},{
+						header: Lang.AssemblyName || '程序集名称',
+						dataIndex: 'AssemblyName',
+						width: 100,
+						sortable: false,
+						hidden: false
+					},{
+						header: Lang.ClassName || '插件类名',
+						dataIndex: 'ClassName',
+						width: 100,
+						sortable: false,
+						hidden: false
+					}
+				],
+                bbar: pagingbar
+            });
+
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+				pageid: "Web:AddinAssemblyList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 4 //每行4列               
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, queryPanel, grid]
+            });
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab('[需替换成TAB页名称]-新增', C_ROOT + '[需替换成AreaName]/AddinAssembly/AddinAssemblyEdit?otype=add');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                
+                if (data.length > 0) {
+                    var id = data[0].get('Phid');
+                    $OpenTab('[需替换成TAB页名称]-修改', C_ROOT + '[需替换成AreaName]/AddinAssembly/AddinAssemblyEdit?otype=edit&id=' + id);
+                }
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('Phid') },
+                                url: '@Url.Content("~/AddinAssembly/Delete")',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('Phid');
+                    $OpenTab('[需替换成TAB页名称]-查看', C_ROOT + '[需替换成AreaName]/AddinAssembly/AddinAssemblyEdit?otype=view&id=' + id);
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                alert("print");
+            });
+
+            //编辑窗口保存后回刷列表
+            var frame = $GetWFrame();
+            var listref = Ext.create('Ext.ng.ListRefresher');
+            if (frame) {
+                frame.ListObserver.add('AddinAssemblyList', listref);
+                listref.on('refreshlist', function (data) {
+                    var curtab = window.frameElement.parentContainer; //获取tab页容器
+                    var actfunc = function () {
+                        var jsonStr = "{Phid:" + data.Phid + "}";
+                        Ext.Ajax.request({
+                            params: { 'queryfilter': jsonStr, 'limit': 1 },
+                            url: '@Url.Content("~/[需替换成AreaName]/AddinAssembly/GetAddinAssemblyList")',
+                            async: false, //同步请求
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.Record.length === 1) {
+                                    var index = store.find("Phid", data.Phid);
+                                    if (index >= 0) {
+                                        Ext.apply(store.data.items[index].data, resp.Record[0]);
+                                    } else {
+                                        index = store.getCount();
+                                        store.insert(index, resp.Record[0]);
+                                    }
+                                    ;
+                                    grid.getView().refresh(true);
+                                }
+                            }
+                        });
+                        curtab.un('activate', actfunc);
+                    };
+                    curtab.on('activate', actfunc);
+                });
+            }
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{Phid:" + data[0].get('Phid') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: '@Url.Content("~/[需替换成AreaName]/AddinAssembly/GetAddinAssemblyList")',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+    </script>
+}
+
+

@@ -1,0 +1,1428 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+		var storeYSKM;
+		var storeYSKM2;
+        Ext.onReady(function () {
+			var win;
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+					'add',  'delete', 'edit',
+                    { itemId: "Taskreference", text: "已有任务申报", width: this.itemWidth, iconCls: "icon-New", langkey: "Taskreference" },
+                    '->',  'close'
+                ]
+            });
+			
+			var storeBM = Ext.create('Ext.ng.JsonStore', {
+				//pageSize: 14,
+			fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetBM',
+				autoLoad:false
+			});
+			storeBM.load();
+			storeYSKM = Ext.create('Ext.ng.JsonStore', {
+				pageSize: 25,
+                fields: [{
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+
+                    "name": "KMDM",
+                    "type": "string",
+                    "mapping": "FKmdm"
+                },
+                {
+                    "name": "KMMC",
+                    "type": "string",
+                    "mapping": "Fkmmc"
+                },
+                {
+                    "name": "KMLB",
+                    "type": "int",
+                    "mapping": "FKMLB"
+                },
+                {
+                    "name": "XM",
+                    "type": "string",
+                    "mapping": "FProjName"
+                },
+                {
+                    "name": "TBBM",
+                    "type": "string",
+                    "mapping": "FFillDept_Name"
+                }, 
+                {
+                    "name": "FType",
+                    "type": "string",
+                    "mapping": "FType"
+                },
+                {
+                    "name": "FDwdm",
+                    "type": "string",
+                    "mapping": "FDwdm"
+                },
+                {
+                    "name": "FFillDept",
+                    "type": "string",
+                    "mapping": "FFillDept"
+                },
+                {
+                    "name": "FYear",
+                    "type": "string",
+                    "mapping": "FYear"
+                }
+
+				],
+				//url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsListDYGXdtl',
+				url: C_ROOT + 'GQT/QT/QtBaseProject/GetQtBaseProjectList',
+				autoLoad:false
+			});
+			var pagingbarYSKM = Ext.create('Ext.ng.PagingBar', {
+                store: storeYSKM
+            });
+			gridYSKM = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-68,
+				store: storeYSKM,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					xtype:'rownumberer',
+					header:'行号',
+					width:80
+					
+				}, {		
+				header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '科目编码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMDM',
+					//hidden:true
+					renderer:function(value, parm, record){
+						if(record.get('XM')!=""){
+							return "";
+						}else{
+							return value;
+						}
+					}
+				}, {
+					header: '科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMMC',
+					renderer:function(value, parm, record){
+						if(record.get('XM')!=""){
+							return "";
+						}else{
+							return value;
+						}
+					}
+				}, {
+					header: '科目属性',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMLB',
+					renderer:function(value, parm, record){
+						if(record.get('XM')!=""){
+							return "";
+						}else{
+							if(value=='0')
+							{
+								return "收入";
+							}else if(value=='1'){
+								return "支出";
+							}else{
+								return "";
+							}
+						}
+					}
+				}, {
+					header: '子科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'XM',
+					/*editor: {
+						xtype: "textfield"
+					},*/
+				}, {
+					header: '填报部门',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'TBBM',
+					/*editor: {
+						xtype: "combobox",
+						store:storeBM,
+						editable:false,
+						valueField:'OName',
+						displayField:'OName'
+					}*/
+                }, {
+					header: '申报进度',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FType',
+                    renderer:function(value, parm, record){
+						
+					    if(value=='c')
+					    {
+                            return "年初申报";
+					    }else if(value=='z'){
+						    return "年中新增";
+					    }else{
+						    return "";
+					    }
+						
+					}
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					},
+					
+					
+					/*beforeedit:function(editor,e,eOpts){
+						
+						if(e.record.get('KMDM')!="")
+						{
+							return false;
+						}
+						//alert(e.rowIdx);
+						//return false;
+					}*/
+
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				},*/
+				plugins:[
+					/*Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false
+					})*/
+				],
+				bbar: [pagingbarYSKM]
+			});
+			
+		 	storeYSKM2 = Ext.create('Ext.ng.JsonStore', {
+				pageSize: 25,
+                fields: [{
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+
+                    "name": "KMDM",
+                    "type": "string",
+                    "mapping": "FKmdm"
+                },
+                {
+                    "name": "KMMC",
+                    "type": "string",
+                    "mapping": "Fkmmc"
+                },
+                {
+                    "name": "KMLB",
+                    "type": "int",
+                    "mapping": "FKMLB"
+                },
+                {
+                    "name": "XM",
+                    "type": "string",
+                    "mapping": "FProjName"
+                },
+                {
+                    "name": "TBBM",
+                    "type": "string",
+                    "mapping": "FFillDept_Name"
+                },
+                {
+                    "name": "FType",
+                    "type": "string",
+                    "mapping": "FType"
+                },
+                {
+                    "name": "FDwdm",
+                    "type": "string",
+                    "mapping": "FDwdm"
+                },
+                {
+                    "name": "FFillDept",
+                    "type": "string",
+                    "mapping": "FFillDept"
+                },
+                {
+                    "name": "FYear",
+                    "type": "string",
+                    "mapping": "FYear"
+                }
+                
+                ],
+				//url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsListDYGXdtl',
+				url: C_ROOT + 'GQT/QT/QtBaseProject/GetQtBaseProjectList',
+				autoLoad:false
+			});
+			var pagingbarYSKM2 = Ext.create('Ext.ng.PagingBar', {
+                store: storeYSKM2
+            });
+			gridYSKM2 = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-68,
+				store: storeYSKM2,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					xtype:'rownumberer',
+					header:'行号',
+					width:80
+					
+				}, {	
+				header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '科目编码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMDM',
+					//hidden:true
+					renderer:function(value, parm, record){
+						if(record.get('XM')!=""){
+							return "";
+						}else{
+							return value;
+						}
+					}
+				}, {
+					header: '科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMMC',
+					renderer:function(value, parm, record){
+						if(record.get('XM')!=""){
+							return "";
+						}else{
+							return value;
+						}
+					}
+				}, {
+					header: '科目属性',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMLB',
+					renderer:function(value, parm, record){
+						if(record.get('XM')!=""){
+							return "";
+						}else{
+							if(value=='0')
+							{
+								return "收入";
+							}else if(value=='1'){
+								return "支出";
+							}else{
+								return "";
+							}
+						}
+					}
+				}, {
+					header: '子科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'XM',
+					/*editor: {
+						xtype: "textfield"
+					},*/
+				}, {
+					header: '填报部门',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'TBBM',
+					/*editor: {
+						xtype: "combobox",
+						store:storeBM,
+						editable:false,
+						valueField:'OName',
+						displayField:'OName'
+					}*/
+                }, {
+					header: '申报进度',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FType',
+                    renderer:function(value, parm, record){
+						
+					    if(value=='c')
+					    {
+                            return "年初申报";
+					    }else if(value=='z'){
+						    return "年中新增";
+					    }else{
+						    return "";
+					    }
+						
+					}
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					},
+					
+					
+					/*beforeedit:function(editor,e,eOpts){
+						
+						if(e.record.get('KMDM')!="")
+						{
+							return false;
+						}
+						//alert(e.rowIdx);
+						//return false;
+					}*/
+
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				},*/
+				plugins:[
+					/*Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false
+					})*/
+				],
+				bbar: [pagingbarYSKM2]
+			});
+			
+
+			
+			
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+					"name": "PhId",
+					"type": "string",
+					"mapping": "PhId"
+				},
+				{
+					"name": "OCode",
+					"type": "string",
+					"mapping": "OCode"
+				},
+				{
+					"name": "OName",
+					"type": "string",
+					"mapping": "OName"
+
+				}],
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+				//url: C_ROOT + 'DMC/Org/Organization/GetOrganizationList',
+				autoLoad:true
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						
+						var params={'Fphid':record.get('PhId'),'FKMLB':'0','FYear':sessionStorage.getItem("FYear")};
+						Ext.apply(storeYSKM.proxy.extraParams,params);
+						storeYSKM.load(function(){
+							
+						});
+						var params2={'Fphid':record.get('PhId'),'FKMLB':'1','FYear':sessionStorage.getItem("FYear")};
+						Ext.apply(storeYSKM2.proxy.extraParams,params2);
+						storeYSKM2.load(function(){
+							
+						});
+						
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				},*/
+			});
+			
+			var tabPanel = Ext.create('Ext.tab.Panel', {
+                layout: 'border',
+                region: 'center',
+                deferredRender: false,
+                plain: true,
+                //activeTab: 0,
+                //minHeight: 400,
+                //minWidth: 600,
+                defaults: { bodyStyle: 'padding:3px' },
+                items: [
+				{
+					title:'收入类科目',
+					items:[gridYSKM]
+				},
+				{
+					title:'支出类科目',
+					items:[gridYSKM2]
+				}
+				]
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridOrg],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[tabPanel],
+				
+				}]
+			});
+			
+			var storeTaskreference = Ext.create('Ext.ng.JsonStore', {
+				pageSize: 25,
+                fields: [{
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+
+                    "name": "KMDM",
+                    "type": "string",
+                    "mapping": "FKmdm"
+                },
+                {
+                    "name": "KMMC",
+                    "type": "string",
+                    "mapping": "Fkmmc"
+                },
+                {
+                    "name": "KMLB",
+                    "type": "int",
+                    "mapping": "FKMLB"
+                },
+                {
+                    "name": "XM",
+                    "type": "string",
+                    "mapping": "FProjName"
+                },
+                {
+                    "name": "TBBM",
+                    "type": "string",
+                    "mapping": "FFillDept_Name"
+                }, 
+                {
+                    "name": "FType",
+                    "type": "string",
+                    "mapping": "FType"
+                },
+                {
+                    "name": "FDwdm",
+                    "type": "string",
+                    "mapping": "FDwdm"
+                },
+                {
+                    "name": "FFillDept",
+                    "type": "string",
+                    "mapping": "FFillDept"
+                },
+                {
+                    "name": "FYear",
+                    "type": "string",
+                    "mapping": "FYear"
+                }
+
+				],
+				//url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsListDYGXdtl',
+				url: C_ROOT + 'GQT/QT/QtBaseProject/GetTaskreferenceList',
+				autoLoad:false
+			});
+			var pagingbarTaskreference = Ext.create('Ext.ng.PagingBar', {
+                store: storeTaskreference
+            });
+			var gridTaskreference = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				//height:document.documentElement.clientHeight-68,
+				store: storeTaskreference,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+                region: 'center',
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					xtype:'rownumberer',
+					header:'行号',
+					width:80
+					
+				}, {		
+				header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '科目编码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMDM',
+					//hidden:true
+					// renderer:function(value, parm, record){
+					// 	if(record.get('XM')!=""){
+					// 		return "";
+					// 	}else{
+					// 		return value;
+					// 	}
+					// }
+				}, {
+					header: '科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMMC',
+					// renderer:function(value, parm, record){
+					// 	if(record.get('XM')!=""){
+					// 		return "";
+					// 	}else{
+					// 		return value;
+					// 	}
+					// }
+				}, {
+					header: '科目属性',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMLB',
+					renderer:function(value, parm, record){
+						// if(record.get('XM')!=""){
+						// 	return "";
+						// }else{
+							if(value=='0')
+							{
+								return "收入";
+							}else if(value=='1'){
+								return "支出";
+							}else{
+								return "";
+							}
+						// }
+					}
+				}, {
+					header: '子科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'XM',
+					/*editor: {
+						xtype: "textfield"
+					},*/
+				}, {
+					header: '填报部门',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'TBBM',
+					/*editor: {
+						xtype: "combobox",
+						store:storeBM,
+						editable:false,
+						valueField:'OName',
+						displayField:'OName'
+					}*/
+                }, {
+					header: '申报进度',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FType',
+                    renderer:function(value, parm, record){
+						
+					    if(value=='c')
+					    {
+                            return "年初申报";
+					    }else if(value=='z'){
+						    return "年中新增";
+					    }else{
+						    return "";
+					    }
+						
+					}
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					},
+					
+					
+					/*beforeedit:function(editor,e,eOpts){
+						
+						if(e.record.get('KMDM')!="")
+						{
+							return false;
+						}
+						//alert(e.rowIdx);
+						//return false;
+					}*/
+
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				},*/
+				plugins:[
+					/*Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false
+					})*/
+				],
+				bbar: [pagingbarTaskreference]
+			});
+			storeTaskreference.on('beforeload',function(){
+                Ext.apply(storeTaskreference.proxy.extraParams, {'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FYear':sessionStorage.getItem("FYear")-1});
+            })
+			var Toolbar_Taskreference = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { id: "Taskreference2", text: "引用", width: this.itemWidth, iconCls: "icon-New"}
+                ]
+			});
+			var Win_Taskreference;
+
+
+			var nodeEditWinPanel_Config = {
+                region: 'center',
+                frame: true,
+                split: true,
+                minWidth: 490,
+                buskey: 'PhId', //对应的业务表主键
+                otype: "edit", //操作类型,add||edit,
+                border: 0,
+                id: "EditPanel",
+                //buskey: "PhId",
+                bindtable: "z_QtBaseProject",
+                desTitle: "编辑面板",
+                columnsPerRow: 1,
+                fields: [
+                  {
+                      fieldLabel: "项目名称",
+                      itemId: "FProjName",
+                      name: "FProjName",
+                      maxLength: 100,
+                      langKey: "FProjName",
+                      xtype: "ngText"
+                  },
+                  {
+                      fieldLabel: "填报部门",
+                      itemId: "FFillDept",
+                      name: "FFillDept",
+                      maxLength: 250,
+                      langKey: "FFillDept",
+                      xtype: "combo",
+					  store:storeBM,
+					  valueField:'OName',
+					  displayField:'OName',
+					  editable:false
+                  },
+                  
+                ]
+
+            };
+			
+			//定义窗口
+            Ext.define("Ext.ng.gh.baseWindow", {
+                extend: 'Ext.window.Window',
+                cancelback: Ext.emptyFn,
+                closeAction: 'close',
+                initComponent: function () {
+                    var me = this;
+                    me.callParent();
+                    me.on("close", Ext.bind(function (p, opts) {
+                        me.invokeCancelback();
+                    }, me));
+                },
+                invokeCancelback: function () {
+                    var me = this;
+                    //if (otype == $Otype.EDIT || otype == $Otype.ADD) {
+                    //    saveSubjectMstAmount(GHSubjectMstBudgetDtl_store);
+                    //}
+                    //GHSubjectMstBudgetDtl_store.clearFilter();
+                    if (!Ext.isEmpty(me.cancelback)) {
+                        me.cancelback();
+                    }
+                }
+            });
+			
+            //新增
+            ngToolbar.get('add').on('click', function () {
+				var data;
+				if(tabPanel.activeTab.title=='收入类科目'){
+					data = gridYSKM.getSelectionModel().getSelection();
+				}else{
+					data = gridYSKM2.getSelectionModel().getSelection();
+                }
+                if (data.length > 0) {
+                    Ext.Ajax.request({
+                        params: { 'FKmdm': data[0].get('KMDM') },
+                        url: C_ROOT + 'GQT/QT/QtBaseProject/JudgeIfEnd',
+                        async: false,
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                var params = { 'OrgId': gridOrg.getSelectionModel().getSelection()[0].get('PhId') };
+                                Ext.apply(storeBM.proxy.extraParams, params);
+                                storeBM.load(function () {
+
+                                });
+
+                                var nodeEditWinPanel = Ext.create('Ext.ng.TableLayoutForm', nodeEditWinPanel_Config);
+                                win = Ext.create('Ext.window.Window', {
+                                    title: '新增项目',
+                                    height: 200,
+                                    width: 450,
+                                    modal: true,
+                                    //closable:true,
+                                    //closeAction:'hide',
+                                    items: [
+                                        nodeEditWinPanel
+                                    ],
+                                    buttons: [
+                                        {
+                                            xtype: "button",
+                                            text: "确认",
+                                            handler: function () {
+                                                if (nodeEditWinPanel.queryById("FProjName").value == "") {
+                                                    Ext.MessageBox.alert('提示', "项目名称不能为空！");
+                                                    return;
+                                                }
+                                                if (nodeEditWinPanel.queryById("FFillDept").value == null) {
+                                                    Ext.MessageBox.alert('提示', "请选择填报部门！");
+                                                    return;
+                                                }
+
+                                                var nodeEditWinPanellvf = nodeEditWinPanel.isValid();
+                                                if (!nodeEditWinPanellvf) {
+                                                    return;
+                                                }
+                                                //var formData = nodeEditWinPanel.getFormData();
+                                                var Fphid = gridOrg.getSelectionModel().getSelection()[0].get('PhId');
+                                                var FDwdm = gridOrg.getSelectionModel().getSelection()[0].get('OCode');
+                                                var FDwmc = gridOrg.getSelectionModel().getSelection()[0].get('OName');
+                                                var FKmdm = data[0].get('KMDM');
+                                                var Fkmmc = data[0].get('KMMC');
+                                                var FKMLB = data[0].get('KMLB');
+                                                var FProjName = nodeEditWinPanel.queryById("FProjName").value;
+                                                var FFillDept_Name = nodeEditWinPanel.queryById("FFillDept").value;
+                                                var BMIndex = findStoreIndex(storeBM, "OName", FFillDept_Name);
+                                                if (BMIndex >= 0) {
+                                                    var FFillDept = storeBM.getAt(BMIndex).get('OCode');
+                                                } else {
+                                                    var FFillDept = "";
+                                                }
+
+                                                var FProcessStatus = ""; //预算申报进度
+
+                                                Ext.Ajax.request({
+                                                    params: { 'oCode': FDwdm, 'deptCode': FFillDept, 'FYear': sessionStorage.getItem("FYear") },
+                                                    url: C_ROOT + 'GYS/YS/BudgetMst/FindBudgetProcessCtrl',
+                                                    async: false,
+                                                    success: function (response) {
+                                                        var resp = Ext.JSON.decode(response.responseText);
+                                                        if (resp.Status === "success") {
+                                                            FProcessStatus = resp.Msg;
+
+                                                        }
+                                                    }
+                                                });
+
+                                                if (FProcessStatus != "1" && FProcessStatus != "3") {
+                                                    Ext.MessageBox.alert('提示', "当前部门不能指派任务！");
+                                                    return null;
+                                                }
+                                                if (FProcessStatus == '1') {
+                                                    var FType = 'c';
+                                                } else if (FProcessStatus == '3') {
+                                                    var FType = 'z';
+                                                }
+
+                                                var qtbaseprojectformData = { 'Fphid': Fphid, 'FKmdm': FKmdm, 'Fkmmc': Fkmmc, 'FKMLB': FKMLB, 'FProjName': FProjName, 'FFillDept': FFillDept, 'FFillDept_Name': FFillDept_Name, 'FDwdm': FDwdm, 'FDwmc': FDwmc, 'FType': FType,'FYear':sessionStorage.getItem("FYear") };
+                                                var subjectMstformData = { 'FDeclarationUnit': FDwdm, 'FDeclarationUnit_EXName': FDwmc, 'FSubjectCode': FKmdm, 'FSubjectName': Fkmmc, 'FFillDept': FFillDept, 'FKMLB': FKMLB,'FYear':sessionStorage.getItem("FYear") };
+                                                Ext.Ajax.request({
+                                                    params: { 'qtbaseprojectformData': qtbaseprojectformData, 'subjectMstformData': subjectMstformData },
+                                                    url: C_ROOT + 'GQT/QT/QtBaseProject/Save',
+                                                    success: function (response) {
+                                                        var resp = Ext.JSON.decode(response.responseText);
+                                                        if (resp.Status === "success") {
+                                                            Ext.MessageBox.alert('设置成功', "设置成功！");
+
+
+                                                            var params = { 'Fphid': Fphid, 'FKMLB': '0' ,'FYear':sessionStorage.getItem("FYear")};
+                                                            Ext.apply(storeYSKM.proxy.extraParams, params);
+                                                            storeYSKM.load(function () {
+
+                                                            });
+                                                            var params2 = { 'Fphid': Fphid, 'FKMLB': '1' ,'FYear':sessionStorage.getItem("FYear")};
+                                                            Ext.apply(storeYSKM2.proxy.extraParams, params2);
+                                                            storeYSKM2.load(function () {
+
+                                                            });
+
+                                                            win.close();
+                                                        } else {
+                                                            Ext.MessageBox.alert('设置失败', resp.Msg);
+                                                            win.close();
+                                                        }
+                                                    }
+                                                });
+
+                                            }
+                                        },
+                                        {
+                                            xtype: "button",
+                                            text: "取消",
+                                            handler: function () {
+                                                win.close();
+                                            }
+                                        }
+                                    ]
+
+                                });
+                                win.show();
+                            } else {
+                                Ext.MessageBox.alert('提示', resp.Msg);
+                                return;
+                            }
+                        }
+                    });
+                    
+					
+					
+				
+				
+					
+				}else{
+					Ext.MessageBox.alert('提示', "请选择科目！");
+				}
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+				var data;
+				if(tabPanel.activeTab.title=='收入类科目'){
+					data = gridYSKM.getSelectionModel().getSelection();
+				}else{
+					data = gridYSKM2.getSelectionModel().getSelection();
+				}
+                if (data.length > 0) {
+					if(data[0].get('XM')!="")
+					{
+						//recoderefresh(data);
+					
+						Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+						function callBack(callBackid) {
+							if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+								return;
+							} else {
+								Ext.Ajax.request({
+									params: { 'id': data[0].get('PhId')},
+									url: C_ROOT + 'GQT/QT/QtBaseProject/JudgeHaveDtl',
+									success: function (response) {
+										var resp = Ext.JSON.decode(response.responseText);
+										if (resp.Status === "success") {
+											Ext.Ajax.request({
+												params: { 'id': data[0].get('PhId') },
+												url: C_ROOT + 'GQT/QT/QtBaseProject/Delete',
+												success: function (response) {
+													var resp = Ext.JSON.decode(response.responseText);
+													if (resp.Status === "success") {
+
+														Ext.Array.each(data, function (record) {
+															if(tabPanel.activeTab.title=='收入类科目'){
+																storeYSKM.remove(record); //前端删除
+															}else{
+																storeYSKM2.remove(record); //前端删除
+															}
+														});
+
+														Ext.MessageBox.alert('提示', '删除成功！');
+														
+														var params={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'0','FYear':sessionStorage.getItem("FYear")};
+														Ext.apply(storeYSKM.proxy.extraParams,params);
+														storeYSKM.load(function(){
+															
+														});
+														var params2={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'1','FYear':sessionStorage.getItem("FYear")};
+														Ext.apply(storeYSKM2.proxy.extraParams,params2);
+														storeYSKM2.load(function(){
+															
+														});
+													} else {
+														Ext.MessageBox.alert('提示', resp.Msg);
+													}
+												}
+											});
+											
+										} else {
+											//Ext.MessageBox.alert('提示', resp.Msg);
+											Ext.MessageBox.confirm('提示', resp.Msg, callBack2);
+											function callBack2(callBackid) {
+												if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+													return;
+												} else {
+													Ext.Ajax.request({
+														params: {'id': data[0].get('PhId') },
+														url: C_ROOT + 'GQT/QT/QtBaseProject/DeleteIfDtl',
+														success: function (response) {
+															var resp = Ext.JSON.decode(response.responseText);
+															if (resp.Status === "success") {
+
+																Ext.Array.each(data, function (record) {
+																	if(tabPanel.activeTab.title=='收入类科目'){
+																		storeYSKM.remove(record); //前端删除
+																	}else{
+																		storeYSKM2.remove(record); //前端删除
+																	}
+																});
+
+																Ext.MessageBox.alert('提示', '删除成功！');
+																
+																var params={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'0','FYear':sessionStorage.getItem("FYear")};
+																Ext.apply(storeYSKM.proxy.extraParams,params);
+																storeYSKM.load(function(){
+																	
+																});
+																var params2={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'1','FYear':sessionStorage.getItem("FYear")};
+																Ext.apply(storeYSKM2.proxy.extraParams,params2);
+																storeYSKM2.load(function(){
+																	
+																});
+															} else {
+																Ext.MessageBox.alert('提示', resp.Msg);
+															}
+														}
+													});
+												}
+											}
+										}
+									}
+								});
+								
+								
+								
+								/*Ext.Ajax.request({
+									params: { 'id': data[0].get('PhId') },
+									url: C_ROOT + 'GQT/QT/QtBaseProject/Delete',
+									success: function (response) {
+										var resp = Ext.JSON.decode(response.responseText);
+										if (resp.Status === "success") {
+
+											Ext.Array.each(data, function (record) {
+												if(tabPanel.activeTab.title=='收入类科目'){
+													storeYSKM.remove(record); //前端删除
+												}else{
+													storeYSKM2.remove(record); //前端删除
+												}
+											});
+
+											Ext.MessageBox.alert('提示', '删除成功！');
+											
+											var params={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'0'};
+											Ext.apply(storeYSKM.proxy.extraParams,params);
+											storeYSKM.load(function(){
+												
+											});
+											var params2={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'1'};
+											Ext.apply(storeYSKM2.proxy.extraParams,params2);
+											storeYSKM2.load(function(){
+												
+											});
+										} else {
+											Ext.MessageBox.alert('提示', resp.Msg);
+										}
+									}
+								});*/
+							}
+						}
+					}else{
+						Ext.MessageBox.alert('提示', "科目不允许删除！");
+					}
+                }
+            });
+			
+			//修改
+			ngToolbar.get('edit').on('click', function () {
+				var data;
+				if(tabPanel.activeTab.title=='收入类科目'){
+					data = gridYSKM.getSelectionModel().getSelection();
+				}else{
+					data = gridYSKM2.getSelectionModel().getSelection();
+				}
+                
+                if (data.length > 0) {
+                    if (data[0].get('FType')!="") {
+                        var FProcessStatus = ""; //预算申报进度
+
+                        Ext.Ajax.request({
+                            params: { 'oCode': data[0].get('FDwdm'), 'deptCode': data[0].get('FFillDept'), 'FYear': sessionStorage.getItem("FYear") },
+                            url: C_ROOT + 'GYS/YS/BudgetMst/FindBudgetProcessCtrl',
+                            async: false,
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.Status === "success") {
+                                    FProcessStatus = resp.Msg;
+
+                                }
+                            }
+                        });
+                        
+                        if (FProcessStatus == '1') {
+                            var FType = 'c';
+                        } else if (FProcessStatus == '3') {
+                            var FType = 'z';
+                        }
+                        if (data[0].get('FType') != FType) {
+                            Ext.MessageBox.alert('提示', "当前进度不能修改！");
+                            return null;
+                        }
+                    }
+
+					if(data[0].get('XM')!="")
+					{
+						var nodeEditWinPanel = Ext.create('Ext.ng.TableLayoutForm', nodeEditWinPanel_Config);
+						
+						win=Ext.create('Ext.window.Window',{
+							title:'修改项目',
+							height: 200,
+							width:450,
+							modal:true,
+							//closable:true,
+							//closeAction:'hide',
+							items: [
+								nodeEditWinPanel
+							],
+							buttons:[
+							{
+								xtype:"button",
+								text:"确认",
+								handler:function(){
+									if(nodeEditWinPanel.queryById("FProjName").value==""){
+										Ext.MessageBox.alert('提示', "项目名称不能为空！");
+										return;
+									}
+									if(nodeEditWinPanel.queryById("FFillDept").value==null){
+										Ext.MessageBox.alert('提示', "请选择填报部门！");
+										return;
+                                    }
+                                    var nodeEditWinPanellvf = nodeEditWinPanel.isValid();
+                                    if (!nodeEditWinPanellvf) {
+                                        return;
+                                    }
+									
+									//var formData = nodeEditWinPanel.getFormData();
+									var Fphid=gridOrg.getSelectionModel().getSelection()[0].get('PhId');
+									var PhId=data[0].get('PhId');
+									var FProjName=nodeEditWinPanel.queryById("FProjName").value;
+                                    var FFillDept_Name = nodeEditWinPanel.queryById("FFillDept").value;
+                                    var BMIndex = findStoreIndex(storeBM, "OName", FFillDept_Name);
+									if(BMIndex>=0){
+										var FFillDept=storeBM.getAt(BMIndex).get('OCode');
+									}else{
+										var FFillDept="";
+                                    }
+
+                                    var qtbaseprojectformData = {
+                                        'PhId': PhId, 'FProjName': FProjName, 'FFillDept': FFillDept, 'FFillDept_Name': FFillDept_Name};
+									//var subjectMstformData={'FDeclarationUnit':FDwdm,'FDeclarationUnit_EXName':FDwmc,'FSubjectCode':FKmdm,'FSubjectName':Fkmmc,'FFillDept':FFillDept,'FKMLB':FKMLB};
+									Ext.Ajax.request({
+										params:{'qtbaseprojectformData':qtbaseprojectformData},
+										url: C_ROOT + 'GQT/QT/QtBaseProject/Update',
+										success: function (response) {
+											var resp = Ext.JSON.decode(response.responseText);
+											if (resp.Status === "success"){
+												Ext.MessageBox.alert('设置成功', "设置成功！");
+												
+												
+												var params={'Fphid':Fphid,'FKMLB':'0','FYear':sessionStorage.getItem("FYear")};
+												Ext.apply(storeYSKM.proxy.extraParams,params);
+												storeYSKM.load(function(){
+													
+												});
+												var params2={'Fphid':Fphid,'FKMLB':'1','FYear':sessionStorage.getItem("FYear")};
+												Ext.apply(storeYSKM2.proxy.extraParams,params2);
+												storeYSKM2.load(function(){
+													
+												});
+						
+												win.close();
+											}else{
+												Ext.MessageBox.alert('设置失败', resp.Msg);
+												win.close();
+											}
+										}
+									});
+									
+								}
+							},
+							{
+								xtype:"button",
+								text:"取消",
+								handler:function(){
+									win.close();
+								}
+							}
+							]
+							
+						});
+						nodeEditWinPanel.queryById("FProjName").setValue(data[0].get('XM'));
+						nodeEditWinPanel.queryById("FFillDept").setValue(data[0].get('TBBM'));
+						win.show();
+							
+						
+					}else{
+						Ext.MessageBox.alert('提示', "科目不允许修改！");
+					}
+				}else{
+					Ext.MessageBox.alert('提示', "请选择科目！");
+				}
+			});
+			//已有任务申报
+			ngToolbar.get('Taskreference').on('click', function () {
+				var Org=gridOrg.getSelectionModel().getSelection();
+				if(Org.length>0){
+					var Fphid = gridOrg.getSelectionModel().getSelection()[0].get('PhId');
+					var params={'Fphid':Fphid,'FYear':sessionStorage.getItem("FYear")-1};
+					Ext.apply(storeTaskreference.proxy.extraParams,params);
+					storeTaskreference.load(function(){
+
+					})
+					Win_Taskreference = Ext.create("Ext.ng.gh.baseWindow", {
+						title: '任务引用',
+						modal: true,
+						height: 450,
+						width: 1000,
+						layout: 'border',
+						items: [
+							Toolbar_Taskreference,
+							gridTaskreference
+						]
+					});
+					Win_Taskreference.show();
+				}else{
+					Ext.MessageBox.alert('提示', '请先选择组织！');
+				}
+			})
+			Toolbar_Taskreference.get('Taskreference2').on('click', function () {
+				var data=gridTaskreference.getSelectionModel().getSelection();
+				if(data.length>0){
+					Toolbar_Taskreference.get("Taskreference2").disable();//禁用保存按钮
+					var PhId = data[0].get('PhId');
+					Ext.Ajax.request({
+						params:{'PhId':PhId,'FYear':sessionStorage.getItem("FYear")},
+						url: C_ROOT + 'GQT/QT/QtBaseProject/SaveTaskreference',
+						success: function (response) {
+							var resp = Ext.JSON.decode(response.responseText);
+							if (resp.Status === "success"){
+								Ext.MessageBox.alert('提示', '保存成功！');
+								// var params = { 'Fphid': gridOrg.getSelectionModel().getSelection()[0].get('PhId'), 'FKMLB': '0' ,'FYear':sessionStorage.getItem("FYear")};
+								// Ext.apply(storeYSKM.proxy.extraParams, params);
+								// storeYSKM.load(function () {
+
+								// });
+								// var params2 = { 'Fphid': gridOrg.getSelectionModel().getSelection()[0].get('PhId'), 'FKMLB': '1' ,'FYear':sessionStorage.getItem("FYear")};
+								// Ext.apply(storeYSKM2.proxy.extraParams, params2);
+								// storeYSKM2.load(function () {
+
+								// });
+								Toolbar_Taskreference.get("Taskreference2").enable();
+								NG3Refresh();
+							}else{
+								Ext.MessageBox.alert('提示', resp.Msg);
+								Toolbar_Taskreference.get("Taskreference2").enable();
+							}
+						}
+					});
+				}
+			})
+			//增行
+            /*ngToolbar.items.get('addrow').on('click', function () {
+				var data = gridYSKM.getSelectionModel().getSelection();
+				var rowid=gridYSKM.getStore().indexOf(data[0]);
+				
+				if (data.length > 0) {
+					var YSKM = gridYSKM.getSelectionModel();
+					
+					storeYSKM.insert(rowid+1, YSKM);
+					storeYSKM.getAt(rowid+1).set('KMLB', '-1');
+				}
+			})*/
+			
+			//删行
+            /*ngToolbar.items.get('deleterow').on('click', function () {
+				var selection = gridYSKM.getSelectionModel().getSelection();
+				if(selection[0].get('KMDM')==""){
+					storeYSKM.remove(selection);
+				}else{
+					Ext.MessageBox.alert('提示', '科目不能删除！');
+				}
+			})*/
+			
+			//保存
+            //ngToolbar.get('save').on('click', function () {
+				//alert(storeYSKM.getCount());
+                /*ngToolbar.get('save').disable();
+                save();
+                ngToolbar.get('save').setDisabled(false);*/
+				//alert(1);
+            //});
+		});
+		function findStoreIndex(store,name,value){
+			for(var i=0;i<store.getCount();i++){
+				if(store.getAt(i).get(name)==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+		function NG3Refresh() {
+			var params={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'0','FYear':sessionStorage.getItem("FYear")};
+			Ext.apply(storeYSKM.proxy.extraParams,params);
+			storeYSKM.load(function(){
+				
+			});
+			var params2={'Fphid':gridOrg.getSelectionModel().getSelection()[0].get('PhId'),'FKMLB':'1','FYear':sessionStorage.getItem("FYear")};
+			Ext.apply(storeYSKM2.proxy.extraParams,params2);
+			storeYSKM2.load(function(){
+				
+			});
+		}
+
+    </script>
+}
+
+

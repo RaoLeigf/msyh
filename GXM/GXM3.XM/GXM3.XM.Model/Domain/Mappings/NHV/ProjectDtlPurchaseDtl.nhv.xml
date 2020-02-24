@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="ProjectDtlPurchaseDtlModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FDtlCode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+    <property name="FName" >
+      <length min="0" max="500" message ="长度不超过500！"/>
+    </property>
+		<property name="FContent" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FCatalogCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FTypeCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FProcedureCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FMeasUnit" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FSpecification" >
+			<length min="0" max="500" message ="长度不超过500！"/>
+		</property>
+		<property name="FRemark" >
+			<length min="0" max="500" message ="长度不超过500！"/>
+		</property>
+		<property name="FEstimatedPurTime" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+	</class>
+</nhv-mapping>

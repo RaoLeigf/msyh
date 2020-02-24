@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B9241BCB-0F25-49F1-967F-79D6B5DEA32F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP.CustomForm.ClientGen</RootNamespace>
+    <AssemblyName>SUP.CustomForm.ClientGen</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Lib\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Base">
+      <HintPath>..\..\Lib\NG3.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>..\..\Lib\NG3.Data.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Aform\PageAppTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageAppTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageControllerEditTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageControllerEditTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageControllerListTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageControllerListTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\AformEditTemplate.cs" />
+    <Compile Include="Aform\PageHtmlTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageHtmlTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\AformListTemplate.cs" />
+    <Compile Include="Aform\PageModelEditTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageModelEditTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageModelListTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageModelListTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageStoreEditTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageStoreEditTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageStoreListTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageStoreListTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageViewEditTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageViewEditTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Aform\PageViewListTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageViewListTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="CommonConvert.cs" />
+    <Compile Include="Generator.cs" />
+    <Compile Include="PageJsExtTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageJsExtTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PageJsExtTemplateEx.cs" />
+    <Compile Include="PageEditJsTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageEditJsTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PageEditTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageEditTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PageEditJsTemplateEx.cs" />
+    <Compile Include="PageEditTemplateEx.cs" />
+    <Compile Include="PageEditJsWithTabTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageEditJsWithTabTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PageEditJsWithTabTemplateEx.cs" />
+    <Compile Include="PageListJsTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageListJsTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PageListJsTemplateEx.cs" />
+    <Compile Include="PageListTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PageListTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PageListTemplateEx.cs" />
+    <Compile Include="Common.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NG3.Metadata.PBDesignerParse\NG3.Metadata.PBDesignerParse.csproj">
+      <Project>{497dfc12-eb02-45b0-8d8e-2a5f0b84be58}</Project>
+      <Name>NG3.Metadata.PBDesignerParse</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\NG3.Metadata\NG3.Metadata.csproj">
+      <Project>{09b59914-7e10-4aad-8b61-375e819182e0}</Project>
+      <Name>NG3.Metadata</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.CustomForm.DataEntity\SUP.CustomForm.DataEntity.csproj">
+      <Project>{ec67ddde-5f0e-484d-97f8-00c1153e45a4}</Project>
+      <Name>SUP.CustomForm.DataEntity</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.CustomForm.Rule\SUP.CustomForm.Rule.csproj">
+      <Project>{B20D4623-530B-424C-8FBF-F95FFBCE0AB3}</Project>
+      <Name>SUP.CustomForm.Rule</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Aform\PageAppTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageAppTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageControllerEditTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageControllerEditTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageControllerListTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageControllerListTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageHtmlTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageHtmlTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageModelEditTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageModelEditTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageModelListTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageModelListTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageStoreEditTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageStoreEditTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageStoreListTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageStoreListTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageViewEditTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageViewEditTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="Aform\PageViewListTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageViewListTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="PageEditTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageEditTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="PageEditJsWithTabTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageEditJsWithTabTemplate.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PageJsExtTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageJsExtTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="PageEditJsTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageEditJsTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="PageListJsTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageListJsTemplate.cs</LastGenOutput>
+    </Content>
+    <Content Include="PageListTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PageListTemplate.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\bin
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

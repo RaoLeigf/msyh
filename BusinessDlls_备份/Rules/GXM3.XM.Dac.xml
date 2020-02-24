@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Dac</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Dac.ProjectDtlBudgetDtlDac">
+            <summary>
+            ProjectDtlBudgetDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectDtlFundApplDac">
+            <summary>
+            ProjectDtlFundAppl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectDtlImplPlanDac">
+            <summary>
+            ProjectDtlImplPlan数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectDtlPerformTargetDac">
+            <summary>
+            ProjectDtlPerformTarget数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectDtlPurchaseDtlDac">
+            <summary>
+            ProjectDtlPurchaseDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectDtlPurDtl4SOFDac">
+            <summary>
+            ProjectDtlPurDtl4SOF数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectDtlTextContentDac">
+            <summary>
+            ProjectDtlTextContent数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.ProjectMstDac">
+            <summary>
+            ProjectMst数据访问处理类
+            </summary>
+        </member>
+    </members>
+</doc>

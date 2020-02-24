@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "IndividualPropertyList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+      
+      <script type="text/javascript">
+
+          Ext.onReady(function () {
+
+              var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                  region: 'north',
+                  //rightName: "EmpinfoList", //权限名称
+                  ngbuttons: ['edit', 'view', '->', 'close']
+              });
+
+
+              Ext.define('Model', {
+                  extend: 'Ext.data.Model',
+                  fields: [{
+                      name: 'c_code',
+                      type: 'string',
+                      mapping: 'c_code'
+                  }, {
+                      name: 'sys_module',
+                      type: 'string',
+                      mapping: 'sys_module'
+                  }, {
+                      name: 'user_code',
+                      type: 'string',
+                      mapping: 'user_code'
+                  }, {
+                      name: 'doc_title',
+                      type: 'string',
+                      mapping: 'doc_title'
+                  }]
+              });
+              
+              var store = Ext.create('Ext.ng.JsonStore', {
+                  model: 'Model',
+                  pageSize: 20,
+                  //autoLoad: false,
+                  url: '../IndividualProperty/GetBusTypeList'
+              })
+              //store.load();
+
+              var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                  store: store
+              });
+
+              var grid = Ext.create('Ext.ng.GridPanel', {
+                  region: 'center',
+                  //frame: true,                  
+                  width: 200,
+                  stateful: true,
+                  stateId: 'IndividaulPropertyUIList',
+                  store: store,
+                  buskey: 'code', //对应的业务表主键               
+                  columnLines: true,                 
+                  columns: [{
+                      header: '代码',
+                      flex: 1,
+                      sortable: false,
+                      dataIndex: 'c_code',
+                      hidden: true
+                  }, {
+                      header: '模块号',
+                      flex: 1,
+                      sortable: false,
+                      dataIndex: 'sys_module',
+                      isNeedQueryField: true //是否需要查询
+                  }, {
+                      header: '业务代码',
+                      flex: 1,
+                      sortable: false,
+                      isNeedQueryField: true, //是否需要查询
+                      dataIndex: 'user_code'
+                  }, {
+                      header: '业务类型',
+                      flex: 1,
+                      sortable: false,
+                      isNeedQueryField: true, //是否需要查询
+                      dataIndex: 'doc_title'
+                  }],              
+                  bbar: pagingbar
+              });
+
+              var queryPanel = Ext.create('Ext.ng.QueryPanel', {
+                  ///split:true,
+                  grid: grid,
+                  columnsPerRow: 3 //每行3列
+                  //hidden: true
+              });
+
+              //布局
+              var viewport = Ext.create('Ext.container.Viewport', {
+                  id: "viewPort",
+                  layout: 'border',
+                  items: [ngToolbar, queryPanel, grid]
+              });
+
+              //修改
+              ngToolbar.get('edit').on('click', function () {
+
+                  var data = grid.getSelectionModel().getSelection();
+
+                  if (data.length > 0) {
+                      var buscode = data[0].get('user_code');
+                      var bustype = data[0].get('doc_title');
+
+                      $OpenTab('字段设计', '@Url.Content("~/")' + 'SUP/Designer/IndividualPropertyUIEdit?bustype=' + bustype + '&buscode=' + buscode + '&otype=' + $Otype.EDIT);
+                  }
+
+              });
+
+              //修改
+              ngToolbar.get('view').on('click', function () {
+
+                  var data = grid.getSelectionModel().getSelection();
+
+                  if (data.length > 0) {
+                      var buscode = data[0].get('user_code');
+                      var bustype = data[0].get('doc_title');
+
+                      $OpenTab('字段设计', '@Url.Content("~/")' + 'SUP/Designer/IndividualPropertyUIEdit?bustype=' + bustype + '&buscode=' + buscode + '&otype=' + $Otype.VIEW);
+                  }
+
+              });
+
+
+          })
+
+      </script>
+}
+

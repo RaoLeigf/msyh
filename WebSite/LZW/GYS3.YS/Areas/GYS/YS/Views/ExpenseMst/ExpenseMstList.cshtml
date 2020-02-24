@@ -1,0 +1,486 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/ExpenseMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add', 'edit', 'delete', 'view', 
+                    '->', 'print', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "FDeclarationunit",
+    "type": "string",
+    "mapping": "FDeclarationunit"
+  },
+  {
+    "name": "FDeclarationunit_EXName",
+    "type": "string",
+    "mapping": "FDeclarationunit_EXName"
+  },
+  {
+    "name": "FBudgetDept",
+    "type": "string",
+    "mapping": "FBudgetDept"
+  },
+  {
+    "name": "FBudgetDept_EXName",
+    "type": "string",
+    "mapping": "FBudgetDept_EXName"
+  },
+  {
+    "name": "FProjname",
+    "type": "string",
+    "mapping": "FProjname"
+  },
+  {
+    "name": "FApprovestatus",
+    "type": "string",
+    "mapping": "FApprovestatus"
+  },
+  {
+    "name": "FDeclarer",
+    "type": "string",
+    "mapping": "FDeclarer"
+  },
+  {
+    "name": "FDateofdeclaration",
+    "type": "date",
+    "mapping": "FDateofdeclaration"
+  },
+  {
+    "name": "FApprover",
+    "type": "string",
+    "mapping": "FApprover"
+  },
+  {
+    "name": "FApprover_EXName",
+    "type": "string",
+    "mapping": "FApprover_EXName"
+  },
+  {
+    "name": "FApprovedate",
+    "type": "date",
+    "mapping": "FApprovedate"
+  },
+  {
+    "name": "FYear",
+    "type": "string",
+    "mapping": "FYear"
+  },
+  {
+    "name": "FProjcode",
+    "type": "string",
+    "mapping": "FProjcode"
+  },
+  {
+    "name": "FProjAttr",
+    "type": "string",
+    "mapping": "FProjAttr"
+  },
+  {
+    "name": "FDuration",
+    "type": "string",
+    "mapping": "FDuration"
+  },
+  {
+    "name": "FExpenseCategory",
+    "type": "string",
+    "mapping": "FExpenseCategory"
+  },
+  {
+    "name": "FExpenseCategory_EXName",
+    "type": "string",
+    "mapping": "FExpenseCategory_EXName"
+  },
+  {
+    "name": "FProjstatus",
+    "type": "int",
+    "mapping": "FProjstatus"
+  },
+  {
+    "name": "FStartdate",
+    "type": "date",
+    "mapping": "FStartdate"
+  },
+  {
+    "name": "FDeclarationDept",
+    "type": "string",
+    "mapping": "FDeclarationDept"
+  },
+  {
+    "name": "FDeclarationDept_EXName",
+    "type": "string",
+    "mapping": "FDeclarationDept_EXName"
+  },
+  {
+    "name": "FEnddate",
+    "type": "date",
+    "mapping": "FEnddate"
+  },
+  {
+    "name": "FIfperformanceappraisal",
+    "type": "int",
+    "mapping": "FIfperformanceappraisal"
+  },
+  {
+    "name": "FIfKeyEvaluation",
+    "type": "int",
+    "mapping": "FIfKeyEvaluation"
+  },
+  {
+    "name": "FProjAmount",
+    "type": "float",
+    "mapping": "FProjAmount"
+  },
+  {
+    "name": "FType",
+    "type": "string",
+    "mapping": "FType"
+  },
+  {
+    "name": "FBudgetamount",
+    "type": "float",
+    "mapping": "FBudgetamount"
+  },
+  {
+    "name": "FLifeCycle",
+    "type": "int",
+    "mapping": "FLifeCycle"
+  },
+  {
+    "name": "FVerno",
+    "type": "string",
+    "mapping": "FVerno"
+  },
+  {
+    "name": "FPlayamount",
+    "type": "float",
+    "mapping": "FPlayamount"
+  },
+  {
+    "name": "FServiceDept",
+    "type": "string",
+    "mapping": "FServiceDept"
+  },
+  {
+    "name": "FCarryover",
+    "type": "int",
+    "mapping": "FCarryover"
+  },
+  {
+    "name": "FFundStandard",
+    "type": "string",
+    "mapping": "FFundStandard"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'billList');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: 'a22db7be-f482-4e56-9dae-d7e15ae99607',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['billList']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+		    //内嵌查询
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+				pageid: "Web:GHExpenseMstList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 2 //每行2列               
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, queryPanel, grid]
+            });
+
+billList_grid.getColumn('FApprovestatus').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '待上报'; break;
+ case 2: temp = '审批中'; break;
+ case 3: temp = '已审批'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FDateofdeclaration').renderer = function(val){
+ if (val) { 
+     var str = Ext.util.Format.date(val, 'Y-m-d'); 
+     return str; 
+ } else { 
+     return ''; 
+  } 
+};
+
+billList_grid.getColumn('FApprovedate').renderer = function(val){
+ if (val) { 
+     var str = Ext.util.Format.date(val, 'Y-m-d'); 
+     return str; 
+ } else { 
+     return ''; 
+  } 
+};
+
+billList_grid.getColumn('FProjAttr').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '延续项目'; break;
+ case 2: temp = '新增项目'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FDuration').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '一次性项目'; break;
+ case 2: temp = '经常性项目'; break;
+ case 3: temp = '跨年度项目'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FProjstatus').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '单位备选'; break;
+ case 2: temp = '纳入预算'; break;
+ case 3: temp = '项目执行'; break;
+ case 4: temp = '项目调整'; break;
+ case 5: temp = '项目暂停'; break;
+ case 6: temp = '项目终止'; break;
+ case 7: temp = '项目关闭'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FStartdate').renderer = function(val){
+ if (val) { 
+     var str = Ext.util.Format.date(val, 'Y-m-d'); 
+     return str; 
+ } else { 
+     return ''; 
+  } 
+};
+
+billList_grid.getColumn('FEnddate').renderer = function(val){
+ if (val) { 
+     var str = Ext.util.Format.date(val, 'Y-m-d'); 
+     return str; 
+ } else { 
+     return ''; 
+  } 
+};
+
+billList_grid.getColumn('FIfperformanceappraisal').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '是'; break;
+ case 2: temp = '否'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FIfKeyEvaluation').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '是'; break;
+ case 2: temp = '否'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FType').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '年初'; break;
+ case 2: temp = '年中新增'; break;
+ case 3: temp = '专项'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+billList_grid.getColumn('FCarryover').renderer = function(val){
+ var temp; 
+ switch (val) { 
+ case 1: temp = '未结转'; break;
+ case 2: temp = '已结转'; break;
+  default: temp = ''; 
+  }
+  return temp; 
+}
+
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab(pageName + '-新增', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=add');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-修改', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=edit&id=' + id);
+                }
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GYS/YS/ExpenseMst/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        NGMsg.Info('删除成功！');
+                                    } else {
+                                        NGMsg.Info('删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=view&id=' + id);
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

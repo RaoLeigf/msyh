@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    @*<meta name="renderer" content="webkit" />*@
+    <meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge,IE=11,IE=10,IE=9" />
+    <meta name="renderer" content="ie-stand">
+    <meta charset="gb2312" />
+    <title>@ViewBag.Title</title>
+    <script type="text/javascript">
+
+
+        var $PageName = "",
+        C_ROOT = '@ViewBag.Root',
+        C_PATH = '@ViewBag.Path',
+        $user = { id: '@ViewBag.Logid', loginname: '@ViewBag.Logid' },
+        $appinfo = {
+            logid: '@ViewBag.Logid', username: '@ViewBag.UserName', ocode: '@ViewBag.OCode',
+            userID: '@ViewBag.userID', orgID: '@ViewBag.orgID',
+            dbServer: '@ViewBag.DbServerName', uCode: '@ViewBag.UCode'
+        },
+        $sessionid = '@ViewBag.SessionID',
+        SupCanVersion = '@ViewBag.SupCanVersion';
+        FuncName = '@ViewBag.FuncName';
+        Product = '@ViewBag.Product';
+        $ToolbarLang = '@ViewBag.ToolbarLang';
+        var $gridStateInfo = '@ViewBag.GridStateInfo';
+        var $queryPanelInfo = '@ViewBag.QueryPanelInfo';
+        var $toolbarRightInfo = '@ViewBag.ToolbarRightInfo';
+
+    </script>
+    <link href=@Url.Script("~/NG3Resource/extjs/Resources/css/ext-all-neptune.css") rel="stylesheet" type="text/css" id="themestyle" />
+    <link href=@Url.Script("~/NG3Resource/icons/icon.css") rel="stylesheet" type="text/css" />
+    <link href=@Url.Script("~/NG3Resource/css/datetime.css") rel="stylesheet" type="text/css" />
+    <link href=@Url.Theme("~/NG3Resource/css/NG3-neptune") rel="stylesheet" type="text/css" />
+
+    <script src=@Url.Script("~/NG3Resource/extjs/ext-all.js") type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/extjs/locale/ext-lang-zh_CN.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/json2.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/datetime.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/ExtUx.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/NG3APPcommon.js") type="text/javascript" charset="gb2312"></script>
+    <script type="text/javascript">
+        Ext.tip.QuickTipManager.init();
+    </script>
+    @RenderSection("css", false)
+    @RenderSection("script", false)
+</head>
+<body>
+    @RenderBody()
+</body>
+@*@RenderSection("scriptAferBody", false)*@
+</html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="SUP3.Log.Model.Domain" assembly="SUP3.Log.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="LogOtherCfgModel" table="log_other_cfg">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		
+		<property name="CfgKey" column="cfg_key" type="System.String" length="20" not-null="true" />
+		<property name="CfgName" column="cfg_name" type="System.String" length="20" not-null="true" />
+		<property name="CfgValue" column="cfg_value" type="System.String" length="20" not-null="true" />
+	</class>
+</hibernate-mapping>

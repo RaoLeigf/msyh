@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="VCorrespondenceSetting2Model" table="v_qtdygx2_zc">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="DWDM" column="DWDM" type="System.String" not-null="true" />
+		<property name="DYDM" column="DYDM" type="System.String" not-null="true" />
+		<property name="DYLX" column="DYLX" type="System.String" not-null="true" />
+		<property name="Dwmc" column="dwmc" type="System.String" not-null="true" />
+		<property name="Dymc" column="dymc" type="System.String" not-null="true" />
+	</class>
+</hibernate-mapping>

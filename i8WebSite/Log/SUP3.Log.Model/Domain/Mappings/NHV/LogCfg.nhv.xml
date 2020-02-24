@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="SUP3.Log.Model.Domain" assembly="SUP3.Log.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="LogCfgModel">
+		<property name="Phid" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="BizModule" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="LogId" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+	</class>
+</nhv-mapping>

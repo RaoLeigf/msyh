@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding = "GBK"?>
+<CMS>
+  <eb>
+    <pub>
+      <TransCode>QPD</TransCode>
+      <CIS>{{cis}}</CIS>
+      <BankCode>{{bankCode}}</BankCode>
+      <ID>{{id}}</ID>
+      <TranDate></TranDate>
+      <TranTime></TranTime>
+      <fSeqno></fSeqno>
+    </pub>
+    <in>
+      <AccNo>{{accNo}}</AccNo>
+      <AreaCode></AreaCode>
+      <MinAmt>{{minAmt}}</MinAmt>
+      <MaxAmt>{{maxAmt}}</MaxAmt>
+      <BeginTime></BeginTime>
+      <EndTime></EndTime>
+      <NextTag>{{nextTag}}</NextTag>
+      <ReqReserved1></ReqReserved1>
+      <ReqReserved2></ReqReserved2>
+    </in>
+  </eb>
+</CMS>

@@ -1,0 +1,174 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+            is an ideal platform for building RESTful applications on the .NET Framework.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <button id="test">xhj的测试按钮</button>
+    </div>
+    <form enctype="multipart/form-data">
+        <input id="upload_file" name="file" type="file" />
+        <input id="upload_file2" name="file2" type="file" />
+        <input id="upload_file3" name="file3" type="file" />
+        <button id="aa" type="button" onclick="upFile()">提交</button>
+    </form>
+</div>
+<script src="@Url.Content("~/Scripts/jquery-2.1.1.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.md5.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    var appKey = 'D31B7F91-3068-4A49-91EE-F3E13AE5C48C',
+        appSecret = '103CB639-840C-4E4F-8812-220ECE3C4E4D',
+        url = "http://127.0.0.1:8038",
+        reqTimeStamp = Date.parse(new Date());
+    var sign = $.md5((url + reqTimeStamp + appKey + appSecret).toLowerCase());
+    var items = [sign, url, reqTimeStamp, appKey];
+    var configData = [];
+
+    var appinfo = {
+        'DbName': 'NG0006',
+        'OrgId': '488181024000001',
+        'OrgName': '',
+        'OCode': '',
+        'UserId': '488181024000001',
+        'UserKey': '9999',
+        'UserName': '',
+        'TokenKey': '',
+        'AppKey': appKey,
+        'AppSecret': appSecret,
+        'DbServerName': '',
+        'SessionKey': '',
+        'UName': ''
+    };
+
+    $(function () {
+        $("#test").bind('click', function () {
+
+            //var data = {
+            //    Uid: 123,
+            //    OrgCode: "111",
+            //    Year: "2019",
+            //    BType:"001",
+            //    PageIndex: 1,
+            //    PageSize: 20,
+            //};
+
+            var data = {
+                OrgPhid: 488181024000002
+
+            };
+            $.ajax({
+                headers: {
+                    'Accept': "multipart/form-data; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                type: 'get',
+                url: '@Url.Content("~/api/GQT/QtXmDistributeApi/GetQtXmDistributeList")',
+                data: data,
+                datatype: 'json',
+                success: function (data, textstatus) {
+                    console.log(JSON.parse(data));
+                },
+                error: function (xmlhttprequest, textstatus, errorThrown) {
+
+                }
+            });
+        });
+
+        $("#test2").bind('click', function () {
+
+            var info = {
+                'Author': 'xiaowang',
+                'Phone': '13587381870',
+                'Description': '很严峻',
+                'IsFinish': '0',
+            };
+            var data = {
+                uid: '631181115000001',
+                orgid: '547181121000001',
+                infoData: configData
+            };
+
+            $.ajax({
+                headers: {
+                    'Accept': "multipart/form-data; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                type: 'post',
+                url: '@Url.Content("~/api/GCW/SysConfig/PostUpdate")',
+                data: data,
+                datatype: 'json',
+                success: function (data, textstatus) {
+                    alert(data);
+                },
+                error: function (xmlhttprequest, textstatus, errorThrown) {
+
+                }
+            });
+        });
+
+        //$("#test").bind('click', function () {
+
+        //});
+
+    })
+
+    function upFile() {
+
+        var form = new FormData();
+        form.append("file", $("#upload_file")[0].files[0]);
+
+
+        $.ajax({
+            headers: {
+                'Accept': "multipart/form-data; charset=utf-8",
+                'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                'Sign': items
+            },
+            url: '@Url.Content("~/api/GCW/SysOrganize/PostInportTxt")',
+            type: 'post',
+            data: '',
+            processData: false,
+            contentType: false,
+            success: function (data, textstatus) {
+                console.log(data);
+                alert("上传成功");
+            },
+            error: function (xmlhttprequest, textstatus, errorThrown) {
+                alert("服务器未正常响应，请重试");
+            }
+        });
+    }
+</script>

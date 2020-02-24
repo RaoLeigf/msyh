@@ -1,0 +1,330 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    
+    <script type="text/javascript">
+		var checkedId;
+        var clickUserCode;
+        var Now_UserID = '@ViewBag.UserID';
+		var Delete=[];
+        Ext.onReady(function () {
+			
+			
+			
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save',
+                    '->',  'close'
+                ]
+            });
+			
+			var storeIsend = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: true,
+				//pageSize: 200,
+				fields: [{
+"name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+  
+    "name": "ParentOrg",
+    "type": "string",
+    "mapping": "ParentOrg"
+  }],
+				
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/JudgeIsend',
+			});
+			
+			
+			
+			var storeDYGX2 = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 200,
+				fields: [{
+
+  
+    "name": "Dwdm",
+    "type": "string",
+    "mapping": "Dwdm"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "Dydm",
+    "type": "string",
+    "mapping": "Dydm"
+  },
+  {
+    "name": "OrgName",
+    "type": "string",
+    "mapping": "OrgName"
+  },
+  {
+    "name": "Dylx",
+    "type": "string",
+    "mapping": "Dylx"
+	},
+  {
+    "name": "DefStr1",
+    "type": "string",
+    "mapping": "DefStr1"
+  },
+  {
+    "name": "DefStr2",
+    "type": "string",
+    "mapping": "DefStr2"
+  },
+  {
+    "name": "DefStr3",
+    "type": "string",
+    "mapping": "DefStr3"
+	  },
+  {
+    "name": "DefInt1",
+    "type": "string",
+    "mapping": "DefInt1"
+
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetCorrespondenceSettings2ListbyRelation',
+				autoLoad:false 
+
+			});
+			
+			
+			
+
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+  },
+  {
+    "name": "IsEnd",
+    "type": "string",
+    "mapping": "IsEnd"
+				}],
+                //url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/OrgByUser?userid=' + Now_UserID,
+				autoLoad:false
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-38,
+				//height: 390,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+				}, {
+					header: '申报组织',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					align:'center',
+					dataIndex: 'ZZ',
+					renderer:function(value, parm, record){
+						return '<input id="'+record.get('OCode')+'" type="checkbox" />';
+					}
+
+				}],
+				listeners: {
+					
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				/*bodyStyle: {
+					top: '24px !important'
+				},*/
+			});
+			
+			storeOrg.load(function(){
+				var params={'Dylx':'SB'};
+				Ext.apply(storeDYGX2.proxy.extraParams,params);
+				storeDYGX2.load(function(){
+					for(var i=0;i<storeDYGX2.getCount();i++){
+						var OrgDM=storeDYGX2.getAt(i).get('Dwdm');
+						var OrgIndex=findStoreIndex(storeOrg,'OCode',OrgDM);
+						if(OrgIndex>-1){
+							Delete.push(OrgDM);
+							document.getElementById(OrgDM).checked=true;
+						}
+					}
+				
+				})
+			});
+			
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridOrg],
+				
+				}]
+            });
+           
+			//保存
+            ngToolbar.get('save').on('click', function () {
+	
+				var Insert=[];
+				var IsEnd=[];
+				var DeleteData=[];
+				var InsertData=[];
+				for(var i=0;i<storeOrg.getCount();i++)
+				{
+					var OrgCode=storeOrg.getAt(i).get('OCode');
+					var OrgPhid=storeOrg.getAt(i).get('PhId');
+					if(document.getElementById(OrgCode).checked){
+						
+						if(findStoreIndex(storeIsend,'ParentOrg',OrgCode)==-1){
+							IsEnd.push({'PhId':OrgPhid,'OCode':OrgCode,'key':OrgPhid});
+						}	
+						
+						var dataindex=findIndex(Delete,OrgCode);
+						if(dataindex!=-1){
+							Delete.splice(dataindex,1);
+						}else{
+							Insert.push(OrgCode);
+						}
+						
+					}
+				}
+				for(var i=0;i<Delete.length;i++){
+					//var DYGX2Index=storeDYGX2.find('Dwdm',Delete[i]);
+					var DYGX2Index=findStoreIndex(storeDYGX2,'Dwdm',Delete[i]);		
+					if(DYGX2Index>=0)
+					{
+						var DYGX2PhID=storeDYGX2.getAt(DYGX2Index).get('PhId');
+						var DYGX2OrgPhID=storeDYGX2.getAt(DYGX2Index).get('DefStr2');
+						//DeleteData.push(DYGX2PhID);
+						DeleteData.push({'PhId':DYGX2PhID,'Dwdm':Delete[i],'DefStr2':DYGX2OrgPhID,'key':DYGX2PhID});
+					}
+				}
+				
+				for(var i=0;i<Insert.length;i++){
+					//var OrgIndex=storeOrg.find('OCode',Insert[i]);
+					var OrgIndex=findStoreIndex(storeOrg,'OCode',Insert[i]);
+					if(OrgIndex>=0)
+					{
+						var OrgPhId=storeOrg.getAt(OrgIndex).get('PhId');
+						var OrgName=storeOrg.getAt(OrgIndex).get('OName');
+						InsertData.push({'PhId':OrgPhId,'OCode':Insert[i],'OName':OrgName,'key':OrgPhId});
+					}
+				}
+				
+				var myData = {"form":{"key":"PhId","modifiedRow":IsEnd}};
+				var myData1 = {"form":{"key":"PhId","modifiedRow":InsertData}};
+				var myData2 = {"form":{"key":"PhId","modifiedRow":DeleteData}};
+				//return;
+				Ext.Ajax.request({
+						params:{'Models':myData,'InsertData':myData1,'DeleteData':myData2},
+						url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/UpdateIfSBOrg',
+						async:false,
+						success: function (response) {
+							var resp = Ext.JSON.decode(response.responseText);
+							if (resp.Status === "success"){
+								Ext.MessageBox.alert('设置成功', "设置成功！");
+								
+							}else{
+								Ext.MessageBox.alert('设置失败', resp.Msg);
+							}
+							Delete=[];
+							storeOrg.load(function(){
+							var params={'Dylx':'SB'};
+							Ext.apply(storeDYGX2.proxy.extraParams,params);
+							storeDYGX2.load(function(){
+								for(var i=0;i<storeDYGX2.getCount();i++){
+									var OrgDM=storeDYGX2.getAt(i).get('Dwdm');
+									var OrgIndex=findStoreIndex(storeOrg,'OCode',OrgDM);
+									if(OrgIndex>-1){
+										Delete.push(OrgDM);
+										document.getElementById(OrgDM).checked=true;
+									}
+								}
+							
+							})
+						});
+					}
+				});
+				
+				
+				
+            });
+
+        });
+		function findIndex(data,value){
+			for(var i=0;i<data.length;i++){
+				if(data[i]==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+		
+		function findStoreIndex(store,name,value){
+			for(var i=0;i<store.getCount();i++){
+				if(store.getAt(i).get(name)==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+		
+    </script>
+}
+
+

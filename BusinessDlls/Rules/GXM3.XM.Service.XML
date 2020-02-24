@@ -1,0 +1,621 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Service</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Service.ProjectMstService">
+            <summary>
+            ProjectMst服务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectMstFacade">
+            <summary>
+            ProjectMst业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlImplPlanFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlTextContentFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlFundApplFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlBudgetDtlFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlPersonnelFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlPersonNameFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.BudgetMstFacade">
+            <summary>
+            预算
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlPerformTargetFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlPurchaseDtlFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.ProjectDtlPurDtl4SOFFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.ProjectMstService.QtAttachmentFacade">
+            <summary>
+            OrderDetails业务外观处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveProjectMst(GXM3.XM.Model.Domain.ProjectMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="projectMstEntity"></param>
+            <param name="projectDtlImplPlanEntities"></param>
+            <param name="projectDtlTextContentEntities"></param>
+            <param name="projectDtlFundApplEntities"></param>
+            <param name="projectDtlBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveProjectMst(GXM3.XM.Model.Domain.ProjectMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="projectMstEntity"></param>
+            <param name="projectDtlTextContentEntities"></param>
+            <param name="projectDtlPurchaseDtlEntities"></param>
+            <param name="projectDtlPurDtl4SOFEntities"></param>
+            <param name="projectDtlPerformTargetEntities"></param>
+            <param name="projectDtlFundApplEntities"></param>
+            <param name="projectDtlBudgetDtlEntities"></param>
+            <param name="projectDtlImplPlanEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlImplPlanByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlImplPlan明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlTextContentByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlTextContent明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPersonnelByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlPersonnel明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPersonNameByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlPersonName明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlFundApplByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlFundAppl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlBudgetDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlBudgetDtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlBudgetDtlByPhID``1(``0)">
+            <summary>
+            返回对Phid的明细记录
+            </summary>
+            <typeparam name="Int64"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetDataCount(System.Int32,System.Int32,System.Int64,System.String,System.String)">
+            <summary>
+            获取首页页面的 条数
+            </summary>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <param name="ng3_logid">用户主键</param>
+            <param name="usercode">账号</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectMst(System.String)">
+            <summary>
+            通过代码获取ProjectMstModel
+            </summary>
+            <param name="dm">代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindPaymentMethod(System.String)">
+            <summary>
+            ProjectDtlBudgetDtlModel
+            </summary>
+            <param name="dm">代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlBudgetDtlMstByZJDM(System.String)">
+            <summary>
+            通过资金来源代码获取ProjectDtlBudgetDtl明细数据
+            </summary>
+            <param name="ZJDM">资金来源代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.UpdateFProjStatus(System.Int64)">
+            <summary>
+            更改项目状态,项目状态更改成“单位备选”时,删除当前预算，并把对应项目的状态改为“单位备选”
+            </summary>
+            <param name="phid"></param>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.UpdateDtlFBudgetAmount(System.Int64[],System.Decimal[])">
+            <summary>
+            预算根据明细表主键回填预算金额
+            </summary>
+            <param name="phid"></param>
+            <param name="FAmount"></param>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.CreateOrGetMaxProjCode(System.String)">
+            <summary>
+            获取最大项目库编码
+            </summary>
+            <param name="year"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.UpdateBudgetDtlList(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel})">
+            <summary>
+            生成预算时回填明细
+            </summary>
+            <param name="oldxm3BudgetDtl"></param>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPerformTargetByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlPerformTarget明细数据
+            </summary>
+            <typeparam name="TValType"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPurchaseDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ProjectDtlPurchaseDtl明细数据
+            </summary>
+            <typeparam name="TValType"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPurchaseDtlByCatalogCode``1(``0)">
+            <summary>
+            通过采购目录代码获取ProjectDtlPurchaseDtl明细数据
+            </summary>
+            <param name="codes">采购目录代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPurDtl4SOFByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取FindProjectDtlPurDtl4SOF明细数据
+            </summary>
+            <typeparam name="TValType"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPerformTargetByFTargetCode(System.String)">
+            <summary>
+            通过指标代码获取ProjectDtlPerformTarget明细数据
+            </summary>
+            <param name="FTargetCode">指标代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlPurchaseDtlByFTypeCode(System.String)">
+            <summary>
+            通过采购类型代码获取ProjectDtlPurchaseDtl明细数据
+            </summary>
+            <param name="FTypeCode">指标代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.DeleteProjectDtlPurchase(System.Int64)">
+            <summary>
+            删除集中采购明细和资金来源
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindUnvalidPiid(System.String,System.String)">
+            <summary>
+            回撤
+            </summary>
+            <param name="approveCode"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.AddData(System.String[])">
+            <summary>
+            项目同步数据到老G6H
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindQTControlSet(System.String,System.String)">
+            <summary>
+            查找是否有设置功能控制
+            </summary>
+            <param name="BZ"></param>
+            <param name="DWDM"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetDefaultDept(System.Int64)">
+            <summary>
+            操作员默认部门
+            </summary>
+            <param name="userPhid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveModify2(GXM3.XM.Model.Domain.ProjectMstModel,GXM3.XM.Model.Domain.ProjectDtlImplPlanModel,GXM3.XM.Model.Domain.ProjectDtlTextContentModel,GXM3.XM.Model.Domain.ProjectDtlFundApplModel,GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel,GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel,GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel,GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel)">
+            <summary>
+            保存预算单据修改记录
+            </summary>
+            <param name="AfterProjectMst"></param>
+            <param name="projectDtlImpls"></param>
+            <param name="projectDtlTexts"></param>
+            <param name="projectDtlFunds"></param>
+            <param name="projectDtlBudgets"></param>
+            <param name="projectDtlPerforms"></param>
+            <param name="projectDtlPurchases"></param>
+            <param name="projectDtlPurDtl4s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveModify(GXM3.XM.Model.Domain.ProjectMstModel,SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel},SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel},SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel},SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel},SUP.Common.Base.EntityInfo{GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel})">
+            <summary>
+            保存预算单据修改记录
+            </summary>
+            <param name="AfterProjectMst"></param>
+            <param name="projectDtlImpls"></param>
+            <param name="projectDtlTexts"></param>
+            <param name="projectDtlFunds"></param>
+            <param name="projectDtlBudgets"></param>
+            <param name="projectDtlPerforms">暂时未做修改记录的保存</param>
+            <param name="projectDtlPurchases"></param>
+            <param name="projectDtlPurDtl4s"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindIndividualInfo(System.String,System.Int64,System.Decimal,System.String)">
+            <summary>
+            判断当前选则的模本金额跟实际录入金额的大小比较
+            </summary>
+            <param name="busType"></param>
+            <param name="IndividualInfoId"></param>
+            <param name="projAmount"></param>
+            <param name="OrgCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindIndividualInfoById(System.String,System.Int64)">
+            <summary>
+            根据项目id获取符合条件的表单
+            </summary>
+            <param name="busType"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.PostCancetProjectList(System.Collections.Generic.List{System.Int64})">
+            <summary>
+            根据主键集合修改作废状态
+            </summary>
+            <param name="phids">主键集合</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.PostPrintData(System.String[])">
+            <summary>
+            根据主键集合获取打印数据
+            </summary>
+            <param name="phids">主键集合</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetNewProPerformTargets(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel},System.String,System.Int64,System.String)">
+            <summary>
+            获取新的项目绩效集合
+            </summary>
+            <param name="projectDtlPerformTargets">项目带的绩效集合</param>
+            <param name="targetTypeCode">父级节点</param>
+            <param name="orgId">组织id</param>
+            <param name="orgCode">组织code</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetNewProPerformTarget(System.Collections.Generic.IList{GQT3.QT.Model.Domain.PerformEvalTargetTypeModel},GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel,System.String,System.Int32)">
+            <summary>
+            获取新的绩效明细
+            </summary>
+            <param name="performEvalTargetTypes">该组织绩效指标类型集合</param>
+            <param name="projectDtlPerformTarget">单个绩效明细</param>
+            <param name="targetTypeCode">父节点</param>
+            <param name="num">数量</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportSummaryExcelSZ1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            预立项汇总打印(省总)
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportSummaryExcel1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            预立项汇总打印(明细区域的)
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportSummaryExcelSZ2(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            立项汇总打印(省总)
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportSummaryExcel2(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            立项汇总打印(明细区域的)
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportDeclareExcel1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            预立项申报表打印
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportDeclareExcel2(System.Collections.Generic.IList{GXM3.XM.Model.Domain.ProjectMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            立项申报表打印
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportDeclareExcelXZ(System.Collections.Generic.IList{GYS3.YS.Model.Domain.BudgetMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            导出年中新增申报表
+            </summary>
+            <param name="budgetMsts">年中新增集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportDeclareExcelTZ(System.Collections.Generic.IList{GYS3.YS.Model.Domain.BudgetMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            导出年中调整申报表
+            </summary>
+            <param name="budgetMsts">年中新增集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportDeclareExcelTZ2(System.Collections.Generic.IList{GYS3.YS.Model.Domain.BudgetMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            导出年中调整申报表(年中新增与年中调整放在同一个execl)
+            </summary>
+            <param name="budgetMsts">年中新增集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportSummaryExcelXZ(System.Collections.Generic.IList{GYS3.YS.Model.Domain.BudgetMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            年中新增汇总表的（按明细来显示）
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportSummaryExcelTZ(System.Collections.Generic.IList{GYS3.YS.Model.Domain.BudgetMstModel},GQT3.QT.Model.Domain.QtCoverUpForOrgModel,GQT3.QT.Model.Domain.OrganizeModel,GQT3.QT.Model.Domain.User2Model)">
+            <summary>
+            年中调整汇总表的（按明细来显示）(年中新增与年中调整合在一起)
+            </summary>
+            <param name="projectMsts">项目集合</param>
+            <param name="qtCoverUpForOrg">套打格式</param>
+            <param name="organize">组织</param>
+            <param name="user">人员</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetProjStatusName(System.Int32)">
+            <summary>
+            通过项目属性获取项目属性名称
+            </summary>
+            <param name="fProjStatus">项目属性</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetResolutionName(System.String)">
+            <summary>
+            会议决议（0-通过，1-不通过）
+            </summary>
+            <param name="resolutionCode">会议决议编码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetIfPerformance(System.Int32)">
+            <summary>
+            是否绩效评价
+            </summary>
+            <param name="ifPerformance"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetApproveName(System.String)">
+            <summary>
+            根据单据状态获取单据状态名
+            </summary>
+            <param name="approveCode">单据状态</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetProjectZclbName(System.String)">
+            <summary>
+            通过支出类别编码获取支出类别名称
+            </summary>
+            <param name="zclbCode">支出类别编码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.FindProjectDtlBudgetDtl(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            根据字典PHID取字表数据
+            </summary>
+            <param name="dictionary"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetProjectAllDataModels(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectMstModel})">
+            <summary>
+            根据主表数据补充明细数据
+            </summary>
+            <param name="projectMsts">主表数据</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveMSHYBudgetMst(System.Collections.Generic.List{System.Int64})">
+            <summary>
+            根据主键集合生成相应的预算集合
+            </summary>
+            <param name="phids">主键集合</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ModelChange``2(``0)">
+            <summary>
+            model 转换
+            </summary>
+            <typeparam name="T1"></typeparam>
+            <typeparam name="T2"></typeparam>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveMSYHPersonnels(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPersonnelModel},System.Int64)">
+            <summary>
+            保存人员分摊数据
+            </summary>
+            <param name="projectDtlPersonnels">人员分摊数据集合</param>
+            <param name="phid">主键id</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveMSYHTextContent(GXM3.XM.Model.Domain.ProjectDtlTextContentModel)">
+            <summary>
+            保存项目内容信息
+            </summary>
+            <param name="projectDtlTextContent">项目内容信息对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetMSYHTextContent(System.String,System.String,System.Int64)">
+            <summary>
+            根据组织，年份与用户id获取对应的内容信息
+            </summary>
+            <param name="orgCode">组织编码</param>
+            <param name="year">年份</param>
+            <param name="userId">用户id</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetMSYHPersonNames(System.Int64)">
+            <summary>
+            根据单据主键获取维护人员信息
+            </summary>
+            <param name="phid">单据主键</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.SaveMSYHPersonNames(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPersonNameModel},System.Int64)">
+            <summary>
+            保存维护人员集合
+            </summary>
+            <param name="projectDtlPersonNames">人员集合</param>
+            <param name="phid">单据主键</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetProjectDtlTextContents(System.Collections.Generic.List{System.Int64})">
+            <summary>
+            根据单据主键集合获取相应的项目材料集合
+            </summary>
+            <param name="phids">单据主键集合</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.ExportXMData(System.Collections.Generic.List{GQT3.QT.Model.Domain.QtXmDistributeModel})">
+            <summary>
+            根据选中的项目分发数据导出模板
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.PostImportXMData(System.String,System.String)">
+            <summary>
+            模板导入用户数据
+            </summary>
+            <param name="uploadPath"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GXM3.XM.Service.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.Resources.Culture">
+            <summary>
+              使用此强类型资源类，为所有资源查找
+              重写当前线程的 CurrentUICulture 属性。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Service.Resources.InitializeObject">
+            <summary>
+              查找类似 初始化对象失败！ 的本地化字符串。
+            </summary>
+        </member>
+    </members>
+</doc>

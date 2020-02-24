@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_technicalprotocol">
+      <Field Name="id" IsKey="true" />
+      <Field Name="protocolid" />
+      <Field Name="attachment" />
+      <Field Name="attachmentname"/>
+      <Field Name="attachmentsize"/>
+      <Field Name="attachmenturl"/>
+      <Field Name="attrvalid"/>
+      <Field Name="materielformat"/>
+      <Field Name="materielid"/>
+      <Field Name="materielname" />
+      <Field Name="ocode" />
+      <Field Name="protocolmark" />
+      <Field Name="signdate" />
+      <Field Name="supplymaterielid" />
+      <Field Name="supplymaterielname" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where] 
+    </Sql>
+    <Where>
+      <Exp Field="ocode"  Target="AppInfo" Value="LoginId"/>
+    </Where>
+    <Query>
+      <Exp Field="materielid" Target="Client" Value="materielid"></Exp>
+      <Exp Field="materielname" Target="Client" Value="materielname"></Exp>
+      <Exp Field="materielformat" Target="Client" Value="materielformat"></Exp>
+    </Query>
+  </Read>
+  <Record>
+    
+  </Record>
+  <Create>
+    
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+   
+  </Destroy>
+</DataService>

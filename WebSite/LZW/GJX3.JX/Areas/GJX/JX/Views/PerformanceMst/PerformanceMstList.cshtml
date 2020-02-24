@@ -1,0 +1,509 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GJX/JX/PerformanceMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store,projectid;//Grid数据源
+
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: 'PerformanceMstList', //权限名称   'add', 'edit', 'delete', 'view', 
+                ngbuttons: [
+                    '->', 'print', 'close'
+                ]
+            });
+
+			var fields = [
+              {
+                "name": "FProjName",
+                "type": "string",
+                "mapping": "FProjName"
+              },
+              {
+                "name": "FProjAmount",
+                "type": "string",
+                "mapping": "FProjAmount"
+              },
+              {
+                "name": "FEvaluationDate",
+                "type": "string",
+                "mapping": "FEvaluationDate"
+              },
+              {
+                "name": "FEvaluationScore",
+                "type": "string",
+                "mapping": "FEvaluationScore"
+              },
+              {
+                "name": "FEvaluationResult",
+                "type": "string",
+                "mapping": "FEvaluationResult"
+              },
+              {
+                "name": "FAuditStatus",
+                "type": "string",
+                "mapping": "FAuditStatus"
+              },
+              {
+                "name": "FDeclarationUnit",
+                "type": "string",
+                "mapping": "FDeclarationUnit"
+                },
+                {
+                    "name": "FDeclarationUnit_EXName",
+                    "type": "string",
+                    "mapping": "FDeclarationUnit_EXName"
+                },
+              {
+                "name": "FDeclarationDept",
+                "type": "string",
+                "mapping": "FDeclarationDept"
+                },
+                {
+                    "name": "FDeclarationDept_EXName",
+                    "type": "string",
+                    "mapping": "FDeclarationDept_EXName"
+                },
+              {
+                "name": "FExploitingEntity",
+                "type": "string",
+                "mapping": "FExploitingEntity"
+              },
+              {
+                "name": "PhId",
+                "type": "string",
+                "mapping": "PhId"
+              },
+              {
+                "name": "YSMstPhId",
+                "type": "string",
+                "mapping": "YSMstPhId"
+              },
+              {
+                "name": "NgRecordVer",
+                "type": "int",
+                "mapping": "NgRecordVer"
+              },{
+                    "name": 'FBudgetDept',
+                    "type": 'System.String',
+                    "mapping": 'FBudgetDept'
+              }, {
+                    "name": 'FBudgetDept_EXName',
+                    "type": 'System.String',
+                    "mapping": 'FBudgetDept_EXName'
+              }
+            ];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'jxGridPanel');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+           store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',  
+                //layout: 'fit',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '338f8351-de80-4052-9fd0-481f2414061e',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				//layout: {
+				//	type: 'hbox',
+				//	align: 'stretch'
+				//},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+                },
+                scroll:'horizontal',
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['jxGridPanel']);
+            var grid = Ext.create('Ext.ng.GridPanel', gridConfig);
+
+
+            //预算项目列表
+            Ext.define('groupgridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'PhId',
+                        type: 'System.Int64',
+                        mapping: 'PhId'
+                    }, {
+                        name: 'FProjName',
+                        type: 'System.String',
+                        mapping: 'FProjName'
+                    },{
+                        name: 'FIfKeyEvaluation',
+                        type: 'System.Int32',
+                        mapping: 'FIfKeyEvaluation'
+                    }, {
+                        name: 'FDeclarationUnit',
+                        type: 'System.String',
+                        mapping: 'FDeclarationUnit'
+                    }, {
+                        name: 'FDeclarationUnit_EXName',
+                        type: 'System.String',
+                        mapping: 'FDeclarationUnit_EXName'
+                    }, {
+                        name: 'FBudgetDept',
+                        type: 'System.String',
+                        mapping: 'FBudgetDept'
+                    }, {
+                        name: 'FBudgetDept_EXName',
+                        type: 'System.String',
+                        mapping: 'FBudgetDept_EXName'
+                    }
+                ]
+            });
+
+            var groupGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'groupgridmodel',
+                autoLoad: false,
+                url: C_ROOT + 'GJX/JX/PerformanceMst/GetBudgetMstList?userId=' + $appinfo.logid
+            });
+
+            var grouppagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: groupGridStore
+            });
+
+            var groupGrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                stateful: true,
+                stateId: 'nggrid',
+                store: groupGridStore,
+                buskey: 'PhId',
+                border: true,
+                columnLines: true,
+                //plugins: [groupCellEditing],
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+                    {
+                        header: '主键',
+                        dataIndex: 'PhId',
+                        width: 100,
+                        sortable: false,
+                        hidden: true
+                    }, {
+                        header: '申报单位',
+                        dataIndex: 'FDeclarationUnit_EXName',
+                        width: 100,
+                        sortable: false
+                    }, {
+                        header: '预算部门',
+                        dataIndex: 'FBudgetDept',
+                        width: 100,
+                        sortable: false,
+                        hidden: true
+                    }, {
+                        header: '预算部门',
+                        dataIndex: 'FBudgetDept_EXName',
+                        width: 100,
+                        sortable: false
+                    },{
+                        header: '项目名称',
+                        dataIndex: 'FProjName',
+                        width: 200,
+                        sortable: false
+                    }, {
+                        header: '重点评价',
+                        dataIndex: 'FIfKeyEvaluation',
+                        width: 100,
+                        sortable: false,
+                        renderer: function (value) {
+                            if (value === 1) {
+                                return "是";
+                            } else {
+                                return "否";
+                            }
+                        }
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected[0] != undefined && selected[0].data != undefined) {
+                            var phid = selected[0].data.PhId;
+
+                            //刷新绩效grid
+                            var storegrid = grid.getStore();
+                            var paramsA = { 'ysmstphid': phid }
+
+                            projectid = phid;
+
+                            Ext.apply(storegrid.proxy.extraParams, paramsA);
+                            storegrid.load();
+
+                            //console.log(selected);
+                        }
+                    }
+                },
+                bbar: grouppagingbar
+            });
+
+
+		    //内嵌查询
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                hidePanel: true,
+                pageid: "Web:GHPerformanceMstList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 3 //每行3列               
+            });
+
+            //按当前操作员过滤申报单位
+            queryPanel.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID }); 
+
+
+            //按当前申报单位过滤预算部门、支出类别
+            queryPanel.queryById("FDeclarationUnit").on("helpselected", function (obj) {
+                var unitCode = obj.code;
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                } else {
+                    filter = "(Z_QTDYGX2.DEF_STR1='" + $appinfo.uCode + "' )";
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                }
+
+            });
+
+
+            //工具栏
+            var ngGridToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: 'PerformanceMstList', //权限名称
+                ngbuttons: [
+                   'add', 'edit', 'delete', 'view'
+                ]
+            });
+
+
+            var groupPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                border: false,
+                layout: 'border',
+                items: [
+                    {
+                        region: 'west',
+                        layout: 'border',
+                        width: '30%',
+                        border: false,
+                        items: [groupGrid]
+                    },
+                    {
+                        region: 'center',
+                        layout: 'border',
+                        margin: '0 0 0 20',
+                        width: '65%',
+                        border: false,
+                        items: [ngGridToolbar,grid]
+                    }
+                ]
+            });
+
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar,queryPanel, groupPanel]
+            });
+
+            //加载预算项目数据
+            groupGridStore.load(function () {
+                if (groupGridStore.getCount() > 0) {
+                    groupGrid.getSelectionModel().select(0, true);//默认选中第一行
+                } else {
+                    var paramsA = { 'ysmstphid': '0' };
+                    Ext.apply(store.proxy.extraParams, paramsA);
+                    store.load();
+                }
+            });
+
+            //新增
+            ngGridToolbar.get('add').on('click', function () {
+
+                var projectdata = groupGrid.getSelectionModel().getSelection();
+
+                if (projectdata.length > 0) {
+                    var id = projectdata[0].get('PhId');
+                    $OpenTab(pageName + '-新增', C_ROOT + 'GJX/JX/PerformanceMst/PerformanceMstEdit?otype=add&ysmstphid=' + id);
+                } else {
+                    Ext.MessageBox.alert("提示", "请先选择预算项目！");
+                }
+            });
+
+            //修改
+            ngGridToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-修改', C_ROOT + 'GJX/JX/PerformanceMst/PerformanceMstEdit?otype=edit&ysmstphid=' + projectid + '&id=' + id);
+                }
+            });
+
+			//删除
+            ngGridToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GJX/JX/PerformanceMst/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        NGMsg.Info('删除成功！');
+                                    } else {
+                                        NGMsg.Info('删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngGridToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GJX/JX/PerformanceMst/PerformanceMstEdit?otype=view&id=' + id);
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				//$Print("PrintTest1", grid, "列表");
+            });
+
+
+            //通用帮助设置条件
+            //按当前操作员过滤申报单位
+            queryPanel.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID });
+
+            //按当前申报单位过滤预算部门、支出类别
+            queryPanel.queryById("FDeclarationUnit").on("helpselected", function (obj) {
+                var unitCode = obj.code;
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                } else {
+                    filter = "(Z_QTDYGX2.DEF_STR1='" + $appinfo.uCode + "' )";
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                } 
+
+            });
+
+            queryPanel.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+                var unitCode = queryPanel.queryById("FDeclarationUnit").getValue();
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                }
+                else {
+                    Ext.MessageBox.alert('请先选择申报单位');
+                    return false;
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                } 
+
+            });
+
+			//刷新列表中想修改或删除的行数据
+            function recoderefresh(data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: C_ROOT + 'GJX/JX/PerformanceMst/GetPerformanceMstList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+        function NG3Refresh(object) {
+
+            //var storegrid = grid.getStore();
+            Ext.apply(store.proxy.extraParams, { 'ysmstphid': projectid });
+            store.load();
+        }
+
+    </script>
+}
+
+

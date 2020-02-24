@@ -1,0 +1,1109 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <style type="text/css">
+        .x-grid-row td, .x-grid-summary-row td {
+            height: 25px;
+        }
+    </style>
+
+    <script>
+
+        var otype = Ext.htmlDecode('@ViewBag.OType');
+        var phid = Ext.htmlDecode('@ViewBag.Phid');
+        var overtime = Ext.htmlDecode('@ViewBag.OverTime');
+        var ucode;
+        var startDate = null;
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                otype: otype,
+                ngbuttons: ['save', 'addrow', 'deleterow', '->', 'close']
+            });
+
+            var ucodeStore = Ext.create('Ext.data.Store', {
+                fields: ['code', 'name'],
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/SysMaintainCall/GetUcodeList',
+                    reader: {
+                        type: 'json',
+                        root: 'items'
+                    }
+                },
+                autoLoad: false
+            });
+
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                buskey: 'phid', //对应的业务表主键
+                otype: otype,
+                columnsPerRow: 4,
+                isBuildByRows: true,
+                fieldDefaults: {
+                    labelWidth: 110,
+                    margin: '3 10 3 0',
+                    anchor: '100%',
+                    msgTarget: 'side'
+                },
+                fieldRows: [
+                    [{
+                        xtype: 'ngText',
+                        fieldLabel: '标题:',
+                        itemId: 'title',
+                        colspan: 2,
+                        maxLength: 200
+                    },
+                    {
+                        xtype: 'ngComboBox',
+                        fieldLabel: '系统维护开始:',
+                        itemId: 'starttime',
+                        valueField: "code",
+                        displayField: 'name',
+                        queryMode: 'local',   //local指定为本地数据  如果是后台传输  值为remote
+                        data: [
+                            { "code": '5', "name": '5分钟后' },
+                            { "code": '10', "name": '10分钟后' },
+                            { "code": '15', "name": '15分钟后' },
+                            { "code": '20', "name": '20分钟后' },
+                            { "code": '25', "name": '25分钟后' },
+                            { "code": '30', "name": '30分钟后' }
+                        ],
+                        value: '5',
+                        colspan: 1,
+                        listeners: {
+                            change: function (combobox, value) {
+                                mstform.queryById('infopreview').setValue('系统将于' + mstform.queryById('starttime').rawValue + '开始维护，预计维护结束时间为'
+                                    + mstform.queryById('preenddate').getValue() + '。' + mstform.queryById('runinfo').getValue());
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngDateTime',
+                        fieldLabel: '预计维护结束时间:',
+                        itemId: 'preenddate',
+                        mustInput: true,
+                        colspan: 1,
+                        listeners: {
+                            change: function (datetime, newValue, oldValue, eOpts) {
+                                var oDate = new Date();
+                                if (otype != 'view' && oDate > new Date(Date.parse(newValue))) {
+                                    Ext.MessageBox.alert('提示', '预计维护结束时间必须大于当前时间!');
+                                    datetime.setValue(oldValue);
+                                } else {
+                                    mstform.queryById('infopreview').setValue('系统将于' + mstform.queryById('starttime').rawValue + '开始维护，预计维护结束时间为'
+                                        + newValue + '。' + mstform.queryById('runinfo').getValue());
+                                }
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngComboBox',
+                        fieldLabel: '维护结束方式:',
+                        itemId: 'endtype',
+                        valueField: "code",
+                        displayField: 'name',
+                        queryMode: 'local',   //local指定为本地数据  如果是后台传输  值为remote
+                        data: [
+                            { "code": '0', "name": '自动结束' },
+                            { "code": '1', "name": '手动结束' }
+                        ],
+                        value: '0',
+                        colspan: 1,
+                        listeners: {
+                            change: function (combobox, newValue, oldValue, eOpts) {
+                                if (newValue == '1') {
+                                    mstform.queryById('enddate').hide();
+                                } else {
+                                    mstform.queryById('enddate').show();
+                                }
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngDateTime',
+                        fieldLabel: '维护结束时间:',
+                        itemId: 'enddate',
+                        labelStyle: 'color:OrangeRed',
+                        colspan: 1,
+                        listeners: {
+                            change: function (datetime, newValue, oldValue, eOpts) {
+                                var oDate = new Date();
+                                if (otype == 'view' && overtime == '1' && startDate != null) {
+                                    if (new Date(Date.parse(startDate)) > new Date(Date.parse(newValue))) {
+                                        Ext.MessageBox.alert('提示', '维护变更时间不能早于维护开始时间!');
+                                        datetime.setValue(oldValue);
+                                        return;
+                                    }
+                                }
+                                if (otype != 'view' && oDate > new Date(Date.parse(newValue))) {
+                                    Ext.MessageBox.alert('提示', '维护结束时间必须大于当前时间!');
+                                    datetime.setValue(oldValue);
+                                }
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngCheckbox',
+                        fieldLabel: '维护完成发送消息自由呼通知:',
+                        labelWidth: 180,
+                        itemId: 'netfreecall',
+                        colspan: 1,
+                        listeners: {
+                            change: function (checkbox, newValue, oldValue, eOpts) {
+                                if (newValue) {
+                                    mstform.queryById('netfreecallucode').show();
+                                } else {
+                                    mstform.queryById('netfreecallucode').hide();
+                                }
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngComboBox',
+                        valueField: "code",
+                        displayField: 'name',
+                        queryMode: 'remote',
+                        store: ucodeStore,
+                        fieldLabel: '发送消息自由呼账套:',
+                        labelWidth: 150,
+                        itemId: 'netfreecallucode',
+                        colspan: 1,
+                        labelStyle: 'color:OrangeRed'
+                    },
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '维护提示信息:',
+                        itemId: 'runinfo',
+                        colspan: 4,
+                        maxLength: 250,
+                        listeners: {
+                            change: function (text, value) {
+                                mstform.queryById('infopreview').setValue('系统将于' + mstform.queryById('starttime').rawValue + '开始维护，预计维护结束时间为'
+                                    + mstform.queryById('preenddate').getValue() + '。' + mstform.queryById('runinfo').getValue());
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '提示信息预览:',
+                        itemId: 'infopreview',
+                        readOnly: true,
+                        colspan: 4
+                    },
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '维护结束提示:',
+                        itemId: 'endinfo',
+                        maxLength: 250,
+                        colspan: 4,
+                        value: '系统维护已完成，可以正常登录使用。'
+                    }
+                    ]
+                ]
+            });
+
+            Ext.define('usergridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'ucode', type: 'string', mapping: 'ucode' },
+                    { name: 'operator', type: 'string', mapping: 'operator' },
+                    { name: 'operator_name', type: 'string', mapping: 'operator_name' },
+                ]
+            });
+
+            var userGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'usergridmodel',
+                autoLoad: false
+            });
+
+            var cellEditing = new Ext.grid.plugin.CellEditing({
+                clicksToEdit: 1
+            });
+            
+            Ext.define('Ext.ng.UserHelp', {
+                extend: 'Ext.form.field.ComboBox',
+                mixins: { base: 'Ext.ng.form.field.Base' },
+                requires: ['Ext.ng.form.field.Base'],
+                alias: ['widget.ngUserHelp'],
+                pageSize: 10,
+                ORMMode: true,
+                selectMode: 'Single', //multiple
+                triggerCls: 'x-form-help-trigger',
+                queryMode: 'remote',
+                triggerAction: 'all', //'query'
+                selectQueryProIndex: 0,
+                isShowing: false,
+                acceptInput: false,//接受用户自由输入的值
+                helpTitle: undefined,//帮助标题
+                maxFlexColumns: 5,
+                minChars: 100, //定义输入最少多少个字符的时候智能搜锁获取数据,设100来禁止智能搜索
+                initComponent: function () {                    
+                    var me = this;
+
+                    this.callParent();
+                    this.mixins.base.initComponent.call(me); //与callParent方法不可调换                   
+
+                    if (Ext.isEmpty(me.helpid) || Ext.isEmpty(me.displayField) || Ext.isEmpty(me.valueField)) return;
+
+                    if (me.listFields && me.listHeadTexts) {
+                        var listheaders = '';
+                        var listfields = '';
+
+                        var heads = me.listHeadTexts.split(','); //列头
+                        var fields = me.listFields.split(','); //所有字段
+
+                        var modelFields = new Array();
+                        for (var i = 0; i < fields.length; i++) {
+                            var tempfield = fields[i].split('.');
+                            var temp;
+                            if (tempfield.length > 1) {
+                                temp = tempfield[1]; //去掉表名
+                            }
+                            else {
+                                temp = fields[i];
+                            }
+
+                            modelFields.push({
+                                name: temp, //fields[i],
+                                type: 'string',
+                                mapping: temp //fields[i]
+                            });
+                        }
+
+                        for (var i = 0; i < heads.length; i++) {
+                            var tempfield = fields[i].split('.');
+                            var temp;
+                            if (tempfield.length > 1) {
+                                temp = tempfield[1]; //去掉表名
+                            }
+                            else {
+                                temp = fields[i];
+                            }
+
+                            listfields += '<td>{' + temp + '}</td>';
+                        }
+
+                        var temp = '<div><table width="100%" style="border-spacing:0px;" ><tpl for="."><tr class="x-boundlist-item">' + listfields + '</tr></tpl></table></div>';
+                        me.tpl = temp;
+                    }
+
+                    var store = Ext.create('Ext.data.Store', {
+                        pageSize: 10,
+                        fields: modelFields,
+                        cachePageData: true,
+                        proxy: {
+                            type: 'ajax',
+                            url: C_ROOT + 'SUP/SysMaintainCall/GetUserList?ucode=' + ucode,
+                            reader: {
+                                type: 'json',
+                                root: 'Record',
+                                totalProperty: 'totalRows'
+                            }
+                        }
+                    });
+
+                    me.bindStore(store);
+
+                    me.addEvents('beforehelpselected'); //定义值被选完的事件
+                    me.addEvents('helpselected'); //定义值被选完的事件
+                    me.addEvents('firstrowloaded');
+                    me.addEvents('beforetriggerclick');
+                    me.addEvents('beforehelpclose');
+
+                    me.on('beforeselect', function (combo, record, index, eOpts) {
+                        me.oldVal = me.getValue();//旧的值
+                    });
+
+                    me.on('expand', function (field, opt) {
+                        //刷新按钮去掉
+                        var autoPagingbar = me.getPicker().pagingToolbar;
+                        autoPagingbar.items.items[10].hide();
+                        autoPagingbar.items.items[9].hide();
+                    });
+
+                    me.on('keydown', function (combo, e, eOpts) {
+                        if (me.isExpanded) {
+                            //回车
+                            if (e.keyCode == Ext.EventObject.ENTER) {
+                                if (me.picker.el.query('.' + me.picker.overItemCls).length > 0) return false;
+                                me.onTriggerClick();
+                            }
+
+                            //翻页
+                            switch (e.keyCode) {
+                                case Ext.EventObject.PAGE_UP:
+                                case Ext.EventObject.LEFT:
+                                    me.getPicker().pagingToolbar.movePrevious();
+                                    return true;
+                                case Ext.EventObject.PAGE_DOWN:
+                                case Ext.EventObject.RIGHT:
+                                    me.getPicker().pagingToolbar.moveNext();
+                                    return true;
+                                case Ext.EventObject.HOME:
+                                    me.getPicker().pagingToolbar.moveFirst();
+                                    return true;
+                                case Ext.EventObject.END:
+                                    me.getPicker().pagingToolbar.moveLast();
+                                    return true;
+                            }
+                        }
+                    });
+                },
+                getValue: function () {
+                    // If the user has not changed the raw field value since a value was selected from the list,
+                    // then return the structured value from the selection. If the raw field value is different
+                    // than what would be displayed due to selection, return that raw value.
+                    var me = this,
+                        picker = me.picker,
+                        rawValue = me.getRawValue(), //current value of text field
+                        value = me.value; //stored value from last selection or setValue() call
+
+                    if (me.getDisplayValue() !== rawValue) {
+                        if (me.acceptInput) {//接受输入值
+                            value = rawValue;//通用帮助选好之后，在后面输入字符再删除，value就会变rawValue
+                            me.value = me.displayTplData = me.valueModels = null;
+                        }
+                        if (picker) {
+                            me.ignoreSelection++;
+                            picker.getSelectionModel().deselectAll();
+                            me.ignoreSelection--;
+                        }
+                    }
+
+                    return value;
+                },
+                onTriggerClick: function (eOption, ignoreBeforeEvent) { //ignoreBeforeEvent为true能手动弹出帮助
+                    if (userGrid.getSelectionModel().getSelection().length > 0) {
+                        var select = userGrid.getSelectionModel().getSelection()[0];
+                        if (select.data.ucode == '') {
+                            Ext.MessageBox.alert('提示', '请先选择账套！');
+                            return
+                        }
+                    }
+
+                    var me = this;
+                    me.selectQueryProIndex = 0;
+                    if (!ignoreBeforeEvent) {//不忽略beforetriggerclick事件
+                        if (!me.fireEvent('beforetriggerclick', me)) return;
+                    }
+                    if (me.isShowing) return;
+
+                    me.isShowing = true;
+                    if (me.readOnly || arguments.length == 3) {
+                        me.isShowing = false;
+                        return; //arguments.length == 3，输入框上点击
+                    }
+
+                    if (Ext.isEmpty(me.helpid)) {
+                        me.isShowing = false;
+                        return;
+                    }
+
+                    //
+                    var title;
+                    var allfield;
+                    var headText;
+                    var ShowHelp;
+                    var queryPropertyItems;
+
+                    ShowHelp = function () {
+                        var queryItems;
+                        var modelFields;
+                        var gridColumns;
+
+                        if (!allfield) {
+                            NGMsg.Error('获取帮助信息失败，请检查数据库通用帮助配置信息是否正确!');
+                            me.isShowing = false;
+                            return;
+                        }
+
+                        var fields = allfield.split(','); //所有字段
+                        var heads = headText.split(','); //列头
+
+                        queryItems = new Array();
+                        for (var i = 0; i < heads.length; i++) {
+                            var tempfield = fields[i].split('.');
+                            var temp = fields[i];
+                            queryItems.push({
+                                xtype: 'textfield',
+                                fieldLabel: heads[i],
+                                name: temp //fields[i]
+                            });
+                        }
+
+                        modelFields = new Array();
+                        for (var i = 0; i < fields.length; i++) {
+                            var tempfield = fields[i].split('.');
+                            var temp;
+                            if (tempfield.length > 1) {
+                                temp = tempfield[1]; //去掉表名
+                            }
+                            else {
+                                temp = fields[i];
+                            }
+                            var ar = temp.split(' ');//取别名
+                            if (ar.length > 1) {
+                                temp = ar[ar.length - 1].trim();
+                            }
+
+                            modelFields.push({
+                                name: temp, //fields[i], //不去掉表名
+                                type: 'string',
+                                mapping: temp
+                            });
+                        }
+
+                        gridColumns = new Array();
+                        for (var i = 0; i < heads.length; i++) {
+                            var tempfield = fields[i].split('.');
+                            var temp;
+                            if (tempfield.length > 1) {
+                                temp = tempfield[1]; //去掉表名
+                            }
+                            else {
+                                temp = fields[i];
+                            }
+                            var ar = temp.split(' ');//取别名
+                            if (ar.length > 1) {
+                                temp = ar[ar.length - 1].trim();
+                            }
+
+                            if (heads.length > me.maxFlexColumns) {
+                                gridColumns.push({
+                                    header: heads[i],
+                                    width: 200,
+                                    dataIndex: temp //fields[i] 去掉表名
+                                });
+                            }
+                            else {
+                                gridColumns.push({
+                                    header: heads[i],
+                                    flex: 1,
+                                    dataIndex: temp //fields[i] 去掉表名
+                                });
+                            }
+                        }
+
+
+                        var toolbar = Ext.create('Ext.Toolbar', {
+                            region: 'north',
+                            border: false,
+                            //split: true,
+                            weight: 20,
+                            height: 36,
+                            minSize: 26,
+                            maxSize: 26,
+                            items: [
+                                {
+                                    xtype: 'textfield',
+                                    itemId: "searchkey",
+                                    width: 200
+                                },
+                                {
+                                    itemId: 'richhelp_query',
+                                    iconCls: 'icon-View'
+                                },
+                                {
+                                    itemId: 'richhelp_refresh',
+                                    iconCls: 'icon-Refresh'
+                                }, '->',
+                                {
+                                    xtype: 'checkboxgroup',
+                                    name: 'hobby',
+                                    items: [
+                                        { boxLabel: '在结果中搜索', width: 100, itemId: 'ch-searchInResult', inputValue: '01' }
+                                    ]
+                                }
+                            ]
+                        });
+
+                        var searcheArr = [];
+                        var searchIndex = {}; //索引
+                        toolbar.queryById('ch-searchInResult').on('change', function (me, nvalue, ovalue, eOpts) {
+                            if (false == nvalue) {
+                                searcheArr.length = 0; //清空条件列表
+                                searchIndex = {}; //清空索引
+                            }
+                        });
+
+                        toolbar.queryById('richhelp_query').on('click', function () {
+                            var searchkey;
+                            var key = toolbar.queryById('searchkey').getValue(); //Ext.getCmp('searchkey').getValue();
+                            if (toolbar.queryById('ch-searchInResult').getValue()) {
+                                if (!searchIndex[key]) {
+                                    searcheArr.push(key);
+                                    searchIndex[key] = key;
+                                }
+
+                                searchkey = searcheArr;
+                            }
+                            else {
+                                searcheArr.length = 0;
+                                searcheArr.push(key);
+                            }
+
+                            Ext.apply(store.proxy.extraParams, { 'searchkey': searcheArr });
+                            store.load();
+                        });
+
+                        toolbar.queryById('richhelp_refresh').on('click', function () {
+                            toolbar.queryById('searchkey').setValue('');
+
+                            if (store.proxy.extraParams.searchkey) {
+                                delete store.proxy.extraParams.searchkey;
+                                store.load();
+                            }
+                        });
+
+                        toolbar.on('afterrender', function () {
+                            toolbar.queryById('searchkey').getEl().on('keypress', function (e, t, eOpts) {
+                                //回车
+                                if (e.keyCode == Ext.EventObject.ENTER) {
+                                    toolbar.queryById('richhelp_query').fireEvent('click');
+                                }
+                            });
+                        });
+
+
+                        var propertyCode = queryPropertyItems[me.selectQueryProIndex].code;
+                        var propertyID = queryPropertyItems[me.selectQueryProIndex].inputValue;
+                        queryPropertyItems[me.selectQueryProIndex].checked = true;
+
+                        Ext.define('model', {
+                            extend: 'Ext.data.Model',
+                            fields: modelFields
+                        });
+
+                        var store = Ext.create('Ext.ng.JsonStore', {
+                            fields: modelFields,
+                            pageSize: 20,
+                            autoLoad: false,
+                            url: C_ROOT + 'SUP/SysMaintainCall/GetUserList?ucode=' + ucode,
+                        });
+
+                        var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                            store: store
+                        });
+
+                        var selModel = Ext.create('Ext.selection.CheckboxModel');
+
+                        var grid = Ext.create('Ext.ng.GridPanel', {
+                            region: 'center',
+                            store: store,
+                            columnLines: true,
+                            columns: gridColumns,
+                            bbar: pagingbar
+                        });
+
+                        var tabItems = [];
+                        tabItems.push({ layout: 'border', title: '列表', id: 'listStyle', items: [grid] });
+
+                        var tabPanel = Ext.create('Ext.tab.Panel', {
+                            layout: 'border',
+                            region: 'center',
+                            deferredRender: false,
+                            plain: true,
+                            activeTab: 0,
+                            tabBar: {
+                                height: 28
+                            },
+                            defaults: { bodyStyle: 'padding:3px' },
+                            items: tabItems
+                        });
+                        
+                        grid.on('itemdblclick', function () {
+                            me.gridDbClick(me, grid, win);
+                        });
+
+                        var winItems = [];
+                        winItems.push(toolbar);
+                        winItems.push(tabPanel);
+
+                        var buttons = [];
+                        buttons.push('->');
+                        buttons.push({ text: '确定', handler: function () { me.btnOk(me, grid, tabPanel, win); } });
+                        buttons.push({ text: '取消', handler: function () { win.close(); } });
+
+                        //显示弹出窗口
+                        var win = Ext.create('Ext.window.Window', {
+                            title: me.helpTitle || title,
+                            border: false,
+                            height: 400, //帮助高度
+                            width: 750, //帮助宽度
+                            draggable: true,
+                            resizable: true,
+                            maximizable: false,
+                            layout: 'border',
+                            y: 100,
+                            modal: true,
+                            //constrain: true,
+                            constrainHeader: true,
+                            items: winItems,
+                            buttons: buttons,
+                            listeners: {
+                                beforeshow: $winBeforeShow,
+                                beforeclose: $winBeforeClose
+                            }
+                        });
+                        win.show();
+
+                        //触发选择改变事件，加载左边树
+                        if (me.selectQueryProIndex != 0) {
+                            var radioGroup = Ext.getCmp('radioQueryPro');
+                            radioGroup.fireEvent('change', radioGroup);
+                        }
+
+                        me.isShowing = false;
+                        store.load();//手工调不会触发beforeload事件
+
+                        store.on('beforeload', function () {
+                            var data = { 'propertyID': propertyID, 'propertyCode': propertyCode };
+                            Ext.apply(store.proxy.extraParams, data);
+                        });
+                    };
+
+                    var url = C_ROOT + 'SUP/RichHelp/GetHelpInfo?helpid=' + me.helpid + '&ORMMode=' + me.ORMMode;
+
+                    Ext.Ajax.request({
+                        //params: { 'id': busid },
+                        url: url,
+                        callback: ShowHelp,
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.status === "ok") {
+                                title = me.title || resp.data.Title;
+                                allfield = resp.data.AllField;
+                                headText = resp.data.HeadText;
+                                queryPropertyItems = Ext.JSON.decode(resp.data.queryProperty);
+                            } else {
+                                Ext.MessageBox.alert('取数失败', resp.status);
+                            }
+                        }
+                    });
+                },
+                showHelp: function (eOption, ignoreBeforeEvent) {
+                    this.onTriggerClick(eOption, ignoreBeforeEvent);//忽略beforetriggerclick事件，手动弹出帮助
+                },
+                bindData: function () {
+                    var me = this;
+                    BindCombox(me, me.valueField, me.displayField, me.helpid, me.getValue(), me.selectMode);
+                    return;
+                }, //bindData
+                btnOk: function (help, grid, tabPanel, win) {
+                    var activeTab = tabPanel.getActiveTab();
+                    var code;
+                    var name;
+                    var pobj = new Object();
+
+                    var valField = help.valueField;
+                    var temp = help.valueField.split('.');//多表关联的时候带表名,否则智能搜索报错
+                    if (temp.length > 1) {
+                        valField = temp[1];//去表名
+                    }
+
+                    var nameField = help.displayField;
+                    var temp = help.displayField.split('.');//多表关联的时候带表名
+                    if (temp.length > 1) {
+                        nameField = temp[1];//去表名
+                    }
+
+                    if (activeTab.id === 'listStyle') {
+                        var data = grid.getSelectionModel().getSelection();
+                        if (data.length > 0) {
+                            code = data[0].get(valField);
+                            name = data[0].get(nameField);
+                            if (!code) {
+                                var obj = data[0].data;
+                                //容错处理，带表名获取不到值
+                                for (var p in obj) {
+                                    var field = [];
+                                    if (p.indexOf('.') > 0) {
+                                        field = p.split('.');
+                                    }
+
+                                    if (field[1] === valField) {
+                                        code = obj[p];
+                                    }
+                                    if (field[1] === nameField) {
+                                        name = obj[p];
+                                    }
+                                }
+                            }
+
+                            pobj.data = data[0].data;
+                        }
+                    }
+
+
+                    var obj = new Object();
+
+                    if (help.acceptInput) {//接受用户输入
+                        obj[valField] = name;
+                    } else {
+                        obj[valField] = code;
+                    }
+                    if (help.displayFormat) {
+                        obj[nameField] = Ext.String.format(help.displayFormat, code, name);
+                    } else {
+                        obj[nameField] = name;
+                    }
+
+                    Ext.define('richhelpModel', {
+                        extend: 'Ext.data.Model',
+                        fields: [{
+                            name: valField,
+                            type: 'string',
+                            mapping: valField
+                        }, {
+                            name: nameField,
+                            type: 'string',
+                            mapping: nameField
+                        }
+                        ]
+                    });
+
+                    pobj.code = code;
+                    pobj.name = name;
+                    pobj.type = 'fromhelp';
+                    if (!help.fireEvent('beforehelpselected', pobj)) return;
+
+                    var valuepair = Ext.create('richhelpModel', obj);
+                    help.setValue(valuepair); //必须这么设置才能成功
+
+                    win.hide();
+                    win.destroy();
+
+                    help.fireEvent('helpselected', pobj);
+                },
+                gridDbClick: function (help, grid, win) {
+                    var data = grid.getSelectionModel().getSelection();
+                    if (data.length > 0) {
+                        var valField = help.valueField;
+                        var temp = help.valueField.split('.');//多表关联的时候带表名
+                        if (temp.length > 1) {
+                            valField = temp[1];//去表名
+                        }
+
+                        var nameField = help.displayField;
+                        var temp = help.displayField.split('.');//多表关联的时候带表名
+                        if (temp.length > 1) {
+                            nameField = temp[1];//去表名
+                        }
+
+                        var code = data[0].get(valField);
+                        var name = data[0].get(nameField);
+
+                        if (!code) {
+                            var obj = data[0].data;
+                            //容错处理，model的字段有可能带表名获取不到值
+                            for (var p in obj) {
+                                var field = [];
+                                if (p.indexOf('.') > 0) {
+                                    field = p.split('.');
+                                }
+
+                                if (field[1] === valField) {
+                                    code = obj[p];
+                                }
+                                if (field[1] === nameField) {
+                                    name = obj[p];
+                                }
+                            }
+                        }
+
+                        var obj = new Object();
+
+                        if (help.acceptInput) {//接受用户输入
+                            obj[valField] = name;
+                        } else {
+                            obj[valField] = code;
+                        }
+                        if (help.displayFormat) {
+                            obj[nameField] = Ext.String.format(help.displayFormat, code, name);
+                        } else {
+                            obj[nameField] = name;
+                        }
+
+                        Ext.define('richhelpModel', {
+                            extend: 'Ext.data.Model',
+                            fields: [{
+                                name: valField,
+                                type: 'string',
+                                mapping: valField
+                            }, {
+                                name: nameField,
+                                type: 'string',
+                                mapping: nameField
+                            }
+                            ]
+                        });
+
+
+                        var pobj = new Object();
+
+                        pobj.oldVal = oldVal;
+                        pobj.code = code;
+                        pobj.name = name;
+                        pobj.type = 'fromhelp';
+                        pobj.data = data[0].data;
+                        if (!help.fireEvent('beforehelpselected', pobj)) return;
+
+                        var oldVal = help.getValue();//旧的值
+                        var valuepair = Ext.create('richhelpModel', obj);
+                        help.setValue(valuepair); //必须这么设置才能成功
+                        win.hide();
+                        win.destroy();
+
+                        help.fireEvent('helpselected', pobj);
+                    }
+                }
+            });
+
+            var userGrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: userGridStore,
+                buskey: 'ucode', //对应的业务表主键属性
+                otype: otype,
+                title: '允许登录人员',
+                columnLines: true,
+                plugins: [cellEditing],
+                columns: [
+                    {
+                        header: '账套',
+                        dataIndex: 'ucode',
+                        width: '40%',
+                        editor: {
+                            xtype: "combobox",
+                            valueField: "code",
+                            displayField: 'name',
+                            queryMode: 'remote',
+                            store: ucodeStore,
+                            listeners: {
+                                change: function (combobox, newValue, oldValue, eOpts) {
+                                    ucode = newValue;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        header: '操作员代码',
+                        dataIndex: 'operator',
+                        itemId: 'operator',
+                    	hidden: true
+                    },
+                    {
+                        header: '操作员',
+                        dataIndex: 'operator_name',
+                        width: '60%',
+                        editor: {
+                            xtype: 'ngUserHelp',
+                            valueField: 'phid',
+                            displayField: 'username',
+                            listFields: 'phid,username',
+                            listHeadTexts: '代码,名称',
+                            helpid: 'fg3_user',
+                            isInGrid: true,
+                            ORMMode: false,
+                            allowBlank: true,
+                            listeners: {
+                                helpselected: function (obj) {
+                                    var data = userGrid.getSelectionModel().getSelection();
+                                    data[0].set('operator', obj.code);
+                                    data[0].set('operator_name', obj.name);
+                                }
+                            }
+                        }
+                    }
+                ],
+                listeners: {
+                    select: function ( grid, record, index, eOpts ) {
+                        ucode = record.data.ucode;
+                    }
+                }
+            });
+
+            ngToolbar.get('addrow').on('click', function () {
+                var data = userGrid.getSelectionModel();
+                userGridStore.insert(userGridStore.getCount(), data);
+            });
+
+            ngToolbar.get('deleterow').on('click', function () {
+                var data = userGrid.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var index = userGridStore.indexOf(data[0]);
+
+                    Ext.Array.each(data, function (record) {
+                        userGridStore.remove(record); //前端删除
+                    });
+
+                    if (userGridStore.getCount() > 0) {
+                        if (index >= userGridStore.getCount()) {
+                            index--;
+                        }
+                        userGrid.getSelectionModel().select(index);
+                    }
+                }
+            });
+
+            ngToolbar.get('save').on('click', function () {
+                if (!mstform.isValid()) {
+                    return;
+                }
+
+                var preenddate = mstform.queryById('preenddate').getValue();
+                var endtype = mstform.queryById('endtype').getValue();
+                var enddate = mstform.queryById('enddate').getValue();
+                var netfreecall = mstform.queryById('netfreecall').getValue();
+                var netfreecallucode = mstform.queryById('netfreecallucode').getValue();
+                var endinfo = mstform.queryById('endinfo').getValue();
+                if (endtype == '0' && enddate == '') {
+                    NGMsg.Error('[维护结束时间]输入不合法:该输入项为必输项');
+                    return;
+                }
+                if (netfreecall && (netfreecallucode == null || netfreecallucode == '')) {
+                    NGMsg.Error('[发送消息自由呼账套]输入不合法:该输入项为必输项');
+                    return;
+                }
+                if (netfreecall && endinfo == '') {
+                    NGMsg.Error('[维护结束提示]输入不合法:该输入项为必输项');
+                    return;
+                }
+
+                var allowlogin = '';
+                for (var i = 0; i < userGridStore.getCount() ; i++) {
+                    allowlogin += userGridStore.getAt(i).get('ucode') + '|' + userGridStore.getAt(i).get('operator') + '|' + userGridStore.getAt(i).get('operator_name') + ';';
+                }
+
+                ngToolbar.get('save').disable();//禁用按钮
+                var myMask = new Ext.LoadMask(document.body, { msg: "正在保存单据,请稍候..." });
+                myMask.show();//锁屏
+
+                Ext.Ajax.request({
+                    params: {
+                        'phid': phid, 'title': mstform.queryById('title').getValue(), 'starttime': mstform.queryById('starttime').getValue().replace('分钟后', ''),
+                        'preenddate': preenddate, 'endtype': endtype, 'enddate': enddate, 'runinfo': mstform.queryById('runinfo').getValue(),
+                        'endinfo': endinfo, 'netfreecall': netfreecall, 'netfreecallucode': netfreecallucode, 'allowlogin': allowlogin, 'otype': otype
+                    },
+                    url: C_ROOT + 'SUP/SysMaintainCall/SaveSysMaintainCall',
+                    success: function (response) {
+                        myMask.hide();//停止锁屏
+                        ngToolbar.get('save').enable();//按钮设置为可用
+                        if (response.responseText != "0") {
+                            if (window.external.RefreshWebListPage != undefined) {
+                                window.external.RefreshWebListPage();
+                            } else {
+                                $NG3Refresh();
+                            }
+                            otype = 'edit';
+                            phid = response.responseText;
+                            mstform.setOriginValue(JSON.stringify(mstform.getForm().getValues()));
+                            userGridStore.commitChanges();
+                            Ext.MessageBox.alert("提示", "保存成功！");
+                        } else {
+                            Ext.MessageBox.alert("提示", "保存失败！");
+                        }
+                    },
+                    failure: function (response) {
+                        myMask.hide();//停止锁屏
+                        ngToolbar.get('save').enable();//按钮设置为可用
+                    }
+                });
+
+            });
+
+            ngToolbar.get('close').addListener('beforeclose', function () {
+                //查看窗口直接关闭
+                if (otype == $Otype.VIEW && overtime != '1') {
+                    return true;
+                }
+
+                if (mstform.hasModifyed() || userGrid.hasModifyed()) {
+                    Ext.MessageBox.confirm('提示', '单据未保存，确定关闭？', function (e) {
+                        if (e == "yes") {
+                            $CloseTab();
+                        }
+                    });
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+
+            Ext.defer(function () {
+                if (otype == 'edit' || otype == 'view' || otype == 'copy') {
+                    Ext.Ajax.request({
+                        params: { 'phid': phid },
+                        url: C_ROOT + 'SUP/SysMaintainCall/GetSysMaintainCallByPhid',
+                        success: function (response) {
+                            var result = Ext.JSON.decode(response.responseText);
+                            mstform.queryById('title').setValue(result[0].title);
+                            mstform.queryById('starttime').setValue(result[0].starttime + '分钟后');
+                            mstform.queryById('preenddate').setValue(result[0].preenddate.replace('T', ' '));
+                            mstform.queryById('endtype').setValue(result[0].endtype);
+                            if (result[0].enddate != null && result[0].endtype == '0') {
+                                mstform.queryById('enddate').setValue(result[0].enddate.replace('T', ' '));
+                            }
+                            mstform.queryById('runinfo').setValue(result[0].runinfo);
+                            mstform.queryById('endinfo').setValue(result[0].endinfo);
+                            mstform.queryById('netfreecall').setValue(result[0].netfreecall == "1" ? true : false);
+                            if (result[0].netfreecall == "1") {
+                                mstform.queryById('netfreecallucode').setValue(result[0].netfreecallucode);
+                            }
+                            if (result[0].allowlogin != null) {
+                                var allowlogins = result[0].allowlogin.split(';');
+                                for (var i = 0; i < allowlogins.length - 1; i++) {
+                                    var r = Ext.create('usergridmodel', {
+                                        ucode: allowlogins[i].split('|')[0],
+                                        operator: allowlogins[i].split('|')[1],
+                                        operator_name: allowlogins[i].split('|')[2]
+                                    });
+                                    userGridStore.insert(userGridStore.getCount(), r);
+                                }
+                                userGridStore.commitChanges();
+                            }
+                            if (result[0].startdate != null && overtime == '1' && otype == 'view') {
+                                startDate = result[0].startdate.replace('T', ' ')
+                            }
+                            mstform.setOriginValue(JSON.stringify(mstform.getForm().getValues()));
+                        }
+                    });
+                }
+
+                if (otype == 'view') {
+                    ngToolbar.get('addrow').hide();
+                    ngToolbar.get('deleterow').hide();
+                    if (overtime != '1') {
+                        ngToolbar.get('save').hide();
+                    } else {
+                        mstform.queryById('enddate').readOnly = false;
+                    }
+                }
+
+                mstform.queryById('netfreecallucode').hide();
+                mstform.setOriginValue(JSON.stringify(mstform.getForm().getValues()));
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        layout: 'border',
+                        items: [mstform, userGrid]
+                    }
+                ]
+            });
+
+        });
+
+    </script>
+}

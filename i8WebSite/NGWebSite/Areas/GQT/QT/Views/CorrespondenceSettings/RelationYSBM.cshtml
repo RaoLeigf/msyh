@@ -1,0 +1,254 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/CorrespondenceSettingsEdit.js") type="text/javascript" charset="utf-8"></script>
+	<script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_YSBM.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var store2;
+		var grid;
+        var grid2;
+        var selectData;
+		
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    {
+						id:'settingButton',
+						itemId:'settingButton',
+						xtype:'button',
+						text:'对应设置',
+						iconCls:'icon-Setup',
+						style:{
+							//background:'#199ED8'
+						}
+					}, 
+                    '->', 'close'
+                ]
+            });
+
+			         
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                autoLoad: true,
+				sorters:[{
+					property:'UserNo',
+					direction:'ASC'
+				}],
+                fields: [
+                    {
+                        "name": "PhId",
+                        "type": "int",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "UserNo",
+                        "type": "string",
+                        "mapping": "UserNo"
+                    },
+                    {
+                        "name": "UserName",
+                        "type": "string",
+                        "mapping": "UserName"
+                    }
+                ],
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetRelationYSBMList'
+            });
+
+            grid = Ext.create('Ext.ng.GridPanel', {
+                autoScroll: true,
+                columnLines: true,
+                border: false,
+                store: store,
+                height: document.documentElement.clientHeight - 38,
+                columns: [
+                    {
+                        header: '主键',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'PhId',
+                        hidden: true
+                    },
+                    {
+                        header: '操作员代码',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 100,
+                        dataIndex: 'UserNo',
+                        hidden: false
+                    },
+                    {
+                        header: '操作员名称',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'UserName',
+                        hidden: false
+                    }
+                ],
+				listeners:{
+                    'itemclick': function (thisView, modelRecord, eleItem, index, e, eOptions) {
+                        selectData = modelRecord.get('UserNo');
+						grid2.getStore().load({
+							params:{
+								'userCode':modelRecord.get('UserNo')
+							}
+						});
+					}
+				}
+            });
+			
+			store2 = Ext.create('Ext.ng.JsonStore',{
+				autoLoad:false,
+				sorters:[{
+					property:'OCode',
+					direction:'ASC'
+				}],
+				fields: [
+                    {
+                        "name": "PhId",
+                        "type": "int",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "OCode",
+                        "type": "string",
+                        "mapping": "OCode"
+                    },
+                    {
+                        "name": "OName",
+                        "type": "string",
+                        "mapping": "OName"
+                    }
+                ],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetRelationYSBMList2'
+			});
+
+            store2.on('beforeload', function () {
+                this.proxy.extraParams = {
+                    'userCode': selectData == undefined ? "" : selectData
+                }
+            });
+
+			grid2 = Ext.create('Ext.ng.GridPanel',{
+				autoScroll: true,
+                columnLines: true,
+                border: false,
+                store: store2,
+				height: document.documentElement.clientHeight - 38,
+                columns: [
+                    {
+                        header: '主键',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'PhId',
+                        hidden: true
+                    },
+                    {
+                        header: '部门代码',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'OCode',
+                        hidden: false
+                    },
+                    {
+                        header: '部门名称',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'OName',
+                        hidden: false
+                    }
+                ]
+			});
+
+            /*var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store2
+            });*/
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar,
+                    {
+                        region: 'west',
+                        xtype: "panel",
+                        items: [grid],
+                        width: 300
+                    },
+					{
+                        region: 'center',
+                        xtype: "panel",
+                        items: [grid2]
+                        
+                    }
+                ]
+            });
+
+            //对应设置
+            ngToolbar.get('settingButton').on('click', function () {
+                //alert("设置成功");
+				var data = grid.getSelectionModel().getSelection();
+				if(data.length > 0){
+					var code = data[0].data.UserNo;
+					var win = Ext.create('Ext.ng.WFDynamicNodeUserWin',{
+						
+					});
+					win.show();
+				}else{
+					Ext.MessageBox.alert('错误', "请选择操作员！");
+				}
+            });
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

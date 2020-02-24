@@ -1,0 +1,726 @@
+IF OBJECT_ID ('dbo.xm3_ProjectDtl_BudgetDtl') IS NOT NULL
+	DROP TABLE dbo.xm3_ProjectDtl_BudgetDtl
+GO
+
+CREATE TABLE dbo.xm3_ProjectDtl_BudgetDtl
+	(
+	phid                BIGINT NOT NULL,
+	mst_phid            BIGINT,
+	f_DtlCode           VARCHAR (255),
+	f_Name              VARCHAR (500),
+	f_MeasUnit          VARCHAR (10),
+	f_qty               NUMERIC (18, 2),
+	f_Price             NUMERIC (18, 2),
+	f_Amount            NUMERIC (18, 2),
+	f_BudgetAmount      NUMERIC (18, 2),
+	f_SourceOfFunds     VARCHAR (10),
+	f_BudgetAccounts    VARCHAR (20),
+	f_OtherInstructions VARCHAR (400),
+	f_PaymentMethod     VARCHAR (10),
+	f_ExpensesChannel   VARCHAR (10),
+	f_Feedback          VARCHAR (200),
+	creator             BIGINT,
+	editor              BIGINT,
+	cur_orgid           BIGINT,
+	ng_insert_dt        DATETIME,
+	ng_update_dt        DATETIME,
+	ng_record_ver       INT,
+	f_midEdit           VARCHAR (2),
+	CONSTRAINT PK_XM3_PROJECTDTL_BUDGETDTL PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.xm3_ProjectDtl_FundAppl') IS NOT NULL
+	DROP TABLE dbo.xm3_ProjectDtl_FundAppl
+GO
+
+CREATE TABLE dbo.xm3_ProjectDtl_FundAppl
+	(
+	phid            BIGINT NOT NULL,
+	mst_phid        BIGINT,
+	f_SourceOfFunds VARCHAR (10),
+	f_Amount        NUMERIC (18, 2),
+	creator         BIGINT,
+	editor          BIGINT,
+	cur_orgid       BIGINT,
+	ng_insert_dt    DATETIME,
+	ng_update_dt    DATETIME,
+	ng_record_ver   INT,
+	CONSTRAINT PK_XM3_PROJECTDTL_FUNDAPPL PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.xm3_ProjectDtl_ImplPlan') IS NOT NULL
+	DROP TABLE dbo.xm3_ProjectDtl_ImplPlan
+GO
+
+CREATE TABLE dbo.xm3_ProjectDtl_ImplPlan
+	(
+	phid          BIGINT NOT NULL,
+	mst_phid      BIGINT,
+	f_ImplContent VARCHAR (200),
+	f_StartDate   DATETIME,
+	f_EndDate     DATETIME,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT PK_XM3_PROJECTDTL_IMPLPLAN PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.xm3_ProjectDtl_TextContent') IS NOT NULL
+	DROP TABLE dbo.xm3_ProjectDtl_TextContent
+GO
+
+CREATE TABLE dbo.xm3_ProjectDtl_TextContent
+	(
+	phid                 BIGINT NOT NULL,
+	mst_phid             BIGINT,
+	f_FunctionalOverview VARCHAR (1000),
+	f_ProjOverview       VARCHAR (1000),
+	f_ProjBasis          VARCHAR (500),
+	f_Feasibility        VARCHAR (500),
+	f_Necessity          VARCHAR (500),
+	f_LTPerformGoal      VARCHAR (1000),
+	f_AnnualPerformGoal  VARCHAR (1000),
+	creator              BIGINT,
+	editor               BIGINT,
+	cur_orgid            BIGINT,
+	ng_insert_dt         DATETIME,
+	ng_update_dt         DATETIME,
+	ng_record_ver        INT,
+	CONSTRAINT PK_XM3_PROJECTDTL_TEXTCONTENT PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.xm3_ProjectMst') IS NOT NULL
+	DROP TABLE dbo.xm3_ProjectMst
+GO
+
+CREATE TABLE dbo.xm3_ProjectMst
+	(
+	phid                     BIGINT NOT NULL,
+	f_year                   VARCHAR (4),
+	f_ProjCode               VARCHAR (255),
+	f_ProjName               VARCHAR (100),
+	f_DeclarationUnit        VARCHAR (200),
+	f_DeclarationDept        VARCHAR (200),
+	f_BudgetDept             VARCHAR (200),
+	f_ProjAttr               VARCHAR (20),
+	f_Duration               VARCHAR (20),
+	f_ExpenseCategory        VARCHAR (20),
+	f_ProjStatus             INT,
+	f_StartDate              DATETIME,
+	f_EndDate                DATETIME,
+	f_DateofDeclaration      DATETIME,
+	f_Declarer               VARCHAR (20),
+	f_ProjAmount             NUMERIC (18, 2),
+	f_BudgetAmount           NUMERIC (18, 2),
+	f_ifPerformanceAppraisal INT,
+	f_ifKeyEvaluation        INT,
+	f_MeetingTime            DATETIME,
+	f_MeetiingSummaryNo      VARCHAR (100),
+	f_Type                   VARCHAR (2),
+	f_ApproveStatus          VARCHAR (2),
+	f_VerNo                  VARCHAR (20),
+	f_LifeCycle              INT,
+	creator                  BIGINT,
+	editor                   BIGINT,
+	cur_orgid                BIGINT,
+	ng_insert_dt             DATETIME,
+	ng_update_dt             DATETIME,
+	ng_record_ver            INT,
+	f_CarryOver              INT,
+	f_BillNo                 VARCHAR (50),
+	f_Approver               BIGINT,
+	f_ApproveDate            DATETIME,
+	f_midYearChange          VARCHAR (2),
+	CONSTRAINT PK_XM3_PROJECTMST PRIMARY KEY (phid)
+	)
+GO
+
+
+IF OBJECT_ID ('dbo.ys3_BudgetDtl_BudgetDtl') IS NOT NULL
+	DROP TABLE dbo.ys3_BudgetDtl_BudgetDtl
+GO
+
+CREATE TABLE dbo.ys3_BudgetDtl_BudgetDtl
+	(
+	phid                BIGINT,
+	mst_phid            BIGINT,
+	xm_phid             BIGINT,
+	f_DtlCode           VARCHAR (255),
+	f_Name              VARCHAR (100),
+	f_MeasUnit          VARCHAR (10),
+	f_qty               NUMERIC (18, 2),
+	f_Price             NUMERIC (18, 2),
+	f_Amount            NUMERIC (18, 2),
+	f_SourceOfFunds     VARCHAR (30),
+	f_BudgetAccounts    VARCHAR (20),
+	f_OtherInstructions VARCHAR (400),
+	f_PaymentMethod     VARCHAR (10),
+	f_ExpensesChannel   VARCHAR (10),
+	f_Feedback          VARCHAR (200),
+	creator             BIGINT,
+	editor              BIGINT,
+	cur_orgid           BIGINT,
+	ng_insert_dt        DATETIME,
+	ng_update_dt        DATETIME,
+	ng_record_ver       INT,
+	f_BudgetAmount      NUMERIC (18, 2),
+	xm3_dtlPhid         BIGINT
+	)
+GO
+
+IF OBJECT_ID ('dbo.ys3_BudgetDtl_FundAppl') IS NOT NULL
+	DROP TABLE dbo.ys3_BudgetDtl_FundAppl
+GO
+
+CREATE TABLE dbo.ys3_BudgetDtl_FundAppl
+	(
+	phid            BIGINT,
+	mst_phid        BIGINT,
+	xm_phid         BIGINT,
+	f_SourceOfFunds VARCHAR (30),
+	f_Amount        NUMERIC (18, 2),
+	creator         BIGINT,
+	editor          BIGINT,
+	cur_orgid       BIGINT,
+	ng_insert_dt    DATETIME,
+	ng_update_dt    DATETIME,
+	ng_record_ver   INT
+	)
+GO
+
+IF OBJECT_ID ('dbo.ys3_BudgetDtl_ImplPlan') IS NOT NULL
+	DROP TABLE dbo.ys3_BudgetDtl_ImplPlan
+GO
+
+CREATE TABLE dbo.ys3_BudgetDtl_ImplPlan
+	(
+	phid          BIGINT,
+	mst_phid      BIGINT,
+	xm_phid       BIGINT,
+	f_ImplContent VARCHAR (200),
+	f_StartDate   DATETIME,
+	f_EndDate     DATETIME,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT
+	)
+GO
+
+IF OBJECT_ID ('dbo.ys3_BudgetDtl_TextContent') IS NOT NULL
+	DROP TABLE dbo.ys3_BudgetDtl_TextContent
+GO
+
+CREATE TABLE dbo.ys3_BudgetDtl_TextContent
+	(
+	phid                 BIGINT,
+	mst_phid             BIGINT,
+	xm_phid              BIGINT,
+	f_FunctionalOverview VARCHAR (1000),
+	f_ProjOverview       VARCHAR (1000),
+	f_ProjBasis          VARCHAR (500),
+	f_Feasibility        VARCHAR (500),
+	f_Necessity          VARCHAR (500),
+	f_LTPerformGoal      VARCHAR (1000),
+	f_AnnualPerformGoal  VARCHAR (1000),
+	creator              BIGINT,
+	editor               BIGINT,
+	cur_orgid            BIGINT,
+	ng_insert_dt         DATETIME,
+	ng_update_dt         DATETIME,
+	ng_record_ver        INT
+	)
+GO
+
+IF OBJECT_ID ('dbo.ys3_BudgetMst') IS NOT NULL
+	DROP TABLE dbo.ys3_BudgetMst
+GO
+
+CREATE TABLE dbo.ys3_BudgetMst
+	(
+	phid                     BIGINT NOT NULL,
+	xm_mst_phid              BIGINT,
+	f_year                   VARCHAR (4),
+	f_ProjCode               VARCHAR (40),
+	f_ProjName               VARCHAR (100),
+	f_DeclarationUnit        VARCHAR (200),
+	f_DeclarationDept        VARCHAR (200),
+	f_ProjAttr               VARCHAR (20),
+	f_Duration               VARCHAR (20),
+	f_ExpenseCategory        VARCHAR (20),
+	f_ProjStatus             INT,
+	f_StartDate              DATETIME,
+	f_EndDate                DATETIME,
+	f_DateofDeclaration      DATETIME,
+	f_Declarer               VARCHAR (20),
+	f_ProjAmount             NUMERIC (18, 2),
+	f_BudgetAmount           NUMERIC (18, 2),
+	f_ifPerformanceAppraisal INT,
+	f_ifKeyEvaluation        INT,
+	f_MeetingTime            DATETIME,
+	f_MeetiingSummaryNo      VARCHAR (100),
+	f_Type                   VARCHAR (2),
+	f_ApproveStatus          VARCHAR (2),
+	f_VerNo                  VARCHAR (20),
+	f_LifeCycle              INT,
+	creator                  BIGINT,
+	editor                   BIGINT,
+	cur_orgid                BIGINT,
+	ng_insert_dt             DATETIME,
+	ng_update_dt             DATETIME,
+	ng_record_ver            INT,
+	f_CarryOver              INT,
+	f_BudgetDept             VARCHAR (200),
+	f_BillNo                 VARCHAR (50),
+	f_Approver               BIGINT,
+	f_ApproveDate            DATETIME,
+	f_midYearChange          VARCHAR (2),
+	CONSTRAINT PK_YS3_BUDGETMST PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.ys3_BudgetProcessCtrl') IS NOT NULL
+	DROP TABLE dbo.ys3_BudgetProcessCtrl
+GO
+
+CREATE TABLE dbo.ys3_BudgetProcessCtrl
+	(
+	phid            BIGINT NOT NULL,
+	f_ocode         VARCHAR (255),
+	f_oname         VARCHAR (100),
+	f_DeptCode      VARCHAR (255),
+	f_DeptName      VARCHAR (100),
+	f_SetByDept     INT,
+	f_ProcessStatus VARCHAR (2),
+	creator         BIGINT,
+	editor          BIGINT,
+	cur_orgid       BIGINT,
+	ng_insert_dt    DATETIME,
+	ng_update_dt    DATETIME,
+	ng_record_ver   INT,
+	CONSTRAINT ID_ys3_BudgetProcessCtrl PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTDYGX') IS NOT NULL
+	DROP TABLE dbo.Z_QTDYGX
+GO
+
+CREATE TABLE dbo.Z_QTDYGX
+	(
+	phid          BIGINT NOT NULL,
+	DWDM          VARCHAR (255),
+	DYDM          VARCHAR (255),
+	DYLX          VARCHAR (10),
+	DEF_STR1      VARCHAR (255),
+	DEF_STR2      VARCHAR (255),
+	DEF_STR3      VARCHAR (255),
+	DEF_STR4      VARCHAR (255),
+	DEF_STR5      VARCHAR (255),
+	DEF_STR6      VARCHAR (255),
+	DEF_INT1      INT,
+	DEF_INT2      INT,
+	DEF_NUM1      MONEY,
+	DEF_NUM2      MONEY,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTDYGX PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTDYGX2') IS NOT NULL
+	DROP TABLE dbo.Z_QTDYGX2
+GO
+
+CREATE TABLE dbo.Z_QTDYGX2
+	(
+	phid          BIGINT NOT NULL,
+	DWDM          VARCHAR (255),
+	DYDM          VARCHAR (255),
+	DYLX          VARCHAR (10),
+	DEF_STR1      VARCHAR (255),
+	DEF_STR2      VARCHAR (255),
+	DEF_STR3      VARCHAR (255),
+	DEF_STR4      VARCHAR (255),
+	DEF_STR5      VARCHAR (255),
+	DEF_STR6      VARCHAR (255),
+	DEF_INT1      INT,
+	DEF_INT2      INT,
+	DEF_NUM1      MONEY,
+	DEF_NUM2      MONEY,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTDYGX2 PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTGKXM') IS NOT NULL
+	DROP TABLE dbo.Z_QTGKXM
+GO
+
+CREATE TABLE dbo.Z_QTGKXM
+	(
+	phid          BIGINT NOT NULL,
+	DM            VARCHAR (255),
+	MC            VARCHAR (250),
+	YSKM          VARCHAR (40),
+	DEF_STR1      VARCHAR (20),
+	DEF_STR2      VARCHAR (255),
+	DEF_STR3      VARCHAR (20),
+	DEF_INT1      INT,
+	DEF_INT2      INT,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTGKXM PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTJFQD') IS NOT NULL
+	DROP TABLE dbo.Z_QTJFQD
+GO
+
+CREATE TABLE dbo.Z_QTJFQD
+	(
+	phid          BIGINT NOT NULL,
+	DM            VARCHAR (30),
+	MC            VARCHAR (255),
+	BZ            VARCHAR (40),
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTJFQD PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTMJKM') IS NOT NULL
+	DROP TABLE dbo.Z_QTMJKM
+GO
+
+CREATE TABLE dbo.Z_QTMJKM
+	(
+	phid          BIGINT NOT NULL,
+	KMDM          VARCHAR (20),
+	KMLB          VARCHAR (2),
+	KMMC          VARCHAR (100),
+	BZ            VARCHAR (100),
+	KMLX          INT,
+	ORGCODE       VARCHAR (20),
+	ORGID         VARCHAR (6),
+	ZFJJKM        VARCHAR (20),
+	DEF_STR1      VARCHAR (100),
+	DEF_STR2      VARCHAR (100),
+	DEF_STR3      VARCHAR (100),
+	DEF_INT1      INT,
+	DEF_INT2      INT,
+	DEF_INT3      INT,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTMJKM PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTYSKM') IS NOT NULL
+	DROP TABLE dbo.Z_QTYSKM
+GO
+
+CREATE TABLE dbo.Z_QTYSKM
+	(
+	phid          BIGINT NOT NULL,
+	KMDM          VARCHAR (20),
+	KMMC          VARCHAR (100),
+	KMLB          CHAR (1),
+	KMXZ          CHAR (1),
+	YEFX          CHAR (1),
+	SF            TINYINT,
+	JM            VARCHAR (6),
+	BM            TINYINT,
+	HB            CHAR (1),
+	DEF_STR1      VARCHAR (20),
+	DEF_STR2      VARCHAR (20),
+	DEF_STR3      VARCHAR (20),
+	DEF_STR4      VARCHAR (20),
+	DEF_STR5      VARCHAR (20),
+	DEF_STR6      VARCHAR (20),
+	DEF_STR7      VARCHAR (20),
+	DEF_STR8      VARCHAR (20),
+	DEF_STR9      VARCHAR (20),
+	DEF_STR10     VARCHAR (20),
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	ocode         VARCHAR (50),
+	orgid         BIGINT,
+	CONSTRAINT ID_Z_QTYSKM PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTYSXZ') IS NOT NULL
+	DROP TABLE dbo.Z_QTYSXZ
+GO
+
+CREATE TABLE dbo.Z_QTYSXZ
+	(
+	phid          BIGINT NOT NULL,
+	DM            VARCHAR (30),
+	MC            VARCHAR (255),
+	BZ            VARCHAR (40),
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTYSXZ PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.Z_QTZFFS') IS NOT NULL
+	DROP TABLE dbo.Z_QTZFFS
+GO
+
+CREATE TABLE dbo.Z_QTZFFS
+	(
+	phid          BIGINT NOT NULL,
+	DM            VARCHAR (30),
+	MC            VARCHAR (255),
+	BZ            VARCHAR (40),
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_Z_QTZFFS PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.JJ_FXGL') IS NOT NULL
+	DROP TABLE dbo.JJ_FXGL
+GO
+
+CREATE TABLE dbo.JJ_FXGL
+	(
+	phid          BIGINT NOT NULL,
+	MK            VARCHAR (20),
+	XMDM          VARCHAR (255),
+	DM            VARCHAR (255),
+	MC            VARCHAR (200),
+	STR1          VARCHAR (20),
+	STR2          VARCHAR (20),
+	STR3          VARCHAR (20),
+	STR4          VARCHAR (20),
+	STR5          VARCHAR (20),
+	STR6          VARCHAR (255),
+	STR7          VARCHAR (40),
+	STR8          VARCHAR (40),
+	STR9          VARCHAR (40),
+	STR10         VARCHAR (40),
+	STR11         VARCHAR (60),
+	STR12         VARCHAR (60),
+	STR13         VARCHAR (60),
+	STR14         VARCHAR (60),
+	STR15         VARCHAR (60),
+	STR16         VARCHAR (60),
+	STR17         VARCHAR (100),
+	STR18         VARCHAR (100),
+	STR19         VARCHAR (250),
+	STR20         VARCHAR (250),
+	MONEY1        DECIMAL (18),
+	MONEY2        DECIMAL (18),
+	MONEY3        DECIMAL (18),
+	MONEY4        DECIMAL (18),
+	MONEY5        DECIMAL (18),
+	MONEY6        DECIMAL (18),
+	MONEY7        DECIMAL (18),
+	MONEY8        DECIMAL (18),
+	MONEY9        DECIMAL (18),
+	MONEY10       DECIMAL (18),
+	INT1          INT,
+	INT2          INT,
+	INT3          INT,
+	INT4          INT,
+	INT5          INT,
+	INT6          INT,
+	INT7          INT,
+	INT8          INT,
+	INT9          INT,
+	INT10         INT,
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT PK__JJ_FXGL PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.jx3_PerformanceDtl_BuDtl') IS NOT NULL
+	DROP TABLE dbo.jx3_PerformanceDtl_BuDtl
+GO
+
+CREATE TABLE dbo.jx3_PerformanceDtl_BuDtl
+	(
+	phid            BIGINT NOT NULL,
+	mst_phid        BIGINT,
+	del_phid        BIGINT,
+	f_Name          VARCHAR (500),
+	f_SourceOfFunds VARCHAR (10),
+	f_BudgetAmount  NUMERIC (18, 2),
+	f_ActualAmount  NUMERIC (18, 2),
+	f_BalanceAmount NUMERIC (18, 2),
+	f_ImplRate      NUMERIC (18, 2),
+	creator         BIGINT,
+	editor          BIGINT,
+	cur_orgid       BIGINT,
+	ng_insert_dt    DATETIME,
+	ng_update_dt    DATETIME,
+	ng_record_ver   INT,
+	f_DtlCode       VARCHAR (255),
+	CONSTRAINT PK_JX3_PERFORMANCEDTL_BUDTL PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.jx3_PerformanceDtl_Eval') IS NOT NULL
+	DROP TABLE dbo.jx3_PerformanceDtl_Eval
+GO
+
+CREATE TABLE dbo.jx3_PerformanceDtl_Eval
+	(
+	phid          BIGINT NOT NULL,
+	mst_phid      BIGINT,
+	f_Name        VARCHAR (100),
+	f_Content     VARCHAR (1000),
+	f_Weight      DECIMAL (18, 2),
+	f_Score       DECIMAL (18, 2),
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT PK_JX3_PERFORMANCEDTL_EVAL PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.jx3_PerformanceDtl_TextCont') IS NOT NULL
+	DROP TABLE dbo.jx3_PerformanceDtl_TextCont
+GO
+
+CREATE TABLE dbo.jx3_PerformanceDtl_TextCont
+	(
+	phid                BIGINT NOT NULL,
+	mst_phid            BIGINT,
+	f_OtherInstructions VARCHAR (1000),
+	creator             BIGINT,
+	editor              BIGINT,
+	cur_orgid           BIGINT,
+	ng_insert_dt        DATETIME,
+	ng_update_dt        DATETIME,
+	ng_record_ver       INT,
+	CONSTRAINT PK_JX3_PERFORMANCEDTL_TEXTCONT PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.jx3_PerformanceMst') IS NOT NULL
+	DROP TABLE dbo.jx3_PerformanceMst
+GO
+
+CREATE TABLE dbo.jx3_PerformanceMst
+	(
+	phid                     BIGINT NOT NULL,
+	ys_mst_phid              BIGINT,
+	f_ProjCode               VARCHAR (255),
+	f_ProjName               VARCHAR (100),
+	f_ExploitingEntity       VARCHAR (200),
+	f_ProjectLeader          VARCHAR (100),
+	f_PhoneNumber            VARCHAR (50),
+	f_ContactAddress         VARCHAR (200),
+	f_DeclarationUnit        VARCHAR (200),
+	f_DeclarationDept        VARCHAR (200),
+	f_BudgetDept             VARCHAR (200),
+	f_ProjAttr               VARCHAR (20),
+	f_Duration               VARCHAR (20),
+	f_StartDate              DATETIME,
+	f_EndDate                DATETIME,
+	f_ProjAmount             NUMERIC (18, 2),
+	f_ifPerformanceAppraisal INT,
+	f_ifKeyEvaluation        INT,
+	f_MeetingTime            DATETIME,
+	f_MeetiingSummaryNo      VARCHAR (100),
+	f_AuditStatus            VARCHAR (2),
+	f_Auditor                BIGINT,
+	f_AuditDate              DATETIME,
+	f_EvaluationDate         DATETIME,
+	f_EvaluationScore        DECIMAL (18, 2),
+	f_EvaluationResult       VARCHAR (10),
+	f_informant              BIGINT,
+	f_informantName          VARCHAR (100),
+	creator                  BIGINT,
+	editor                   BIGINT,
+	cur_orgid                BIGINT,
+	ng_insert_dt             DATETIME,
+	ng_update_dt             DATETIME,
+	ng_record_ver            INT,
+	CONSTRAINT PK_JX3_PERFORMANCEMST PRIMARY KEY (phid)
+	)
+GO
+
+IF OBJECT_ID ('dbo.qt3_SysCodeSeq') IS NOT NULL
+	DROP TABLE dbo.qt3_SysCodeSeq
+GO
+
+CREATE TABLE dbo.qt3_SysCodeSeq
+	(
+	phid          BIGINT NOT NULL,
+	f_year        VARCHAR (4),
+	f_code        VARCHAR (30),
+	f_name        VARCHAR (100),
+	f_tname       VARCHAR (50),
+	f_SeqNo       VARCHAR (100),
+	f_remark      VARCHAR (200),
+	creator       BIGINT,
+	editor        BIGINT,
+	cur_orgid     BIGINT,
+	ng_insert_dt  DATETIME,
+	ng_update_dt  DATETIME,
+	ng_record_ver INT,
+	CONSTRAINT ID_qt3_SysCodeSeq PRIMARY KEY (phid)
+	)
+GO
+
+
+
+
+

@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_report_log">
+      <Field Name="rep_id" IsKey="true"/>
+      <Field Name="userid" IsKey="true"/>
+      <Field Name="func_use"  IsKey="true"/>
+      <Field Name="time_use" IsKey="true" />
+      <Field Name="status" IsKey="true" />
+      <Field Name="ocode"  IsKey="true"/>      
+    </Table>
+    <Table Name="rw_report_main">
+      <Field Name="rep_code" />
+      <Field Name="rep_name"  />
+      <Field Name="rep_format"/>
+      <Field Name="rep_classid"/>
+      <Field Name="rep_keys"/>
+      <Field Name="rep_type"/>
+      <Field Name="rep_summary"/>
+    </Table>
+    <Table Name="secuser">
+      <Field Name="u_name" AsName="username"/>
+    </Table>    
+    <Table Name="rw_report_class">
+      <Field Name="class_name" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join rw_report_main on [table].rep_id = rw_report_main.rep_id
+      left join secuser on [table].userid = secuser.logid
+      left join rw_report_class on rw_report_main.rep_classid = rw_report_class.class_id 
+      [where] [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <!--<Exp Field="rep_id" Target="Client"  Value="rep_id"/>-->
+      <Exp Field="repid"  Target="Client" Value="repid" Type="Array">
+        <Exp Field="rw_report_log.rep_id" ParamName ="rep_id"  TypeKey="0"/>
+      </Exp>
+      <Exp Field="username" Target="Client"  Oper="Like" Value="username"/>
+      <Exp Field="rep_keys" Target="Client"  Oper="Like" Value="rep_keys"/>
+      <Exp Field="rep_name" Target="Client"  Oper="Like" Value="rep_name"/>
+    </Query>
+    <OrderBy format="{time_use}">
+      <Exp Field="time_use" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <GetReportApplyData>
+    <Sql>
+      select rw_report_log.rep_id,rep_name,func_use,COUNT(*) counts
+      from rw_report_log
+      left join rw_report_main on rw_report_log.rep_id = rw_report_main.rep_id
+      left join secuser on rw_report_log.userid = secuser.logid
+      [where]
+      group by rw_report_log.rep_id,func_use,rep_name
+      order by rw_report_log.rep_id
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="repid"  Target="Client" Value="repid" Type="Array">
+        <Exp Field="rw_report_log.rep_id" ParamName ="rep_id"  TypeKey="0"/>
+      </Exp>
+      <Exp Field="func_use" Target="Client" Value="func_use" />
+      <Exp Field="secuser.u_name" Oper="Like" ParamName="username" Target="Client" Value="username" />
+    </Query>
+  </GetReportApplyData>
+
+  <GetReportApplyData4UserRight>
+    <Sql>
+      select distinct rw_report_log.rep_id,rep_code,rep_name,class_name,rep_summary,rep_keys,func_use from rw_report_log
+      left join rw_report_main on rw_report_log.rep_id = rw_report_main.rep_id
+      left join secuser on rw_report_log.userid = secuser.logid
+      left join rw_report_class on rw_report_main.rep_classid = rw_report_class.class_id
+      where rw_report_log.rep_id in (
+      select rep_id from rw_report_rights
+      where u_sort ='01' and {userid1} and rightstr >= '1'
+      union all
+      select rep_id from rw_report_rights
+      where u_sort='04' and userid in(
+      select actorid from fg_useractor
+      where {userid2} and {ocode1}) and rightstr >= '1'
+      union all
+      select rep_id from rw_report_rights
+      where u_sort='02' and userid in(
+      select g_code from fg_guser
+      where {g_id} and {ocode2}) and  rightstr >= '1'
+      ) 
+      [query] 
+      [orderby]
+    </Sql>
+    <Where>
+      <Exp Field="rw_report_rights.userid" ParamName="userid1" Target="Client" Value="userid1" />
+      <Exp Field="fg_useractor.userid" ParamName="userid2" Target="Client" Value="userid2" />
+      <Exp Field="fg_useractor.ocode" ParamName="ocode1" Target="Client" Value="ocode1" />
+      <Exp Field="fg_guser.ocode" ParamName="ocode2" Target="Client" Value="ocode2" />
+      <Exp Field="g_id" Target="Client" Value="g_id" />
+    </Where>
+    <Query>
+      <Exp Field="func_use" Target="Client" Value="func_use" />
+      <Exp Field="rep_keys" Target="Client"  Oper="Like" Value="rep_keys"/>
+      <Exp Field="rep_name" Target="Client"  Oper="Like" Value="rep_name"/>
+    </Query>
+  </GetReportApplyData4UserRight>
+
+  <!--
+        select class_name, rep_classid,COUNT(*) counts
+      from rw_report_log
+      left join rw_report_main on rw_report_log.rep_id = rw_report_main.rep_id
+      left join rw_report_class on rw_report_main.rep_classid = rw_report_class.class_id
+      where rw_report_log.rep_id in (
+      select rep_id from rw_report_rights
+      where u_sort ='01' and rw_report_rights.userid = '9999' and rightstr >= '1' 
+      union all
+      select rep_id from rw_report_rights
+      where u_sort='04' and userid in(
+      select actorid from fg_useractor
+      where fg_useractor.userid = '9999' and fg_useractor.ocode = '001') and rightstr >= '1'
+      union all
+      select rep_id from rw_report_rights
+      where u_sort='02' and userid in(
+      select g_code from fg_guser
+      where g_id = '9999' and fg_guser.ocode = '001') and  rightstr >= '1' 
+      )
+      
+      group by rep_classid,class_name
+      order by class_name
+  -->
+  
+  <GetReportApplyDataPie4UserRight>
+    <Sql>
+      select class_name, rep_classid,COUNT(*) counts
+      from rw_report_log
+      left join rw_report_main on rw_report_log.rep_id = rw_report_main.rep_id
+      left join rw_report_class on rw_report_main.rep_classid = rw_report_class.class_id
+      where rw_report_log.rep_id in (
+      select rep_id from rw_report_rights
+      where u_sort ='01' and {userid1} and rightstr >= '1'
+      union all
+      select rep_id from rw_report_rights
+      where u_sort='04' and userid in(
+      select actorid from fg_useractor
+      where {userid2} and {ocode1}) and rightstr >= '1'
+      union all
+      select rep_id from rw_report_rights
+      where u_sort='02' and userid in(
+      select g_code from fg_guser
+      where {g_id} and {ocode2}) and  rightstr >= '1'
+      )
+      [query]
+      group by rep_classid,class_name
+      order by class_name
+    </Sql>
+    <Where>
+      <Exp Field="rw_report_rights.userid" ParamName="userid1" Target="Client" Value="userid1" />
+      <Exp Field="fg_useractor.userid" ParamName="userid2" Target="Client" Value="userid2" />      
+      <Exp Field="fg_useractor.ocode" ParamName="ocode1" Target="Client" Value="ocode1" />
+      <Exp Field="fg_guser.ocode" ParamName="ocode2" Target="Client" Value="ocode2" />
+      <Exp Field="g_id" Target="Client" Value="g_id" />
+    </Where>
+    <Query>
+      <Exp Field="func_use" Target="Client" Value="func_use" />
+      <Exp Field="rep_keys" Target="Client"  Oper="Like" Value="rep_keys"/>
+      <Exp Field="rep_name" Target="Client"  Oper="Like" Value="rep_name"/>
+    </Query>
+  </GetReportApplyDataPie4UserRight>
+</DataService>

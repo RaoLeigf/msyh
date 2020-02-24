@@ -1,0 +1,722 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{    
+    <style type="text/css">
+        .iconview-hover {            
+            /*background-color:rgb(133,177,218);*/
+            border: 1px dashed rgb(133,177,218);
+        }
+    </style>
+
+    <script>
+
+        var buildinIconShow = true;
+        var customIconShow = false;
+        var cur_iconid = '';
+        var cur_icontype;
+        var cur_icontag;
+        var cur_attachid;
+        var tag = '';
+
+        Ext.onReady(function () {
+
+            var addTagWin = Ext.create('Ext.window.Window', {
+                title: '新增标签',
+                height: 95,
+                width: 400,
+                modal: true,
+                closeAction: 'hide',
+                layout: 'column',
+                items: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '标签名',
+                        id: 'tagName',
+                        labelWidth: 50,
+                        width: 240,
+                        margin: '20 10 20 50'
+                    },
+                    {
+                        xtype: 'button',
+                        height: 23,
+                        margin: '20 10 20 0',
+                        text: '确定',
+                        id: 'addTagBtn',
+                        handler: function () {
+                            Ext.getCmp('addTagBtn').disable();//禁用按钮
+                            var myMask = new Ext.LoadMask(document.body, { msg: "正在新增标签,请稍候..." });
+                            myMask.show();//锁屏
+                            Ext.Ajax.request({
+                                params: { 'name': Ext.getCmp('tagName').getValue() },
+                                url: '../FuncIconManager/AddTag',
+                                success: function (response) {
+                                    myMask.hide();//停止锁屏
+                                    Ext.getCmp('addTagBtn').enable();
+                                    if (response.responseText == "True") {
+                                        Ext.MessageBox.alert('提示', '标签新增成功！');
+                                        gridStore.load({ params: { "search": "" } });
+                                        addTagWin.hide();
+                                    } else if (response.responseText == "False") {
+                                        Ext.MessageBox.alert('提示', '标签新增失败，标签名重复。');
+                                    }
+                                },
+                                failure: function (response) {
+                                    myMask.hide();//停止锁屏
+                                    Ext.getCmp('addTagBtn').enable();//按钮设置为可用
+                                }
+                            });
+                        }
+                    }
+                ]
+            });
+
+            var addIconBtn = Ext.create("Ext.button.Button", {
+                x: 375,
+                y: 230,
+                text: '上传',
+                height: 23,
+                width: 64,
+                itemId: 'addIconBtn',
+                handler: function () {
+                    addIconBtn.disable();//禁用按钮
+                    var myMask = new Ext.LoadMask(document.body, { msg: "正在上传图标,请稍候..." });
+                    myMask.show();//锁屏
+                    var name = Ext.getCmp('addIconUpload').getValue();
+                    name = name.substring(name.lastIndexOf("\\") + 1);
+                    if (!/^.*\.(jpg|png|ico)$/i.test(name)) {
+                        Ext.MessageBox.alert('提示', '请选择jpg,png,ico格式的图标文件!');
+                        myMask.hide();//停止锁屏
+                        addIconBtn.enable();//按钮设置为可用
+                        return;
+                    }
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        form.submit({
+                            url: '../FuncIconManager/AddIconUpload',
+                            method: 'post',
+                            params: { 'name': name, 'tag': Ext.getCmp("addTag").getValue() },
+                            success: function (response) {
+                                myMask.hide();//停止锁屏
+                                addIconBtn.enable();
+                                Ext.MessageBox.alert('提示', '图标新增成功！');
+                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": "" } });
+                                addIconWin.hide();
+                            },
+                            failure: function (response) {
+                                myMask.hide();//停止锁屏
+                                addIconBtn.enable();//按钮设置为可用
+                            }
+                        });
+                    }
+                }
+            });
+
+            var replaceIconBtn = Ext.create("Ext.button.Button", {
+                x: 375,
+                y: 230,
+                text: '上传',
+                height: 23,
+                width: 64,
+                itemId: 'replaceIconBtn',
+                handler: function () {
+                    replaceIconBtn.disable();//禁用按钮
+                    var myMask = new Ext.LoadMask(document.body, { msg: "正在替换图标,请稍候..." });
+                    myMask.show();//锁屏
+                    var name = Ext.getCmp('replaceIconUpload').getValue();
+                    name = name.substring(name.lastIndexOf("\\") + 1);
+                    if (!/^.*\.(jpg|png|ico)$/i.test(name)) {
+                        Ext.MessageBox.alert('提示', '请选择jpg,png,ico格式的图标文件!');
+                        myMask.hide();//停止锁屏
+                        replaceIconBtn.enable();//按钮设置为可用
+                        return;
+                    }
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {                       
+                        form.submit({
+                            url: '../FuncIconManager/ReplaceIconUpload',
+                            method: 'post',
+                            params: { 'id': cur_iconid, 'name': name, 'tag': Ext.getCmp("replaceTag").getValue(), 'attachid': cur_attachid },
+                            success: function (response) {
+                                myMask.hide();//停止锁屏
+                                replaceIconBtn.enable();
+                                Ext.MessageBox.alert('提示', '图标替换成功！');
+                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": "" } });
+                                replaceIconWin.hide();
+                            },
+                            failure: function (response) {
+                                myMask.hide();//停止锁屏
+                                replaceIconBtn.enable();//按钮设置为可用
+                            }
+                        });
+                    }
+                }
+            });
+
+            var addTagPanel = Ext.create('Ext.panel.Panel', {
+                x: 8,
+                y: 106,
+                height: 110,
+                width: 431,
+                overflowY: 'scroll',
+                autoScroll: true,
+                layout: 'absolute'
+            });
+
+            var replaceTagPanel = Ext.create('Ext.panel.Panel', {
+                x: 8,
+                y: 106,
+                height: 110,
+                width: 431,
+                overflowY: 'scroll',
+                autoScroll: true,
+                layout: 'absolute'
+            });
+
+            Ext.define('gridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'phid',
+                        type: 'string',
+                        mapping: 'phid'
+                    }, {
+                        name: 'name',
+                        type: 'string',
+                        mapping: 'name'
+                    }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'gridmodel',
+                autoLoad: false,
+                url: '../FuncIconManager/GetTagGrid'
+            });
+          
+            var addIconPanel = Ext.create("Ext.form.Panel", {
+                layout: 'absolute',
+                height: 270,
+                border: false,
+                items: [
+                    {
+                        height: 30,
+                        xtype: 'filefield',
+                        name: 'addCustomIcon',
+                        id: 'addIconUpload',
+                        buttonText: '...',
+                        msgTarget: 'side',
+                        anchor: '100%',
+                        allowBlank: false,
+                        margin: '12 8 3 8',
+                        regex: /^.*\.(jpg|png|ico)$/i,
+                        regexText: '请选择jpg,png,ico格式的图标文件',
+                        width: 427
+                    },
+                    {
+                        xtype: 'label',
+                        margin: '5 0 5 10',
+                        y: 42,
+                        text: '支持jpg、png、ico格式的图标文件'
+                    },
+                    {
+                        xtype: 'textfield',
+                        x: 10,
+                        y: 72,
+                        fieldLabel: '标签:',
+                        id: 'addTag',
+                        margin: '0 3 0 0',
+                        labelWidth: 38,
+                        width: 429,
+                        readOnly: true
+                    },
+                    addTagPanel,
+                    addIconBtn
+                ]
+            });
+
+            var replaceIconPanel = Ext.create("Ext.form.Panel", {
+                layout: 'absolute',
+                height: 270,
+                border: false,
+                items: [
+                    {
+                        height: 30,
+                        xtype: 'filefield',
+                        name: 'replaceCustomIcon',
+                        id: 'replaceIconUpload',
+                        buttonText: '...',
+                        msgTarget: 'side',
+                        anchor: '100%',
+                        allowBlank: false,
+                        margin: '12 8 3 8',
+                        regex: /^.*\.(jpg|png|ico)$/i,
+                        regexText: '请选择jpg,png,ico格式的图标文件',
+                        width: 427
+                    },
+                    {
+                        xtype: 'label',
+                        margin: '5 0 5 10',
+                        y: 42,
+                        text: '支持jpg、png、ico格式的图标文件'
+                    },                    
+                    {
+                        xtype: 'textfield',
+                        x: 10,
+                        y: 72,
+                        fieldLabel: '标签:',
+                        id: 'replaceTag',
+                        margin: '0 3 0 0',
+                        labelWidth: 38,
+                        width: 429,
+                        readOnly: true
+                    },
+                    replaceTagPanel,
+                    replaceIconBtn
+                ]
+            });
+
+            var addIconWin = Ext.create('Ext.window.Window', {
+                title: '新增图标',
+                height: 300,
+                width: 460,
+                modal: true,
+                closeAction: 'hide',
+                items: [addIconPanel]
+            });
+
+            var replaceIconWin = Ext.create('Ext.window.Window', {
+                title: '替换图标',
+                height: 300,
+                width: 460,
+                modal: true,
+                closeAction: 'hide',
+                items: [replaceIconPanel]
+            });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                stateful: true,
+                stateId: 'nggrid',
+                store: gridStore,
+                buskey: 'phid', //对应的业务表主键属性
+                hideHeaders: true,
+                border: false,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'phid',
+                        width: 100,
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '标签名称',
+                        dataIndex: 'name',
+                        width: '100%',
+                        sortable: false,
+                        hidden: false
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected.length == 0) return;
+                        else {
+                            var name = selected[0].data.name;
+                            if (name == '全部') {
+                                tag = '';
+                                Ext.getCmp('buildinBtn').el.setStyle('background', 'rgb(158,193,225)');
+                                buildinIconShow = true;
+                                Ext.getCmp('customBtn').el.setStyle('background', 'rgb(158,193,225)');
+                                customIconShow = true;
+                                iconsStore.load({ params: { "buildinIconShow": true, "customIconShow": true, "tag": "" } });
+                            } else {
+                                tag = name;
+                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": name } });
+                            }
+                        }
+                    }
+                }
+            });
+
+            var tagToolbar = Ext.create('Ext.ng.Toolbar', {
+                margin: '3 0 0 0',
+                ngbuttons: [
+                    {
+                        text: '新增',
+                        iconCls: "icon-New",
+                        handler: function () {
+                            Ext.getCmp('tagName').setValue("");
+                            addTagWin.show();
+                        }
+                    },
+                    {
+                        text: '删除',
+                        iconCls: "icon-delete",
+                        handler: function () {
+                            var rs = grid.getSelectionModel().getSelection();
+                            if (rs.length > 0) {
+                                var r = rs[0];
+                                var name = r.data.name;
+                                if (name == "全部") {
+                                    Ext.MessageBox.alert('提示', '不能删除此标签');
+                                } else {
+                                    Ext.Ajax.request({
+                                        params: { 'name': name },
+                                        url: '../FuncIconManager/DelTag',
+                                        success: function (response) {
+                                            if (response.responseText == "True") {
+                                                Ext.MessageBox.alert('提示', '标签删除成功！');
+                                                gridStore.load({ params: { "search": "" } });
+                                            } else if (response.responseText == "False") {
+                                                Ext.MessageBox.alert('提示', '标签删除失败，此标签已被功能图标应用。');
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                Ext.MessageBox.alert('提示', '请选择想要删除的标签');
+                            }
+                        }
+                    }
+                ]
+            });
+
+            var tagList = Ext.create("Ext.panel.Panel", {
+                title: '标签列表',
+                region: 'west',
+                width: '24%',
+                layout: 'border',
+                bodyStyle: 'background:#FFF',
+                items: [
+                    {
+                        region:'north',
+                        border: false,
+                        items:[
+                            tagToolbar,
+                            {
+                                layout: 'column',
+                                border: false,
+                                height: 37,
+                                items:[
+                                    {
+                                        xtype: 'textfield',
+                                        columnWidth: 0.85,
+                                        id: 'tagSearch',
+                                        margin:'6 3 0 5'
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        text: '搜索',
+                                        columnWidth: 0.15,
+                                        height: 23,
+                                        margin: '6 5 0 0',
+                                        handler: function () {
+                                            gridStore.load({ params: { "search": Ext.getCmp('tagSearch').getValue() } });
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        margin: '5 5 5 5',
+                        layout: 'fit',
+                        items: [grid]
+                    }
+                ]
+            });
+
+            Ext.define('iconmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'id', type: 'string' },
+                    { name: 'name', type: 'string' },
+                    { name: 'src', type: 'string' },
+                    { name: 'tag', type: 'string' },
+                    { name: 'icontype', type: 'string' },
+                    { name: 'attachid', type: 'string' }
+                ]
+            });
+
+            var iconsStore = Ext.create('Ext.data.JsonStore', {
+                id: 'iconsStore',
+                model: 'iconmodel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: '../FuncIconManager/GetIconsEx',
+                    reader: {
+                        type: 'json',
+                        root: 'items'
+                    }
+                }
+            });
+
+            var dataView = Ext.create('Ext.view.View', {
+                store: Ext.data.StoreManager.lookup('iconsStore'),
+                tpl: new Ext.XTemplate(
+                    '<ul style="list-style-type:none;-webkit-padding-start: 3px">',
+                        '<tpl for=".">',
+                            '<li style="background-color:rgb(158,193,225);width:88px;height:88px;float:left;margin:2px" class="iconview" onclick=ClickIcon(this,"{id}","{icontype}","{tag}","{attachid}")>',
+                                '<img width="88" height="88" src="{src}" />',
+                            '</li>',
+                        '</tpl>',
+                    '</ul>'
+                ),
+                id: 'dataView',
+                trackOver: true,
+                overItemCls: 'iconview-hover',
+                itemSelector: 'li.iconview',
+                style: {
+                    'overflow-x': 'hidden'
+                }
+            });
+
+            var iconToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                margin: '3 0 0 0',
+                ngbuttons: [
+                    {
+                        text: '新增',
+                        iconCls: "icon-New",
+                        handler: function () {
+                            var items = addTagPanel.items;
+                            items.each(function (item) {
+                                addTagPanel.remove(item);
+                            });
+                            Ext.getCmp("addTag").setValue('');
+
+                            var myTabs = [];
+                            var i = 0;
+                            gridStore.each(function (record) {
+                                if (record.get('name') != '全部') {
+                                    myTabs.push({
+                                        xtype: 'checkboxfield',
+                                        margin: '3 5 3 10',
+                                        x: 106 * (i % 4),
+                                        y: parseInt(i / 4) * 25,
+                                        width: 98,
+                                        boxLabel: record.get('name'),
+                                        name: record.get('phid'),
+                                        listeners: {
+                                            'change': function (obj) {
+                                                var tagValue = Ext.getCmp("addTag").getValue();
+                                                if (obj.checked) {
+                                                    tagValue += obj.boxLabel + ';';
+                                                } else {
+                                                    tagValue = tagValue.replace(obj.boxLabel + ';', '');
+                                                }
+                                                Ext.getCmp("addTag").setValue(tagValue);
+                                            }
+                                        }
+                                    });
+                                    i++;
+                                }
+                            });
+                            addTagPanel.add(myTabs);
+
+                            addIconWin.show();
+                        }
+                    },
+                    {
+                        text: '删除',
+                        iconCls: "icon-delete",
+                        handler: function () {
+                            if (cur_iconid == '') {
+                                Ext.MessageBox.alert('提示', '请选择想要删除的图标。');
+                            }
+                            else {
+                                if (cur_icontype == '1') {
+                                    Ext.Ajax.request({
+                                        params: { 'id': cur_iconid },
+                                        url: '../FuncIconManager/DelIcon',
+                                        success: function (response) {
+                                            if (response.responseText == "True") {
+                                                Ext.MessageBox.alert('提示', '删除图标成功!');
+                                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": "" } });
+                                            } else if (response.responseText == "False") {
+                                                Ext.MessageBox.alert('提示', '图标删除失败，此图标已被功能点应用。');
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Ext.MessageBox.alert('提示', '只能删除自定义图标!');
+                                }
+                            }
+                        }
+                    },
+                    {
+                        text: '替换',
+                        iconCls: "icon-Refresh",
+                        handler: function () {
+                            if (cur_iconid == '') {
+                                Ext.MessageBox.alert('提示', '请选择想要替换的图标。');
+                            }
+                            else {
+                                if (cur_icontype == '1') {
+                                    var items = replaceTagPanel.items;
+                                    items.each(function (item) {
+                                        replaceTagPanel.remove(item);
+                                    });
+                                    Ext.getCmp("replaceTag").setValue(cur_icontag);
+
+                                    var myTabs = [];
+                                    var i = 0;
+                                    gridStore.each(function (record) {
+                                        if (record.get('name') != '全部') {
+                                            myTabs.push({
+                                                xtype: 'checkboxfield',
+                                                margin: '3 5 3 10',
+                                                x: 106 * (i % 4),
+                                                y: parseInt(i / 4) * 25,
+                                                width: 98,
+                                                boxLabel: record.get('name'),
+                                                name: record.get('phid'),
+                                                checked: cur_icontag.indexOf(record.get('name') + ';') > -1,
+                                                listeners: {
+                                                    'change': function (obj) {
+                                                        var tagValue = Ext.getCmp("replaceTag").getValue();
+                                                        if (obj.checked) {
+                                                            tagValue += obj.boxLabel + ';';
+                                                        } else {
+                                                            tagValue = tagValue.replace(obj.boxLabel + ';', '');
+                                                        }
+                                                        Ext.getCmp("replaceTag").setValue(tagValue);
+                                                    }
+                                                }
+                                            });
+                                            i++;
+                                        }
+                                    });
+                                    replaceTagPanel.add(myTabs);
+
+                                    replaceIconWin.show();
+                                } else {
+                                    Ext.MessageBox.alert('提示', '只能替换自定义图标!');
+                                }
+                            }
+                        }
+                    }, '->',
+                    'help',
+                    { itemId: "close", text: "退出", iconCls: "icon-Exit" }
+                ]
+            });
+
+            iconToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('SysIconLib.cshtml');
+            });
+
+            var iconPanel = Ext.create("Ext.panel.Panel", {
+                title: '图标库',
+                region: 'center',
+                layout: 'border',
+                bodyStyle: 'background:#FFF',
+                items: [
+                    iconToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        border: false,
+                        layout: 'border',
+                        bodyStyle: 'background:#FFF',
+                        items: [
+                            {
+                                region: 'north',
+                                xtype: 'panel',
+                                border: false,
+                                height: 26,
+                                margin: '10 0 5 15',
+                                items: [
+                                    {
+                                        xtype: 'button',
+                                        text: '内置图标',
+                                        id: 'buildinBtn',
+                                        width: 72,
+                                        height: 25,
+                                        style:{
+                                            background: 'rgb(158,193,225)',
+                                            border: '0px'
+                                        },
+                                        margin: '0 12 0 0',
+                                        handler: function () {
+                                            if (buildinIconShow == true) {
+                                                Ext.getCmp('buildinBtn').el.setStyle('background', 'rgb(238,238,238)');
+                                                buildinIconShow = false;
+                                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": tag } });
+                                            } else {
+                                                Ext.getCmp('buildinBtn').el.setStyle('background', 'rgb(158,193,225)');
+                                                buildinIconShow = true;
+                                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": tag } });
+                                            }
+                                        }
+                                    },
+                                    {
+                                        xtype: 'button',
+                                        text: '自定义图标',
+                                        id: 'customBtn',
+                                        width: 72,
+                                        height: 25,
+                                        style:{
+                                            background: 'rgb(238,238,238)',
+                                            border: '0px'
+                                        },
+                                        handler: function () {
+                                            if (customIconShow == false) {
+                                                Ext.getCmp('customBtn').el.setStyle('background','rgb(158,193,225)');
+                                                customIconShow = true;
+                                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": tag } });
+                                            } else {
+                                                Ext.getCmp('customBtn').el.setStyle('background', 'rgb(238,238,238)');
+                                                customIconShow = false;
+                                                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": tag } });
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                region: 'center',
+                                xtype: 'panel',
+                                layout: 'fit',
+                                border: false,
+                                autoScroll: true,
+                                overflowY: 'scroll',
+                                margin: '0 5 5 10',
+                                items: [dataView]
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            Ext.defer(function () {
+                gridStore.load({ params: { "search": "" } });
+                iconsStore.load({ params: { "buildinIconShow": buildinIconShow, "customIconShow": customIconShow, "tag": "" } });
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [tagList, iconPanel]
+            });
+
+        });
+
+        function ClickIcon(e, id, icontype, tag, attachid) {
+            for (var i = 0; i < e.parentNode.childNodes.length;i++)
+            {
+                e.parentNode.childNodes[i].style.background = 'rgb(158,193,225)';
+            }
+            e.style.background = 'rgb(133,177,218)';
+            cur_iconid = id;
+            cur_icontype = icontype;
+            cur_icontag = tag;
+            cur_attachid = attachid;
+        }
+
+    </script>
+}

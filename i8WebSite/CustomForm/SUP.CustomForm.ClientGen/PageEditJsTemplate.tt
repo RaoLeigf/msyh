@@ -1,0 +1,1948 @@
+﻿//------------------------------全局函数------------------------------
+//附件接收返回值
+function AttachReturnValue(key, value) {
+    AttachReturnRefresh(key, value);
+}
+
+
+//------------------------------全局变量------------------------------
+//全局变量
+Ext.useShims = true;  //帮助显示在最顶层
+var attfrom;  //附件打开自form、grid还是list
+var blobdocUrl = '';  //金格控件url
+var Guid = new GUID();  //用于生成guid
+var eform = '<#= EForm #>';  //工作流等的key 
+var busname = '<#= PForm #>';
+var classname = '<#= ClassName #>';
+var tablenameM = '<#= TableName #>';
+var istask = '<#= IsTask #>';
+var otypeori = otype;
+var reltable = '<#= Reltable #>';
+
+var curToolbar;  //当前工具栏
+var curForm;  //当前form
+var curGrid;  //当前grid
+var curStore;  //当前store
+
+var isMultiSelect = false;  //grid是否复选
+var isForbidSave = false;  //禁止保存，防止连续点击保存按钮重复请求
+
+//------------------------------onReady------------------------------
+Ext.onReady(function () {
+	//布局前初始化函数
+    if (typeof allInitEdit === "function") {
+        allInitEdit();
+    }
+
+	//虚面板，用于调整某些事件的触发时机
+    var virtualPanel = Ext.create('Ext.panel.Panel', {});
+    virtualPanel.addEvents('afterViewport');  //viewport建完后触发
+
+	//工具栏
+	var toolbarStr;
+
+	if (IsSso == 'true') {
+		toolbarStr = ['->', '', 'close'];  //单点登录预览按钮特殊处理
+	}
+	else {
+		toolbarStr = [<#= Common.GetButtons(Toolbar,"Edit") #>];
+	}
+
+	var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+		region: 'north',
+		rightName: '<#= QForm #>', //权限名称
+		id: 'toolbar',
+		ngbuttons: toolbarStr
+	});
+
+	<# if (HasBlobdoc != "0") { #>
+		//创建金格panel
+		var blobdocPanel = Ext.create('Ext.panel.Panel', {
+			id: 'BlobdocPanel',
+			region: 'center',
+			y: <#= FieldSetBlobdoc.Y #>,
+			width: '100%',
+			minHeight: <#= FieldSetBlobdoc.Height < 500 ? 500 : FieldSetBlobdoc.Height #>,
+			layout: 'fit',
+			html: '<div id="webofficetab" style="height:100%"><iframe src="" style="width:100% !important;height:100%;" scrolling="auto" id="webofficeiframe"></iframe></div>',
+			listeners: {
+				beforeRender: function (com, eOpts) {
+
+				},
+				render: function (com, eOpts) {
+
+				}
+			}
+		});
+	<# } #>
+
+	<# if (HasEppocx != "0") { #>
+		//创建进度panel
+		var eppocxPanel = document.createElement('IFRAME');
+		eppocxPanel.scrolling = 'auto';
+		eppocxPanel.frameBorder = 0;
+		eppocxPanel.src = '';
+		eppocxPanel.height = '100%';
+		eppocxPanel.width = '100%';
+
+		virtualPanel.on('afterViewport', function () {
+			mstform.on('dataready', function () {
+				if (Ext.getCmp('pc')) {
+					var pcid = Ext.getCmp('pc').getValue();
+					if (!Ext.isEmpty(pcid)) {
+						eppocxPanel.src = C_ROOT + "Schedules/SpmNetPlan/EScheduleChild?pc=" + pcid;
+					}
+				}
+			});
+		});
+	<# } #>
+
+	<# if (PictureBoxs.Count > 0) { #>
+	    //创建图片控件
+		<# for (int i = 0; i < PictureBoxs.Count; i++) { #>
+		    var <#= PictureBoxs[i].Name #>Upload = Ext.create("Ext.form.field.File", {
+                msgTarget: 'side',
+				flex: 1,
+                buttonText: '上传',
+                listeners: {
+				    afterrender: function () {
+                        <#= PictureBoxs[i].Name #>Upload.el.down('input').dom.style.display = 'none';
+                    },
+                    change: function () {
+                        var form = this.up('form').getForm();
+                        form.submit({
+                            url: C_ROOT + '<#= Area #>/<#= ClassName #>Edit/<#= PictureBoxs[i].Name #>ImageUpload',
+                            waitMsg: '上传图片中...',
+                            success: function (fp, o) {
+							    if (o.result.success) {
+                                    var path = o.result.path;
+							        Ext.getCmp('<#= PictureBoxs[i].Name #>' + 'picCom').getEl().dom.src = C_ROOT + path;
+									Ext.getCmp('<#= PictureBoxs[i].Name #>' + 'picCom').show();
+									Ext.getCmp('<#= PictureBoxs[i].Name #>' + '_url').setValue(path);
+								}
+                            },
+							failure: function (fp, o) {
+							    Ext.MessageBox.alert('提示', o.result.msg);
+							}
+                        });
+                    }
+                }
+            });
+
+			var <#= PictureBoxs[i].Name #>picPanel = Ext.create("Ext.form.Panel", {
+			    <# if (tableLayouts.IsAbsoluteLayout) { #>
+			    width: <#= PictureBoxs[i].Width #>,
+				x: <#= PictureBoxs[i].XPos #>,
+				y: <#= PictureBoxs[i].YPos #>,
+				<# } else { #>
+				colspan : <#= PictureBoxs[i].ColSpan #>,
+				<# } #>
+                border: false,
+				<# if (!string.IsNullOrEmpty(PictureBoxs[i].Tag)) { #>
+				title: <#= PictureBoxs[i].Tag #>,
+				<# } #>
+				margin: '0 10 0 0',
+				items: [
+                    {
+                        xtype: 'component',
+                        width: '100%',
+                        height: <#= PictureBoxs[i].Height #>,
+                        id: '<#= PictureBoxs[i].Name #>picCom',
+						hidden : true,
+                        autoEl: { tag: 'img', src: '' },
+						listeners: {
+						    render: function() {
+							    Ext.fly(this.el).on('click', function(e,t) {
+								    window.open(Ext.getCmp('<#= PictureBoxs[i].Name #>picCom').getEl().dom.src);
+								});
+						    }
+						}
+                    },
+					{
+					    layout: 'hbox',
+					    border: false,
+					    items: [
+					        <#= PictureBoxs[i].Name #>Upload,
+					        {
+                                flex: 1,
+							    border: false,
+							    items: [
+							        {
+						                xtype: 'button',
+                                        text: '下载',
+							            margin: '1.5 30 0 30',
+							            id: '<#= PictureBoxs[i].Name #>Download',
+							            hidden : true,
+                                        handler: function() {
+                                            var url = Ext.getCmp('<#= PictureBoxs[i].Name #>picCom').getEl().dom.src;
+						    	            var a = document.createElement('a');
+						    	            var event = new MouseEvent('click');
+						    	            a.href = url;
+						    	            a.download = '';
+						    	            a.dispatchEvent(event);
+                                        }
+							        }
+							    ]
+					        }
+					    ]
+					}
+			    ]
+			});	
+		<# } #>
+	<# } #>
+
+	<# if (fieldSets.Count==0 && tableLayouts.AllFields.Count > 0 ) { #>
+		<# if (tableLayouts.IsAbsoluteLayout) { #>
+		var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+			id: '<#= TableName #>',
+		<# if (BodyCmpCount == 0) { #>
+			region: 'center',
+		<# } else { #>
+			region: 'north',
+		<# } #>
+			buskey: '<#= PkPropertyname #>', //对应的业务表主键
+			autoScroll: true,
+			otype: otype,
+			minHeight: <#= Common.GetFormHeight(tableLayouts) #>,	
+			layout: {
+				type: 'absolute'
+			},
+			columnsPerRow: <#= tableLayouts.ColumnsPerRow #>,
+			fieldDefaults: {
+				labelWidth: <#= tableLayouts.FormLabelWidth #>,
+				margin: '3 10 3 0',
+				//anchor: '100%',  //绝对布局下锚定不要
+				msgTarget: 'side'
+			},		
+			fields: [
+					<#= Common.GetFormAbs(tableLayouts, PictureBoxs) #>
+			]
+		});
+		<# } else { #>
+		var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+			id: '<#= TableName #>',
+		<# if (BodyCmpCount == 0) { #>
+			region: 'center',
+		<# } else { #>
+			region: 'north',
+		<# } #>
+			buskey: '<#= PkPropertyname #>', //对应的业务表主键
+			autoScroll: true,
+			otype: otype,
+		<# if (BodyCmpCount == 0) { #>
+			minHeight: <#= Common.GetFormHeight(tableLayouts) #>,
+		<# } #>		
+			columnsPerRow: <#= tableLayouts.ColumnsPerRow #>,
+			isBuildByRows: true,
+			fieldDefaults: {
+				labelWidth: <#= tableLayouts.FormLabelWidth #>,
+				margin: '3 10 3 0',
+				anchor: '100%',
+				msgTarget: 'side'
+			},	
+			fieldRows: [
+				<#= Common.GetForm(tableLayouts, PictureBoxs) #>
+			]
+		});
+		<# } #>
+	<# } #>
+
+	<# if (Reltable != "0") { #>
+		var reltables = reltable.split(';');
+		var masReltables = [];
+		var slaReltables = [];
+		for(var i = 0; i < reltables.length; i++)
+		{
+			var temp = reltables[i].split('@');
+			masReltables[i] = temp[0];
+			slaReltables[i] = temp[1];
+		}
+	<# } #>
+
+
+	<# for (int i = 0; i < AllGrids.Count; i++) { #>
+		//<#= AllGrids[i].TableName #>grid
+		var <#= AllGrids[i].TableName #>cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+			clicksToEdit: 1,  //单击编辑，单元格修改
+			listeners: {
+				edit: function (editor, e) {
+					if (e.originalValue == e.value) {
+						return;
+					}
+
+					<#    if (Expressions.ContainsValue("GridNormal")) { #>
+					<#        foreach (var item in Expressions) { #>
+					<#            if (item.Value == "GridNormal") { #>
+					<#=                    item.Key #>
+					<#            }}} #>
+				}
+			}
+		});
+		
+		<# if (AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+			//--树grid
+			var <#= AllGrids[i].TableName #>grid = Ext.create('Ext.ng.TreePanel', {
+			<# if (AllGrids[i].Title != "0") { #>
+				title: '<#= AllGrids[i].Title #>',
+			<# } #>
+				height: <#= AllGrids[i].Height > 200 ? AllGrids[i].Height : 200 #>,
+				region: '<#= AllGrids[i].Region #>',
+				id: '<#= AllGrids[i].TableName #>grid',
+				margin: '0 0 10 0',
+			<# if (!string.IsNullOrEmpty(AllGrids[i].LevelSum)) { #>
+				sumByLevel: true,
+                sumByLevelCols: [<#= AllGrids[i].LevelSum #>], //级次汇总列
+			<# } #>
+			<# if (tableLayouts.IsAbsoluteLayout || (BodyCmpCount <= 1)) { #>
+				x: <#= AllGrids[i].X #>,
+				y: <#= AllGrids[i].Y #>,
+				width: <#= AllGrids[i].Width #>,
+			<# } #>
+				minHeight: <#= AllGrids[i].Height < 150 ? 150 : AllGrids[i].Height #>,
+			<# if (AllGrids[i].Collapse == "1") { #>
+				collapsible: true,
+			<# } #>		
+				buskey: '<#= PkPropertyname #>', //对应的业务表主键属性
+				otype: otype,
+				autoLoad: false,
+				columnLines: true,
+				rowLines: true,
+				url: C_ROOT + '<#= Area #>/<#= ClassName #>Edit/Get<#= AllGrids[i].TableName #>List?istreegrid=1&id=' + busid,
+				treeFields: [
+					{
+						name: 'phid',
+						type: 'string',
+						mapping: 'phid'
+					},
+					<#= Common.GetPageModelFields(AllGrids[i],"Edit",4) #>
+				],
+				columns: [<#= Common.GetPageGridColumns(AllGrids[i],"Edit",4) #>
+				<# if (AllGrids[i].Columns.Count>0){ #>
+				,{
+					text: '主键',
+					dataIndex: '<#= PkPropertyname #>',
+					hidden: true
+				}
+				<# } #>
+				],        		
+				listeners: {
+					beforeedit: function (editor, e, eOpts) {
+					 var data = <#= AllGrids[i].TableName #>grid.getSelectionModel().getSelection();
+				        if (data.length > 0 && !data[0].raw.leaf) {
+				            return false;
+				        }
+						//有物资列的话，单位列设为只读
+						if (e.field == 'msunit_name') {
+							if (<#= AllGrids[i].TableName #>grid.getColumn('itemid')) {
+								return false;
+							}
+						}
+					}
+					<# if (AllGrids[i].ColumnNames.Contains("asr_flg")) { #>
+						,
+						celldblclick: function (editor, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+							if (editor.getHeaderAtIndex(cellIndex).dataIndex == 'asr_flg') {
+								curGrid = <#= AllGrids[i].TableName #>grid;
+								curGrid.getSelectionModel().select(rowIndex);
+								OpenAttachment('grid', '<#= AllGrids[i].TableName #>');
+							} 
+						}
+					<# } #>
+				},
+				plugins: [<#= AllGrids[i].TableName #>cellEditing		
+						<# if (AllGrids[i].ColumnNames.Contains("res_code")){ #>
+							,
+							{
+								pluginId: 'itempropertycellediting',
+								ptype: 'itempropertycellediting',
+								resPropertysCol: 'res_propertys',////组合名称字段名，不显示可空
+								resMasterDataCol: '',////资源信息字段名，不修改保存可空
+								phidItemDetailCol: 'itemid'////事物特性内容主键字段名，不可空
+							}
+						<# } #>
+						] //绑定编辑对象
+			});
+			
+			var <#= AllGrids[i].TableName #>store = <#= AllGrids[i].TableName #>grid.store;
+		<# } else { #>
+			Ext.define('<#= AllGrids[i].TableName #>model', {
+				extend: 'Ext.data.Model',
+				fields: [
+				{
+					name: 'phid',
+					type: 'string',
+					mapping: 'phid'
+				},
+				<#= Common.GetPageModelFields(AllGrids[i],"Edit",4) #>
+				]
+			});
+			
+			var <#= AllGrids[i].TableName #>store = Ext.create('Ext.ng.JsonStore', {
+				model: <#= AllGrids[i].TableName #>model,
+				autoLoad: false,
+			<# if (AllGrids[i].Groupfield.Count > 0) { #>
+				groupField: otype == 'view' ? 's_groupfield' : '',
+			<# } #>
+				url: C_ROOT + '<#=  Area #>/<#= ClassName #>Edit/Get<#= AllGrids[i].TableName #>List'
+			});
+
+			var <#= AllGrids[i].TableName #>grid = Ext.create('Ext.ng.GridPanel', {
+			<# if (AllGrids[i].Title != "0") { #>
+				title: '<#= AllGrids[i].Title #>',
+			<# } #>
+			    height: <#= AllGrids[i].Height > 200 ? AllGrids[i].Height : 200 #>,
+				region: '<#= AllGrids[i].Region #>',
+				id: '<#= AllGrids[i].TableName #>grid',
+				margin: '0 0 10 0',
+				stateful: true,
+				stateId: '<#= AllGrids[i].TableName #>grid',
+				multiSelect: isMultiSelect,
+			<# if (AllGrids[i].Sumdic.Count > 0 || AllGrids[i].Subdic.Count > 0) { #>
+				features: <#= Common.GetSummary(AllGrids[i]) #>,
+			<# } #>
+				store: <#= AllGrids[i].TableName #>store,
+			<# if (tableLayouts.IsAbsoluteLayout || (BodyCmpCount <= 1)) { #>
+				x: <#= AllGrids[i].X #>,
+				y: <#= AllGrids[i].Y #>,
+				width: <#= AllGrids[i].Width #>,
+			<# } #>
+				minHeight: <#= AllGrids[i].Height < 150 ? 150 : AllGrids[i].Height #>,
+			<# if (AllGrids[i].Collapse == "1") { #>
+				collapsible: true,
+			<# } #>			
+				buskey: '<#= PkPropertyname #>', //对应的业务表主键属性
+				otype: otype,
+				columnLines: true,
+				columns: [<#= Common.GetPageGridColumns(AllGrids[i],"Edit",4) #>
+				<# if (AllGrids[i].Columns.Count>0) { #>
+				,{
+					header: '主键',
+					dataIndex: '<#= PkPropertyname #>',
+					hidden: true
+				}
+				<# } #>
+				],        		
+				listeners: {
+					beforeedit: function (editor, e, eOpts) {
+						//有物资列的话，单位列设为只读
+						if (e.field == 'msunit_name') {
+							if (<#= AllGrids[i].TableName #>grid.getColumn('itemid')) {
+								return false;
+							}
+						}
+					}
+					<# if (AllGrids[i].ColumnNames.Contains("asr_flg")) { #>
+						,
+						celldblclick: function (editor, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+							if (editor.getHeaderAtIndex(cellIndex).dataIndex == 'asr_flg') {
+								curGrid = <#= AllGrids[i].TableName #>grid;
+								curGrid.getSelectionModel().select(rowIndex);
+								OpenAttachment('grid', '<#= AllGrids[i].TableName #>');
+							} 
+						}
+					<# } #>
+				},
+				plugins: [<#= AllGrids[i].TableName #>cellEditing		
+						<# if (AllGrids[i].ColumnNames.Contains("res_code")){ #>
+							,
+							{
+								pluginId: 'itempropertycellediting',
+								ptype: 'itempropertycellediting',
+								resPropertysCol: 'res_propertys',////组合名称字段名，不显示可空
+								resMasterDataCol: '',////资源信息字段名，不修改保存可空
+								phidItemDetailCol: 'itemid'////事物特性内容主键字段名，不可空
+							}
+						<# } #>
+						] //绑定编辑对象
+			});
+		<# } #>
+
+		<# if (AllGrids[i].ColumnNames.Contains("res_code")) { #>
+		//事物特性控件批量录入
+		<#= AllGrids[i].TableName #>grid.getPlugin('itempropertycellediting').on('onBatchInput', function (records) {
+			var addrows = <#= AllGrids[i].TableName #>grid.getSelectionModel().getSelection();
+			if (addrows.length > 0) {
+				Ext.Array.forEach(records, function (item) {
+					var data = {};
+					Ext.apply(data, addrows[0].data);
+					Ext.apply(data, item);
+
+					<#= AllGrids[i].TableName #>grid.addrow(data);
+				});
+			}
+		});
+		<# } #>
+
+		//设定当前grid和store
+		<#= AllGrids[i].TableName #>grid.addListener('containerclick', function (me, e, eOpts) {
+			curGrid = <#= AllGrids[i].TableName #>grid;
+			curStore = curGrid.store;
+			setButtonStatus(curGrid);
+		});
+		<#= AllGrids[i].TableName #>grid.addListener('cellclick', function (me, rowIndex, columnIndex, e) {
+			curGrid = <#= AllGrids[i].TableName #>grid;
+			curStore = curGrid.store;
+			setButtonStatus(curGrid);
+		});
+
+	<# if (AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+		 <#= AllGrids[i].TableName #>grid.getView().getRowClass = function (record, index, rowParams, store) {
+            if (!record.data.leaf) {
+                return 'row-parentLevel';
+            }
+			else{
+			    return 'row-leafLevel';
+			}
+         };
+		 <# } #>
+
+		<# if (Reltable != "0") { #>
+		var <#= AllGrids[i].TableName #>indexs = [];
+		for (var i = 0; i < masReltables.length; i++)
+		{
+		   if ('<#= AllGrids[i].TableName #>' == masReltables[i]) {
+		       <#= AllGrids[i].TableName #>indexs.push(i);
+		    }
+		}
+		if(<#= AllGrids[i].TableName #>indexs.length > 0){
+		   <#= AllGrids[i].TableName #>grid.addListener('selectionchange', function (me, selection, eOpts) {
+		      for (var i = 0; i < <#= AllGrids[i].TableName #>indexs.length; i++)
+		      {
+			     Ext.getCmp(slaReltables[i] + 'grid').getStore().filter = function (record, id) {
+				    if (record != undefined && id != undefined) {
+                       var selection = <#= AllGrids[i].TableName #>grid.getSelectionModel().getSelection()[0];
+                       return record.get('rel_key1') == selection.data.rel_key1;
+					}
+                 };
+                 if (<#= AllGrids[i].TableName #>grid.getSelectionModel().getSelection().length > 0) {
+                    Ext.getCmp(slaReltables[i] + 'grid').getStore().filterBy(Ext.getCmp(slaReltables[i] + 'grid').getStore().filter);
+                 }
+		      }
+		   });
+		}
+		<# } #>
+	<# } #>
+
+	<# if (HasAsrGrid == "1") { #>
+	    //附件单据体
+		var asrgridstore = Ext.create('Ext.ng.JsonStore', {
+			fields: ['asr_name', 'logid', 'asr_dt'],
+		    autoLoad: false,
+			url: C_ROOT + '<#=  Area #>/<#= ClassName #>Edit/GetAsrGridList'
+		});
+
+		var asrgrid = Ext.create('Ext.ng.GridPanel', {
+		<# if (tableLayouts.IsAbsoluteLayout) { #>
+			x: <#= AsrGrid.X #>,
+			y: <#= AsrGrid.Y #>,
+			width: <#= AsrGrid.Width #>,
+		<# } #>
+			height: <#= AsrGrid.Height #>,
+			store: asrgridstore,
+			columnLines: true,
+			columns: [<#= Common.GetAsrGridColumns(AsrGrid) #>]
+		});
+	<# } #>
+
+	<# if (fieldSets.Count > 0) { #>
+		//fieldSets
+		var mstform = Ext.create('Ext.ng.FieldSetForm', {
+			id: '<#= TableName #>',
+		<# if (tableLayouts.IsAbsoluteLayout || BodyCmpCount == 0) { #>
+			region: 'center',
+		<# } else { #>
+			region: 'north',
+		<# } #>
+			autoScroll: true,
+			frame: true,
+			border: false,
+			buskey: '<#= PkPropertyname #>',
+			otype: otype,  //操作类型,add||edit
+			minHeight: <#= Common.GetFormHeight(fieldSets) #>,
+			isBuildByRows: true,
+			bodyStyle: 'padding-bottom:8px',
+		<# if ( tableLayouts.IsAbsoluteLayout ) { #>
+			layout: {
+				type: 'absolute'
+			},
+		<# } #>
+			fieldDefaults: {
+				labelWidth: <#= tableLayouts.FormLabelWidth #>,
+				margin: '3 10 3 0',
+				//anchor: '100%',  //绝对布局下锚定不要
+				msgTarget: 'side'
+			},	
+			fieldSets: [				    
+				<#= Common.GetFieldSetsExt(tableLayouts, fieldSets, null, panels, PictureBoxs) #>
+			]
+		});
+	<# } #>
+
+
+	//布局面板数组
+	var layoutItem = [ngToolbar];
+
+	//工作流panel
+	var buttonItem = ['save', 'attachment'];
+	if (<#= PanelNames.Count #> > 0 ){
+		buttonItem.push('addrow');
+		buttonItem.push('deleterow');
+		buttonItem.push('import');
+	}
+	if (WorkFlowInfo.wfotype) {
+		layoutItem.push({
+			xtype: 'panel',
+			region: 'north',
+			height: 175,
+			autoScroll: true,
+			bodyStyle: "padding-right:20px",
+			items: [{
+				xtype: 'ngWorkFlowPanel',
+				toolbar: ngToolbar,
+				otype: otype,
+				bizType: '<#= EForm #>',
+				bizPhid: busid,
+				showToolBarItems: buttonItem,  //任务办理时可见toolbar按钮itemid数组
+				workFlowInfo: WorkFlowInfo,
+				bizSaveAsync: true,
+				bizSaveFn: function (callback, oper) {
+					//审批节点的话调审核前检测函数
+                    if (WorkFlowInfo.compType == 3 && oper == 'taskComplete' && typeof beforeVerifyEdit === "function") {
+                        if (!beforeVerifyEdit()) {
+                            return false;
+                        }
+                    }
+
+                    //调取消审批前检测函数
+                    if (WorkFlowInfo.isBizApproved == true && WorkFlowInfo.compType == 3 && oper == 'rollBack' && typeof beforeUnVerifyEdit === "function") {
+                        if (!beforeUnVerifyEdit()) {
+                            return false;
+                        }
+                    }
+					Save(callback);
+				},
+				getAttachData : function (oper) {
+					//调取消审批前检测函数
+                    if (WorkFlowInfo.isBizApproved == true && WorkFlowInfo.compType == 3 && oper == 'rollBack' && typeof beforeUnVerifyEdit === "function") {
+                        if (!beforeUnVerifyEdit()) {
+                            return { funcname: '@@##' };
+                        }
+                    }
+
+					if (typeof getSaveDataEdit === "function") {
+                        if (WorkFlowInfo.compType == 3 && oper == 'taskComplete') {
+                            return getSaveDataEdit("Approve");
+                        }
+						if (WorkFlowInfo.isBizApproved == true && WorkFlowInfo.compType == 3 && oper == 'rollBack') {
+                            return getSaveDataEdit("UnApprove");
+                        }                        
+                    } else {
+                        return;
+                    }
+				},
+				listeners: {
+					taskComplete: function (compId, wfParam) {
+						//alert("调用业务进行业务处理")
+					}
+				},
+				colspan: 4
+			}]
+		});
+	} 
+	<# if (HasWfGrid == "1") { #>
+	else {
+		if (otype != 'copy'){
+			layoutItem.push({
+				xtype: 'ngWorkFlowPanel',
+				otype: otype,
+				bizType: '<#= EForm #>',
+				bizPhid: busid,
+				showFlowHis: true,
+				hisGridStateId: '<#= TableName #>workflowhisgrid',
+				<# if (tableLayouts.IsAbsoluteLayout) { #>
+			    x: <#= WfGrid.X #>,
+			    y: <#= WfGrid.Y #>,
+			    width: <#= WfGrid.Width #>,
+		        <# } #>
+			    height: <#= WfGrid.Height #>,
+				region: 'south',
+				colspan: 4
+			});
+		}
+	}
+	<# } #>
+	
+	layoutItem.push({
+		xtype: 'panel',
+		layout: 'border',
+		region: 'center',
+		autoScroll: true,
+		bodyStyle: "padding-right:20px",
+		items: [<#= Common.GetViewPortItems(fieldSets, panels, tableLayouts, HasBlobdoc, HasEppocx)#>
+		<# if (HasAsrGrid == "1") { #> ,asrgrid <# } #>]
+	});
+
+    //布局
+    var viewport = Ext.create('Ext.container.Viewport', {
+        id: "viewPort",
+        layout: 'border',
+        items: layoutItem
+    });
+
+	//触发虚面板事件
+	virtualPanel.fireEvent('afterViewport');
+
+	//edit 编辑初始化时公共代码
+	CommonReadyEdit();
+
+	<#    if (Expressions.ContainsValue("Normal")) { #>
+	<#        foreach (var item in Expressions) { #>
+	<#            if (item.Value == "Normal") { #>
+	<#=                    item.Key #>
+	<#            }}} #>
+
+	//设置grid列为只读、必输等状态
+	   <# for (int i = 0; i < AllGrids.Count; i++) { #>
+	<# if (!AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+	<#= Common.SetGridColStatus(AllGrids) #>
+	<# } #>
+	<# } #>
+
+	//预览不做任何数据操作
+    if (IsSso == 'true') {
+        return;
+    }
+
+	//自定义帮助列添加外部查询条件
+	<#= Common.GetOutFilter(tableLayouts, fieldSets, panels) #>
+
+	<# if (HasBlobdoc == "1") { #>
+	//加载金格控件模板文件
+	if (Ext.getCmp('otid')) {
+		Ext.getCmp('otid').addListener('beforetriggerclick', function () {
+			<# if (!string.IsNullOrEmpty(tableLayouts.Otid)) { #>
+			Ext.getCmp('otid').setClientSqlFilter("phid in (<#= tableLayouts.Otid #>)");
+			<# } #>
+
+			Ext.getCmp('otid').setOutFilter({ 'chk_status': '1' });
+			return true;
+        });
+
+        Ext.getCmp('otid').addListener('helpselected', function (obj) {
+			blobdocUrl = C_ROOT + 'WM/Archive/KingGridObject/KingGridObjectEdit?OpType=Add&DataFrom=custom&RecordID=' + obj.code;
+
+			if (obj.name.indexOf('.xlsx')>0) {
+                blobdocUrl += '&FileType=' + '.xlsx';
+            }
+			else if (obj.name.indexOf('.xls')>0) {
+                blobdocUrl += '&FileType=' + '.xls';
+            }
+
+			if (window.frames['webofficeiframe']) {
+				if (window.frames['webofficeiframe'].document) {
+					window.frames['webofficeiframe'].document.location = blobdocUrl;
+				}
+			}
+        });
+    }
+	<# } #>
+
+	<#    for (int i = 0; i < panels.Count; i++) { #>
+	<#        if (panels[i].Height<=0){ #>
+				   <#= panels[i].TableName #>grid.hide(); 
+	<#        } #>
+	<#    } #>
+
+    if (otype == $Otype.EDIT || otype == $Otype.VIEW || otype == 'copy') {
+        Ext.Ajax.request({
+            params: { 'id': busid },
+			async: false, //同步请求
+            url: C_ROOT +'<#= Area #>/<#= ClassName #>Edit/GetMasterInfo',
+            success: function (response) {
+                var resp = Ext.JSON.decode(response.responseText);
+                if (resp.Status === "OK") {
+					var mstformobj = mstform.getForm();
+                    mstformobj.setValues(resp.Data);
+					
+					<# for (int i = 0; i < PictureBoxs.Count; i++) { #>
+					if (otype == $Otype.VIEW) {
+						<#= PictureBoxs[i].Name #>Upload.hide();
+					}
+					if (resp.Data.<#= PictureBoxs[i].Name #>_url != '' && resp.Data.<#= PictureBoxs[i].Name #>_url != null){
+						Ext.getCmp('<#= PictureBoxs[i].Name #>picCom').getEl().dom.src = C_ROOT + resp.Data.<#= PictureBoxs[i].Name #>_url;
+						Ext.getCmp('<#= PictureBoxs[i].Name #>picCom').show();
+						Ext.getCmp('<#= PictureBoxs[i].Name #>Download').show();
+					}
+					<# } #>
+
+					//复制时单据编号要重新设置，主键phid要清空
+					if (otype == 'copy') {
+						Ext.getCmp('phid').setValue('');
+						Ext.getCmp('code').setValue('');
+						if (Ext.getCmp('bill_dt')) {
+							Ext.getCmp('bill_dt').setValue(CurDate);
+						}
+						if (Ext.getCmp('asr_flg')) {
+							Ext.getCmp('asr_flg').setValue('0');
+						}
+						if (Ext.getCmp('ischeck')) {
+							Ext.getCmp('ischeck').setValue(0);
+						}
+						if (Ext.getCmp('check_dt')) {
+							Ext.getCmp('check_dt').setValue(null);
+						}
+						if (Ext.getCmp('checkpsn')) {
+							Ext.getCmp('checkpsn').setValue(null);
+						}
+						if (Ext.getCmp('bill_no')) {
+							 Ext.getCmp('bill_no').setValue(billno);
+						}
+
+						//任务分解
+						if (Ext.getCmp('s_task_wf')) {
+							Ext.getCmp('s_task_wf').setValue(PhidWork);
+						}
+						if (Ext.getCmp('s_task_node')) {
+							Ext.getCmp('s_task_node').setValue(PhidWorkNode);
+						}
+
+						//记账字段清空
+                        if (Ext.getCmp('tr_date')) {
+                            Ext.getCmp('tr_date').setValue(null);
+                        }
+                        if (Ext.getCmp('voucher_flag')) {
+                            Ext.getCmp('voucher_flag').setValue(null);
+                        }
+                        if (Ext.getCmp('tr_num')) {
+                            Ext.getCmp('tr_num').setValue(null);
+                        }
+                        if (Ext.getCmp('tr_type')) {
+                            Ext.getCmp('tr_type').setValue(null);
+                        }
+					}
+
+                    <#= Common.BatchBindCombox(tableLayouts, fieldSets) #>
+
+					if (otype == $Otype.EDIT) {
+						<#= Common.FireEvents(tableLayouts) #>
+						<#= Common.FireEvents(fieldSets) #>
+					}					
+					
+					<# if (HasBlobdoc == "1") { #>
+					//取得金格控件内容
+					GetBlobDoc('edit');
+					<# } #>
+
+					//mstform数据查出来赋完值后
+                    mstform.fireEvent('dataready');
+                } else {
+                    Ext.MessageBox.alert('取数失败', resp.status);
+                }
+
+				//保存form初始值
+				mstform.setOriginValue(JSON.stringify(mstform.getForm().getValues()))
+            }
+        });
+
+		<# for (int i = 0; i < AllGrids.Count; i++) { #>
+			<# if (AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+				//<#= AllGrids[i].TableName #>grid明细，树grid
+				//来自任务分解查看原汇总信息
+				<#= AllGrids[i].TableName #>grid.addListener('load', function (me, node, records, successful, eOpts) {
+					if (node.childNodes.length > 0) {
+						Ext.Array.each(node.childNodes, function (childNode) {
+							gridLoadSet(childNode, otype);
+						});
+						otype = otypeori;
+						<#= AllGrids[i].TableName #>grid.expandAll();
+					}
+				});
+				if (BusType == '2') {
+					<#= AllGrids[i].TableName #>grid.loadByUrl(C_ROOT + '<#= Area #>/<#= ClassName #>Edit/Get<#= AllGrids[i].TableName #>List?istreegrid=1&bustype=2&id=' + busid + "&ids=" + IDs + '&phidwork=' + PhidWork);
+				}
+				else {
+					<#= AllGrids[i].TableName #>store.load();
+				}
+			<# } else { #>	
+				//<#= AllGrids[i].TableName #>grid明细
+				//来自任务分解查看原汇总信息
+				if (BusType == '2') {
+					Ext.apply(<#= AllGrids[i].TableName #>store.proxy.extraParams, { 'id': busid, 'bustype': 2, 'ids': IDs, 'phidwork': PhidWork });
+				}
+				else {
+					Ext.apply(<#= AllGrids[i].TableName #>store.proxy.extraParams, { 'id': busid });
+				}				
+				<#= AllGrids[i].TableName #>store.cachePageData = false;
+				<#= AllGrids[i].TableName #>store.load(function (records, operation, success) {
+					if (records.length > 0) {
+						Ext.Array.each(records, function (rd) {
+							gridLoadSet(rd, otype);
+						});
+						otype = otypeori;
+					}
+
+				<# if (Reltable != "0") { #>
+					for (var i = 0; i < slaReltables.length; i++)
+					{
+		   				if ('<#= AllGrids[i].TableName #>' == slaReltables[i]) {
+							<#= AllGrids[i].TableName #>store.filter = function (record, id) {               
+            					return false;
+        					};
+        					<#= AllGrids[i].TableName #>store.filterBy(<#= AllGrids[i].TableName #>store.filter);
+		      				break;
+		    			}
+					}
+				<# } #>
+				});
+				<#= AllGrids[i].TableName #>store.cachePageData = true;
+			<# } #>	
+		<# } #>
+
+		$CreateFloatMenu('<#= EForm #>');
+
+		<# if (HasAsrGrid == "1") { #> 
+		asrgridstore.load({ params: { "tablename": '<#= TableName #>', 'asr_code': Ext.getCmp('phid').getValue() } });
+		<# } #>
+    }
+
+	//当新增时
+    if (otype == $Otype.ADD) {
+		<#    if (Expressions.ContainsValue("AddInit")) { #>
+		<#        foreach (var item in Expressions) { #>
+		<#            if (item.Value == "AddInit") { #>
+		<#=                    item.Key#>
+		<#            }}} #> 
+	   
+		if (Ext.getCmp('bill_dt')) {
+			Ext.getCmp('bill_dt').setValue(CurDate);
+		}
+		if (Ext.getCmp('bill_no')) {
+		   Ext.getCmp('bill_no').setValue(billno);
+		}
+		if (Ext.getCmp('fillpsn')) {
+			Ext.getCmp('fillpsn').setValue($appinfo.userID);
+		}
+
+		if (Ext.getCmp('ocode')) {
+			if (!Ext.isEmpty(TreeOrgId)) {
+				Ext.getCmp('ocode').setValue(TreeOrgId);
+			}
+			else {
+				Ext.getCmp('ocode').setValue($appinfo.orgID);
+			}
+		}
+
+		if (Ext.getCmp('pc')) {
+			if (!Ext.isEmpty(TreeProjId) && Ext.isEmpty(Ext.getCmp('pc').getValue())) {
+				Ext.getCmp('pc').setValue(TreeProjId);
+			}
+		}
+
+		if (Ext.getCmp('s_task_wf')) {
+			Ext.getCmp('s_task_wf').setValue(PhidWork);
+		}
+		if (Ext.getCmp('s_task_node')) {
+			Ext.getCmp('s_task_node').setValue(PhidWorkNode);
+		}
+		if (Ext.getCmp('s_task_phid')) {
+			Ext.getCmp('s_task_phid').setValue(PhidTemplate);
+		}
+
+		<#= Common.BatchBindCombox(tableLayouts, fieldSets) #>
+		
+		<# if (HasBlobdoc == "1") { #>
+		//取得金格控件内容
+		GetBlobDoc('add');
+		<# } #>
+
+		//保存form初始值
+        mstform.setOriginValue(JSON.stringify(mstform.getForm().getValues()));
+
+		//mstform新增初始数据赋值完成后执行
+        mstform.fireEvent('dataready');
+    }
+
+	//部分字段始终只读
+	if (Ext.getCmp('bill_dt')) {
+		Ext.getCmp('bill_dt').userSetReadOnly(true);
+	}
+	if (Ext.getCmp('bill_no')) {
+		Ext.getCmp('bill_no').userSetReadOnly(true);
+	}
+	if (Ext.getCmp('fillpsn')) {
+		Ext.getCmp('fillpsn').userSetReadOnly(true);
+	}
+	if (Ext.getCmp('checkpsn')) {
+		Ext.getCmp('checkpsn').userSetReadOnly(true);
+	}
+	if (Ext.getCmp('ischeck')) {
+		Ext.getCmp('ischeck').userSetReadOnly(true);
+	}
+	if (Ext.getCmp('check_dt')) {
+		Ext.getCmp('check_dt').userSetReadOnly(true);
+	}
+
+    //当不存在grid时
+    if (<#= PanelNames.Count #> == 0 ) {
+        if (ngToolbar.get('addrow')) {
+            ngToolbar.get('addrow').hide();
+        }
+        if (ngToolbar.get('deleterow')) {
+            ngToolbar.get('deleterow').hide();
+        }
+		if (ngToolbar.get('import')) {
+            ngToolbar.get('import').hide();
+        }
+    }
+	else {
+		<# if (PanelNames.Count > 0) { #>
+		curGrid = <#= PanelNames[0] #>grid;
+		curStore = curGrid.store;
+		setButtonStatus(curGrid);
+		<# } #>
+	}
+
+<# if (Reltable != "0") { #>
+    function AddRowHandle(record)
+    {
+         var tablename = curGrid.id.replace('grid', '');
+        for (var i = 0; i < slaReltables.length; i++) {
+            if (tablename == slaReltables[i]) {
+                record.rel_key1 = Ext.getCmp(masReltables[i] + 'grid').getSelectionModel().getSelection()[0].data.rel_key1;
+                curStore.insert(curStore.getCount(), record);
+                return;
+            }
+        }
+        for (var i = 0; i < masReltables.length; i++) {
+            if (tablename == masReltables[i]) {
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/CustomCommon/GetGuid',
+                    success: function (response) {
+                        record.rel_key1 = response.responseText;
+                        curStore.insert(curStore.getCount(), record);
+                    }
+                });
+                return;
+            }
+        }
+
+        curStore.insert(curStore.getCount(), record);
+    }
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("addrow") || Toolbar.RNgButtons.Contains("addrow")) { #>
+   
+   <#if (AllGrids.Count==1) { #>
+   <# for (int i = 0; i < AllGrids.Count; i++) { #>
+	<# if (!AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+   ngToolbar.get('addrow').on('click', function () {
+	    <# if (Reltable != "0") { #>
+		AddRowHandle(curGrid.getSelectionModel());
+		<# } else { #>
+        var data = curGrid.getSelectionModel();
+        curStore.insert(curStore.getCount(), data);
+		<# } #>
+    });
+   <# }else{ #>
+
+   ngToolbar.get('addrow').on('click', function () {
+	    var data = curGrid.getSelectionModel().getSelection();
+        if (data[0].length == 0) {
+            Ext.MessageBox.alert('提示', '请选中行之后再新增');
+            return;
+        }
+        if (data[0].raw.leaf) {
+            var p = new Object({
+                myLevel: data[0].raw.myLevel,
+                leaf:true,
+				s_tree_id:parseInt(data[0].raw.s_tree_id)+1,
+                s_tree_pid: data[0].raw.s_tree_pid
+            });
+            data[0].parentNode.appendChild(p);
+        }
+        else {
+            Ext.MessageBox.alert('提示', '只有叶子节点才能新增行');
+        }
+	 });
+   <# } #>
+
+   <# } #>
+	
+     <# }else{ #>
+	   ngToolbar.get('addrow').on('click', function () {
+	    <# if (Reltable != "0") { #>
+		AddRowHandle(curGrid.getSelectionModel());
+		<# } else { #>
+        var data = curGrid.getSelectionModel();
+        curStore.insert(curStore.getCount(), data);
+		<# } #>
+    });
+	<# } #>
+
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("deleterow") || Toolbar.RNgButtons.Contains("deleterow")) { #>
+    //删行
+	<#if (AllGrids.Count==1) { #>
+	<# for (int i = 0; i < AllGrids.Count; i++) { #>
+	<# if (!AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+    ngToolbar.get('deleterow').on('click', function () {
+		var data = curGrid.getSelectionModel().getSelection();
+        if (data.length > 0) {
+            var index = curStore.indexOf(data[0]);
+            
+            Ext.Array.each(data, function (record) {
+                curStore.remove(record); //前端删除
+            });
+
+            if (curStore.getCount() > 0) {
+                if (index >= curStore.getCount()) {
+                    index--;
+                }
+                curGrid.getSelectionModel().select(index);
+            }
+        }
+    });
+	 <# }else{ #>
+
+   ngToolbar.get('deleterow').on('click', function () {
+       var data = curGrid.getSelectionModel().getSelection();
+        if (data.length > 0) {
+            data[0].parentNode.removeChild(data[0]);
+		}
+        else {
+            Ext.MessageBox.alert('提示', '请选中你要删除的行');
+        }
+	 });
+   <# } #>
+
+   <# } #>
+    <# }else{ #>
+	      ngToolbar.get('deleterow').on('click', function () {
+		var data = curGrid.getSelectionModel().getSelection();
+        if (data.length > 0) {
+            var index = curStore.indexOf(data[0]);
+            
+            Ext.Array.each(data, function (record) {
+                curStore.remove(record); //前端删除
+            });
+
+            if (curStore.getCount() > 0) {
+                if (index >= curStore.getCount()) {
+                    index--;
+                }
+                curGrid.getSelectionModel().select(index);
+            }
+        }
+    });
+	<# } #>
+<# } #>
+
+<#    if (Expressions.ContainsValue("BeforeSave")) { #>
+<#        int count= 1; #>
+<#        foreach (var item in Expressions) { #>
+<#            if (item.Value == "BeforeSave") { #>
+                    function Validate<#= count #>() {
+<#                    count++; #>
+<#=                   item.Key #>
+                    };
+<#        }} #>
+<#    } #>
+
+	//保存函数
+	function Save(callback) {
+		var vt = mstform.isValid();
+		if (!vt) {
+			return;
+		}
+
+		<# for (int i = 0; i < PanelNames.Count; i++) { #>
+		vt = <#= PanelNames[i] #>grid.isValid();
+		if (!vt) {
+			return;
+		}
+		<# } #>
+
+		//保存前检测函数
+		if (typeof beforeSaveEdit === "function") {
+			if (!beforeSaveEdit()) {
+				return;
+			}
+		}
+
+	<#    if (Expressions.ContainsValue("BeforeSave") ) { #> 
+	<#        int count= 1; #>
+	<#        foreach (var item in Expressions) { #>
+	<#            if (item.Value == "BeforeSave"){ #>
+						if (!Validate<#= count #>())
+							return;
+	<#                count++; #>
+	<#            }}} #>    
+		
+	<# if (HasBlobdoc == "1") { #>
+		//金格控件保存
+		if (window.frames['webofficeiframe']) {
+			var res = window.frames['webofficeiframe'].SaveDocument();
+			if (!res || res == '' || res == '0') {
+				Ext.MessageBox.alert('提示', '金格保存失败！');
+				return;
+			}
+
+			Ext.getCmp('blobdocid').setValue(res);
+		}
+	<# } #>
+
+		var formData = mstform.getFormData();
+
+	<# for (int i = 0; i < PanelNames.Count; i++) { #>
+	    <# if (Reltable != "0") { #>
+		var flag = false;
+		for (var i = 0; i < slaReltables.length; i++)
+		{
+		    if ('<#= PanelNames[i] #>' == slaReltables[i]) {			    
+				flag = true;
+		        break;
+		    }
+		}
+		if (flag) {
+		    <#= PanelNames[i] #>store.clearFilter();
+            var <#= PanelNames[i]#>Data = <#= PanelNames[i] #>grid.getChange();
+            <#= PanelNames[i] #>store.filterBy(<#= PanelNames[i] #>store.filter);
+		} else {
+		    var <#= PanelNames[i]#>Data = <#= PanelNames[i] #>grid.getChange();
+		}
+		<# } else { #>
+		    var <#= PanelNames[i]#>Data = <#= PanelNames[i] #>grid.getChange();	    
+		<# } #>
+	<# } #>
+
+	<# if (Expressions.ContainsValue("SaveUpdate") ) { #> 
+		var sqlstr="";
+		var execstr="";
+	<#        foreach (var item in Expressions) { #>
+	<#            if (item.Value == "SaveUpdate") { #>
+	<#= item.Key #>
+	<# }}} #>
+
+		Ext.Ajax.request({
+			params: {
+				'formData': formData
+				,'phidtemplate': PhidTemplate
+			<# for (int i = 0; i < PanelNames.Count; i++) { #>   
+				,'<#= PanelNames[i] #>Data':<#= PanelNames[i] #>Data
+			<# } #>
+				,'extendParam': typeof getSaveDataEdit === "function" ? getSaveDataEdit('Save') : ''  //获取需保存数据
+			<# if (Expressions.ContainsValue("SaveUpdate") ) { #>
+				,'sql': sqlstr
+				,'exec': execstr
+			<# } #>  
+			},
+			url: C_ROOT + '<#= Area #>/<#= ClassName #>Edit/save',
+			async: false, //同步请求
+			success: function (response) {
+				if (Ext.isEmpty(response.responseText)) {
+                    Ext.MessageBox.alert('提示', '保存失败，服务端发生异常');
+                    return;
+                }
+
+				var resp = Ext.JSON.decode(response.responseText);
+				if (resp.Status === "OK") {
+					//工作流界面点提交或保存
+                    if (WorkFlowInfo.wfotype) {
+                        if (callback != '') {  //提交
+                            callback();
+                        }
+                        else {  //保存
+                            Ext.MessageBox.alert('提示', "保存成功");
+                        }
+                    }
+                    else {
+                        Ext.MessageBox.alert('提示', "保存成功", function () {
+                            //重刷编辑窗口
+							var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=edit&id=' + resp.id + '&appTitle=<#= Title #>-修改';
+
+						<# if(HasBlobdoc != "0" || HasReport != "0") { #>
+							url += '&ie=1';
+						<# } #>
+
+							//是任务分解模板
+                            if (!Ext.isEmpty(PhidTemplate)) {
+                                url += '&phidtemplate=' + PhidTemplate;
+                            }
+
+                            window.location.href = url;
+
+                            //刷新列表
+                            if (typeof window.external.RefreshWebListPage === "function") {
+                                window.external.RefreshWebListPage();
+                            } else {
+                                var frame = $GetWFrame();
+                                if (frame) {
+                                    var listref = frame.ListObserver.get(eform);
+                                    if (listref) {
+                                        listref.fireEvent('refreshlist');
+                                    }
+                                }
+                            }
+                        });
+                    }
+				} else {
+					Ext.MessageBox.alert('提示', '保存失败');
+				}
+			}
+		});
+	}
+
+<# if (Toolbar.LNgButtons.Contains("save") || Toolbar.RNgButtons.Contains("save")) { #>
+	//保存
+	ngToolbar.get('save').on('click', function () {
+		if (isForbidSave)
+		{
+			return;
+		}
+		//设置禁止保存变量，并且保存按钮暂时置灰
+		isForbidSave = true;
+		ngToolbar.get('save').disable();
+		Save('');
+		isForbidSave = false;
+		ngToolbar.get('save').enable();
+	});
+<# } #>
+
+    //审核
+	if (ngToolbar.get('verify')) {
+		ngToolbar.get('verify').on('click', function () {
+			if (isModifyed()) {
+				Ext.MessageBox.alert('提示', '单据已修改，请先保存');
+				return;
+			}
+
+			var operate = ngToolbar.get('verify').text;
+
+			if (Ext.getCmp('ischeck').getValue() == '1') {
+                Ext.MessageBox.alert('提示', '该单据已审核，不能重复审核!');
+                return;
+            }
+
+			//审核前检测函数
+			if (typeof beforeVerifyEdit === "function") {
+				if (!beforeVerifyEdit()) {
+					return;
+				}
+			}
+
+			var paramvalue = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=view&id=' + busid + '&ie=1&isapplycheck=1*web';
+			var receiverid = Ext.getCmp('checkpsn').getValue();
+		
+			Ext.Ajax.request({
+				params: {
+					'id': busid,
+					'isapplycheck': IsApplyCheck,
+					'paramvalue': paramvalue,
+					'receiverid': receiverid,
+					'extendParam': typeof getSaveDataEdit === "function" ? getSaveDataEdit('Verify') : ''  //获取需保存数据
+				},
+				url: C_ROOT + '<#= Area #>/<#= ClassName #>List/Verify',
+				async: false, //同步请求
+				success: function (response) {
+					var resp = Ext.JSON.decode(response.responseText);
+					if (resp.status === "OK") {
+						//审核成功
+						if (Ext.getCmp('ischeck')) {
+							Ext.getCmp('ischeck').setValue(1);
+						}
+						if (Ext.getCmp('check_dt')) {
+							Ext.getCmp('check_dt').setValue(CurDate);
+						}
+						if (Ext.getCmp('checkpsn')) {
+							Ext.getCmp('checkpsn').setValue($appinfo.userID);
+							var codectl = [];
+							codectl.push(Ext.getCmp('checkpsn'));
+							BatchBindCombox(codectl);
+						}
+
+						//ngToolbar.get('unverify').enable();
+						//ngToolbar.get('verify').disable();
+
+						//界面只读
+						if (ngToolbar.get('addrow')) {
+							ngToolbar.get('addrow').disable();
+						}
+						if (ngToolbar.get('deleterow')) {
+							ngToolbar.get('deleterow').disable();
+						}
+						if (ngToolbar.get('save')) {
+							ngToolbar.get('save').disable();
+						}
+						otype = 'view';
+						mstform.setFormReadOnly(true);
+						<# for (int i = 0; i < PanelNames.Count; i++) { #>
+							<#= PanelNames[i] #>grid.setGridReadOnly(true);
+						<# } #>
+
+						//form原始值更新
+						mstform.OriginValue = JSON.stringify(mstform.getForm().getValues());
+
+						Ext.MessageBox.alert('提示', operate + "成功!", function () {
+							if (typeof window.external.RefreshWebListPage === "function") {
+								window.external.RefreshWebListPage();
+							} else {
+                        	    var frame = $GetWFrame();
+                        	    if (frame) {
+                            	    var listref = frame.ListObserver.get(eform);
+                            	    if (listref) {
+                                	    listref.fireEvent('refreshlist');
+                            	    }
+                        	    }
+                   	 	    }
+						});
+					} else {
+						Ext.MessageBox.alert( '提示', operate + "失败!");
+					}
+				}
+			});
+		});
+	}
+
+	//去审核
+	if (ngToolbar.get('unverify')) {
+		ngToolbar.get('unverify').on('click', function () {
+			if (isModifyed()) {
+				Ext.MessageBox.alert('提示', '单据已修改，请先保存');
+				return;
+			}
+
+			var operate = ngToolbar.get('unverify').text;		
+
+			if (Ext.getCmp('ischeck').getValue() != '1') {
+                Ext.MessageBox.alert('提示', '该单据未审核，不能重复去审!');
+                return;
+            }
+
+			//审核/去审核前检测函数
+			if (typeof beforeUnVerifyEdit === "function") {
+				if (!beforeUnVerifyEdit()) {
+					return;
+				}
+			}
+
+			var paramvalue = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=view&id=' + busid + '&ie=1&isapplycheck=1*web';
+			var receiverid = Ext.getCmp('checkpsn').getValue();
+		
+			Ext.Ajax.request({
+				params: {
+					'id': busid,
+					'isapplycheck': IsApplyCheck,
+					'paramvalue': paramvalue,
+					'receiverid': receiverid,
+					'extendParam': typeof getSaveDataEdit === "function" ? getSaveDataEdit('UnVerify') : ''  //获取需保存数据
+				},
+				url: C_ROOT + '<#= Area #>/<#= ClassName #>List/Verify',
+				async: false, //同步请求
+				success: function (response) {
+					var resp = Ext.JSON.decode(response.responseText);
+					if (resp.status === "OK") {				
+						//去审核成功
+						//申请去审打开时去审核后直接关闭窗口
+						if (IsApplyCheck == '1') {
+							Ext.MessageBox.alert('提示', operate + "成功!", function () {
+								if (typeof window.external.RefreshWebListPage === "function") {
+									window.external.RefreshWebListPage();
+								} else {
+                        	        var frame = $GetWFrame();
+                        	        if (frame) {
+                            	        var listref = frame.ListObserver.get(eform);
+                            	        if (listref) {
+                                	        listref.fireEvent('refreshlist');
+                            	        }
+                        	        }
+                   	 	        }
+								$CloseTab();
+							});
+							return;
+						}
+
+						if (Ext.getCmp('ischeck')) {
+							Ext.getCmp('ischeck').setValue(0);
+						}
+						if (Ext.getCmp('check_dt')) {
+							Ext.getCmp('check_dt').setValue(null);
+						}
+						if (Ext.getCmp('checkpsn')) {
+							Ext.getCmp('checkpsn').setValue(null);
+						}
+
+						//ngToolbar.get('verify').enable();
+						//ngToolbar.get('unverify').disable();
+
+						//界面去只读
+						if (ngToolbar.get('addrow')) {
+							ngToolbar.get('addrow').enable();
+						}
+						if (ngToolbar.get('deleterow')) {
+							ngToolbar.get('deleterow').enable();
+						}
+						if (ngToolbar.get('save')) {
+							ngToolbar.get('save').enable();
+						}
+						otype = 'edit';
+						mstform.setFormReadOnly(false);
+						<# for (int i = 0; i < PanelNames.Count; i++) { #>
+							<#= PanelNames[i] #>grid.setGridReadOnly(false);
+						<# } #>
+
+						//form原始值更新
+						mstform.OriginValue = JSON.stringify(mstform.getForm().getValues());
+
+						Ext.MessageBox.alert('提示', operate + "成功!", function () {
+							if (typeof window.external.RefreshWebListPage === "function") {
+								window.external.RefreshWebListPage();
+							} else {
+                        	    var frame = $GetWFrame();
+                        	    if (frame) {
+                            	    var listref = frame.ListObserver.get(eform);
+                            	    if (listref) {
+                                	    listref.fireEvent('refreshlist');
+                            	    }
+                        	    }
+                   	 	    }
+						});
+					} else {
+						Ext.MessageBox.alert( '提示', operate + "失败!");
+					}
+				}
+			});
+		});
+	}
+
+<# if (Toolbar.LNgButtons.Contains("check") || Toolbar.RNgButtons.Contains("check")) { #>
+    //送审
+    ngToolbar.get('check').on('click',function(){
+		if (isModifyed()) {
+            Ext.MessageBox.alert('提示', '单据已修改，请先保存');
+            return;
+        }
+
+		$WorkFlow.startFlow('<#= EForm #>', busid, function () {
+			if (Ext.getCmp('is_wf')) {
+				Ext.getCmp('is_wf').setValue('1'); 
+			}
+
+			//界面只读
+			if (ngToolbar.get('addrow')) {
+                ngToolbar.get('addrow').disable();
+            }
+            if (ngToolbar.get('deleterow')) {
+                ngToolbar.get('deleterow').disable();
+            }
+			if (ngToolbar.get('import')) {
+                ngToolbar.get('import').disable();
+            }
+			if (ngToolbar.get('save')) {
+                ngToolbar.get('save').disable();
+            }
+			otype = 'view';
+            mstform.setFormReadOnly(true);
+			<# for (int i = 0; i < PanelNames.Count; i++) { #>
+				<#= PanelNames[i] #>grid.setGridReadOnly(true);
+			<# } #>
+
+			//form原始值更新
+			mstform.OriginValue = JSON.stringify(mstform.getForm().getValues());
+
+			if (typeof window.external.RefreshWebListPage === "function") {
+				window.external.RefreshWebListPage();
+			} else {
+                var frame = $GetWFrame();
+                if (frame) {
+                    var listref = frame.ListObserver.get(eform);
+                    if (listref) {
+                        listref.fireEvent('refreshlist');
+                    }
+                }
+            }
+		});
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("history") || Toolbar.RNgButtons.Contains("history")) { #>
+	//送审追踪
+	ngToolbar.get('history').on('click',function(){ 
+		$WorkFlow.showFlowInfo('<#= EForm #>', busid);
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("applycheck") || Toolbar.RNgButtons.Contains("applycheck")) { #>
+	//申请去审
+	ngToolbar.get('applycheck').on('click',function(){ 
+	    if (!Ext.getCmp('ocode')) {
+            Ext.MessageBox.alert('提示', "[设计问题]表头没有组织列");
+            return;
+        }
+        if (!Ext.getCmp('checkpsn')) {
+            Ext.MessageBox.alert('提示', "[设计问题]表头没有审核人列");
+            return;
+        }
+
+        var chkflg = Ext.getCmp('ischeck').getValue();
+        if (chkflg != "1") {
+            Ext.MessageBox.alert('提示', '该单据未审核，不能申请去审!');
+            return;
+        }
+
+		var billno = Ext.getCmp('bill_no').getValue();
+        var busTitle = '<#= Title #>';
+        var ocode = Ext.getCmp('ocode').getValue();
+        var receiverid = Ext.getCmp('checkpsn').getValue();
+		var receivername = Ext.getCmp('checkpsn').getRawValue();
+		var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=view&id=' + busid + '&ie=1&isapplycheck=1*web';
+
+        Ext.Ajax.request({
+            params: {
+                id: busid,
+				billno: billno,
+				busTitle: busTitle,
+				ocode: ocode,
+                receiverid: receiverid,
+				receivername: receivername,
+                urlLink: url
+            },
+            url: C_ROOT + 'SUP/CustomCommon/ApplyCheckParam',
+            async: false, //同步请求
+            success: function (response) {
+                var ret = response.responseText;
+                var url = C_ROOT + 'SUP/ApplyCheck/ApplyCheck?params=' + ret;
+                $OpenTab(busTitle + '-申请去审', url);
+            }
+        });
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("import") || Toolbar.RNgButtons.Contains("import")) { #>
+	//导入
+    ngToolbar.get('import').on('click', function () {
+		if (Ext.isEmpty(curGrid)) {
+            Ext.MessageBox.alert('提示', "请先选中grid");
+            return;
+        }
+
+        Ext.create('Ext.Gc.ExcelImport', {
+            busiType: eform,
+            busiGrid: curGrid,
+			iseform: true,
+            beforeCreate: function (columndata) {
+			    var dataIndexs = [];
+			    Ext.Array.each(columndata, function (col) {
+			        Ext.Array.include(dataIndexs, col.dataIndex);
+			    });
+
+			    Ext.Array.each(columndata, function (col) {
+				    if (col.dataIndex == 'c_name') {
+				        col.helpId = 'itemdata|itemid';
+				    } else if (col.dataIndex == 'pc_name') {
+				        col.helpId = 'pms3.project_table|pc';
+				    } else if (col.dataIndex == 'custno_name') {
+				        col.helpId = 'fg3_enterprise|custno';
+				    } else if (col.dataIndex == 'vendor_id_name') {
+				        col.helpId = 'fg3_enterprise|vendor_id';
+				    } else if (col.dataIndex == 'manufacturer_id_name') {
+				        col.helpId = 'fg3_enterprise|manufacturer_id';
+				    } else if (col.dataIndex == 'cbsid_name') {
+				        col.helpId = 'pms3.bd_cbs|cbsid';
+				    } else if (col.dataIndex == 'org_id_name') {
+				        col.helpId = 'fg3_enterprise|org_id';
+				    } else if (col.dataIndex == 'empid_name') {
+				        col.helpId = 'hr3.hr_epm_main|empid';
+				    } else if (col.dataIndex == 'wbscode_name') {
+				        col.helpId = 'pmm3.bd_wbs|wbscode';
+				    } else if (col.dataIndex == 'forwarder_id_name') {
+				        col.helpId = 'fg3_enterprise|forwarder_id';
+				    } else if (col.dataIndex == 'deptid_name') {
+				        col.helpId = 'fg_orglist|deptid';
+				    } else {
+			            if (col.dataIndex.indexOf('_name') > -1) {
+			                var temp = col.dataIndex.replace('_name', '');
+			                if (Ext.Array.contains(dataIndexs, temp)) {
+			                    Ext.Array.each(curGrid.columns, function (gridcol) {
+							        if (gridcol.items.length > 0) {
+								        Ext.Array.each(gridcol.items.items, function (griditemscol) {
+									        if (griditemscol.dataIndex == col.dataIndex) {
+			                                    if (griditemscol.helpid != undefined) {
+			                                        col.helpId = griditemscol.helpid + '|' + temp;
+			                                    } else if (griditemscol.editor != undefined && griditemscol.editor.helpid != undefined) {
+			                                        col.helpId = griditemscol.editor.helpid + '|' + temp;
+			                                    }
+			                                }
+								        })
+							        } else {
+			                            if (gridcol.dataIndex == col.dataIndex) {
+			                                if (gridcol.helpid != undefined) {
+			                                    col.helpId = gridcol.helpid + '|' + temp;
+			                                } else if (gridcol.editor != undefined && gridcol.editor.helpid != undefined) {
+			                                    col.helpId = gridcol.editor.helpid + '|' + temp;
+			                                }
+			                            }
+			                        }
+			                    })
+			                }
+					    }
+				    }
+			    })
+            },
+            listeners: {
+                'helpselected': function (obj) {
+                    var msgbox = Ext.Msg.show({
+                        title: '正在导入Excel数据',
+					    width: 350,
+					    model: true,
+					    progress: true
+				    });
+
+                    intervalHandle(0, obj, msgbox);
+                }
+            }
+        }).show();
+    });
+<# } #>
+
+    function intervalHandle(i, obj, msgbox) {
+        _returnInterval = setInterval(function () {
+            clearInterval(_returnInterval);
+
+            if (i != obj.data.length - 1) {
+                msgbox.updateProgress(i / obj.data.length, "正在处理第" + (i + 1) + "/" + obj.data.length + "行数据");
+            } else {
+                msgbox.hide();
+            }
+
+        <# if (Reltable != "0") { #>
+            AddRowHandle(obj.data[i].data);
+        <# } else { #>
+            var record = obj.data[i].data;
+            if (record.hasOwnProperty("phid_itemdata") && record.hasOwnProperty("phid_itemdata")) {
+			    if (record.itemid == ''){
+				    record.c_name = '';
+				} else {
+				    record.phid_itemdata = record.itemid;
+				}
+            }
+            curStore.insert(curStore.getCount(), record);
+        <# } #>
+
+            if (i < obj.data.length - 1) {
+                intervalHandle(i + 1, obj, msgbox)
+            }
+        }, 1);
+    }
+
+<# if (Toolbar.LNgButtons.Contains("attachment") || Toolbar.RNgButtons.Contains("attachment")) { #>
+	//附件
+	ngToolbar.get('attachment').on('click', function () {
+		OpenAttachment('form', '<#= TableName #>');
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("subbill") || Toolbar.RNgButtons.Contains("subbill")) { #>
+	//下达
+	ngToolbar.get('subbill').on('click',function(){
+		if (isModifyed()) {
+            Ext.MessageBox.alert('提示', '单据已修改，请先保存');
+            return;
+        }
+		 
+		var phidbill = busid;  //表单主键
+        var phidwork = Ext.getCmp('s_task_wf').getValue();  //流程主键
+
+		if (Ext.isEmpty(phidbill) || Ext.isEmpty(phidwork)) {
+            Ext.MessageBox.alert('提示', '表单主键和流程主键不能为空');
+            return;
+        }
+		
+		$Work.BreakDownNodeAddNext(phidwork, phidbill);
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("ok") || Toolbar.RNgButtons.Contains("ok")) { #>
+	//提交
+	ngToolbar.get('ok').on('click',function(){
+		if (isModifyed()) {
+            Ext.MessageBox.alert('提示', '单据已修改，请先保存');
+            return;
+        }
+
+		var phidbill = busid;  //表单主键
+        var phidworknode = Ext.getCmp('s_task_node').getValue();  //节点主键
+
+		if (Ext.isEmpty(phidbill) || Ext.isEmpty(phidworknode)) {
+            Ext.MessageBox.alert('提示', '表单主键和节点主键不能为空');
+            return;
+        }
+		
+		$Work.BreakDownNodeComplete(phidworknode, phidbill);
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("query") || Toolbar.RNgButtons.Contains("query")) { #>
+	//汇总
+	ngToolbar.get('query').on('click',function(){
+		if (isModifyed()) {
+            Ext.MessageBox.alert('提示', '单据已修改，请先保存');
+            return;
+        }
+
+		var phidwork = Ext.getCmp('s_task_wf').getValue();  //流程主键
+		var phidworknode = Ext.getCmp('s_task_node').getValue();  //节点主键
+
+		if (Ext.isEmpty(phidwork) || Ext.isEmpty(phidworknode)) {
+			Ext.MessageBox.alert('提示', '流程主键和节点主键不能为空');
+			return;
+		}
+
+		Ext.Ajax.request({
+			params: { 'nodephid': phidworknode },
+			async: false,
+			url: C_ROOT + 'Work/BreakDown/GetNodeChildBill',
+			success: function (response) {
+				var data = Ext.JSON.decode(response.responseText);
+
+				if (data.length > 0) {
+					var ids = '';
+					Ext.Array.each(data, function (rd) {
+						if (rd.nodestate != '2') {
+                            Ext.MessageBox.alert('提示', '部分下级节点数据未提交，不能汇总');
+                            return false;
+                        }
+
+						if (!Ext.isEmpty(rd.phidbill)) {
+							ids += rd.phidbill + ',';
+						}						
+					});
+
+					if (ids == '') {
+						Ext.MessageBox.alert('提示', '任务中心返回值为空，下级节点数据未提交');
+						return false;
+					}
+
+					ids = ids.substr(0, ids.length - 1);
+			<# for (int i = 0; i < AllGrids.Count; i++) { #>
+				<# if (AllGrids[i].ColumnNames.Contains("s_tree_no")) { #>
+					<#= AllGrids[i].TableName #>grid.loadByUrl(C_ROOT + '<#= Area #>/<#= ClassName #>Edit/Get<#= AllGrids[i].TableName #>List?istreegrid=1&bustype=1&id=' + busid + "&ids=" + ids + '&phidwork=' + phidwork);
+				<# } else { #>
+					Ext.apply(<#= AllGrids[i].TableName #>store.proxy.extraParams, { 'id': busid, 'bustype': 1, 'ids': ids, 'phidwork': phidwork });
+					<#= AllGrids[i].TableName #>store.cachePageData = false;
+					<#= AllGrids[i].TableName #>store.load();
+					<#= AllGrids[i].TableName #>store.cachePageData = true;
+				<# } #>
+			<# } #>
+				} else {
+					Ext.MessageBox.alert('提示', '没有可汇总下级节点数据');
+				}
+			}
+		});			
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("deal") || Toolbar.RNgButtons.Contains("deal")) { #>
+	//原汇总信息
+	ngToolbar.get('deal').on('click',function(){
+		var phidwork = Ext.getCmp('s_task_wf').getValue();  //流程主键
+		var phidworknode = Ext.getCmp('s_task_node').getValue();  //节点主键
+
+		if (Ext.isEmpty(phidwork) || Ext.isEmpty(phidworknode)) {
+			Ext.MessageBox.alert('提示', '流程主键和节点主键不能为空');
+			return;
+		}
+
+		Ext.Ajax.request({
+			params: { 'nodephid': phidworknode },
+			async: false,
+			url: C_ROOT + 'Work/BreakDown/GetNodeChildBill',
+			success: function (response) {
+				var data = Ext.JSON.decode(response.responseText);
+
+				if (data.length > 0) {
+					var ids = '';
+					Ext.Array.each(data, function (rd) {
+						if (!Ext.isEmpty(rd.phidbill)) {
+							ids += rd.phidbill + ',';
+						}						
+					});
+
+					if (ids == '') {
+						Ext.MessageBox.alert('提示', '任务中心返回值为空，下级节点数据未提交');
+						return;
+					}
+
+					ids = ids.substr(0, ids.length - 1);
+
+					var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=view&bustype=2&id=' + busid + '&ids=' + ids + '&phidwork=' + phidwork;
+					<# if(HasBlobdoc != "0") { #>
+					url += '&ie=1';
+					<# } #>
+					$OpenTab('<#= Title #>-原汇总信息', url);
+				} else {
+					Ext.MessageBox.alert('提示', '没有可汇总下级节点数据');
+				}
+			}
+		});
+	});
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("print") || Toolbar.RNgButtons.Contains("print")) { #>
+    //打印
+    ngToolbar.get('print').on('click', function () {        
+		<# if (PanelNames.Count == 0){ #>
+			$PrintHelp("<#= ClassName #>", '<#= EForm #>', mstform, [], ["<#= Title #>"]);
+		<#  }else { #>
+
+			var grids = [ <# for (int i = 0; i < PanelNames.Count; i++) { #>   
+				<# if (i == PanelNames.Count-1){ #>
+					<#= PanelNames[i] #>grid ];
+				<# }else{ #> 
+					<#= PanelNames[i] #>grid, 
+				<# } #>
+			<# } #>
+
+			$PrintHelp("<#= ClassName #>", '<#= EForm #>', mstform, grids, ["<#= Title #>"]);
+		<#  } #>
+    }); 
+<# } #>
+
+<# if (Toolbar.LNgButtons.Contains("close") || Toolbar.RNgButtons.Contains("close")) { #>
+	//关闭
+	ngToolbar.get('close').addListener('beforeclose', function () {
+        //查看窗口直接关闭
+        if (otype == $Otype.VIEW) {
+            return true;
+        }
+
+        if (isModifyed()) {
+            Ext.MessageBox.confirm('提示', '单据未保存，确定关闭？', function (e) {
+                if (e == "yes") {
+                    $CloseTab();
+                }
+            });
+            return false;
+        }
+        else {
+            return true;
+        }
+    });
+<# } #>
+	
+	//判断表单是否已编辑
+    function isModifyed() {
+        if (mstform.hasModifyed() <# for (int i = 0; i < PanelNames.Count; i++) { #> || <#= PanelNames[i] #>grid.hasModifyed() <# } #> ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+	//布局后初始化函数
+    if (typeof allReadyEdit === "function") {
+        allReadyEdit();
+    }
+
+}); 

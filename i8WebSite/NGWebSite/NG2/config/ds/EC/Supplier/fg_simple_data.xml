@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_simple_data">
+      <Field Name="c_code" IsKey="true" />
+      <Field Name="c_descript"  />
+      <Field Name="c_id"  />
+      <Field Name="c_name"  />
+      <Field Name="c_no"  />
+      <Field Name="c_type"  />
+      <Field Name="cancel_flg"  />
+      <Field Name="default_flg"  />
+      <Field Name="eb_dt"  />
+      <Field Name="ee_dt"  />
+      <Field Name="enable_flg"  />
+      <Field Name="simple_type"  />
+      <Field Name="userdata_flg"  />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+    </Sql>
+    <Where>
+    </Where>
+    <OrderBy>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+    <Values>
+
+    </Values>
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+  <GetSupplierOrderState>
+    <Sql>
+      select c_no statusno,c_name statusname from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="c_type"  Value="supplierorderstate"/>
+    </Where>
+    <OrderBy>
+    </OrderBy>
+  </GetSupplierOrderState>
+  
+</DataService>

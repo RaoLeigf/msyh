@@ -1,0 +1,24 @@
+﻿<Data>
+    <items>
+      <item ID="02" str="供应商门户">
+        <item ID="0201" str="询报价管理">
+          <item ID="020101" str="待报价询价单" para="~/EC/Supplier/DealAskPriceList.aspx" />
+          <item ID="020102" str="报价单" para="~/EC/Supplier/SupplyQuottonList.aspx" />
+        </item>
+        <item ID="0202" str="订发货管理">
+          <item ID="020201" str="待接收订单" para="~/EC/Supplier/PurList.aspx" />
+          <item ID="020202" str="UIC发货单" para="~/SendList" />
+        </item>
+        <item ID="0203" str="业务报表">
+          <item ID="020301" str="订单进度报告" para="~/EC/Supplier/ReportOrderExcute.aspx" />
+          <item ID="020302" str="发货明细表" para="~/EC/Supplier/ReportSendDtl.aspx" />
+        </item>
+        <item ID="0204" str="技术质量管理">
+           <item ID="020401" str="技术协议" para="~/EC/Supplier/ReportTechnicalProtocol.aspx" />
+        </item>
+        <item ID="0205" str="供应商信息维护">
+          <item ID="020501" str="供应商信息维护" para="~/EC/Supplier/SupplyInfo.aspx" />
+        </item>
+    </item>
+  </items>
+</Data>

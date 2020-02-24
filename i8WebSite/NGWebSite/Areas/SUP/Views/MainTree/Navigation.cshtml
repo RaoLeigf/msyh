@@ -1,0 +1,122 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = @ViewBag.Text + "-查看";
+}
+
+@*<style type="text/css">
+    #holder {
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        position: absolute;
+        z-index: 999;
+    }
+
+    test {
+        position: absolute;
+        width: 80px;
+        height: 30px;
+        top: 0px;
+        z-index: 0;
+    }
+</style>*@
+
+
+
+
+@section script
+{
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    @*<script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>*@
+
+    @*<script src=@Url.Script("~/NG3Resource/raphael-master/raphael.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/raphael-master/node_modules/jquery/dist/jquery.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/dragNode.js") type="text/javascript" charset="utf-8"></script>*@
+
+    <link href="~/NG3Resource/css/mainTreeTab.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        //var svgText = Ext.htmlDecode('@ViewBag.Text');
+        var svgText = '@ViewBag.Text';
+        //var svgText = Ext.isEmpty(svgTextInfo) ? {} : Ext.decode(svgTextInfo);
+        var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+
+        var frame1;
+
+        Ext.onReady(function () {
+            frame1 = document.createElement("IFRAME");
+            frame1.frameBorder = 0;
+            frame1.name = 'frame1';
+            frame1.src = C_ROOT + 'NG3Resource/maintree/viewNode.html?text=' + svgText;
+            frame1.height = "100%";
+            frame1.width = "100%";
+            frame1.onload = function () {
+                frame1.contentWindow;
+            }
+
+            var naviPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                itemId: 'naviPanel',
+                layout: 'fit',
+                //items:[frame1]
+                contentEl: frame1,
+                listeners: {
+                    'afterrender': function (tabPanel, eOpts) {
+
+                    }
+                }
+            });
+
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'edit', '->', 'close'
+                ]
+            })
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [
+                    ngToolbar,
+                    naviPanel
+                ]
+            });
+
+            ngToolbar.get('edit').on('click', function () {
+                $OpenTab(svgText, C_ROOT + 'SUP/MainTree/IndividualNavigation?text=' + svgText);
+                //$OpenTab('自定义功能导航', C_ROOT + 'SUP/MainTree/IndividualNavigation');
+            });
+
+        });
+
+        var load = function () {
+            var param;
+            Ext.Ajax.request({
+                params: {
+                    'text': svgText
+                },
+                url: C_ROOT + 'SUP/IndividualNavigation/Load',
+                async: false, //同步
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    param = resp;
+                }
+            });
+            return param;
+        }
+
+        function NG3Refresh()
+        {
+            window.location.reload();
+        }
+    </script>
+
+
+}

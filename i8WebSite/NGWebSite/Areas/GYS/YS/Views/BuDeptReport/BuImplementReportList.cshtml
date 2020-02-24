@@ -1,0 +1,274 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/BuImplement.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    // 'view', 
+                    '->', 'print', 'close'
+                ]
+            });
+
+            var fields = [
+                {
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "f_year",
+                    "type": "string",
+                    "mapping": "f_year"
+                },
+                {
+                    "name": "f_DeclarationUnit",
+                    "type": "string",
+                    "mapping": "f_DeclarationUnit"
+                },
+                {
+                    "name": "f_DeclarationUnitName",
+                    "type": "string",
+                    "mapping": "f_DeclarationUnitName"
+                },
+                {
+                    "name": "f_BudgetDept",
+                    "type": "string",
+                    "mapping": "f_BudgetDept"
+                },
+                {
+                    "name": "f_BudgetDeptName",
+                    "type": "string",
+                    "mapping": "f_BudgetDeptName"
+                },
+                {
+                    "name": "f_BudgetAccounts",
+                    "type": "string",
+                    "mapping": "f_BudgetAccounts"
+                },
+                {
+                    "name": "f_BudgetAccountsName",
+                    "type": "string",
+                    "mapping": "f_BudgetAccountsName"
+                },
+                {
+                    "name": "f_ProjCode",
+                    "type": "string",
+                    "mapping": "f_ProjCode"
+                },
+                {
+                    "name": "f_ProjName",
+                    "type": "string",
+                    "mapping": "f_ProjName"
+                },
+                {
+                    "name": "f_ProjAmount",
+                    "type": "string",
+                    "mapping": "f_ProjAmount"
+                },
+                {
+                    "name": "f_BudgetAmount",
+                    "type": "string",
+                    "mapping": "f_BudgetAmount"
+                },
+                {
+                    "name": "f_DtlCode",
+                    "type": "string",
+                    "mapping": "f_DtlCode"
+                },
+                {
+                    "name": "f_DtlName",
+                    "type": "string",
+                    "mapping": "f_DtlName"
+                },
+                {
+                    "name": "f_ExpensesChannel",
+                    "type": "string",
+                    "mapping": "f_ExpensesChannel"
+                },
+                {
+                    "name": "f_ExpensesChannelName",
+                    "type": "string",
+                    "mapping": "f_ExpensesChannelName"
+                },
+                {
+                    "name": "f_Amount",
+                    "type": "string",
+                    "mapping": "f_Amount"
+                },
+                {
+                    "name": "f_IncrementAmount",
+                    "type": "string",
+                    "mapping": "f_IncrementAmount"
+                },
+                {
+                    "name": "f_DecrementAmount",
+                    "type": "string",
+                    "mapping": "f_DecrementAmount"
+                },
+                {
+                    "name": "f_DtlBuAmount",
+                    "type": "string",
+                    "mapping": "f_DtlBuAmount"
+                },
+                {
+                    "name": "f_UsedAmount",
+                    "type": "string",
+                    "mapping": "f_UsedAmount"
+                },
+                {
+                    "name": "f_ImplRate",
+                    "type": "string",
+                    "mapping": "f_ImplRate"
+                },
+                {
+                "name": "NgRecordVer",
+                "type": "int",
+                "mapping": "NgRecordVer"
+                }
+            ];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'gridPanel');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+				url: C_ROOT + 'GYS/YS/BuDeptReport/GetBuImplementReportList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,				
+				stateId: 'b9a9fbc7-babb-4dc7-9faf-745a2b42f81d',
+				buskey: 'PhId', //对应的业务表主键属性         
+				//layout: {
+				//	type: 'hbox',
+				//	align: 'stretch'
+				//},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['gridPanel']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+		    //内嵌查询
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                pageid: "Web:GHBudgetImplementList",//对应内嵌查询业务点标识 
+                grid: grid,
+                columnsPerRow: 4 //每行4列               
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, queryPanel, grid]
+            });
+
+            
+            ////查看
+            //ngToolbar.get('view').on('click', function () {
+            //    var data = grid.getSelectionModel().getSelection();
+
+            //    if (data.length > 0) {
+            //        var id = data[0].get('PhId');
+            //        $OpenTab(pageName + '-查看', C_ROOT + 'GYS/YS/BudgetMst/BudgetMstEdit?otype=view&id=' + id);
+            //    }
+            //});
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                //$Print("PrintTest1", grid, "预算执行情况表");
+                queryPanel.buskey = "PhId";
+                var forms = [queryPanel];
+                var grids = [grid];
+                var titles = ['预算执行情况表', '详细信息'];
+                $PrintHelp("BPM_GHBudgetImpleteReport", 'BPM_GHBudgetImpleteReport', forms, grids, titles);
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: C_ROOT + 'GYS/YS/BuDeptReport/GetBuImplementReportList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+
+            //通用帮助设置条件
+            //按当前操作员过滤申报单位
+            queryPanel.query("[name='mst.f_DeclarationUnit*str*eq*1']")[0].setOutFilter({ userid: $appinfo.userID });
+
+            //设置金额格式
+            grid.getColumn('f_ProjAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_BudgetAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            
+            grid.getColumn('f_Amount').renderer = Ext.util.Format.numberRenderer('0,000.00');            
+            grid.getColumn('f_IncrementAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_DecrementAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_DtlBuAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_UsedAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_ImplRate').renderer = Ext.util.Format.numberRenderer('0,000.00%');
+            
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

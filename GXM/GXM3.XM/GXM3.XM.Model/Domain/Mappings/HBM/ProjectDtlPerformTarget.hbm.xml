@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="ProjectDtlPerformTargetModel" table="xm3_ProjectDtl_PerformTar">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="FTargetCode" column="f_TargetCode" type="System.String" length="30" not-null="false" />
+		<property name="FTargetName" column="f_TargetName" type="System.String" length="255" not-null="false" />
+		<property name="FTargetContent" column="f_TargetContent" type="System.String" length="200" not-null="false" />
+		<property name="FTargetValue" column="f_TargetValue" type="System.String" length="100" not-null="false" />
+    <property name="FTargetWeight" column="f_targetweight" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="FTargetDescribe" column="f_TargetDescribe" type="System.String" length="300" not-null="false" />
+		<property name="FTargetClassCode" column="f_TargetClassCode" type="System.String" length="30" not-null="false" />
+		<property name="FTargetTypeCode" column="f_TargetTypeCode" type="System.String" length="30" not-null="false" />
+		<property name="FIfCustom" column="f_ifCustom" type="GXM3.XM.Model.Enums.EnumYesNo, GXM3.XM.Model"  not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+	</class>
+</hibernate-mapping>

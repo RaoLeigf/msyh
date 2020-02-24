@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="YsAccountModel" table="ys3_account">
+		<id name="PhId" access="property" column="PHID" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="PHIDMST" column="PHID_MST" type="System.Int64" not-null="false" />
+		<property name="PHIDSUBJECT" column="PHID_SUBJECT" type="System.Int64" not-null="false" />
+		<property name="SUBJECTCODE" column="SUBJECTCODE" type="System.String" length="50" not-null="false" />
+		<property name="ORGID" column="ORGID" type="System.Int64" not-null="false" />
+		<property name="ORGCODE" column="ORGCODE" type="System.String" length="50" not-null="false" />
+		<property name="UYEAR" column="UYEAR" type="System.String" length="4" not-null="false" />
+		<property name="FINALACCOUNTSTOTAL" column="FINALACCOUNTS_TOTAL" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="BUDGETTOTAL" column="BUDGET_TOTAL" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="ADJUSTMENT" column="ADJUSTMENT" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="APPROVEDBUDGETTOTAL" column="APPROVEDBUDGET_TOTAL" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="ThisaccountsTotal" column="Thisaccounts_Total" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="COMPLETE" column="COMPLETE" type="System.Decimal" precision="18" scale="2" not-null="false" /> 
+    <property name="BudgetComplete" column="budgetcomplete" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="DESCRIPTION" column="DESCRIPTION" type="System.String" length="500" not-null="false" />
+		<property name="VERIFYSTART" column="VERIFY_START" type="System.Int32" not-null="false" />
+		<property name="VERIFYMIDDLE" column="VERIFY_MIDDLE" type="System.Int32" not-null="false" />
+		<property name="VERIFYEND" column="VERIFY_END" type="System.Int32" not-null="false" />
+		<property name="VERIFYSTARTTIME" column="VERIFY_START_TIME" type="System.DateTime" not-null="false" />
+		<property name="VERIFYMIDDLETIME" column="VERIFY_MIDDLE_TIME" type="System.DateTime" not-null="false" />
+		<property name="VERIFYENDTIME" column="VERIFY_END_TIME" type="System.DateTime" not-null="false" />
+		<property name="DESCRIPTIONMIDDLE" column="DESCRIPTION_MIDDLE" type="System.String" length="500" not-null="false" />
+		<property name="DESCRIPTIONEND" column="DESCRIPTION_END" type="System.String" length="500" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

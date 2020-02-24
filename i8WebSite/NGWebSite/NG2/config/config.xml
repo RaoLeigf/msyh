@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<configuration>
+  <!-- SUPCAN 版本设置 -->
+  <item key="SupcanVersion" value="1.0.65.6"/>
+  
+	<!-- 默认的数据库连接名称 -->
+	<item key="DefaultConnString" value="Conn"/>
+  <!-- NGSoft数据库连接名称 -->
+  <item key="NGSoftConnString" value="NGSoft"/>
+
+  <!-- 默认的NG1.0 UP 主机 
+  <item key="UPHostPath" value="127.0.0.1"/>-->
+  <!-- 默认的NG1.0 UP 主目录 
+  <item key="UPAppPath" value="i6"/>-->
+  <!-- 默认的NG1.0 UP MapPath 
+  <item key="UPMapPath" value="D:\i6MidServer\NGWebSite"/>-->
+  
+  <!-- 皮肤文件夹相对应用程序的路径 -->
+	<item key="skin" value="default"/>
+	<!-- 消息页面相对应用程序的路径 -->
+	<item key="msgPagePath" value="msg.aspx"/>
+	<item key="PageSize" value="20"/>
+  <!-- 是否缓存Ajax请求,设置为true时,性能倍增,但是某些地方可能有错误,还在测试阶段 -->
+  <item key="cacheAjaxRequest" value="true"/>
+  <!-- 请求延时(毫秒),调试的时候很有用,可以看清楚过程,正式使用的时候请改为0 -->
+  <item key="requestDelay" value="0"/>
+</configuration>

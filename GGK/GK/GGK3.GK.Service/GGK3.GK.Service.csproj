@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6EC01BA7-B6FD-4D30-AEF5-8FB15F475BB9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GGK3.GK.Service</RootNamespace>
+    <AssemblyName>GGK3.GK.Service</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GGK3.GK.Service.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.ExceptionHandling">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Service">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.WebApi.ApiControllerBase">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.WebApi.ApiControllerBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Exceptions">
+      <HintPath>..\..\..\BusinessDlls\NG3.Exceptions.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308" />
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GK3_BankVauitService.cs" />
+    <Compile Include="GKPaymentMstService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GBK\BK\GBK3.BK.Facade.Interface\GBK3.BK.Facade.Interface.csproj">
+      <Project>{1E26ACE3-D2B2-44C3-9A55-543D4DD2366F}</Project>
+      <Name>GBK3.BK.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\Common\GData3.Common.Model\GData3.Common.Model.csproj">
+      <Project>{38f33231-5a70-4374-beb3-5d77138e8d46}</Project>
+      <Name>GData3.Common.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\Common\GData3.Common.Utils\GData3.Common.Utils.csproj">
+      <Project>{A4DA9236-7F50-4C27-B4C7-2B3F051E0FC1}</Project>
+      <Name>GData3.Common.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\YQHL\GData.YQHL.Model\GData.YQHL.Model.csproj">
+      <Project>{7341ea5f-b9ac-4e0e-a9c7-949454f0e6ff}</Project>
+      <Name>GData.YQHL.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\YQHL\GData.YQHL.Service.Interface\GData.YQHL.Service.Interface.csproj">
+      <Project>{4a696072-cbe9-4ece-9bb1-140c883fa92a}</Project>
+      <Name>GData.YQHL.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\YQHL\GData.YQHL.Service\GData.YQHL.Service.csproj">
+      <Project>{04943589-a032-4b16-991d-ecacc8e36618}</Project>
+      <Name>GData.YQHL.Service</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Facade.Interface\GQT3.QT.Facade.Interface.csproj">
+      <Project>{C2328D95-250F-4968-8B7A-62CA2ECFB146}</Project>
+      <Name>GQT3.QT.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GSP\SP\Enterprise3.WebApi.GSP3.SP.Model\Enterprise3.WebApi.GSP3.SP.Model.csproj">
+      <Project>{8E7FDDB9-8FED-40ED-8742-8B5CB47E479E}</Project>
+      <Name>Enterprise3.WebApi.GSP3.SP.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GSP\SP\GSP3.SP.Facade.Interface\GSP3.SP.Facade.Interface.csproj">
+      <Project>{00EB0419-6A34-4215-895B-EB12AE4D971E}</Project>
+      <Name>GSP3.SP.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GSP\SP\GSP3.SP.Model\GSP3.SP.Model.csproj">
+      <Project>{259AD850-29EA-46A1-80C7-DCD20149220A}</Project>
+      <Name>GSP3.SP.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GGK3.GK.Facade.Interface\GGK3.GK.Facade.Interface.csproj">
+      <Project>{0947cd35-ea38-499f-b7df-7bc72f0e0885}</Project>
+      <Name>GGK3.GK.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GGK3.GK.Model\GGK3.GK.Model.csproj">
+      <Project>{8c7038ce-b766-414f-b5e1-d15710157e85}</Project>
+      <Name>GGK3.GK.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GGK3.GK.Service.Interface\GGK3.GK.Service.Interface.csproj">
+      <Project>{4789ccd3-f280-4550-bc95-139e72ca17ef}</Project>
+      <Name>GGK3.GK.Service.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\i6Rules\ /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

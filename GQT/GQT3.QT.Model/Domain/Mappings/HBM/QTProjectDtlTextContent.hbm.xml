@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QTProjectDtlTextContentModel" table="qt3_projectdtl_textcontent">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="FFunctionalOverview" column="f_functionaloverview" type="System.String" length="1200" not-null="false" />
+		<property name="FProjOverview" column="f_projoverview" type="System.String" length="1000" not-null="false" />
+		<property name="FProjBasis" column="f_projbasis" type="System.String" length="1200" not-null="false" />
+		<property name="FFeasibility" column="f_feasibility" type="System.String" length="1200" not-null="false" />
+		<property name="FNecessity" column="f_necessity" type="System.String" length="1200" not-null="false" />
+		<property name="FLTPerformGoal" column="f_ltperformgoal" type="System.String" length="1000" not-null="false" />
+		<property name="FAnnualPerformGoal" column="f_annualperformgoal" type="System.String" length="1000" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

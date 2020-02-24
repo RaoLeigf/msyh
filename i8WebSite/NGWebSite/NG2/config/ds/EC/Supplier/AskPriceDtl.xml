@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_askpricedtl">
+      <Field Name="askpriceid" IsKey="true" />
+      <Field Name="lineid" IsKey="true" />
+      <Field Name="itemno"  />
+      <Field Name="askitem" />
+      <Field Name="ranks"/>
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname" AsName="askitemname"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join itemdata on itemdata.itemno=[table].itemno 
+      [where] [orderby]
+    </Sql>
+    <Where>
+      <exp Field="askpriceid" Target = "Client" value="askpriceid"/>
+    </Where>
+    <OrderBy>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+     
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+    <Values>
+
+    </Values>
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

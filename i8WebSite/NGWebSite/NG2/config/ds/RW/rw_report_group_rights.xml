@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_report_group_rights">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="group_id" />
+      <Field Name="actor_id"  />      
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]      
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy>      
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+    <where>
+      <Exp Field="group_id" Target="Client" Value="group_id" />
+      <Exp Field="actor_id" Target="Client" Value="actor_id" />
+    </where>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="group_id" Target="Client" Value="group_id" />
+        <Exp Field="actor_id" Target="Client" Value="actor_id" />
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <SelectMaxID>
+    <Sql>
+      select max(id) from rw_report_group_rights
+    </Sql>
+  </SelectMaxID>
+
+  <DeleteByGroup>
+    <Sql>
+      delete from rw_report_group_rights [where]
+    </Sql>
+    <Where >
+      <Exp Field="group_id" Target="Client" Value="group_id"/>
+    </Where>
+  </DeleteByGroup>
+
+
+</DataService>
+

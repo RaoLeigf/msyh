@@ -1,0 +1,1135 @@
+﻿@{
+    if (string.IsNullOrWhiteSpace(ViewBag.Title))
+    {
+        ViewBag.Title = "表单设计";
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+
+    <script type="text/javascript">
+
+
+          Ext.onReady(function () {
+
+              var bustype = '';
+              var busname;
+              var phid = '';
+              var busphid = '';
+              var phidInOrgTree = '';
+
+
+              var AddOrgtree = [];//组织树【新增】的时候（打上勾），就把节点的id放到这个数组里
+              var DelOrgtree = [];//组织树【删除】的时候（打上勾），就把节点的id放到这个数组里
+              var OriginOrgtree = [];//后台返回的数组（原始数组）
+              var CopyOrgtree = []; //原始数组的拷贝值，获取的时候和原始数组相等，删除或新增的时候改变这里面的值,用来切换的时候比较差异,感觉这样方便一点。
+              var orgTreeNotAllowCheck = [];  //不允许勾选的数组
+              var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                  region: 'north',
+                  //rightName: "EmpinfoList", //权限名称
+                  ngbuttons: ['save', 'addrow', 'deleterow','copy',
+                      { itemId: 'design', text: "界面设计", width: this.itemWidth, iconCls: "icon-Assign" },
+                      { itemId: 'script', text: "脚本设计", width: this.itemWidth, iconCls: "icon-Assign" },
+                      { itemId: 'update', text: "界面升级", width: this.itemWidth, iconCls: "icon-Export" },
+                      { itemId: 'allocate', text: "界面分配", width: this.itemWidth, iconCls: "icon-Setup" },
+                      { itemId: 'sync', text: "脚本同步", width: this.itemWidth, iconCls: "icon-Refresh" },
+               '->','help', 'close']
+                });
+
+              Ext.define('bustypeModel', {
+                  extend: 'Ext.data.Model',
+                  fields: [{
+                      name: 'bustype',
+                      type: 'string',
+                      mapping: 'bustype'
+                  }, {
+                      name: 'busname',
+                      type: 'string',
+                      mapping: 'busname'
+                  }, {
+                      name: 'url',
+                      type: 'string',
+                      mapping: 'url'
+                  }]
+              });
+
+
+              //var busTree = Ext.create('Ext.ng.TreePanel', {
+              //    region: 'west',
+              //    title: '业务类型',
+              //    autoLoad: true,
+              //    treeFields: [{ name: 'text', type: 'string' },
+              //        { name: 'bustype', string: 'string' },
+              //        { name: 'phid', type: 'string' }
+              //    ],
+              //    url:C_ROOT +  'SUP/IndividualProperty/LoadBusTree'
+              //})
+
+
+              Ext.define('Model', {
+                  extend: 'Ext.data.Model',
+                  fields: [{
+                      name: 'phid',
+                      type: 'string',
+                      mapping: 'phid'
+                  }, {
+                      name: 'name',
+                      type: 'string',
+                      mapping: 'name'
+                  }, {
+                      name: 'bustype',
+                      type: 'string',
+                      mapping: 'bustype'
+                  }, {
+                      name: 'defaultflg',
+                      type: 'string',
+                      mapping: 'defaultflg'
+                  }, {
+                      name: 'isbackup',
+                      type: 'string',
+                      mapping: 'isbackup'
+                  }, {
+                      name: 'remark',
+                      type: 'string',
+                      mapping: 'remark'
+                  }]
+              });
+
+              var infostore = Ext.create('Ext.ng.JsonStore', {
+                  model: 'Model',
+                  pageSize: 50,
+                  autoLoad: false,
+                  cachePageData: false,
+                  url: '../IndividualUI/GetIndividualInfoList'
+              })
+
+              var defaultflag = Ext.create('Ext.ng.ComboBox', {
+                  valueField: "flag",
+                  displayField: 'name',
+                  queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote
+                  data: [{             //编辑状态下,状态列的下拉菜单的 data
+                      "flag": "1",
+                      "name": "是"
+                  }, {
+                      "flag": "0",
+                      "name": "否"
+                  }]
+              });
+
+              var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                  clicksToEdit: 2
+              });
+
+              var infogrid = Ext.create('Ext.ng.GridPanel', {
+                  region: 'center',
+                  //frame: true,
+                  autoScroll: true,
+                  width: 200,
+                  stateful: true,
+                  stateId: 'SupIndividualInfoListgrid',
+                  store: infostore,
+                  buskey: 'phid', //对应的业务表主键
+                  columnLines: true,
+                  layout: {
+                      type: 'hbox',
+                      align: 'stretch'
+                  },
+                  columns: [
+				{
+				    header: '代码',
+				    flex: 1,
+				    sortable: false,
+				    dataIndex: 'code',
+				    hidden: true
+				}, {
+				    header: '业务类型',
+				    width: 200,
+				    sortable: false,
+				    dataIndex: 'bustype'
+				}, {
+				    header: '是否默认',
+				    width: 100,
+				    sortable: false,
+				    dataIndex: 'defaultflg',
+				    editor: defaultflag,
+				    renderer: function (val) {
+				        if (val === '1') {
+				            return '是';
+				        }
+				        else {
+				            return '否';
+				        }
+				    }
+				}, {
+				    header: '是否副本',
+				    width: 100,
+				    sortable: false,
+				    dataIndex: 'isbackup',
+				    //editor: defaultflag,
+				    renderer: function (val) {
+				        if (val === '1') {
+				            return '是';
+				        }
+				        else {
+				            return '否';
+				        }
+				    }
+				}, {
+				    header: '界面名称',
+				    flex:1,
+				    sortable: false,
+				    dataIndex: 'name',
+				    editor: {
+				        allowBlank: false
+				    }
+				}, {
+				    header: '备注',
+				    flex: 1,
+				    sortable: false,
+				    dataIndex: 'remark',
+				    editor: {
+				        allowBlank: true
+				    }
+				}],
+                  viewConfig: {
+                      forceFit: true,
+                      scrollOffset: 0,
+                      enableTextSelection: true
+                  },
+                  plugins: [cellEditing],
+                    //var AddOrgtree = [];//组织树【新增】的时候（打上勾），就把节点的id放到这个数组里
+                    //var DelOrgtree = [];//组织树【删除】的时候（打上勾），就把节点的id放到这个数组里
+                    //var OriginOrgtree = [];//后台返回的数组（原始数组）
+                    //var CopyOrgtree = []; //原始数组的拷贝值，获取的时候和原始数组相等，删除或新增的时候改变这里面的值
+                  listeners: {
+                      'cellclick': function(treePanel, td, cellIndex, record, tr, rowIndex, e, eOpts){
+                          //单击的时候判断组织树在不在，在的话就发Ajax请求,去获取这个phid里面有多少个组织，返回两个数组
+                        var orgtree = Ext.getCmp('orgpanel')
+                        currentRecord = record;//当前节点
+                        var data = infogrid.getSelectionModel().getSelection();
+                        phid = data[0].data.phid; //全局变量phid，保存的时候也要用到
+                        if (phid != '') {
+                            if (orgtree.isVisible()) {
+                                phidInOrgTree = phid;//点击的时候就把当前项目的phid赋值给树上的一个id
+                                //开始发Ajax请求,返回数组
+                                GetOrgNumberByPhid();
+                            }
+                        }
+
+
+                      },
+                    'beforecellclick': function (treePanel, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+                        var orgtree = Ext.getCmp('orgpanel')
+
+                        if (orgtree.isVisible()) {
+                          if (record.data.phid != phid) {
+                            if (CopyOrgtree.sort().toString() != OriginOrgtree.sort().toString()) {
+
+                                var msg = '数据发生变化，是否保存?';
+                                Ext.Msg.confirm('警告', msg, function (btn, text) {
+                                    if (btn == 'yes') {
+                                        SaveOrgTree();
+                                        treePanel.getSelectionModel().select(currentRecord);//切回当前节点
+                                    }
+                                    else {
+                                        //节点切换回去
+                                        treePanel.getSelectionModel().select(currentRecord);//切回当前节点
+                                        setTreeCheckByid(roleorgtree.getRootNode(), OriginOrgtree); //同时刷新树的勾选状态
+                                        //四个数组置为初始状态
+                                        var changeTree = OriginOrgtree.slice(0);
+                                        CopyOrgtree = changeTree;
+                                        AddOrgtree = [];
+                                        DelOrgtree = [];
+                                        //return false;
+                                    }
+                                });
+                                return false;//先不切换过去,根据弹出框的选择后再操作
+                            }
+                            return true;
+                        }
+                        else {
+                            return true;
+                        }
+                  }
+                },
+
+              }
+              });
+
+              var leftPanel = Ext.create('Ext.ng.BusTreePanel', {
+                  tablename: 'fg_individualinfo_reg'
+              });
+              var busTree = leftPanel.getTree();
+
+
+              //组织树的paneltree//////////////////////开始/////////////////////////////////////////////////////////////
+
+              //数组删除指点节点的方法
+              Array.prototype.removeByValue = function(val){
+                  for(var i = 0;i<this.length;i++){
+                      if(this[i] == val){
+                          this.splice(i,1);
+                          break;
+                      }
+                  }
+              }
+
+              var roleorgtree = Ext.create('Ext.ng.TreePanel', {
+                  itemId: 'orgpanel',
+                  id: 'orgpanel',
+                  region: "east",
+                  width: 220,
+                  split: true,
+                  //title: '组织树',
+                  rootVisible: false,
+                  controlCheckState: true,//是否需要控制树的check的只读状态,这里不需要只读状态，需要修改的
+                  autoLoad: false,//禁止树发出请求
+                  treeFields: [
+                      { name: 'text', type: 'string' },
+                      { name: 'customsort', type: 'string' }
+                  ],
+                  //url: C_ROOT+'/dmc/org/OrgRelat/GetSysRelatitemTreeData?includedept=true&needcheck=true',
+                  url: C_ROOT+'/dmc/org/OrgRelat/GetSysRelatitemTreeData?includedept=false&needcheck=true',
+                  listeners: {
+                      'selectionchange': function (selModel, rcds, eOpts) {
+                      },
+                      'checkchange': function (node, checked, eOpts) {
+                    //var AddOrgtree = [];//组织树【新增】的时候（打上勾），就把节点的id放到这个数组里
+                    //var DelOrgtree = [];//组织树【删除】的时候（打上勾），就把节点的id放到这个数组里
+                    //var OriginOrgtree = [];//后台返回的数组（原始数组）
+                    //var CopyOrgtree = []; //原始数组的拷贝值，获取的时候和原始数组相等，删除或新增的时候改变这里面的值
+                          //首先判断节点的disabled不等于true才行
+                          if(node.data.disabled != true){
+                            //每点击一个节点，先遍历原数组拷贝
+                            // >-1 代表删除此节点
+                            if(CopyOrgtree.indexOf(parseInt(node.raw.id)) > -1){
+                                //console.log('这是删除')
+                                if(AddOrgtree.indexOf(parseInt(node.raw.id)) > -1){
+                                    //AddOrgtree删除节点
+                                    AddOrgtree.removeByValue(parseInt(node.raw.id));
+                                    //拷贝数组也要删除节点
+                                    CopyOrgtree.removeByValue(parseInt(node.raw.id));
+                                }else{
+                                    //DelOrgtree删除节点
+                                    DelOrgtree.push(parseInt(node.raw.id));
+                                    //拷贝数组也要删除节点
+                                    CopyOrgtree.removeByValue(parseInt(node.raw.id));
+                                }
+                            }else{
+                                //console.log('这是新增')
+                                //这里是新增节点
+                                if(DelOrgtree.indexOf(parseInt(node.raw.id)) > -1){
+                                    //AddOrgtree删除节点
+                                    DelOrgtree.removeByValue(parseInt(node.raw.id));
+                                    //拷贝数组也要删除节点
+                                    CopyOrgtree.push(parseInt(node.raw.id));
+                                }else{
+                                    //DelOrgtree新增节点
+                                    AddOrgtree.push(parseInt(node.raw.id));
+                                    //拷贝数组也要删除节点
+                                    CopyOrgtree.push(parseInt(node.raw.id));
+                                }
+                            }
+                          }
+
+                      },
+                      'cellclick': function(a, td, cellIndex, record, tr, rowIndex, e, eOpts){
+                          //console.log('123')
+                      },
+                      'afterrender': function(a,b,c,d){
+                          //a.on('click',()=>{console.log('123')})
+                          //debugger;
+                      }
+                  },
+                  dockedItems: [
+                    Ext.create('Ext.ng.Toolbar', {
+                        xtype: 'ngtoolbar',
+                        id: 'mytoolbar',
+                        region: 'north',
+                        showArrowBtn:false,
+                        //rightName: 'CommonHelpList', //权限名称
+                        ngbuttons: ['save','clear']
+                    })
+                  ]
+              });
+              var roleorgpanel = Ext.create('Ext.panel.Panel', {
+                  region: 'east',
+                  width: 300,
+                  itemId: 'orgpanel1',
+                  id: 'orgpanel1',
+                  style: 'margin-left:0px;margin-right:0px',
+                  title: '组织树',
+                  layout: 'border',
+                  border: 0,
+                  items: [roleorgtree]
+              });
+
+
+
+
+
+              //结束//////////////////////////组织树结束/////////////////////
+
+
+
+
+
+
+              //布局
+              var viewport = Ext.create('Ext.container.Viewport', {
+                  id: "viewPort",
+                  layout: 'border',
+                  items: [ngToolbar, leftPanel, infogrid, roleorgtree]
+              });
+
+              infogrid.on("beforeedit", function (editor, e, eOpts) {
+                  if (e.record.data['isbackup'] === '1') {//备份的数据不可编辑
+                      return false;
+                  }
+              });
+
+              var currentRecord;//当前选中的记录节点
+              busTree.on('beforecellclick', function (treePanel, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+                  //console.log(record.data.phid)
+                  //切换的时候是否保存。
+                    var orgtree = Ext.getCmp('orgpanel')
+                    if (orgtree.isVisible()) {
+                    if (record.data.bustype != bustype) {
+                        if (CopyOrgtree.sort().toString() != OriginOrgtree.sort().toString()) {
+
+                            var msg = '数据发生变化，是否保存?';
+                            Ext.Msg.confirm('警告', msg, function (btn, text) {
+                                if (btn == 'yes') {
+                                    SaveOrgTree();
+                                    //treePanel.getSelectionModel().select(currentRecord);//切回当前节点
+                                    Ext.apply(infostore.proxy.extraParams, { 'bustype': record.data.bustype });
+                                    infostore.load();
+                                }
+                                else {
+                                    //节点切换回去
+                                    treePanel.getSelectionModel().select(currentRecord);//切回当前节点
+                                    setTreeCheckByid(roleorgtree.getRootNode(), OriginOrgtree); //同时刷新树的勾选状态
+                                    //四个数组置为初始状态
+                                    var changeTree = OriginOrgtree.slice(0);
+                                    CopyOrgtree = changeTree;
+                                    AddOrgtree = [];
+                                    DelOrgtree = [];
+                                    //return false;
+                                }
+                            });
+                            return false;//先不切换过去,根据弹出框的选择后再操作
+                        }
+                        return true;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+
+
+
+                  if (record.data.bustype != bustype) {
+                      if (infogrid.hasModifyed()) {
+
+                          //if (window.confirm('业务类型[' + bustype + ']的自定义界面信息未保存,是否切换到业务类型[' + record.data.text + '] ?')) {
+                          //    return true;
+                          //}
+                          //return false;
+                          var msg = '业务类型[' + bustype + ']的自定义界面信息未保存,是否切换到业务类型[' + record.data.text + '] ?';
+                          Ext.Msg.confirm('警告', msg, function (btn, text) {
+                              if (btn == 'yes') {
+                                  Ext.apply(infostore.proxy.extraParams, { 'bustype': record.data.bustype });
+                                  bustype = record.data.bustype;//切换业务类型
+                                  busname = record.data.text;
+                                  infostore.load();
+                              }
+                              else {
+                                  //节点切换回去
+                                  //treePanel.selectPath(record.getPath());//光标选中
+                                  treePanel.getSelectionModel().select(currentRecord);//切回当前节点
+                              }
+                          });
+                          return false;//先不切换过去,根据弹出框的选择后再操作
+                      }
+                      return true;
+                  }
+                  else {
+                      return true;
+                  }
+              });
+
+              busTree.on('cellclick', function (treePanel, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+
+                  if (record.data.leaf) {
+
+                      bustype = record.data.bustype;
+                      busname = record.data.text;
+                      currentRecord = record;//当前节点
+                      busphid = record.data.phid; //当前节点的phid（例如338,220这种类型的数据）
+
+                      Ext.apply(infostore.proxy.extraParams, { 'bustype': bustype });
+                      infostore.load();
+
+                      //orgTreeNotAllowCheck = []; //设置完之后把它置为空
+                      var orgtree = Ext.getCmp('orgpanel')
+                      //切换树的时候全部初始化树
+                      if (orgtree.isVisible()) {
+                          ResetOrgTree(roleorgtree.getRootNode())
+                      }
+
+                  }
+              });
+
+              //增行
+              ngToolbar.get('addrow').on('click', function () {
+
+                  if (Ext.isEmpty(bustype)) {
+                      NGMsg.Info('请选择业务类型!');
+                      return;
+                  }
+
+                  var data = [{
+                      'code': '',
+                      'name': '',
+                      'bustype': bustype,
+                      'defaultflg': '0'
+                  }];
+
+                  infostore.insert(infostore.getCount(), data);
+
+              });
+
+              //删行
+              ngToolbar.get('deleterow').on('click', function () {
+
+                  if (Ext.isEmpty(bustype)) {
+                      NGMsg.Info('请选择删除项!');
+                      return;
+                  }
+
+                  var data = infogrid.getSelectionModel().getSelection();
+                  if (data.length == 0) {
+                      NGMsg.Info('请选择删除项!');
+                      return;
+                  }
+
+                  Ext.Msg.confirm('删除警告', '是否确认删除', function (btn, text) {
+                      if (btn == 'yes') {
+                           if (data.length > 0) {
+                           var id = data[0].get('phid');
+                          if (!Ext.isEmpty(id)) {
+                              Ext.Ajax.request({
+                                  params: { 'id': id },
+                                  url: '@Url.Content("~/SUP/IndividualUI/Delete")',
+                                  success: function (response) {
+                                      var resp = Ext.JSON.decode(response.responseText);
+                                      if (resp.Status === "success") {
+                                          NGMsg.Success('删除成功');
+                                          var ids = [];
+                                          Ext.Array.each(data, function (record) {
+                                              infostore.remove(record); //前端删除
+                                          });
+                                      } else {
+                                          NGMsg.Error('删除失败' + resp.Msg);
+                                      }
+                                  }
+                              });
+                          }//isEmpty
+                          else {
+                             Ext.Array.each(data, function (record) {
+                                   infostore.remove(record); //前端删除
+                             });
+                          }
+                        }//length > 0
+                      }
+                  });
+
+              });
+
+              //保存
+              ngToolbar.get('save').on('click', function () {
+
+                  var griddata = infogrid.getChange();
+
+                  //alert(griddata);
+
+                  if (!infogrid.hasModifyed()) {
+                      NGMsg.Info("单据并无更新,无需保存!");
+                      return;
+                  }
+
+                  var count = 0;
+                  for (var i = 0; i < infostore.data.items.length; i++) {
+
+                      if (infostore.data.items[i].data['defaultflg'] === '1') {
+                          count++;
+                      }
+                  }
+                  if (count > 1) {
+                      NGMsg.Warn('只能有一个默认界面方案！');
+                      return;
+                  }
+
+                  if (!infogrid.isValid()) {
+                      return;
+                  }
+
+
+                  ngToolbar.get("save").disable();//禁用保存按钮
+                  var myMask = new Ext.LoadMask(document.body, { msg: "单据正在保存中,请稍候..." });
+                  myMask.show();//锁屏
+                  Ext.Ajax.request({
+                      params: { 'data': griddata },
+                      url: '@Url.Content("~/SUP/IndividualUI/Save")',
+                      success: function (response) {
+                          var resp = Ext.JSON.decode(response.responseText);
+                          if (resp.Status === "success") {
+                              //succFn();
+                              //CommitGridData(store);
+                              infostore.commitChanges();
+                              NGMsg.Success('保存成功');
+                              infostore.load();
+
+                          } else {
+                              NGMsg.Error('保存失败' + resp.Msg);
+                          }
+                          myMask.hide();//停止锁屏
+                          ngToolbar.get("save").enable();//保存失败，保存按钮设置为可用
+                      }
+                  });
+
+              });
+
+              //复制
+              ngToolbar.get('copy').on('click', function () {
+                  var data = infogrid.getSelectionModel().getSelection();
+                  if (data.length == 0) {
+                      NGMsg.Info('请选择数据项!');
+                      return;
+                  }
+
+                  Ext.Msg.confirm('提示', '是否复制界面【' + data[0].get('name')+ '】', function (btn, text) {
+                      if (btn == 'yes') {
+
+                          var id = data[0].get('phid');
+                          ngToolbar.get("copy").disable();//禁用保存按钮
+                          var myMask = new Ext.LoadMask(document.body, { msg: "正在处理中,请稍候..." });
+                          myMask.show();//锁屏
+                          Ext.Ajax.request({
+                              params: { 'id': id },
+                              url: '@Url.Content("~/SUP/IndividualUI/Copy")',
+                              success: function (response) {
+                                  var resp = Ext.JSON.decode(response.responseText);
+                                  if (resp.Status === "success") {
+                                      infostore.load();
+                                  } else {
+                                      NGMsg.Error('复制失败' + resp.Msg);
+                                  }
+                                  myMask.hide();//停止锁屏
+                                  ngToolbar.get("copy").enable();//保存失败，保存按钮设置为可用
+                              }
+                          });
+                      }
+                  });
+
+              });
+
+              //界面设计
+              ngToolbar.get('design').on('click', function () {
+
+                  var data = infogrid.getSelectionModel().getSelection();
+
+                  if (data.length > 0) {
+                      var id = data[0].get('phid');
+
+                      if (Ext.isEmpty(id)) {
+                          NGMsg.Error('请先保存该行数据!');
+                          return;
+                      }
+
+                      $OpenTab('界面设计', '@Url.Content("~/")' + 'SUP/Designer?bustype=' + bustype + '&phid=' + id + '&busname=' + encodeURIComponent(busname));
+
+                  }
+                  else {
+                      NGMsg.Error('请选择行!');
+                  }
+
+              });
+
+
+              //脚本代码
+              ngToolbar.get('script').on('click', function () {
+
+                  var data = infogrid.getSelectionModel().getSelection();
+                  if (data.length > 0) {
+                      var id = data[0].get('phid');
+                      if (Ext.isEmpty(id)) {
+                          NGMsg.Error('请先选保存界面信息!');
+                          return;
+                      }
+
+                      $OpenTab('脚本设计', '@Url.Content("~/")' + 'SUP/Designer/IndividualScript?bustype=' + bustype + '&id=' + id);
+                  }
+              });
+
+              //界面升级
+              ngToolbar.get('update').on('click', function () {
+                  $OpenTab('界面升级', '@Url.Content("~/")' + 'SUP/IndividualUI/IndividualUIUpdate?bustype=' + bustype);
+              });
+
+              ngToolbar.get('help').on('click', function () {
+                  $OpenOnlineHelp('IndividualInfoList');
+              });
+
+
+
+            //界面分配////////////////////////////////开始/////////////////////////////////////////////////////////////
+
+            //两个数组合并去重
+            function merge(bigArray){
+                var array = [];
+                var middleArray = bigArray.reduce(function(a,b){
+                    return a.concat(b);
+                });
+
+                middleArray.forEach(function(arrItem){
+                    if(array.indexOf(arrItem) == -1){
+                        array.push(arrItem);
+                    }
+                });
+
+                return array
+            }
+
+            //两个数组取差集
+            function diff(arr1,arr2){
+                return arr1.concat(arr2).filter(function(arg){
+                  return !(arr1.indexOf(arg) >= 0 && arr2.indexOf(arg) >= 0);
+                });
+            }
+
+
+
+            //当前树节点Check发生变化对父子节点的影响,[ismodifyparent为false时下级不勾选不影响父级]
+            function treeNodeCheckBoxSelected(node, checked, ismodifyparent) {
+                setChildNodeChecked(node, checked);
+                setParentNodeChecked(node, checked, ismodifyparent);
+            }
+            //当前树节点Check发生变化对子节点的影响
+            function setChildNodeChecked(node, checked) {
+                if (!node.data.disabled) {
+                    if (node.data.checked != null) {
+                        node.set('checked', checked);
+                        if (node.raw.checked != node.data.checked) {
+                            node.dirty = true; //发生变化
+                        }
+                        else {
+                            node.dirty = false; //没发生变化
+                        }
+                    }
+                }
+                if (node.hasChildNodes()) {
+                    node.eachChild(function (child) {
+                        setChildNodeChecked(child, checked);
+                    });
+                }
+            }
+
+            //当前树节点Check发生变化对父节点的影响
+            function setParentNodeChecked(node, checked, ismodifyparent) {
+                if (!node.data.disabled) {
+                    if (node.data.checked != null) {
+                        node.set({ checked: checked });
+                        if (node.raw.checked != node.data.checked) {
+                            node.dirty = true; //发生变化
+                        }
+                        else {
+                            node.dirty = false; //没发生变化
+                        }
+                    }
+                }
+                var parentNode = node.parentNode;
+                if (parentNode != null) {
+                    var flag = false;
+                    parentNode.eachChild(function (childnode) {
+                        if (childnode.get('checked')) {
+                            flag = true;
+                        }
+                    });
+
+                    if (checked == false) {
+                        //ismodifyparent为false时下级不勾选不影响父级
+                        if (ismodifyparent)
+                        {
+                            if (!flag) {
+                                setParentNodeChecked(parentNode, checked);
+                            }
+                        }
+                    }
+                    else {
+                        if (flag) {
+                            setParentNodeChecked(parentNode, checked);
+                        }
+                    }
+                }
+            }
+
+            //根据id查找设置树check状态,
+            function setTreeCheckByid(node, checkdata) {
+                var childnodes = node.childNodes;
+                for (var i = 0; i < childnodes.length; i++) {
+                    if (childnodes[i].data.checked != null)
+                    {
+                        childnodes[i].set({ checked: false });
+                    }
+                    //console.log(childnodes[i].data.id)
+                    for (var j = 0; j < checkdata.length; j++) {
+                        if (childnodes[i].data.id == checkdata[j]) {
+                            if (childnodes[i].data.checked != null) {
+                                childnodes[i].set({ checked: true });
+                                //childnodes[i].set({ disabled: false });
+                                break;
+                            }
+                        }
+                    }
+
+                    if (childnodes[i].childNodes.length > 0) {
+                        setTreeCheckByid(childnodes[i], checkdata);
+                    }
+                }
+            }
+
+            //同时也设置disabled为false(这样处理了本身节点点了之后不能再点的问题)
+            function setTreeNodeEnable(node, checkdata){
+                var childnodes = node.childNodes;
+                for (var i = 0; i < childnodes.length; i++) {
+                    //console.log(childnodes[i].data.id)
+                    for (var j = 0; j < checkdata.length; j++) {
+                        if (childnodes[i].data.id == checkdata[j]) {
+                            if (childnodes[i].data.checked != null) {
+                                childnodes[i].set({ disabled: false });
+                                break;
+                            }
+                        }
+                    }
+
+                    if (childnodes[i].childNodes.length > 0) {
+                        setTreeNodeEnable(childnodes[i], checkdata);
+                    }
+                }
+            }
+
+
+            //根据id查找设置树不允许check状态
+            function NoSetTreeCheckByid(node, checkdata) {
+                var childnodes = node.childNodes;
+                for (var i = 0; i < childnodes.length; i++) {
+                    for (var j = 0; j < checkdata.length; j++) {
+                        if (childnodes[i].data.id == checkdata[j]) {
+                            if (childnodes[i].data.checked != null) {
+                                //console.log('不能点'+childnodes[i].data.id)
+                                childnodes[i].disable();
+                                break;
+                            }
+                        }
+                    }
+                    if (childnodes[i].childNodes.length > 0) {
+                        NoSetTreeCheckByid(childnodes[i], checkdata);
+                    }
+                }
+            }
+
+            //刷新树Enable所有(Reset树)
+            function ResetOrgTree(node) {
+                var childnodes = node.childNodes;
+                for (var i = 0; i < childnodes.length; i++) {
+
+
+                    childnodes[i].enable();
+                    //break;
+
+
+
+                    if (childnodes[i].childNodes.length > 0) {
+                        ResetOrgTree(childnodes[i]);
+                    }
+                }
+            }
+
+
+            //清空树状态-不知道有没有树自带的方法
+            function resetTreeState(node) {
+                if (node.data.checked != null)
+                {
+                    node.raw.checked = node.data.checked;
+                }
+                //node.set("checked", node.data.checked);
+                node.dirty = false;
+                if (node.hasChildNodes()) {
+                    node.eachChild(function (child) {
+                        resetTreeState(child);
+                    });
+                }
+            }
+
+            //清空树状态-不知道有没有树自带的方法
+            function ChangeTreeAllEnable(node) {
+                node.data.disabled = false;
+                if (node.hasChildNodes()) {
+                    node.eachChild(function (child) {
+                        resetTreeState(child);
+                    });
+                }
+            }
+
+
+            function SaveOrgTree(){
+            //节点保存方法：
+            //var AddOrgtree = [];//组织树【新增】的时候（打上勾），就把节点的id放到这个数组里
+            //var DelOrgtree = [];//组织树【删除】的时候（打上勾），就把节点的id放到这个数组里
+            //var OriginOrgtree = [];//后台返回的数组（原始数组）
+            //var CopyOrgtree = []; //原始数组的拷贝值，获取的时候和原始数组相等，删除或新增的时候改变这里面的值
+                //如果返回的orgtreeOrigin的长度=0（即一个都没勾选，就只需要处理新增的即可）
+                //开始发Ajax请求,返回成功或失败
+                var addOrg = AddOrgtree.slice(0);//拷贝数组
+                var delOrg = DelOrgtree.slice(0);
+                //var delOrg = orgtreeDelete.slice(0);//拷贝数组
+                if(typeof(phid) == 'undefined'|| phid == ''){
+                    Ext.Msg.alert('操作', '请选择行 或者 请先保存这条新增数据!');
+                }else{
+                    //如果拷贝数组和原数组排序之后相等，就表示没有变化。这里直接判断sort().toString()之后的值，不需要其他严格模式
+                    if(CopyOrgtree.sort().toString() == OriginOrgtree.sort().toString()){
+                        Ext.Msg.alert('操作', '没有发生数据变化');
+                        return;
+                    }
+                    //console.log(phid)
+                    //拼接添加的json
+                    var addParams = [];
+                    for(var i = 0;i<addOrg.length;i++){
+                        addParams.push({ "phid": '', "individualinfo_phid": phid, "object_id": addOrg[i], "object_type": '0',"busphid": busphid });
+
+                    }
+                    //console.log(typeof(addParams))
+                    var addOrgjJson =  JSON.stringify(addParams)
+                    //console.log(addOrgjJson)
+                    //拼接删除的json
+                    var delParams = [];
+                    for(var i = 0;i<delOrg.length;i++){
+                        //delParams.push({"phid":'',"individualinfo_phid":phid,"object_id":delOrg[i],"object_type":0});
+                        delParams.push({"object_id":delOrg[i]});
+                    }
+                    //var delOrgjJson = '{'+addParams+'}'
+                    var delOrgjJson =  JSON.stringify(delParams)
+                    Ext.Ajax.request({
+                        params: { 'addOrg': addOrgjJson,'delOrg':delOrgjJson,'phid':phid },
+                        url: '@Url.Content("~/SUP/IndividualUI/SaveOrg")',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                Ext.Msg.alert('操作', '保存成功');
+                                //如果保存成功了,则需要把AddOrgtree，DelOrgtree变为空，
+                                //OriginOrgtree数组： 把拷贝数组变为原数组
+                                //CopyOrgtree数组不变
+                                AddOrgtree = [];
+                                DelOrgtree = [];
+                                var saveFinish = CopyOrgtree.slice(0);//这里还要拷贝，不能直接相等
+                                OriginOrgtree = saveFinish;
+
+                                setTreeCheckByid(roleorgtree.getRootNode(), CopyOrgtree); //同时刷新树的勾选状态
+                            } else {
+                                Ext.Msg.alert('操作', '保存失败');
+                            }
+                        }
+                    });
+                }
+                //treeNodeCheckBoxSelected(roleorgtree.getStore().getRootNode(), true, false);//第三参数为true时下级不勾选影响父级
+            }
+
+
+            //
+            //开始发Ajax请求,返回数组
+            function GetOrgNumberByPhid(){
+                Ext.Ajax.request({
+                    params: { 'phid': phid,'bustypephid':busphid },
+                    url: '@Url.Content("~/SUP/IndividualUI/GetOrgNumberByPhid")',
+                    success: function (resp) {
+                        if (resp.responseText != "" && resp.statusText == "OK") {
+                            var data = Ext.JSON.decode(resp.responseText);//解析返回的值
+                            //console.log('所有的data[0].list1：'+data[0].list1)
+                            //console.log('自己的data[1].list2：'+data[1].list2)
+                            //console.log(typeof(data[0].list1))
+                            orgTreeNotAllowCheck = diff(data[0].list1,data[1].list2); //得到2个数组的差集，就是不能按的
+                            //console.log('差集'+orgTreeNotAllowCheck)
+
+
+                            OriginOrgtree = data[1].list2;//返回有值的话，就把返回的数组赋值给OriginOrgtree,原始的数组
+                            CopyOrgtree = OriginOrgtree.slice(0);//拷贝数组,所有新增删除操作都在这个数组中
+                            ResetOrgTree(roleorgtree.getRootNode()); //点击的时候先去刷新树
+
+                            setTreeCheckByid(roleorgtree.getRootNode(), data[1].list2); //勾选
+                            NoSetTreeCheckByid(roleorgtree.getRootNode(), orgTreeNotAllowCheck); //不允许勾选
+                            setTreeNodeEnable(roleorgtree.getRootNode(), data[1].list2); //设置自身勾选去掉以后不能第二次勾选的问题
+                            //console.log('差集2'+orgTreeNotAllowCheck)
+
+
+
+                        } else {
+
+                            setTreeCheckByid(roleorgtree.getRootNode(), "[]");
+                        }
+                        resetTreeState(roleorgtree.getRootNode()); //清状态
+                        roleorgtree.setCheckUI();//更新checkbox只读样式
+                    }
+                });
+            }
+
+
+
+
+
+              roleorgtree.hide();//页面加载的时候先隐藏起来
+
+             //组织树【保存】事件
+              roleorgtree.queryById('mytoolbar').get('save').on('click',function(){
+                    //参数：1.addOrg 新增的项
+                    //参数：2.delOrg 删除的项
+                    //参数：3.phid 是哪个业务点（业务点的phid）
+                //var AddOrgtree = [];//组织树【新增】的时候（打上勾），就把节点的id放到这个数组里
+                //var DelOrgtree = [];//组织树【删除】的时候（打上勾），就把节点的id放到这个数组里
+                //var OriginOrgtree = [];//后台返回的数组（原始数组）
+                //var CopyOrgtree = []; //原始数组的拷贝值，获取的时候和原始数组相等，删除或新增的时候改变这里面的值
+                    //如果返回的orgtreeOrigin的长度=0（即一个都没勾选，就只需要处理新增的即可）
+                    //开始发Ajax请求,返回成功或失败
+                    var addOrg = AddOrgtree.slice(0);//拷贝数组
+                    var delOrg = DelOrgtree.slice(0);
+                    //var delOrg = orgtreeDelete.slice(0);//拷贝数组
+                    if(typeof(phid) == 'undefined'|| phid == ''){
+                        Ext.Msg.alert('操作', '请选择行 或者 请先保存这条新增数据!');
+                        //console.log(AddOrgtree)
+                        //console.log(DelOrgtree)
+                    }else{
+                        //如果拷贝数组和原数组排序之后相等，就表示没有变化。这里直接判断sort().toString()之后的值，不需要其他严格模式
+                        if(CopyOrgtree.sort().toString() == OriginOrgtree.sort().toString()){
+                            Ext.Msg.alert('操作', '没有发生数据变化');
+                            return;
+                        }
+                        //console.log(phid)
+                        //拼接添加的json
+                        var addParams = [];
+                        for(var i = 0;i<addOrg.length;i++){
+                            addParams.push({"phid":'',"individualinfo_phid":phid,"object_id":addOrg[i],"object_type":'0',"busphid":busphid});
+
+                        }
+                        //console.log(typeof(addParams))
+                        var addOrgjJson =  JSON.stringify(addParams)
+                        //console.log(addOrgjJson)
+                        //拼接删除的json
+                        var delParams = [];
+                        for(var i = 0;i<delOrg.length;i++){
+                            //delParams.push({"phid":'',"individualinfo_phid":phid,"object_id":delOrg[i],"object_type":0});
+                            delParams.push({"object_id":delOrg[i]});
+                        }
+                        //var delOrgjJson = '{'+addParams+'}'
+                        var delOrgjJson =  JSON.stringify(delParams)
+                        //console.log(addOrgjJson)
+                        //return;
+                        Ext.Ajax.request({
+                            params: { 'addOrg': addOrgjJson,'delOrg':delOrgjJson,'phid':phid },
+                            url: '@Url.Content("~/SUP/IndividualUI/SaveOrg")',
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.Status === "success") {
+                                    Ext.Msg.alert('操作', '保存成功');
+                                    //var AddOrgtree = [];//组织树【新增】的时候（打上勾），就把节点的id放到这个数组里
+                                    //var DelOrgtree = [];//组织树【删除】的时候（打上勾），就把节点的id放到这个数组里
+                                    //var OriginOrgtree = [];//后台返回的数组（原始数组）
+                                    //var CopyOrgtree = []; //原始数组的拷贝值，获取的时候和原始数组相等，删除或新增的时候改变这里面的值
+
+                                    //如果保存成功了,则需要把AddOrgtree，DelOrgtree变为空，
+                                    //OriginOrgtree数组： 把拷贝数组变为原数组
+                                    //CopyOrgtree数组不变
+                                    AddOrgtree = [];
+                                    DelOrgtree = [];
+                                    var saveFinish = CopyOrgtree.slice(0);//这里还要拷贝，不能直接相等
+                                    //OriginOrgtree = CopyOrgtree;
+                                    OriginOrgtree = saveFinish;
+                                    //console.log('拷贝数组'+CopyOrgtree);
+                                    //console.log('Add数组'+AddOrgtree);
+                                    //console.log('Del数组'+DelOrgtree);
+                                    //console.log('原数组'+OriginOrgtree);
+
+
+                                    setTreeCheckByid(roleorgtree.getRootNode(), CopyOrgtree); //同时刷新树的勾选状态
+                                } else {
+                                    Ext.Msg.alert('操作', '保存失败');
+                                }
+                            }
+                        });
+                    }
+
+                    //treeNodeCheckBoxSelected(roleorgtree.getStore().getRootNode(), true, false);//第三参数为true时下级不勾选影响父级
+              });
+            //组织树【清空】事件
+              roleorgtree.queryById('mytoolbar').get('clear').on('click',function(){
+                if(typeof(phid) == 'undefined'|| phid == ''){
+                    Ext.Msg.alert('操作', '请选择行 或者 请先保存这条新增数据!');
+                }
+                treeNodeCheckBoxSelected(roleorgtree.getStore().getRootNode(), false, false);//第三参数为true时下级不勾选影响父级
+                AddOrgtree = []; //Add清空
+                CopyOrgtree = []; //拷贝数组清空
+                var orgTreeArrayCopy = OriginOrgtree.slice(0);
+                DelOrgtree = orgTreeArrayCopy; //Delete数组就是原数组
+              });
+
+
+
+              //界面分配
+              ngToolbar.get('allocate').on('click', function () {
+
+                  var orgpanel = Ext.getCmp('orgpanel')
+                  roleorgtree.getRootNode().expand(); //手动调用，发送树的请求
+                  if (orgpanel.isVisible()) {
+                      roleorgtree.hide()
+                  } else {
+                      roleorgtree.show(); //点击显示组织树
+                      //如果两者不相等，就发请求去刷新树,同时phidInOrgTree = phid
+                      if(phidInOrgTree != phid){
+                        GetOrgNumberByPhid();
+                        phidInOrgTree = phid;
+                      }
+                  }
+                  resetTreeState(roleorgtree.getRootNode()); //清状态
+                  //resetTreeState(roleorgtree.getRootNode());
+
+              });
+
+              //脚本同步
+              ngToolbar.get('sync').on('click', function () {
+                  Ext.Ajax.request({
+                      //params: { 'addOrg': addOrgjJson, 'delOrg': delOrgjJson, 'phid': phid },
+                      url: '@Url.Content("~/SUP/IndividualUI/SyncScript")',
+                      success: function (response) {
+                          var resp = Ext.JSON.decode(response.responseText);
+                          if (resp.Status === "success") {
+                              //console.log('成功啦！')
+                              //console.log(resp.count);
+                              Ext.Msg.alert('操作', '同步成功,共同步【' + resp.count + '】条数据');
+                          } else {
+                              Ext.Msg.alert('操作', '同步失败');
+                          }
+                      }
+                  });
+
+
+
+              });
+
+          })
+
+    </script>
+}
+
+
+

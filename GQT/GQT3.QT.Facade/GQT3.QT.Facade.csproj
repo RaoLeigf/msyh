@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B5455AE1-B422-4B16-91E1-175075FBDEE6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GQT3.QT.Facade</RootNamespace>
+    <AssemblyName>GQT3.QT.Facade</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GQT3.QT.Facade.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.BizBase, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.BizBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.ExceptionHandling, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Facade, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Facade.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Rights.AnalyticEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Rights.AnalyticEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Exceptions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL" />
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataAccess, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Rule, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.Rule.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Frame.Rule, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Frame.Rule.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BankAccountFacade.cs" />
+    <Compile Include="BudgetAccountsFacade.cs" />
+    <Compile Include="CorrespondenceSettings2Facade.cs" />
+    <Compile Include="CorrespondenceSettingsFacade.cs" />
+    <Compile Include="ExpenseCategoryFacade.cs" />
+    <Compile Include="GHProjDtlShareFacade.cs" />
+    <Compile Include="OrganizationFacade.cs" />
+    <Compile Include="OrgRelatitem2Facade.cs" />
+    <Compile Include="PaymentMethodFacade.cs" />
+    <Compile Include="PerformEvalTargetClassFacade.cs" />
+    <Compile Include="PerformEvalTargetFacade.cs" />
+    <Compile Include="PerformEvalTargetTypeFacade.cs" />
+    <Compile Include="PerformEvalTypeFacade.cs" />
+    <Compile Include="ProcurementCatalogFacade.cs" />
+    <Compile Include="ProcurementProceduresFacade.cs" />
+    <Compile Include="ProcurementTypeFacade.cs" />
+    <Compile Include="ProjectThresholdFacade.cs" />
+    <Compile Include="ProjLibProjFacade.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QtAccountFacade.cs" />
+    <Compile Include="QtAttachmentFacade.cs" />
+    <Compile Include="QtBaseProjectFacade.cs" />
+    <Compile Include="QTControlSetFacade.cs" />
+    <Compile Include="QtCoverUpDataFacade.cs" />
+    <Compile Include="QtCoverUpForOrgFacade.cs" />
+    <Compile Include="QtDtlStageFacade.cs" />
+    <Compile Include="QTEditMemoFacade.cs" />
+    <Compile Include="QTIfApproveFacade.cs" />
+    <Compile Include="QTMemoFacade.cs" />
+    <Compile Include="QTModifyFacade.cs" />
+    <Compile Include="QTIndividualInfoFacade.cs" />
+    <Compile Include="QtNaviGationFacade.cs" />
+    <Compile Include="QtOrgDygxFacade.cs" />
+    <Compile Include="QTProductFacade.cs" />
+    <Compile Include="QTProductUserDygxFacade.cs" />
+    <Compile Include="QTProductUserFacade.cs" />
+    <Compile Include="QTProjectDtlBudgetDtlFacade.cs" />
+    <Compile Include="QTProjectDtlFundApplFacade.cs" />
+    <Compile Include="QTProjectDtlImplPlanFacade.cs" />
+    <Compile Include="QTProjectDtlPerformTargetFacade.cs" />
+    <Compile Include="QTProjectDtlPurchaseDtlFacade.cs" />
+    <Compile Include="QTProjectDtlPurDtl4SOFFacade.cs" />
+    <Compile Include="QTProjectDtlTextContentFacade.cs" />
+    <Compile Include="QTProjectMstFacade.cs" />
+    <Compile Include="QtSysCodeSeqFacade.cs" />
+    <Compile Include="QTSysSetFacade.cs" />
+    <Compile Include="QtTableCustomizeFacade.cs" />
+    <Compile Include="QtVenueFacade.cs" />
+    <Compile Include="QtXmDistributeFacade.cs" />
+    <Compile Include="QtYJKFacade.cs" />
+    <Compile Include="QtZcgnflFacade.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RWReportFacade.cs" />
+    <Compile Include="SourceOfFundsFacade.cs" />
+    <Compile Include="UserFacade.cs" />
+    <Compile Include="UserOrgFacade.cs" />
+    <Compile Include="VCorrespondenceSetting2Facade.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GQT3.QT.Facade.Interface\GQT3.QT.Facade.Interface.csproj">
+      <Project>{c2328d95-250f-4968-8b7a-62ca2ecfb146}</Project>
+      <Name>GQT3.QT.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47ee9856-f415-4171-8609-b0531db86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Rule.Interface\GQT3.QT.Rule.Interface.csproj">
+      <Project>{52aeffed-ef6e-4104-b7ef-953c47a96666}</Project>
+      <Name>GQT3.QT.Rule.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\i6Rules\ /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

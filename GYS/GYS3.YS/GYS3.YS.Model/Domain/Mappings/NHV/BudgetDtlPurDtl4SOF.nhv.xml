@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="BudgetDtlPurDtl4SOFModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FDtlCode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FSourceOfFunds" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FName" >
+			<length min="0" max="500" message ="长度不超过500！"/>
+		</property>
+	</class>
+</nhv-mapping>

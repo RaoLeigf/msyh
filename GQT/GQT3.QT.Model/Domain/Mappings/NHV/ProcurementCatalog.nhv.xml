@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="ProcurementCatalogModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FName" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FRemark" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+	</class>
+</nhv-mapping>

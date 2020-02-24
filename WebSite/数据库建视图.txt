@@ -1,0 +1,49 @@
+
+CREATE view v_qtdygx2_zc
+as
+select t1.*,t2.oname dwmc,t3.oname dymc from Z_QTDYGX2 t1 left join fg_orglist t2 on t1.DWDM=t2.ocode left join fg_orglist t3 on t1.DYDM=t3.ocode  where DYDM is not null;
+
+
+CREATE VIEW [dbo].[v_ys3_BudgetMst] AS 
+	SELECT 
+		temp.phid,
+		temp.xm_mst_phid,
+		temp.f_year,
+		temp.f_ProjCode,
+		temp.f_ProjName,
+		temp.f_DeclarationUnit,
+		temp.f_DeclarationDept,
+		temp.f_ProjAttr,
+		temp.f_Duration,
+		temp.f_ExpenseCategory,
+		temp.f_ProjStatus,
+		temp.f_StartDate,
+		temp.f_EndDate,
+		temp.f_DateofDeclaration,
+		temp.f_Declarer,
+		temp.f_ProjAmount,
+		temp.f_BudgetAmount,
+		temp.f_ifPerformanceAppraisal,
+		temp.f_ifKeyEvaluation,
+		temp.f_MeetingTime,
+		temp.f_MeetiingSummaryNo,
+		temp.f_Type,
+		temp.f_ApproveStatus,
+		temp.f_VerNo,
+		temp.f_LifeCycle,
+		temp.creator,
+		temp.editor,
+		temp.cur_orgid,
+		temp.ng_insert_dt,
+		temp.ng_update_dt,
+		temp.ng_record_ver,
+		temp.f_CarryOver,
+		temp.f_BudgetDept,
+		temp.f_BillNo,
+		temp.f_Approver,
+		temp.f_ApproveDate,
+		temp.f_midYearChange
+	
+	FROM ( SELECT ys3_BudgetMst.*,row_number() over(partition by f_ProjCode order by ng_insert_dt desc) group_idx from ys3_BudgetMst) temp where temp.group_idx = 1 ;
+
+

@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GYS3.YS.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GYS3.YS.Rule.Interface.IBuDeptReportRule">
+            <summary>
+            BudgetDtlBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlBudgetDtlRule">
+            <summary>
+            BudgetDtlBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlFundApplRule">
+            <summary>
+            BudgetDtlFundAppl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlImplPlanRule">
+            <summary>
+            BudgetDtlImplPlan业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlPerformTargetRule">
+            <summary>
+            BudgetDtlPerformTarget业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlPurchaseDtlRule">
+            <summary>
+            BudgetDtlPurchaseDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlPurDtl4SOFRule">
+            <summary>
+            BudgetDtlPurDtl4SOF业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlTextContentRule">
+            <summary>
+            BudgetDtlTextContent业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetMstRule">
+            <summary>
+            BudgetMst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Rule.Interface.IBudgetMstRule.AddData(System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Nullable{System.DateTime}},System.String)">
+            <summary>
+            同步数据到老G6H数据库
+            </summary>
+            <param name="userConn"></param>
+            <param name="zbly_dm"></param>
+            <param name="valuesqlList"></param>
+            <param name="mstSqlList"></param>
+            <param name="dtlSqlList"></param>
+            <param name="DJRQList"></param>
+            <param name="DEF_BZ1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Rule.Interface.IBudgetMstRule.GetId(System.String)">
+            <summary>
+            取最大ID值
+            </summary>
+            <param name="userConn"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Rule.Interface.IBudgetMstRule.AddYBF(System.String,System.String)">
+            <summary>
+            允许预备费抵扣
+            </summary>
+            <param name="userConn"></param>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetProcessCtrlRule">
+            <summary>
+            BudgetProcessCtrl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IExpenseDtlRule">
+            <summary>
+            ExpenseDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IExpenseHxRule">
+            <summary>
+            ExpenseHx业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IExpenseMstRule">
+            <summary>
+            ExpenseMst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IGHSubjectRule">
+            <summary>
+            GHSubject业务逻辑层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Rule.Interface.IGHSubjectRule.AddData(System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Nullable{System.DateTime}})">
+            <summary>
+            同步数据到老G6H数据库
+            </summary>
+            <param name="userConn"></param>
+            <param name="zbly_dm"></param>
+            <param name="valuesqlList"></param>
+            <param name="mstSqlList"></param>
+            <param name="dtlSqlList"></param>
+            <param name="DJRQList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Rule.Interface.IGHSubjectRule.AddDataSP(System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Nullable{System.DateTime}})">
+            <summary>
+            基本支出审批同步数据到老G6H数据库
+            </summary>
+            <param name="userConn"></param>
+            <param name="zbly_dm"></param>
+            <param name="valuesqlList"></param>
+            <param name="mstSqlList"></param>
+            <param name="dtlSqlList"></param>
+            <param name="DJRQList"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.ISubjectMstBudgetDtlRule">
+            <summary>
+            SubjectMstBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.ISubjectMstRule">
+            <summary>
+            SubjectMst业务逻辑层接口
+            </summary>
+        </member>
+    </members>
+</doc>

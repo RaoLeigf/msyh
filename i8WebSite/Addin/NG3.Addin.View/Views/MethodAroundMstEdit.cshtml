@@ -1,0 +1,1380 @@
+﻿@{
+    ViewBag.Title = "MethodAroundMstEdit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{  
+    <script type="text/javascript">
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo)? {} : Ext.decode(langInfo); //自定义
+
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        //var busno = '@ViewBag.No';
+
+        var $currentObj;
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save'
+                ]
+            });
+
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 400,
+                autoScroll: true,
+                buskey: 'Phid', //对应的业务表主键属性
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 3,
+                fieldDefaults: {
+                    labelWidth: 87,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                fields: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: Lang.TargetServiceId || 'ServiceId',
+                        name: 'TargetServiceId',
+                        itemId: 'TargetServiceId',
+                        readOnly: true,
+                        mustInput: false,
+                        hidden:true,
+                        colspan: 1
+                    }
+                    ,
+                    {
+                        xtype: 'ngRichHelp',
+                        fieldLabel: Lang.TargetService || '功能扩展点',
+                        id: 'TargetServiceName',
+                        name: 'TargetServiceName',
+                        readOnly: false,
+                        ORMMode: false,
+                        mustInput: true,
+                        valueField: 'phid',
+                        displayField: 'servicename',
+                        helpid: 'addinservice', //帮助标记
+                        matchFieldWidth: false,
+                        pickerWidth: 400,
+                        
+                        listeners:{
+                                helpselected: function (obj) {
+                                    // var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+                                    // data[0].set('department', obj.code);
+                                    //data[0].set('department_name', obj.name);
+                                    mstform.queryById("TargetServiceId").setValue(obj.data.phid);
+                                    mstform.queryById("TargetAssemblyName").setValue(obj.data.targetassemblyname);
+                                    mstform.queryById("TargetClassName").setValue(obj.data.targetclassname);
+                                    mstform.queryById("TargetMethodName").setValue(obj.data.targetmethodname);
+                                        }
+                            },
+                        colspan: 1
+
+                    },
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: Lang.TargetAssemblyName || '目标程序集',
+                        name: 'TargetAssemblyName',
+                        itemId: 'TargetAssemblyName',
+                        readOnly: true,
+                        mustInput: false,
+                        colspan: 1
+                    },
+					{
+					    xtype: 'ngText',
+					    fieldLabel: Lang.TargetClassName || '目标类名',
+					    name: 'TargetClassName',
+					    itemId: 'TargetClassName',
+					    readOnly: true,
+					    mustInput: false,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: Lang.TargetMethodName || '目标方法名',
+					    name: 'TargetMethodName',
+					    itemId: 'TargetMethodName',
+					    readOnly: true,
+					    mustInput: false,
+					    colspan: 1
+					}, {
+					    xtype: 'ngComboBox',
+					    fieldLabel: Lang.InterceptorType || '拦截类型',
+					    name: 'InterceptorType',
+					    id: 'InterceptorType',
+					    queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+					    //outFilter: {},
+					    editable: false,
+					    mustInput: true,
+					    valueType: 'int',
+					    datasource: 'default', //加载的数据源类型
+					    data: [{
+					        "code": 0,
+					        "name": "方法前"
+					    }, {
+					        "code": 1,
+					        "name": "方法后"
+					    }],
+					    colspan: 1
+					    },
+                        //{
+					//    xtype: 'ngComboBox',
+					//    fieldLabel: Lang.AddinType || '插件类型',
+					//    name: 'AddinType',
+					//    id: 'AddinType',
+					//    queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+					//    //outFilter: {},
+					//    editable: false,
+					//    mustInput: false,
+					//    valueType: 'int',
+					//    datasource: 'default', //加载的数据源类型
+					//    data: [{
+					//        "code": 0,
+					//        "name": "SQL语句"
+					//    }, {
+					//        "code": 1,
+					//        "name": "程序集"
+					//    }, {
+					//        "code": 2,
+					//        "name": "表达式"
+					//    }, {
+					//        "code": 3,
+					//        "name": "Url"
+					//    }],
+					//    colspan: 1
+					//},
+                    {
+					    xtype: 'container',
+					    hidden: true,
+					    items: [
+							{
+							    xtype: 'hiddenfield',
+							    fieldLabel: 'phid',
+							    name: 'Phid',
+							    itemId: 'Phid'
+							}
+					    ]
+					}
+                ]
+            });
+
+
+            Ext.define('sqlgridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'Phid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'Phid'
+					}, {
+					    name: 'MstPhid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'MstPhid'
+					}, {
+					    name: 'FromDs',
+					    type: 'string',
+					    mapping: 'FromDs'
+					}, {
+					    name: 'RowsType',
+					    type: 'int',
+					    mapping: 'RowsType'
+					}, {
+					    name: 'SqlType',
+					    type: 'int',
+					    mapping: 'SqlType'
+					}, {
+					    name: 'ToTable',
+					    type: 'string',
+					    mapping: 'ToTable'
+					}, {
+					    name: 'ToTableKey',
+					    type: 'string',
+					    mapping: 'ToTableKey'
+					}, {
+					    name: 'SqlText',
+					    type: 'string',
+					    mapping: 'SqlText'
+					}
+                ]
+            });
+
+            var sqlgridstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'sqlgridmodel',
+                pageSize: 25,
+                autoLoad: false,
+                url: 'GetAddinSqlList?id=' + busid                 
+            });
+
+            var sqlgrid = Ext.create('Ext.ng.GridPanel', {
+                minHeight: 400,
+                id:"sqlgrid",
+                stateful: true,
+                stateId: 'sqlgrid',
+               // forceFit:'true',
+                store: sqlgridstore,
+                buskey: 'Phid', //对应的业务表主键属性
+                columnLines: true,
+                tbar: [
+                       { text: '新增', itemId: "addsql", pid: 'sqlgrid', iconCls: "icon-New" }, { text: '删除', itemId: 'deletesql', pid: 'sqlgrid', iconCls: "delete" }
+                ],
+                selModel:{
+                    mode:'single'
+                },
+                selType:'cellmodel',
+
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.Phid || 'phid',
+					    dataIndex: 'Phid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.MstPhid || '主表PHID',
+					    dataIndex: 'MstPhid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    text: Lang.FromDs || '请求参数名称',
+					    dataIndex: 'FromDs',
+					    width: 150,
+					    sortable: false,
+					    hidden: false,
+					    editor:{
+					        xtype: "textfield"
+					    }
+					}, {
+					    text: Lang.RowsType || '参数数据类型',
+					    dataIndex: 'RowsType',
+					    width: 100,
+					    sortable: false,
+					    hidden: false,
+					    renderer: function (val, cell) {
+					        switch (val) {
+					            //case 0:
+					            //    return "空";
+					            case 1:
+					                return "新增行";
+					            case 2:
+					                return "删除行";
+					            case 3:
+					                return "修改行";
+					            case 4:
+					                return "所有行";
+					        }
+					    },
+					    editor: {
+					        xtype: 'ngComboBox',
+					        queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+					        //outFilter: {},
+					        editable: false,
+					        mustInput: false,
+					        valueType: 'int',
+					        datasource: 'default', //加载的数据源类型
+					        data: [
+                            //    {
+					        //    "code": 0,
+					        //    "name": "空"
+					        //},
+                            {
+					            "code": 1,
+					            "name": "新增行"
+					        }, {
+					            "code": 2,
+					            "name": "删除行"
+					        }, {
+					            "code": 3,
+					            "name": "修改行"
+					        }, {
+					            "code": 4,
+					            "name": "所有行"
+					        }],
+					        colspan: 1
+
+					    }
+					}, {
+					    header: Lang.SqlType || 'SQL类型',
+					    dataIndex: 'SqlType',
+					    width: 100,
+					    sortable: false,
+					    hidden: false,
+					    renderer: function (val, cell) {
+					        switch (val) {
+					            case 0:
+					                return "SQL语句";
+					            case 1:
+					                return "存储过程";
+					            case 2:
+					                return "SQL函数";
+					            //case 3:
+					            //    return "内置方法";
+					        }
+					    },
+					    editor: {
+					        xtype: 'ngComboBox',
+					        queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+					        //outFilter: {},
+					        editable: false,
+					        mustInput: false,
+					        valueType: 'int',
+					        datasource: 'default', //加载的数据源类型
+					        data: [{
+					            "code": 0,
+					            "name": "SQL语句"
+					        }, {
+					            "code": 1,
+					            "name": "存储过程"
+					        }
+                            //,
+                            //{
+					        //    "code": 2,
+					        //    "name": "SQL函数"
+                            //},
+                            //{
+					        //    "code": 3,
+					        //    "name": "内置方法"
+                            //}
+					        ],
+					        colspan: 1
+					    }
+					}, {
+					    header: Lang.ToTable || '保存到指定表',
+					    dataIndex: 'ToTable',
+					    width: 150,
+					    sortable: false,
+					    hidden: true,
+					    editor: {
+					        xtype: "textfield"
+					    }
+					}, {
+					    header: Lang.ToTableKey || '用来存入主表的主键列',
+					    dataIndex: 'ToTableKey',
+					    width: 150,
+					    sortable: false,
+					    hidden: true,
+					    editor: {
+					        xtype: "textfield"
+					    }
+					}, {
+					    header: Lang.SqlText || 'SQL文本',
+					    dataIndex: 'SqlText',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false,
+					    editor: {
+					        xtype: "textfield"
+					    }
+					}
+                ],
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+
+            });
+
+
+            Ext.define('expvarmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'Phid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'Phid'
+					}, {
+					    name: 'MstPhid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'MstPhid'
+					}, {
+					    name: 'VarName',
+					    type: 'string',
+					    mapping: 'VarName'
+					}, {
+					    name: 'FromDs',
+					    type: 'string',
+					    mapping: 'FromDs'
+					}, {
+					    name: 'RowsType',
+					    type: 'int',
+					    mapping: 'RowsType'
+					}, {
+					    name: 'SqlOpType',
+					    type: 'int',
+					    mapping: 'SqlOpType'
+					}, {
+					    name: 'SqlText',
+					    type: 'string',
+					    mapping: 'SqlText'
+					}
+                ]
+            });
+
+            var expvarstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'expvarmodel',
+                pageSize: 25,
+                autoLoad: false,
+                url: 'GetAddinExpressionVarList?id=' + busid                     
+            });
+
+
+
+            var expvargrid = Ext.create('Ext.ng.GridPanel', {
+                //frame: true,
+                id:"expvargrid",
+                stateful: true,
+                stateId: 'expvargrid',
+                store: expvarstore,
+                buskey: 'Phid', //对应的业务表主键属性
+                columnLines: true,
+                tbar: [
+                      { text: '新增', itemId: "addexpvar", pid: 'expvargrid', iconCls: "icon-New" }, { text: '删除', itemId: 'deleteexpvar', pid: 'expvargrid', iconCls: "icon-delete" }
+                ],
+                selModel: {
+                    mode: 'single'
+                },
+                selType: 'cellmodel',
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.Phid || 'Phid',
+					    dataIndex: 'Phid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.MstPhid || '主表Phid',
+					    dataIndex: 'MstPhid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.VarName || '变量名称',
+					    dataIndex: 'VarName',
+					    width: 200,
+					    sortable: false,
+					    hidden: false,
+					    editor:{
+                         xtype:"textfield"
+                             }
+					}, {
+					    header: Lang.FromDs || '请求参数名称',
+					    dataIndex: 'FromDs',
+					    width: 150,
+					    sortable: false,
+					    hidden: false,
+					    editor:
+                        {
+                        xtype:"textfield"
+                        }
+					}, {
+					    header: Lang.RowsType || '参数数据类型',
+					    dataIndex: 'RowsType',
+					    width: 100,
+					    sortable: false,
+					    hidden: false,
+					    renderer: function (val, cell) {
+					        switch (val) {
+					            //case 0:
+					            //    return "空";
+					            case 1:
+					                return "新增行";
+					            case 2:
+					                return "删除行";
+					            case 3:
+					                return "修改行";
+					            case 4:
+					                return "所有行";
+					        }
+					    },
+					    editor: {
+					        xtype: 'ngComboBox',
+					        queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+					        //outFilter: {},
+					        editable: false,
+					        mustInput: false,
+					        valueType: 'int',
+					        datasource: 'default', //加载的数据源类型
+					        data: [
+                            //    {
+					        //    "code": 0,
+					        //    "name": "空"
+					        //},
+                            {
+					            "code": 1,
+					            "name": "新增行"
+					        }, {
+					            "code": 2,
+					            "name": "删除行"
+					        }, {
+					            "code": 3,
+					            "name": "修改行"
+					        }, {
+					            "code": 4,
+					            "name": "所有行"
+					        }],
+					        colspan: 1
+
+					    }
+					}, {
+					    header: Lang.SqlOpType || 'SQL类型',
+					    dataIndex: 'SqlOpType',
+					    width: 100,
+					    sortable: false,
+					    hidden: false,
+					    renderer: function (val, cell) {
+					        switch (val) {
+					            case 0:
+					                return "SQL语句";
+					            case 1:
+					                return "存储过程";
+					            case 2:
+					                return "SQL函数";
+					            case 3:
+					                return "内置方法";
+					        }
+					    },
+					    editor: {
+					        xtype: 'ngComboBox',
+					        queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+					        //outFilter: {},
+					        editable: false,
+					        mustInput: false,
+					        valueType: 'int',
+					        datasource: 'default', //加载的数据源类型
+					        data: [{
+					            "code": 0,
+					            "name": "SQL语句"
+					        },
+                            //{
+					        //    "code": 1,
+					        //    "name": "存储过程"
+                            //},
+                            {
+					            "code": 2,
+					            "name": "SQL函数"
+					        }
+                            //,
+                            //{
+					        //    "code": 3,
+					        //    "name": "内置方法"
+                            //}
+					        ],
+					        colspan: 1
+					    }
+					}, {
+					    header: Lang.SqlText || 'Sql文本',
+					    dataIndex: 'SqlText',
+					    flex:1,
+					    sortable: false,
+					    hidden: false,
+                        editor:{xtype:"textfield"}
+					}
+                ],
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+            });
+
+
+
+
+            //定义模型
+            Ext.define('assemblymodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'Phid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'Phid'
+					}, {
+					    name: 'MstPhid',
+					    type: 'string',
+					    mapping: 'MstPhid'
+					}, {
+					    name: 'AssemblyName',
+					    type: 'string',
+					    mapping: 'AssemblyName'
+					}, {
+					    name: 'ClassName',
+					    type: 'string',
+					    mapping: 'ClassName'
+					}
+                ]
+            });
+
+            var assemblystore = Ext.create('Ext.ng.JsonStore', {
+                model: 'assemblymodel',
+                pageSize: 25,
+                autoLoad: false,                
+                url: 'GetAddinAssemblyList?id=' + busid
+            });
+
+
+            var assemblygrid = Ext.create('Ext.ng.GridPanel', {
+                //frame: true,
+                id: "assemblygrid",
+                height:400,
+                stateful: true,
+                stateId: 'assemblygrid',
+                store: assemblystore,
+                buskey: 'Phid', //对应的业务表主键属性
+                columnLines: true,
+                tbar: [
+                         { text: '新增', itemId: "addassembly", pid: 'assemblygrid', iconCls: "icon-New" }, { text: '删除', itemId: 'deleteassembly', pid: 'assemblygrid', iconCls: "icon-delete" }
+                ],
+                selModel: {
+                    mode: 'single'
+                },
+                selType: 'cellmodel',
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.Phid || 'Phid',
+					    dataIndex: 'Phid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.MstPhid || '主表PHID',
+					    dataIndex: 'MstPhid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.AssemblyName || '程序集名称',
+					    dataIndex: 'AssemblyName',
+					    flex:1,
+					    sortable: false,
+					    hidden: false,
+					    editor:{xtype:"textfield"}
+					}, {
+					    header: Lang.ClassName || '插件类名',
+					    dataIndex: 'ClassName',
+					    flex:2,
+					    sortable: false,
+					    hidden: false,
+					    editor: { xtype: "textfield" }
+					}
+                ]
+                ,
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+
+            });
+
+            var expbuttons = [{
+                x: 10,
+                y: 10,
+                id:'operator01',
+                text: '+',
+                xtype: 'button',
+                handler: event.OpButtonClick,
+                width: 40,
+                height: 20
+            }, {
+                x: 10,
+                y: 40,
+                id: 'operator02',
+                text: '-',
+                xtype: 'button',
+                width: 40,
+                handler:event.OpButtonClick,
+                height: 20
+            }, {
+                x: 10,
+                y: 70,
+                id: 'operator03',
+                text: '*',
+                xtype: 'button',
+                handler: event.OpButtonClick,
+                width: 40,
+                height: 20
+            }, {
+                x: 10,
+                y: 100,
+                id: 'operator04',
+                text: '/',
+                xtype: 'button',
+                handler: event.OpButtonClick,
+                width: 40,
+                height: 20
+            },
+            {
+                x: 10,
+                y: 130,
+            id: 'operator13',
+            text: '(',
+            xtype: 'button',
+            handler: event.OpButtonClick,
+            width: 40,
+            height: 20
+            },
+            //第二列
+        {
+                x: 55,
+                y: 10,
+                id: 'operator05',
+                text: '>',
+                xtype: 'button',
+                handler: event.OpButtonClick,
+                width: 40,
+                height: 20
+            },{
+                x: 55,
+                y: 40,
+                id: 'operator06',
+            text: '<',
+            xtype: 'button',
+            handler: event.OpButtonClick,
+            width: 40,
+            height: 20
+        },{
+        x: 55,
+        y: 70,
+        id: 'operator07',
+        text: '>=',
+        xtype: 'button',
+        width: 40,
+        handler: event.OpButtonClick,
+        height: 20
+        }, {
+            x: 55,
+            y: 100,
+            id: 'operator08',
+            text: '<=',
+            xtype: 'button',
+            width: 40,
+            handler: event.OpButtonClick,
+            height: 20
+        },
+         {
+             x: 55,
+             y: 130,
+             id: 'operator14',
+             text: ')',
+             xtype: 'button',
+             width: 40,
+             handler: event.OpButtonClick,
+             height: 20
+         },
+        {
+            x: 100,
+            y: 10,
+            text: '==',
+            id: 'operator09',
+            xtype: 'button',
+            width: 40,
+            handler: event.OpButtonClick,
+            height: 20
+        }, {
+            x: 100,
+            y: 40,
+            text: '<>',
+            id: 'operator10',
+            xtype: 'button',
+            width: 40,
+            handler: event.OpButtonClick,
+            height: 20
+        }, {
+            x: 100,
+            y: 70,
+            text: '||',
+            id: 'operator11',
+            xtype: 'button',
+            width: 40,
+            handler: event.OpButtonClick,
+            height: 20
+        }, {
+            x: 100,
+            y: 100,
+            id: 'operator12',
+            text: '&&',
+            xtype: 'button',
+            width: 40,
+            height: 20,
+            handler:event.OpButtonClick
+        }];
+
+
+            Ext.define('funcmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'FuncName',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'FuncName'
+					}, {
+					    name: 'FuncDesc',
+					    type: 'string',
+					    mapping: 'FuncDesc'
+					}
+                ]
+            });
+
+            var funcstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'funcmodel',
+                pageSize: 25,
+                autoLoad: true,
+                url: 'GetFuncList'
+            });
+
+            var funcgrid = Ext.create('Ext.ng.GridPanel', {
+                //frame: true,
+                id: "funcgrid",
+                stateful: true,
+                stateId: 'funcgrid',
+                store: funcstore,
+                columnLines: true,
+                selModel: {
+                    mode: 'single'
+                },
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.FuncName || '内置函数',
+					    dataIndex: 'FuncName',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+					}, {
+					    header: Lang.FuncDesc || '函数说明',
+					    dataIndex: 'FuncDesc',
+					    flex: 2,
+					    sortable: false,
+					    hidden: false
+					}
+                ]
+            });
+
+          
+
+            
+
+
+            Ext.define('expressionmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'Phid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'Phid'
+					}, {
+					    name: 'MstPhid',
+					    type: 'string',
+					    mapping: 'MstPhid'
+					}, {
+					    name: 'ExpText',
+					    type: 'string',
+					    mapping: 'ExpText'
+					},
+                    {
+                        name: 'Msg',
+                        type: 'string',
+                        mapping: 'Msg'
+                    },
+                    
+                    {
+                        name: 'IsContinue',
+                        type: 'int',
+                        mapping: 'IsContinue'
+                    }
+                ]
+            });
+
+            var expressionstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'expressionmodel',
+                pageSize: 25,
+                autoLoad: false,
+                url: 'GetAddinExpressionList?id=' + busid
+            });
+
+            var expchildgrid = Ext.create('Ext.ng.GridPanel', {
+
+                //frame: true,
+                id: "expchildgrid",
+                height:400,
+                stateful: true,
+                stateId: 'expchildgrid',
+                store: expressionstore,
+                buskey: 'Phid', //对应的业务表主键属性
+                columnLines: true,
+                tbar: [
+                         { text: '新增', itemId: "addexp", pid: 'expchildgrid', iconCls: "icon-New" }, 
+                         { text: '删除', itemId: 'deleteexp', pid: 'expchildgrid', iconCls: "icon-delete" },
+                         { text: '验证', itemId: "checkexp", pid: "expression", iconCls: "icon-Check" }
+                ],
+                selModel: {
+                    mode: 'single'
+                },
+                selType: 'cellmodel',
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.Phid || 'Phid',
+					    dataIndex: 'Phid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.MstPhid || '主表PHID',
+					    dataIndex: 'MstPhid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: Lang.ExpText || '表达式',
+					    dataIndex: 'ExpText',
+					    itemId:'expinput',
+					    flex:2,
+					    sortable: false,
+					    hidden: false,
+					    editor:{
+					        xtype:"textfield",
+					        listeners:
+                                {
+                                    blur: {
+                                        fn: function (ta) {
+                                            ta.selectionStart = ta.inputEl.dom.selectionEnd;
+                                            ta.selectionEnd = ta.inputEl.dom.selectionEnd;
+                                            $currentObj = ta;
+                                        }
+                                    }
+                                }
+					    }
+					}
+                    ,
+                    {
+                        header: Lang.MstPhid || '提示消息',
+                        dataIndex: 'Msg',
+                        flex:1,
+                        sortable: false,
+                        hidden: false,
+                        editor: { xtype: "textfield" }
+                        
+                    },
+                    {
+                        header: Lang.MstPhid || '是否继续',
+                        dataIndex: 'IsContinue',
+                        width: 50,
+                        sortable: false,
+                        hidden: false,
+                        renderer: function (val, cell) {
+                            switch (val) {
+                                case 0:
+                                    return "否";
+                                case 1:
+                                    return "是";                          
+                            }
+                        },
+                        editor: {
+                                xtype: 'ngComboBox',
+                                queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+                                //outFilter: {},
+                                editable: false,
+                                mustInput: false,
+                                valueType: 'int',
+                                datasource: 'default', //加载的数据源类型
+                                data: [{
+                                    "code": 0,
+                                    "name": "否"
+                                },                               
+                                {
+                                    "code": 1,
+                                    "name": "是"
+                                }
+                                
+                                ] }
+                        }  
+                    
+
+                ]
+                ,
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+                
+            })
+
+            var expgrid = Ext.create("Ext.panel.Panel", {
+                layout: "border",
+                id: "expression",
+                //tbar: [{ text: '验证', itemId: "addexp", pid: "expression", iconCls: "icon-Check" }],
+                items: [{
+                    title: '表达式定义',
+                    height: '40%',
+                    //width: 600,
+                    margin: '1px',
+                    region: "north",
+                    layout: 'fit',                    
+                    items: [expchildgrid]
+                },
+                {
+                    // height: 200,
+                    width: '20%',
+                    region: "west",
+                    layout: 'fit',
+                    items: [{
+                        // xtype: 'panel',
+                        title: '运算符',
+                        layout: 'absolute',
+                        items: expbuttons
+                    }]
+
+                }, {
+                    title: '系统内置函数',
+                    width: '80%',
+                    region: "east",
+                    layout: 'fit',
+                    items: [funcgrid]
+
+                    // height: 200,
+
+                }]
+
+            });
+
+
+
+            var tabItems = [
+              {
+                  id: 'tab1',
+                  //layout: 'border', //使grid填充
+                  title: 'SQL',
+                  autoScroll: true,
+                  layout:'fit',
+                  //autoScroll: true,
+                  //height:400,
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [sqlgrid]
+              },
+              {
+                  id: 'tab2',
+                  title: '表达式变量定义',
+                  autoScroll: true,
+                  layout: 'fit',
+                  //contentEl: 'center1'
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [expvargrid]
+              },
+              {
+                  id: 'tab3',
+                  title: '表达式定义',
+                  autoScroll: true,
+                  layout:'fit',
+                  //contentEl: 'center1'
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [expgrid]
+              },
+              {
+                  id: 'tab4',
+                  title: '程序集',
+                  autoScroll: true,
+                  layout:'fit',
+                  //contentEl: 'center1'
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [assemblygrid]
+              }
+            ];
+
+
+
+
+            var tabPanel = Ext.create('Ext.tab.Panel', {
+                //renderTo: 'tabpanel',
+                //xtype: 'tabpanel',
+                //layout: 'border',
+                region: 'center',
+                deferredRender: false,
+                plain: true,
+                id:"tabs",
+                //activeTab: 0,
+                minHeight: 400,
+                minWidth: 600,
+                defaults: { bodyStyle: 'padding:3px' },
+                items: tabItems
+
+            });
+
+
+
+            //定义模型
+
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, {
+                    xtype: 'panel',
+                    region: 'center',
+                    autoScroll: true,
+                    overflowY: 'scroll',
+                    layout: 'border',
+                    bodyStyle: "padding-right:5px",
+                    items: [mstform, tabPanel]
+                }]
+            });
+
+
+            //事件处理
+
+
+
+            //当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'methodaroundmst' },
+                    url: '@Url.Content("~/Addin/MethodAroundMst/GetMethodAroundMstInfo")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mstform.getForm();
+                            mstformobj.setValues(resp.Data);
+
+                            //代码转名称
+                            var codectl = [];
+                            BatchBindCombox(codectl);
+
+                            sqlgridstore.load();
+                            expvarstore.load();
+                            assemblystore.load();
+                            expressionstore.load();
+                           // funcstore.load();
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.Msg);
+                        }
+                    }
+                });
+               
+
+            }
+
+            //当新增时
+            if (otype == $Otype.ADD) {
+                //if (busno != undefined && busno != "") {
+                //    Ext.getCmp("No").userSetReadOnly(true);
+                //    Ext.getCmp("No").setValue(busno);
+                //}
+            }
+
+            //当修改时
+            if (otype == $Otype.EDIT) {
+            }
+
+            //当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+            }
+
+           // 保存
+            ngToolbar.get('save').on('click', function () {
+                var mstvf = mstform.isValid();
+
+                if (!mstvf) {
+                    return;
+                }
+
+                var mstformData = mstform.getFormData();
+
+                var sqlgriddata = sqlgrid.getChange();
+
+                var expvardata = expvargrid.getChange();
+                               
+                var expression = expchildgrid.getChange();
+
+
+                var assemblydata = assemblygrid.getChange();
+
+                Ext.Ajax.request({
+                    params: {
+                        'mstformData': mstformData, 'sqlgriddata': sqlgriddata,
+                        'expvardata': expvardata, 'expression': expression,
+                        'assemblydata': assemblydata
+                    },
+                    url: '@Url.Content("~/Addin/MethodAroundMst/save")', //先替换成log后续MVC area修改成addin
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                var frame = $GetWFrame();
+                                if (frame) {
+                                    var listref = frame.ListObserver.get('MethodAroundMstList');
+                                    var data = mstform.getForm().getValues();
+                                    data.Phid = resp.KeyCodes[0];//赋主键值
+                                    listref.fireEvent('refreshlist', data);
+                                }
+
+                                $CloseTab();
+                            });
+
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+            });
+
+
+            ////附件
+            //ngToolbar.get('attachment').on('click', function () {
+            //    alert("attachment");
+            //});
+
+            ////打印
+            //ngToolbar.get('print').on('click', function () {
+            //    alert("print");
+            //});
+
+
+        });
+
+        //事件绑定
+        Ext.onReady(function () { event.bindEvent(); });
+
+        var event = {
+            bindEvent: function () {
+                var obj;
+                obj = Ext.getCmp("sqlgrid");
+                obj.queryById("addsql").on('click', this.AddSql);
+                obj.queryById("deletesql").on('click', this.DeleteRecord);
+
+                Ext.getCmp("expvargrid").queryById("addexpvar").on("click",this.AddExpvar);
+                Ext.getCmp("expvargrid").queryById("deleteexpvar").on("click", this.DeleteRecord);
+
+                Ext.getCmp("assemblygrid").queryById("addassembly").on("click", this.AddAssembly);
+                Ext.getCmp("assemblygrid").queryById("deleteassembly").on("click", this.DeleteRecord);
+
+                Ext.getCmp("expchildgrid").queryById("addexp").on("click", this.AddExpression);
+                Ext.getCmp("expchildgrid").queryById("deleteexp").on("click", this.DeleteRecord);
+
+                var interceptorType = Ext.getCmp("InterceptorType");
+                interceptorType.on("change", this.InterceptorTypeChange);
+            },
+
+            InterceptorTypeChange: function (obj, newValue, oldValue, eOpts) {
+                var tabs = Ext.getCmp("tabs");
+
+                if (newValue == 0) //方法前
+                {
+                    //方法前只表达式可用
+                    tabs.tabBar.items.items[0].hide(); //tab_sql
+                    tabs.tabBar.items.items[1].show(); //tab_expvar
+                    tabs.tabBar.items.items[2].show(); //tab_exp
+                    tabs.tabBar.items.items[3].hide(); //tab_assembly
+                    tabs.setActiveTab(2);
+
+                } else if (newValue == 1)//方法后
+                {
+                    //方法后可用SQL，与插件
+                    tabs.tabBar.items.items[0].show(); //tab_sql
+                    tabs.tabBar.items.items[1].hide(); //tab_expvar
+                    tabs.tabBar.items.items[2].hide(); //tab_exp
+                    tabs.tabBar.items.items[3].show(); //tab_assembly
+                    tabs.setActiveTab(0);
+                }
+            },
+
+
+            AddSql: function () {
+                var sqlgrid = Ext.getCmp('sqlgrid');
+                var row = [{
+                    'Phid':'',
+                    'MstPhid':'',
+                    'FromDs': '',
+                    'RowsType': 4,
+                    'SqlType': '',
+                    'SqlText': '',
+                    'ToTable': '',
+                    'ToTableKey':''
+                }];
+
+                var store = sqlgrid.getStore();
+                store.insert(store.getCount(), row);
+            },
+            DeleteRecord: function (btn) {
+
+
+                var grid = Ext.getCmp(btn.pid);
+                if (Ext.isEmpty(grid)) return;
+
+                var data = grid.getSelectionModel().getSelection();
+                if (Ext.isEmpty(data)) {
+                    Ext.Msg.alert("提示","请先选择行!");
+                    return;
+                }
+                Ext.MessageBox.confirm('提示', '是否确定删除该记录?', function (btn) {
+                    if(btn!='yes')
+                    {
+                        return;
+                    }
+                    var store = grid.getStore();
+                    store.remove(data);
+                });
+
+            },
+
+            AddExpvar: function () {
+
+                var grid = Ext.getCmp('expvargrid');
+                var row = [{
+                    'Phid': '',
+                    'MstPhid': '',
+                    'VarName': '##',
+                    'RowsType': 4,
+                    'SqlOpType': '',
+                    'SqlText': ''
+                }];
+
+                var store = grid.getStore();
+                store.insert(store.getCount(), row);
+            },
+
+            AddAssembly:function(){
+                var grid = Ext.getCmp('assemblygrid');
+                var row = [{
+                    'Phid': '',
+                    'MstPhid': '',
+                    'AssemblyName': '',
+                    'ClassName': ''
+
+                }];
+
+                var store = grid.getStore();
+                store.insert(store.getCount(), row);
+            },
+
+            AddExpression:function(){
+                var grid = Ext.getCmp('expchildgrid');
+                var row = [{
+                    'Phid': '',
+                    'MstPhid': '',
+                    'ExpText': '',
+                    'Msg': '',
+                    'IsContinue':0
+                }];
+
+                var store = grid.getStore();
+                store.insert(store.getCount(), row);
+            },
+            OpButtonClick:function(btn)
+            {
+                //var record = Ext.getCmp("expchildgrid").getSelectionModel().getSelection();
+
+                var oldValue = $currentObj.value;
+
+                var value = btn.getText();
+                var newValue = oldValue.substring(0, $currentObj.selectionStart) + value + oldValue.substring($currentObj.selectionEnd);
+
+                $currentObj.setValue(newValue);
+
+                $currentObj.selectionStart += value.length;
+                $currentObj.selectionEnd += value.length;
+
+            }
+        };
+
+    </script>
+}

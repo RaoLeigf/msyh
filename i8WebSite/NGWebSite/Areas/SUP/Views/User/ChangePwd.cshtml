@@ -1,0 +1,143 @@
+﻿@{
+    ViewBag.Title = "修改密码";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+@section Script
+{    
+    <script type="text/javascript">
+
+        var UserIDCookie = Cookie.get('EditUserName');
+
+        var limitInfo = '@ViewBag.pwdLimitInfo';
+
+        var param = limitInfo.split('#');
+
+        var charlimit = param[0];//必须为字母、数字、下划线
+        var minlength = param[1]; //密码最短长度
+        var oldequalnew = param[2];//新旧密码相等
+
+        Ext.onReady(function () {
+
+            var form = Ext.create('Ext.ng.FormPanel', {
+                renderTo: "loginDiv",
+                width: 350,
+                height: 192,
+                bodyPadding: 20,
+                frame: true,
+                border: false,
+                floating: false,
+                defaultType: "textfield",
+                buttonAlign: 'center',
+                fieldDefaults: {
+                    labelAlign: 'left',
+                    labelWidth: 80,
+                    width: 300,
+                    msgTarget: 'side'
+                },
+                items: [{
+                    xtype: 'ngText',
+                    id: "UserID",
+                    name: "UserID",
+                    fieldLabel: "当前用户",
+                    readOnly: true,
+                    value: UserIDCookie
+                }, {
+                    id: "oldpwd",
+                    name: "oldpwd",
+                    //inputType: "password",
+                    fieldLabel: "旧密码"
+                }, {
+                    id: "newpwd",
+                    name: "newpwd",
+                    inputType: "password",
+                    fieldLabel: "新密码"
+                }, {
+                    id: "checknewpwd",
+                    name: "checknewpwd",
+                    inputType: "password",
+                    fieldLabel: "新密码确认"
+                }, {
+                    xtype: 'displayfield',
+                    id: "msg",
+                    name: "msg",
+                    fieldLabel: ""
+                }],
+                buttons: ["->", { text: "提交", handler: Save }, { text: "关闭", handler: Close}]
+            });
+
+            function Save() {
+
+                var newpwd = Ext.getCmp('newpwd').value;
+                var oldpwd = Ext.getCmp('oldpwd').value;
+
+                if (Ext.isEmpty(newpwd) && Ext.isEmpty(oldpwd)) {
+                    return;
+                }
+
+                var msg = Ext.getCmp('msg');
+
+
+
+                var express = eval('/\\w{' + minlength + ',10}/');
+
+
+                if (!Ext.isEmpty(newpwd) && (charlimit === '1') && !express.test(newpwd)) {
+                    alert("密码只能包含6-10位字母、数字、下划线");
+                    return;
+                }
+
+
+                if (newpwd != Ext.getCmp('checknewpwd').value) {
+
+                    msg.setFieldStyle({ color: 'red' });
+                    msg.setValue('两次输入新密码不一致，请重新输入！');
+                    return;
+                }
+
+                if ((oldequalnew == '0') && (oldpwd != newpwd)) {
+                    msg.setFieldStyle({ color: 'red' });
+                    msg.setValue('不允许新旧密码一致，请重新输入新密码！');
+                    return;
+                }
+
+                Ext.Ajax.request({
+                    params: { 'oldpwd': oldpwd, 'newpwd': newpwd },
+                    url: '@Url.Content("~/SUP/User/ChangePwd")',
+                    success: function (response) {
+                        var resp = response.responseText;
+                        if (resp == "1") {
+
+                            var npwd = Ext.getCmp('newpwd');
+                            var opwd = Ext.getCmp('oldpwd');
+
+                            msg.setFieldStyle({ color: 'blue' });
+                            msg.setValue('密码修改成功！');
+
+                            opwd.reset();
+                            npwd.reset();
+                            Ext.getCmp('checknewpwd').reset();
+
+                        } else if (resp == "-1") {
+                            msg.setFieldStyle({ color: 'red' });
+                            msg.setValue('失败：旧密码输入错误！');
+
+                        }
+                    }
+                });
+
+
+            };
+
+            var win = this.frameElement.parentContainer;
+
+            function Close() {
+                win.close();
+            };
+
+        });
+
+    </script>
+}
+
+<div class="login" id="loginDiv"></div>
+

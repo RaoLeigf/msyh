@@ -1,0 +1,576 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QTIndividualInfoEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_IndividualInfo.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save', 'addrow', 'delete',{ id: "OrgChange", text: "设置组织", width: this.itemWidth, iconCls: "icon-Operate" },// 'view',
+                    '->', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "IndividualinfoPhid",
+    "type": "string",
+    "mapping": "IndividualinfoPhid"
+                },
+                {
+                    "name": "IndividualinfoPhid_EXName",
+                    "type": "string",
+                    "mapping": "IndividualinfoPhid_EXName"
+                },
+                {
+                    "name": "YLXPhid",
+                    "type": "string",
+                    "mapping": "YLXPhid"
+                },
+                {
+                    "name": "YLXPhid_EXName",
+                    "type": "string",
+                    "mapping": "YLXPhid_EXName"
+                },
+                {
+                    "name": "XMLXPhid",
+                    "type": "string",
+                    "mapping": "XMLXPhid"
+                },
+                {
+                    "name": "XMLXPhid_EXName",
+                    "type": "string",
+                    "mapping": "XMLXPhid_EXName"
+                },
+                {
+                    "name": "NZTXPhid",
+                    "type": "string",
+                    "mapping": "NZTXPhid"
+                },
+                {
+                    "name": "NZTXPhid_EXName",
+                    "type": "string",
+                    "mapping": "NZTXPhid_EXName"
+                },
+  {
+    "name": "IndividualinfoName",
+    "type": "string",
+    "mapping": "IndividualinfoName"
+  },
+  {
+    "name": "IndividualinfoBustype",
+    "type": "string",
+    "mapping": "IndividualinfoBustype"
+  },
+  {
+    "name": "IndividualinfoBustypeName",
+    "type": "string",
+    "mapping": "IndividualinfoBustypeName"
+  },
+  {
+    "name": "IndividualinfoAmount1",
+    "type": "float",
+    "mapping": "IndividualinfoAmount1"
+  },
+  {
+    "name": "IndividualinfoAmount2",
+    "type": "float",
+    "mapping": "IndividualinfoAmount2"
+  },
+  {
+    "name": "BZ",
+    "type": "string",
+    "mapping": "BZ"
+  },
+  {
+    "name": "DEFINT1",
+    "type": "float",
+    "mapping": "DEFINT1"
+  },
+  {
+    "name": "DEFSTR4",
+    "type": "string",
+    "mapping": "DEFSTR4"
+  },
+  {
+    "name": "DEFSTR9",
+    "type": "string",
+    "mapping": "DEFSTR9"
+  },
+  {
+    "name": "DEFSTR10",
+    "type": "string",
+    "mapping": "DEFSTR10"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'QTindividualinfolist');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+                autoLoad: true,
+                url: C_ROOT + 'GQT/QT/QTIndividualInfo/GetQTIndividualInfoList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: 'd3ec76d5-fc15-410f-ae01-0433961de23b',
+				buskey: 'PhId', //对应的业务表主键属性
+				//layout: {
+				//	type: 'hbox',
+				//	align: 'stretch'
+				//},
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+                bbar: [pagingbar],
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1    //单击编辑，单元格修改
+                        //autoEncode: false  //不解析成html
+                    })
+                ]
+			};
+
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['QTindividualinfolist']);
+			 grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, grid]
+            });
+
+
+            ////新增
+            //ngToolbar.get('add').on('click', function () {
+            //    $OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/QTIndividualInfo/QTIndividualInfoEdit?otype=add');
+            //});
+
+            ////修改
+            //ngToolbar.get('edit').on('click', function () {
+            //    var data = grid.getSelectionModel().getSelection();
+
+            //    if (data.length > 0) {
+            //        var id = data[0].get('PhId');
+            //        $OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/QTIndividualInfo/QTIndividualInfoEdit?otype=edit&id=' + id);
+            //    }
+            //});
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+
+
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            var id = data[0].get('PhId');
+                            if (!Ext.isEmpty(id)) {
+                                Ext.Ajax.request({
+                                    params: { 'id': id },
+                                    url: C_ROOT + 'GQT/QT/QTIndividualInfo/Delete',
+                                    success: function (response) {
+                                        var resp = Ext.JSON.decode(response.responseText);
+                                        if (resp.Status === "success") {
+
+                                            Ext.Array.each(data, function (record) {
+                                                store.remove(record); //前端删除
+                                            });
+
+                                            NGMsg.Info('删除成功！');
+                                        } else {
+                                            NGMsg.Info('删除失败！');
+                                        }
+                                    }
+                                });
+                            } else {
+                                Ext.Array.each(data, function (record) {
+                                    store.remove(record); //前端删除
+                                });
+                            }
+                            
+                        }
+                    }
+                }
+            });
+            //保存
+            ngToolbar.get('save').on('click', function () {
+
+                 var griddata = grid.getChange();
+
+                  if (!grid.hasModifyed()) {
+                      NGMsg.Info("单据并无更新,无需保存!");
+                      return;
+                  }
+
+                  if (!grid.isValid()) {
+                      return;
+                  }
+
+                for (var i = 0; i < store.data.items.length; i++) {
+
+                    //if (store.data.items[i].data['IndividualinfoPhid'] === "") {
+                    //    NGMsg.Info("自定义表单名称未录，不能保存!");
+                    //    return;
+                    //}
+                    if (store.data.items[i].data['IndividualinfoBustypeName'] === "" || store.data.items[i].data['IndividualinfoBustype'] === "") {
+                        NGMsg.Info("自定义表单类型未录，不能保存!");
+                        return;
+                    }
+                    //if (store.data.items[i].data['IndividualinfoAmount1'] === 0 || store.data.items[i].data['IndividualinfoAmount2'] === 0) {
+                    //    NGMsg.Info("控制金额未录，不能保存!");
+                    //    return;
+                    //}
+                }
+
+                if (FindAmount("GHProjectBegin") && FindAmount("GHBudgetYLX") && FindAmount("GHBudgetXMLX") && FindAmount("GHExpenseMst") && FindAmount("GHPerformanceMst")) { } else {
+                    NGMsg.Info("控制金额不正确，请先验证!");
+                    return;
+                }
+
+
+
+                ngToolbar.get("save").disable();//禁用保存按钮
+                var myMask = new Ext.LoadMask(document.body, { msg: "单据正在保存中,请稍候..." });
+                myMask.show();//锁屏
+                Ext.Ajax.request({
+                    params: { 'data': griddata },
+                    url: '@Url.Content("~/GQT/QT/QTIndividualInfo/SaveData")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            //infostore.commitChanges();
+                            NGMsg.Success('保存成功');
+                            store.load();
+                        } else {
+                            NGMsg.Error('保存失败' + resp.Msg);
+                        }
+                        myMask.hide();//停止锁屏
+                        ngToolbar.get("save").enable();//保存失败，保存按钮设置为可用
+                    }
+                });
+            });
+
+            //增行
+            ngToolbar.get('addrow').on('click', function () {
+                var data = grid.getSelectionModel();
+                store.insert(store.getCount(), data);
+            });
+            ngToolbar.get('OrgChange').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+                    });
+                    win.show();
+                }
+            }); 
+
+            function FindAmount(Bustype) {
+                store.clearFilter();
+                store.filter("IndividualinfoBustype", Bustype);
+                var begAmount = 0;
+                var endAmount = 0;
+                var begAmount1 = 0;
+                var endAmount1 = 0;
+                for (var i = 0; i < store.data.items.length; i++) {
+                    begAmount = store.data.items[i].data['IndividualinfoAmount1'];
+                    endAmount = store.data.items[i].data['IndividualinfoAmount2'];
+                    if (begAmount > endAmount) {
+                        return false;
+                    }
+                    for (var j = 0; j < store.data.items.length; j++) {
+                        if (j == i) {
+                            continue;
+                        }
+                        begAmount1 = store.data.items[j].data['IndividualinfoAmount1'];
+                        endAmount1 = store.data.items[j].data['IndividualinfoAmount2'];
+                        if (begAmount > begAmount1 && begAmount < endAmount1) {
+                            return false;
+                        } else if (begAmount < begAmount1 && begAmount1 < endAmount) {
+                            return false;
+                        }
+                    }
+                }
+                store.clearFilter();
+                return true;
+            }
+            
+            
+
+    //        //查看
+    //        ngToolbar.get('view').on('click', function () {
+    //            var data = grid.getSelectionModel().getSelection();
+
+    //            if (data.length > 0) {
+    //                var id = data[0].get('PhId');
+    //                $OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/QTIndividualInfo/QTIndividualInfoEdit?otype=view&id=' + id);
+    //            }
+    //        });
+
+    //        //打印
+    //        ngToolbar.get('print').on('click', function () {
+				//$Print("PrintTest1", grid, "列表");
+    //        });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/QTIndividualInfo/GetQTIndividualInfoList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+
+
+
+
+
+            grid.getColumn('IndividualinfoPhid_EXName').getEditor().on('beforetriggerclick', function (obj) {
+                var data = grid.getSelectionModel().getSelection();
+                if (data[0].data.IndividualinfoBustype == "" ) {
+                    Ext.MessageBox.alert("提示", '请先选择表单类型');
+                    return;
+                }
+                var filter = "(bustype='" + data[0].data.IndividualinfoBustype + "')";
+                grid.getColumn('IndividualinfoPhid_EXName').getEditor().setClientSqlFilter(filter);
+            });
+
+
+            grid.getColumn('IndividualinfoPhid_EXName').getEditor().on('helpselected', function (obj) {
+                var data = grid.getSelectionModel().getSelection();
+                data[0].set('IndividualinfoPhid', obj.code);
+                data[0].set('IndividualinfoPhid_EXName', obj.name);
+            });
+
+            grid.getColumn('YLXPhid_EXName').getEditor().on('beforetriggerclick', function (obj) {
+             
+                var filter = "(bustype='GHBudgetYLX')";
+                grid.getColumn('YLXPhid_EXName').getEditor().setClientSqlFilter(filter);
+            });
+
+            grid.getColumn('YLXPhid_EXName').getEditor().on('helpselected', function (obj) {
+                var data = grid.getSelectionModel().getSelection();
+                data[0].set('YLXPhid', obj.code);
+                data[0].set('YLXPhid_EXName', obj.name);
+            });
+
+            grid.getColumn('XMLXPhid_EXName').getEditor().on('beforetriggerclick', function (obj) {
+              
+                var filter = "(bustype='GHBudgetXMLX')";
+                grid.getColumn('XMLXPhid_EXName').getEditor().setClientSqlFilter(filter);
+            });
+            grid.getColumn('XMLXPhid_EXName').getEditor().on('helpselected', function (obj) {
+                var data = grid.getSelectionModel().getSelection();
+                data[0].set('XMLXPhid', obj.code);
+                data[0].set('XMLXPhid_EXName', obj.name);
+            });
+
+            grid.getColumn('NZTXPhid_EXName').getEditor().on('beforetriggerclick', function (obj) {
+                
+                var filter = "(bustype='GHProjectBegin')";
+                grid.getColumn('NZTXPhid_EXName').getEditor().setClientSqlFilter(filter);
+            });
+            grid.getColumn('NZTXPhid_EXName').getEditor().on('helpselected', function (obj) {
+                var data = grid.getSelectionModel().getSelection();
+                data[0].set('NZTXPhid', obj.code);
+                data[0].set('NZTXPhid_EXName', obj.name);
+            });
+            
+            grid.getColumn('IndividualinfoBustype').renderer = function (val) {
+                switch (val) {
+                    case "GHProjectBegin":
+                        return "GHProjectBegin";
+
+                    case "GHBudgetYLX":
+
+                        return "GHBudgetYLX";
+
+                    case "GHBudgetXMLX":
+
+                        return "GHBudgetXMLX";
+
+                    case "GHExpenseMst":
+
+                        return "GHExpenseMst";
+
+                    case "GHPerformanceMst":
+
+                        return "GHPerformanceMst";
+                }
+            };
+
+            grid.getColumn('IndividualinfoBustypeName').renderer = function (val) {
+                switch (val) {
+                    case "GHProjectBegin":
+
+                        return "年中调整";
+
+                    case "GHBudgetYLX":
+
+                        return "预立项";
+
+                    case "GHBudgetXMLX":
+
+                        return "项目立项";
+
+                    case "GHExpenseMst":
+
+                        return "项目支出预算审批";
+
+                    case "GHPerformanceMst":
+
+                        return "绩效评价";
+                }
+            };
+
+
+            grid.getColumn('IndividualinfoBustype').getEditor().on('helpselected', function (obj) {
+                switch (obj.code) {
+                    case "GHProjectBegin":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustypeName', "GHProjectBegin");
+                        break;
+
+                    case "GHBudgetYLX":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustypeName', "GHBudgetYLX");
+                        break;
+
+                    case "GHBudgetXMLX":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustypeName', "GHBudgetXMLX");
+                        break;
+
+                    case "GHExpenseMst":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustypeName', "GHExpenseMst");
+                        break;
+                    case "GHPerformanceMst":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustypeName', "GHPerformanceMst");
+                        break;
+                }
+
+            });
+
+            grid.getColumn('IndividualinfoBustypeName').getEditor().on('helpselected', function (obj) {
+                switch (obj.code) {
+                    case "GHProjectBegin":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustype', "GHProjectBegin");
+                        break;
+
+                    case "GHBudgetYLX":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustype', "GHBudgetYLX");
+                        break;
+
+                    case "GHBudgetXMLX":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustype', "GHBudgetXMLX");
+                        break;
+
+                    case "GHExpenseMst":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustype', "GHExpenseMst");
+                        break;
+                    case "GHPerformanceMst":
+                        var data = grid.getSelectionModel().getSelection();
+                        data[0].set('IndividualinfoBustype', "GHPerformanceMst");
+                        break;
+                }
+
+            });
+
+            
+            grid.getColumn('DEFSTR4').renderer = function (val) {
+                switch (val) {
+                    case "1":
+
+                        return "项目支出";
+
+                    case "2":
+
+                        return "基本支出-公用经费";
+
+                    case "3":
+
+                        return "基本支出-人员经费";
+                }
+            };
+
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

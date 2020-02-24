@@ -1,0 +1,253 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script>
+
+        var otype = Ext.htmlDecode('@ViewBag.OType');
+
+        //获取页面url的参数，判断是初始化设置界面还是选项设置界面
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", 'i');
+            var r = window.location.search.substr(1).match(reg);//window.location.search代表从?开始的url
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        var isweb = GetQueryString('isweb');
+
+        // 密码最小长度
+        var pwdMinLength = 0;
+
+        // 是否需要限制（字母、数字混合）
+        var isNeedLimit = false;
+
+        // 是否不允许新旧密码重复
+        var isNotAllowRepeat = false;
+
+        // 密码不能为空 true 不能为空，false 可以为空
+        var pwdNotEmpty = false;
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: ['save', '->',
+                    {
+                        text: '关闭',
+                        width: this.itemWidth,
+                        iconCls: "icon-Close",
+                        langkey: "close",
+                        handler: function () {
+                            if (isweb == 'true') {
+                                window.top.closePwdWin();
+                            }
+                            else {
+                                $CloseTab();
+                            }
+                        }
+                    },
+                ]
+            });
+
+            var centerForm = Ext.create("Ext.panel.Panel", {
+                region: 'center',
+                defaults: {
+                    margin: '10 0 0 40',
+                    width: 300,
+                    labelWidth: 80
+                },
+                items: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '当前操作员',
+                        id: 'curOperator',
+                        margin: '30 0 0 40',
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '旧密码',
+                        id: 'oldPwd',
+                        inputType: 'password'
+                    },
+                    {
+                        border: false,
+                        layout: 'hbox',
+                        width: 600,
+                        items: [
+                            {
+                                xtype: 'label',
+                                margin: '4 42 0 0',
+                                text: '新密码:'
+                            },
+                            {
+                                xtype: 'ngText',
+                                id: 'newPwd',
+                                width: 215,
+                                inputType: 'password'
+                            },
+                            {
+                                xtype: 'label',
+                                margin: '4 0 0 15',
+                                id: 'pwdMessge1'
+                            }
+                        ]
+                    },
+                    {
+                        border: false,
+                        layout: 'hbox',
+                        width: 600,
+                        items: [
+                            {
+                                xtype: 'label',
+                                margin: '4 30 0 0',
+                                text: '密码确认:'
+                            },
+                            {
+                                xtype: 'ngText',
+                                id: 'newPwdCheck',
+                                width: 215,
+                                inputType: 'password'
+                            },
+                            {
+                                xtype: 'label',
+                                margin: '4 0 0 15',
+                                id: 'pwdMessge2'
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            ngToolbar.get('save').on('click', function () {
+                save();
+            });
+
+            Ext.defer(function () {
+
+                if (otype == '1') {
+                    ngToolbar.hide();
+                }
+
+                Ext.getCmp('curOperator').setValue($appinfo.logid + "[" + $appinfo.username + "]");
+
+                Ext.Ajax.request({
+                    url: '../SUP/ChangePwd/GetPwdLimit',
+                    success: function (response) {
+                        var pwdLimit = response.responseText;
+
+                        // 获取密码的限制，以@分割,格式为 密码必须由数字和字母组成@密码最小位数#新密码与老密码是否不能一致，
+                        // 如1@6#1，表示密码必须由数字和字母组成，密码最小位数为6，新密码与老密码不能一致
+                        if (pwdLimit != '') {
+                            var asypwdlimit = pwdLimit.split(',');
+
+                            //密码必须由数字和字母组成
+                            isNeedLimit = (asypwdlimit[0] == "1");
+
+                            //密码最小位数
+                            pwdMinLength = (asypwdlimit[1] == '') ? 0 : parseInt(asypwdlimit[1]);
+
+                            //新密码与老密码是否不能一致
+                            isNotAllowRepeat = (asypwdlimit[2] == "1");
+
+                            //密码不能为空 true 不能为空，false 可以为空
+                            pwdNotEmpty = (asypwdlimit[3] == "1");
+                        }
+
+                        if (pwdMinLength == 0) {
+                            Ext.getCmp('pwdMessge1').el.dom.innerHTML = "请输入不多于10位英文字母、数字或常用符号";
+                        } else {
+                            Ext.getCmp('pwdMessge1').el.dom.innerHTML = "请输入" + minpwdlength + "-10位英文字母、数字或常用符号";
+                        }
+
+                        if (isNeedLimit) {
+                            Ext.getCmp('pwdMessge2').el.dom.innerHTML = "密码必须由数字和字母组成";
+                        }
+                    }
+                });
+
+            });
+
+            var viewport = Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, centerForm]
+            });
+
+        });
+
+        function save() {
+            var oldpwd = Ext.getCmp("oldPwd").getValue();//旧密码
+            var newpwd = Ext.getCmp("newPwd").getValue();//新密码
+            var newpwdcheck = Ext.getCmp("newPwdCheck").getValue();//新密码确认
+
+            if (newpwd != newpwdcheck) {
+                Ext.MessageBox.alert('提示', '新密码与确认的密码不一致,请重新输入!');
+                return;
+            }
+
+            if (oldpwd == newpwd && isNotAllowRepeat) {
+                Ext.MessageBox.alert('提示', '新密码不能与旧密码一样');
+                return;
+            }
+
+            if (pwdNotEmpty && newpwd.length <= 0) {
+                Ext.MessageBox.alert('提示', '密码不能为空');
+                return;
+            }
+
+            if (newpwd.length < pwdMinLength) {
+                Ext.MessageBox.alert('提示', "用户密码长度少于" + minpwdlength + "位，请修改!");
+                return;
+            }
+
+            if (newpwd.length > 10) {
+                Ext.MessageBox.alert('提示', '用户密码长度不能超过10位，请修改');
+                return;
+            }
+
+            if (isNeedLimit) {
+                var pattern1 = /[\d].*[a-zA-Z]/;
+                var pattern2 = /[a-zA-Z].*[\d]/;
+                var success = false;
+                success |= pattern1.test(newpwd);
+                success |= pattern2.test(newpwd);
+
+                if (!success) {
+                    Ext.MessageBox.alert('提示', '密码必须由数字和字母组成');
+                    return;
+                }
+            }
+
+            Ext.Ajax.request({
+                params: { 'oldpwd': oldpwd, 'newpwd': newpwd },
+                url: '../SUP/ChangePwd/SavePwd',
+                success: function (response) {
+                    if (response.responseText == '') {
+                        Ext.MessageBox.alert('提示', '密码修改成功，请记住自己的新密码！', function (btn) {
+                            if (btn == 'ok') {
+                                if (otype == '1') {
+                                    window.external.CloseForm();
+                                } else {
+                                    //window.close();
+                                    if (isweb == 'true') {
+                                        window.top.closePwdWin();
+                                    }
+                                    else {
+                                        $CloseTab();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        Ext.MessageBox.alert('提示', response.responseText);
+                    }
+                }
+            });
+        }
+
+    </script>
+}

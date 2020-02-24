@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <APIConfig>
+    <Debug>1</Debug>
+    <LogAPIServer>http://10.0.15.106/ng3/</LogAPIServer>
+    <W3APIServer>http://10.0.15.106/IntegrationService/</W3APIServer>
+    <WorkFlowServer>http://10.0.15.105:8035/activiti-rest/service/</WorkFlowServer>
+    <TaskListServer>http://10.0.15.105:8035/activiti-rest/</TaskListServer>
+    <SecurityServer>http://10.0.15.105:82/V1.0/Router.ashx</SecurityServer>
+    <SSOServer>http://10.0.15.105:82/V1.0/Router.ashx</SSOServer>
+    <I6PServer>http://10.0.15.106/i6p/</I6PServer>
+    <AppKey>0ca9cd902425406ba877e56534382ead</AppKey>
+    <MD5>12d062ff3fa949d1bf2e2adf0f194217</MD5>
+  </APIConfig>
+</NewDataSet>

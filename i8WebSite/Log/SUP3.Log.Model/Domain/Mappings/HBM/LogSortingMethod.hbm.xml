@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="SUP3.Log.Model.Domain" assembly="SUP3.Log.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="LogSortingMethodModel" table="log_sorting_method">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="ClassName" column="classname" type="System.String" length="100" not-null="false" />
+		<property name="MethodName" column="method" type="System.String" length="100" not-null="false" />
+		<property name="InvokeCount" column="invoke_count" type="System.Int64" not-null="false" />
+		<property name="TotalDuration" column="total_duration" type="System.Int64" not-null="false" />
+		<property name="MaxDuration" column="max_duration" type="System.Int64" not-null="false" />
+		<property name="MinDuration" column="min_duration" type="System.Int64" not-null="false" />
+
+	</class>
+</hibernate-mapping>

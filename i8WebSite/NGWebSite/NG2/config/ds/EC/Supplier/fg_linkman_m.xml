@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_linkman_m">
+      <Field Name="c_row" IsKey="true" />
+      <Field Name="c_code" IsKey="true" />
+      <Field Name="main_flg" />
+      <Field Name="c_bcode"  />
+      <Field Name="c_type" />
+      <Field Name="enable_flg" />
+      <Field Name="c_status" />
+      <Field Name="lastname" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="c_bcode"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+
+    </Sql>
+    <Where>
+
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Record>
+  <Create>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

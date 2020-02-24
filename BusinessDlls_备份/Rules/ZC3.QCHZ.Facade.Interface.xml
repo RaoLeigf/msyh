@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZC3.QCHZ.Facade.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:ZC3.QCHZ.Facade.Interface.INqmx04DtlFacade">
+            <summary>
+            Nqmx04Dtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Facade.Interface.INqmx04MstFacade">
+            <summary>
+            Nqmx04Mst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:ZC3.QCHZ.Facade.Interface.INqmx04MstFacade.SaveNqmx04Mst(ZC3.QCHZ.Model.Domain.Nqmx04MstModel,System.Collections.Generic.List{ZC3.QCHZ.Model.Domain.Nqmx04DtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="nqmx04MstEntity"></param>
+            <param name="nqmx04DtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ZC3.QCHZ.Facade.Interface.IUploadfileInfoFacade">
+            <summary>
+            UploadfileInfo业务组装层接口
+            </summary>
+        </member>
+    </members>
+</doc>

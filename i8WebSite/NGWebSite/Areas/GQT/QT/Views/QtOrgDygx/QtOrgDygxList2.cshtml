@@ -1,0 +1,416 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QtOrgDygxEdit2.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+        var deletedata = [];
+        var orgphid;
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'addrow', 'deleterow', 'save', 'import', 'export',
+                    '->', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "Xmorg",
+    "type": "string",
+    "mapping": "Xmorg"
+  },
+  {
+    "name": "Xmorg_EXName",
+    "type": "string",
+    "mapping": "Xmorg_EXName"
+  },
+  {
+    "name": "Oldorg",
+    "type": "string",
+    "mapping": "Oldorg"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  },
+    {
+    "name": "IfCorp",
+    "type": "string",
+    "mapping": "IfCorp"
+  },
+     {
+    "name": "ParentOrgId",
+    "type": "int",
+    "mapping": "ParentOrgId"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'ORGDYGX');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GQT/QT/QtOrgDygx/GetQtOrgDygxList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '6749065e-7199-472b-b28e-5bdba0dfd040',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+                },
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1,    //单击编辑，单元格修改
+                        autoEncode: false  //不解析成html
+                    })
+                ],
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['ORGDYGX']);
+            var grid = Ext.create('Ext.ng.GridPanel', gridConfig);
+
+            
+
+            var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm',
+                {
+                    region: 'north',
+                    xtype: '',
+                    height: 50,
+                    border: false,
+                    layout: 'border',
+                    items: [{
+                        fieldLabel: "组织选择",
+                        xtype: "ngRichHelp",
+                        helpid: "gxm_orglist_all",
+                        valueField: "ocode",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+                        isInGrid: true,
+                        helpResizable: true,
+                        margin: '10 0 10 10',
+                        itemId: "Org",
+                        name: "Org",
+                    }]
+                }
+
+            );
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, mainPanel_form,grid]
+            });
+            
+
+            mainPanel_form.queryById("Org").on("beforetriggerclick", function (str) {
+                var sqlFilter = "fg_orglist.IFCORP='" + 'Y' + "'" + "AND fg_orglist.ISACTIVE='" + '1' + "'";
+                mainPanel_form.queryById("Org").setClientSqlFilter(sqlFilter);
+            });
+
+            mainPanel_form.queryById("Org").on("helpselected", function (str) {
+                orgphid = parseInt(str.data.phid);
+                /*store.load(function () {
+
+                })*/
+
+                var params = { 'ParentOrgId': orgphid };
+                Ext.apply(store.proxy.extraParams, params);
+                store.load(function () {
+
+                });
+                
+            });
+
+            //项目库组织代码
+            grid.getColumn('Xmorg_EXName').getEditor().on("beforetriggerclick", function (str) {
+                if (orgphid != undefined) {
+                    var sqlFilter = "fg_orglist.IFCORP='" + 'N' + "'" + "AND fg_orglist.ISACTIVE='" + '1' + "'" + "AND fg_orglist.PARENT_ORGID='" + orgphid + "'";
+                    grid.getColumn("Xmorg_EXName").getEditor().setClientSqlFilter(sqlFilter);
+                } else {
+                    Ext.MessageBox.alert("提示", '请先选择组织');
+                    return false;
+                }
+            });
+
+            grid.getColumn('Xmorg_EXName').getEditor().on("helpselected", function (str) {
+      
+                var data = grid.getSelectionModel().getSelection();
+                for (var i = 0; i < store.getCount(); i++) {
+                    if (i != store.indexOf(data[0]) && store.getAt(i).get('Xmorg') == str.data.ocode ) {
+                        Ext.MessageBox.alert("提示", '一个项目库部门不能对应多个老G6H部门');
+                        return;
+                    }
+                }
+                data[0].set('Xmorg', str.data.ocode);
+                data[0].set('Xmorg_EXName', str.data.oname);
+
+            });
+
+
+            //新增
+            /*ngToolbar.get('add').on('click', function () {
+                $OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/QtOrgDygx/QtOrgDygxEdit?otype=add');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/QtOrgDygx/QtOrgDygxEdit?otype=edit&id=' + id);
+                }
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/QtOrgDygx/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        NGMsg.Info('删除成功！');
+                                    } else {
+                                        NGMsg.Info('删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/QtOrgDygx/QtOrgDygxEdit?otype=view&id=' + id);
+                }
+            });*/
+
+            //增行
+            ngToolbar.items.get('addrow').on('click', function () {
+                //var data = grid.getSelectionModel().getSelection();
+                
+
+                //if (data.length > 0) {
+                    var model1 = grid.getSelectionModel();
+                    var rowid = store.getCount();
+
+                    store.insert(rowid, model1);
+                //}
+            })
+
+            //删行
+            ngToolbar.items.get('deleterow').on('click', function () {
+                var selection = grid.getSelectionModel().getSelection();
+                var phid = selection[0].data.PhId;
+                if (!phid || phid.length == 0) {
+
+                } else {
+                    deletedata.push(selection[0].data.PhId);
+                }
+                store.remove(selection);
+
+            })
+
+            //保存
+            ngToolbar.items.get('save').on('click', function () {
+                var adddata = [];
+                var updatedata = [];
+                for (var i = 0; i < store.getModifiedRecords().length; i++) {
+                    var phid = store.getModifiedRecords()[i].data.PhId;
+                    var Xmorg = store.getModifiedRecords()[i].data.Xmorg;
+                    var Oldorg = store.getModifiedRecords()[i].data.Oldorg;
+                    if (!phid || phid.length == 0) {
+                        adddata.push({ 'Xmorg': Xmorg, 'Oldorg': Oldorg, 'IfCorp': 'N', 'ParentOrgId': orgphid });
+                    } else {
+                        updatedata.push({ 'PhId': phid,'Xmorg': Xmorg, 'Oldorg': Oldorg });
+                    }
+                    
+                }
+                Ext.Ajax.request({
+                    params: { "adddata": adddata, "updatedata": updatedata,"deletedata":deletedata },
+                    url: C_ROOT + 'GQT/QT/QtOrgDygx/Save2',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', '保存成功');
+                            store.load();
+                            deletedata = [];
+                        } else {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                });
+
+            })
+
+            //导入
+            ngToolbar.get("import").on('click', function () {
+                var panel = Ext.create('Ext.form.Panel', {
+                    title: '导入',
+                    width: 450,
+                    bodyPadding: 10,
+                    frame: true,
+                    closable: true,
+                    renderTo: Ext.getBody(),
+                    items: [{
+                        xtype: 'filefield',
+                        name: 'file',
+                        fieldLabel: 'Excel文件',
+                        labelWidth: 100,
+                        allowBland: false,
+                        anchor: '100%',
+                        buttonText: '选择文件'
+                    }],
+                    buttons: [{
+                        text: '导入',
+                        handler: function () {
+                            var form = this.up('form').getForm();
+                            if (form.isValid()) {
+                                form.submit({
+                                    url: C_ROOT + 'GQT/QT/QtOrgDygx/ImportData',
+                                    waitMsg: '正在导入',
+                                    success: function (fp, o) {
+                                        Ext.Msg.alert('Success', o.result.message);
+                                        store.load();
+                                        panel.close();
+                                    },
+                                    failure: function (fp, o) {
+                                        Ext.Msg.alert('Failed', o.result.message);
+                                        store.load();
+                                        panel.close();
+                                    }
+                                });
+                            }
+
+                        }
+                    }]
+                });
+                panel.el.center();
+                
+                    
+                
+            });
+
+            //导出
+            ngToolbar.get("export").on('click', function () {
+                Ext.MessageBox.confirm('提示', '是否导出数据？', callBack);
+                function callBack(callBackid) {
+                    if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                        return;
+                    } else {
+
+                        window.location.href = C_ROOT + 'GQT/QT/QtOrgDygx/ExportData';
+
+                    }
+                }
+            });
+
+            //打印
+            /*ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });*/
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/QtOrgDygx/GetQtOrgDygxList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

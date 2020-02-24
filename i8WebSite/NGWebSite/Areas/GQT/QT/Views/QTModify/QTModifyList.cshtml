@@ -1,0 +1,385 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QTModifyEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var FDeclarationUnitcode='@ViewBag.Unit';;//申报单位
+		var FBudgetDeptcode='@ViewBag.Dept';;//预算部门
+		var year='@ViewBag.year';;//年度
+		var projcode='@ViewBag.projcode';;//项目代码
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'refresh',
+                    '->', 'print', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "UserCode",
+    "type": "string",
+    "mapping": "UserCode"
+  },
+  {
+    "name": "UserName",
+    "type": "string",
+    "mapping": "UserName"
+  },
+  {
+    "name": "IP",
+    "type": "string",
+    "mapping": "IP"
+  },
+  {
+    "name": "ModifyField",
+    "type": "string",
+    "mapping": "ModifyField"
+  },
+  {
+    "name": "BeforeValue",
+    "type": "string",
+    "mapping": "BeforeValue"
+  },
+  {
+    "name": "AfterValue",
+    "type": "string",
+    "mapping": "AfterValue"
+  },
+  {
+    "name": "FProjCode",
+    "type": "string",
+    "mapping": "FProjCode"
+  },
+  {
+    "name": "FProjName",
+    "type": "string",
+    "mapping": "FProjName"
+  },
+  {
+    "name": "TabName",
+    "type": "string",
+    "mapping": "TabName"
+  },
+  {
+    "name": "NgInsertDt",
+    "type": "datetime",
+    "mapping": "NgInsertDt"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'ModifyGrid');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GQT/QT/QTModify/GetQTModifyList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '3f988e7f-7920-4ab2-b770-fe70db0a5fe7',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				/*layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},*/
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['ModifyGrid']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+			
+			var mainPanel_formInitialConfig = {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 600,
+                buskey: 'PhId', //对应的业务表主键
+                otype: 'add' //操作类型,add||edit
+            };
+            var mainPanel_formConfig = mainPanel_formInitialConfig;
+            if (individualInfo.form) {
+                Ext.apply(mainPanel_formConfig, individualInfo.form['mainPanel']);
+            }
+            var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm', mainPanel_formConfig);
+			
+			/*var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm',
+                {
+                    region: 'north',
+                    xtype: '',
+                    height: 50,
+                    border: false,
+                    layout: 'border',
+                    items: [{
+                        fieldLabel: "申报单位",
+                        xtype: "ngRichHelp",
+                        helpid: "sb_orglist",
+                        valueField: "ocode",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+                        //isInGrid: true,
+                        //helpResizable: true,
+                        margin: '10 0 10 10',
+                        itemId: "FDeclarationUnit",
+                        name: "FDeclarationUnit",
+						editable: false
+					},
+					{
+						fieldLabel: "预算部门",
+                        xtype: "ngRichHelp",
+                        helpid: "ys_orglist",
+                        valueField: "ocode",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+                        //isInGrid: true,
+                        //helpResizable: true,
+                        margin: '10 0 10 360',
+                        itemId: "FBudgetDept",
+                        name: "FBudgetDept",
+						editable: false
+					},
+					{
+						fieldLabel: "项目年度",
+                        xtype: "ngComboBox",
+                        valueField: "code",
+                        displayField: "name",
+                        userCodeField: "code",
+                        queryMode: "local",
+                        margin: '10 0 10 710',
+                        itemId: "FYear",
+                        name: "FYear",
+						valueType: "int",
+						data:[
+							{
+								"code": 2018,
+								"name": 2018
+							},
+							{
+								"code": 2019,
+								"name": 2019
+							},
+							{
+								"code": 2020,
+								"name": 2020
+							}
+						]
+					},
+					{
+						fieldLabel: "项目名称",
+                        xtype: "ngRichHelp",
+                        helpid: "GHXMName_xm3",//  GHXMName
+                        valueField: "f_projcode",
+                        displayField: "f_projname",
+                        userCodeField: "f_projcode",
+                        ORMMode: false,
+                        //isInGrid: true,
+                        //helpResizable: true,
+                        margin: '10 0 10 1060',
+                        itemId: "FProjName",
+                        name: "FProjName",
+						editable: false
+                    }]
+                }
+
+            );*/
+			
+			//布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,mainPanel_form, grid]
+            });
+			
+			//初始化
+			mainPanel_form.queryById("FDeclarationUnit").setValue(FDeclarationUnitcode);
+			mainPanel_form.queryById("FBudgetDept").setValue(FBudgetDeptcode);
+			mainPanel_form.queryById("FYear").setValue(year);
+			mainPanel_form.queryById("FProjName").setValue(projcode);
+			
+			var codectl = [
+				mainPanel_form.queryById('FDeclarationUnit'),
+				mainPanel_form.queryById('FBudgetDept'),
+				mainPanel_form.queryById('FProjName')
+			];
+			BatchBindCombox(codectl);
+			var params={'FProjCode':projcode};
+			Ext.apply(store.proxy.extraParams,params);
+			store.load(function(){
+				
+			})
+			//按当前操作员过滤申报单位
+            mainPanel_form.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID });
+			
+			mainPanel_form.queryById("FDeclarationUnit").on("helpselected", function (str) {
+				if(FDeclarationUnitcode!=str.code){
+					mainPanel_form.queryById("FBudgetDept").setValue("");
+					mainPanel_form.queryById("FProjName").setValue("");
+					FDeclarationUnitcode=str.code;
+					ngToolbar.get('refresh').fireEvent('click');//触发刷新
+				}
+			});
+			
+			//按当前申报单位过滤预算部门
+			mainPanel_form.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+                //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var unitCode = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                var filter;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                }
+                else {
+                    Ext.MessageBox.alert('提示','请先选择申报单位');
+                    return false;
+                }
+
+                //预算单位
+                if (filter) {
+                    mainPanel_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+                }
+               
+            });
+			mainPanel_form.queryById("FBudgetDept").on("helpselected", function (str) {
+				if(FBudgetDeptcode!=str.code){
+					mainPanel_form.queryById("FProjName").setValue("");
+					FBudgetDeptcode=str.code;
+					ngToolbar.get('refresh').fireEvent('click');//触发刷新
+				}
+			});
+			
+			//项目名称
+			mainPanel_form.queryById("FProjName").on("beforetriggerclick", function (str) {
+				var SBOrg = mainPanel_form.queryById("FDeclarationUnit").getValue();
+				var SBDept = mainPanel_form.queryById("FBudgetDept").getValue();
+				var FYear = mainPanel_form.queryById("FYear").getValue();
+				var filter;
+				if (SBDept){
+					if(FYear){
+						filter="(XM3_PROJECTMST.F_DECLARATIONUNIT='" + SBOrg + "' and XM3_PROJECTMST.F_BUDGETDEPT = '"+SBDept+ "' and XM3_PROJECTMST.F_YEAR = '"+FYear+"' and XM3_PROJECTMST.F_LIFECYCLE = 0 )";//and YS3_BUDGETMST.F_APPROVESTATUS = '3' and YS3_BUDGETMST.F_MIDYEARCHANGE = '0'
+					}else
+					{
+						filter="(XM3_PROJECTMST.F_DECLARATIONUNIT='" + SBOrg + "' and XM3_PROJECTMST.F_BUDGETDEPT = '"+SBDept+ "' and XM3_PROJECTMST.F_LIFECYCLE = 0 )";//and YS3_BUDGETMST.F_APPROVESTATUS = '3' and YS3_BUDGETMST.F_MIDYEARCHANGE = '0'
+					}
+					mainPanel_form.queryById("FProjName").setClientSqlFilter(filter);
+				}else{
+					Ext.MessageBox.alert("提示", '请先选择预算部门！');
+					return false;
+				}
+			});
+			
+			mainPanel_form.queryById("FProjName").on("helpselected", function (str) {
+				var params={'FProjCode':str.code};
+				Ext.apply(store.proxy.extraParams,params);
+				store.load(function(){
+					
+				})
+				
+			});
+			
+			//年度
+			mainPanel_form.queryById("FYear").on("change", function (str,afterValue,beforeValue) {
+				if(mainPanel_form.queryById("FProjName").getValue()!=null && mainPanel_form.queryById("FProjName").getValue()!=""){
+					mainPanel_form.queryById("FProjName").setValue("");
+					ngToolbar.get('refresh').fireEvent('click');//触发刷新
+				}
+			});
+
+
+            
+
+			//刷新
+			ngToolbar.get('refresh').on('click', function () {
+				var params={'FProjCode':mainPanel_form.queryById("FProjName").getValue()};
+				Ext.apply(store.proxy.extraParams,params);
+				store.load(function(){
+					
+				})
+            });
+
+            
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/QTModify/GetQTModifyList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

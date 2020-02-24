@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B20D4623-530B-424C-8FBF-F95FFBCE0AB3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP.CustomForm.Rule</RootNamespace>
+    <AssemblyName>SUP.CustomForm.Rule</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\customer\WebSite\Custom3WebSite\bin\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.WebApi.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\customer\WebSite\Custom3WebSite\bin\Enterprise3.WebApi.Client.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="gudusoft.gsqlparser">
+      <HintPath>..\..\Lib\gudusoft.gsqlparser.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Lib\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Data.Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\customer\WebSite\Custom3WebSite\bin\NG3.Data.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Log">
+      <HintPath>..\..\Lib\NG3.Log.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.WorkFlow.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\NG3.WorkFlow.Interfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\SUP.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\SUP.Common.DataEntity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppControlConverter.cs" />
+    <Compile Include="AppEditParser.cs" />
+    <Compile Include="AppPbListParser.cs" />
+    <Compile Include="BillNoHelp.cs" />
+    <Compile Include="CommonParser.cs" />
+    <Compile Include="ControlConverter.cs" />
+    <Compile Include="Expression\BillHeadUniqueCheck.cs" />
+    <Compile Include="Expression\BillValidationComplexExp.cs" />
+    <Compile Include="Expression\BillValidationExp.cs" />
+    <Compile Include="Expression\CheckBodyUnique.cs" />
+    <Compile Include="Expression\ComputeExpAndFillSpecificCol.cs" />
+    <Compile Include="Expression\ComputeExpDisBodyColExp.cs" />
+    <Compile Include="Expression\ComputeFuncFillSpecificColExp.cs" />
+    <Compile Include="Expression\ComputeSqlFillSpecificBodyColExp.cs" />
+    <Compile Include="Expression\ComputeSqlFillSpecificColExp.cs" />
+    <Compile Include="Expression\ExecuteSqlExp.cs" />
+    <Compile Include="Expression\ExpressionBase.cs" />
+    <Compile Include="Expression\IsMustInputExp.cs" />
+    <Compile Include="Expression\IsReadOnlyExp.cs" />
+    <Compile Include="Expression\IsVisibleExp.cs" />
+    <Compile Include="Expression\WhereCondition.cs" />
+    <Compile Include="HelpRule.cs" />
+    <Compile Include="PbEditFormParser.cs" />
+    <Compile Include="PbListFormParser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerFuncParserRule.cs" />
+    <Compile Include="SqlTypeConverter.cs" />
+    <Compile Include="AppCommonParser.cs" />
+    <Compile Include="AppPbEditFormParser.cs" />
+    <Compile Include="WorkFlowPlugin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NG3.Metadata.PBDesignerParse\NG3.Metadata.PBDesignerParse.csproj">
+      <Project>{497dfc12-eb02-45b0-8d8e-2a5f0b84be58}</Project>
+      <Name>NG3.Metadata.PBDesignerParse</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\NG3.Metadata\NG3.Metadata.csproj">
+      <Project>{09b59914-7e10-4aad-8b61-375e819182e0}</Project>
+      <Name>NG3.Metadata</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.CustomForm.DataAccess\SUP.CustomForm.DataAccess.csproj">
+      <Project>{ada14c7f-5971-4fee-9456-e7936f0a764a}</Project>
+      <Name>SUP.CustomForm.DataAccess</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.CustomForm.DataEntity\SUP.CustomForm.DataEntity.csproj">
+      <Project>{ec67ddde-5f0e-484d-97f8-00c1153e45a4}</Project>
+      <Name>SUP.CustomForm.DataEntity</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\Rules
+xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\Bin
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

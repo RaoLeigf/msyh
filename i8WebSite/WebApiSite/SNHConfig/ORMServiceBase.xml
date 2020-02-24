@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net">
+
+  <description></description>
+
+  <object id="aroundAdvice" type="Enterprise3.NHORM.Base.AspectsHandling.PerformanceLoggingAroundAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <object id="throwsAdvice" type="Enterprise3.NHORM.Base.AspectsHandling.ErrorHandlingThrowsAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <!--<object id="beforeAdvice" type="Enterprise3.NHORM.Base.AspectsHandling.MethodLoggingBeforeAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <object id="afterAdvice"  type="Enterprise3.NHORM.Base.AspectsHandling.MethodLoggingAfterAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <object id="ResultCacheAfterAdvice"  type="Enterprise3.NHORM.Base.AspectsHandling.ResultCacheAroundAdvice, Enterprise3.NHORM.Base" />-->
+
+  <object id="transactionManager" type="Spring.Data.NHibernate.HibernateTransactionManager, Spring.Data.NHibernate4" singleton="true">
+    <property name="DbProvider" ref="DbProvider"/>
+    <property name="SessionFactory" ref="NHibernateSessionFactory"/>
+  </object>
+
+  <object id="transactionInterceptor" type="Spring.Transaction.Interceptor.TransactionInterceptor, Spring.Data" singleton="true">
+    <property name="TransactionManager" ref="transactionManager"/>
+    <property name="TransactionAttributeSource">
+      <object type="Spring.Transaction.Interceptor.AttributesTransactionAttributeSource, Spring.Data"/>
+    </property>
+  </object>
+
+  <!--事物管理器-->
+  <object id="BaseTransactionManager" type="Spring.Transaction.Interceptor.TransactionProxyFactoryObject, Spring.Data" abstract="true" singleton="true">
+    <property name="PlatformTransactionManager" ref="transactionManager"/>
+    <property name="TransactionAttributes">
+      <name-values>
+        <add key="Add*" value="PROPAGATION_REQUIRED"/>
+        <add key="Copy*" value="PROPAGATION_REQUIRED"/>
+        <add key="Create*" value="PROPAGATION_REQUIRED"/>
+        <add key="Save*" value="PROPAGATION_REQUIRED"/>
+        <add key="Update*" value="PROPAGATION_REQUIRED"/>
+        <add key="Delete*" value="PROPAGATION_REQUIRED"/>
+        <add key="Cancel*" value="PROPAGATION_REQUIRED"/>
+        <add key="Execute*" value="PROPAGATION_REQUIRED"/>
+        <add key="Set*" value="PROPAGATION_REQUIRED"/>
+        <add key="Put*" value="PROPAGATION_REQUIRED"/>
+        <add key="Post*" value="PROPAGATION_REQUIRED"/>
+        <add key="Audit*" value="PROPAGATION_REQUIRED"/>
+        <add key="Approve*" value="PROPAGATION_REQUIRED"/>
+        <add key="Apply*" value="PROPAGATION_REQUIRED"/>
+        <add key="Submit*" value="PROPAGATION_REQUIRED"/>
+        <add key="Synch*" value="PROPAGATION_REQUIRED"/>
+        <add key="Import*" value="PROPAGATION_REQUIRED"/>
+        <add key="Remove*" value="PROPAGATION_REQUIRED"/>
+        <add key="Change*" value="PROPAGATION_REQUIRED"/>
+
+        <add key="*" value="PROPAGATION_REQUIRED,readOnly"/>
+
+        <!--<add key="*" value="PROPAGATION_SUPPORTS,readOnly"/>-->
+      </name-values>
+    </property>
+  </object>
+
+  <!--日志注入-->
+  <object type="Spring.Aop.Framework.AutoProxy.TypeNameAutoProxyCreator, Spring.Aop">
+    <property name="TypeNames">
+      <list>
+        <value>*Service</value>
+        <value>*Rule</value>
+        <!--<value>*Facade</value>        
+        <value>*Dac</value>-->
+      </list>
+    </property>
+    <property name="InterceptorNames">
+      <list>
+        <value>throwsAdvice</value>
+        <value>aroundAdvice</value>
+        <!--<value>beforeAdvice</value>
+        <value>afterAdvice</value>
+        <value>ResultCacheAspect</value>-->
+        <value>addinMethodBeforeAspect</value>
+        <value>addinMethodAfterAspect</value>
+      </list>
+    </property>
+  </object>
+
+  <!--缓存注入-->
+  <!--<object id="ResultCacheAspect" type="Spring.Aop.Support.AttributeMatchMethodPointcutAdvisor, Spring.Aop">
+    <property name="Advice" ref="ResultCacheAfterAdvice" />
+    <property name="attribute" value="Enterprise3.Common.Model.Attributes.ResultCacheAttribute, Enterprise3.Common.Model" />
+  </object>-->
+
+<!--addin配置-->
+
+  <object id="addinMethodBeforeAdvice"  type="NG3.Addin.Core.Interceptor.BeforeAdvice, NG3.Addin.Core">
+    <property name="executor" ref="NG3.Addin.Core.Interceptor.InterceptorExecutor" />
+  </object>
+
+  <object id="addinMethodAfterAdvice"  type="NG3.Addin.Core.Interceptor.AfterAdvice, NG3.Addin.Core">
+    <property name="executor" ref="NG3.Addin.Core.Interceptor.InterceptorExecutor" />
+  </object>
+
+  <object id="NG3.Addin.Core.Interceptor.InterceptorExecutor"  type="NG3.Addin.Core.Interceptor.InterceptorExecutor, NG3.Addin.Core" >
+    <constructor-arg index="0"  ref="HibernateTemplate" />
+  </object>
+
+  <object id="addinMethodBeforeAspect" type="Spring.Aop.Support.AttributeMatchMethodPointcutAdvisor, Spring.Aop">
+    <property name="Advice" ref="addinMethodBeforeAdvice" />
+    <property name="attribute" value="Enterprise3.Common.Model.Attributes.AddinAttribute, Enterprise3.Common.Model" />
+  </object>
+
+
+  <object id="addinMethodAfterAspect" type="Spring.Aop.Support.AttributeMatchMethodPointcutAdvisor, Spring.Aop">
+    <property name="Advice" ref="addinMethodAfterAdvice" />
+    <property name="attribute" value="Enterprise3.Common.Model.Attributes.AddinAttribute, Enterprise3.Common.Model" />
+  </object>
+
+  <object id="NG3.Addin.Core.Extend.ExtendExecutor" type="NG3.Addin.Core.Extend.ExtendExecutor, NG3.Addin.Core" >
+    <property name="hibernateTemplate"  ref="HibernateTemplate"/>
+  </object>
+  <!--addin配置-->
+  
+</objects>

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlBudgetDtlRule">
+            <summary>
+            ProjectDtlBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlFundApplRule">
+            <summary>
+            ProjectDtlFundAppl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlImplPlanRule">
+            <summary>
+            ProjectDtlImplPlan业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlPerformTargetRule">
+            <summary>
+            ProjectDtlPerformTarget业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlPurchaseDtlRule">
+            <summary>
+            ProjectDtlPurchaseDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlPurDtl4SOFRule">
+            <summary>
+            ProjectDtlPurDtl4SOF业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectDtlTextContentRule">
+            <summary>
+            ProjectDtlTextContent业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IProjectMstRule">
+            <summary>
+            ProjectMst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.Interface.IProjectMstRule.ApproveAddData(System.String,System.String,System.Collections.Generic.List{System.String},System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Nullable{System.DateTime}},System.String,System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            审批时同步项目数据
+            </summary>
+            <param name="userConn"></param>
+            <param name="zbly_dm"></param>
+            <param name="valuesqlList"></param>
+            <param name="mstSql"></param>
+            <param name="dtlSqlList"></param>
+            <param name="DJRQList"></param>
+            <param name="DEF_BZ1"></param>
+            <param name="mstCode"></param>
+            <param name="dtlcodeList"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

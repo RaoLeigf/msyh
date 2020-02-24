@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B39F5A26-7C4D-4BAF-AB96-4CF43B4BE734}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GJX3.JX.Model</RootNamespace>
+    <AssemblyName>GJX3.JX.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GJX3.JX.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\GenerateCodes\PerformanceDtlBuDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformanceDtlEvalModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformanceDtlTarImplModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformanceDtlTextContModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformanceMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ThirdAttachmentModel.cs" />
+    <Compile Include="Enums\EnumApproveStatus.cs" />
+    <Compile Include="Enums\EnumCarryOver.cs" />
+    <Compile Include="Enums\EnumPerStatus.cs" />
+    <Compile Include="Enums\EnumPerType.cs" />
+    <Compile Include="Enums\EnumProjAttr.cs" />
+    <Compile Include="Enums\EnumProjBillType.cs" />
+    <Compile Include="Enums\EnumProjDuration.cs" />
+    <Compile Include="Enums\EnumProjStatus.cs" />
+    <Compile Include="Enums\EnumYesNo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformanceDtlBuDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformanceDtlEval.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformanceDtlTextCont.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformanceMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformanceDtlBuDtl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformanceDtlEval.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformanceDtlTextCont.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformanceMst.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extra\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformanceDtlTarImpl.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformanceDtlTarImpl.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\ThirdAttachment.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

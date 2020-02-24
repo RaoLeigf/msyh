@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_sendmst">
+      <Field Name="sendid" IsKey="true" />
+      <Field Name="sendno"  />
+      <Field Name="ocode"/>
+      <Field Name="supcomp"/>
+      <Field Name="recordman"/>
+      <Field Name="recorddate"/>
+      <Field Name="sendflg"/>
+      <Field Name="verdtm"/>
+      <Field Name="remarks"/>
+      <Field Name="appflg" />
+      <Field Name="appman" />
+      <Field Name="appdate" />
+      <Field Name="scmacceptflg" />
+      <Field Name="carrytype" />
+      <Field Name="carryno" />
+      <Field Name="senddate" />
+      <Field Name="box" />
+      <Field Name="boxqty" />
+    </Table>
+    <Table Name="secuser" AsName="secuser1">
+      <Field Name="u_name" AsName="recordmanname"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser2">
+      <Field Name="u_name" AsName="appmanname"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select distinct [fields] from [table]
+      inner join wsp_supply_senddtl on wsp_supply_sendmst.sendid = wsp_supply_senddtl.sendid
+      left join secuser secuser1 on secuser1.logid=[table].recordman
+      left join secuser secuser2 on secuser2.logid=[table].appman
+      left join itemdata on wsp_supply_senddtl.itemno = itemdata.itemno 
+      [where] [orderby]
+    </Sql>
+    <Where>
+      <Exp Field="supcomp" Target="AppInfo" Value="LoginID" />
+    </Where>
+    <Query>
+      <Exp Name="audit" format=" wsp_supply_sendmst.appflg = '1' "></Exp>
+      <Exp Name="noaudit" format=" (wsp_supply_sendmst.appflg = '0' or wsp_supply_sendmst.appflg is null) "></Exp>
+      <Exp Field="itemdata.itemno" paramName="itemno" Target="Client" Value="itemno"></Exp>
+      <Exp Field="itemdata.itemname" paramName="itemname" Target="Client" Value="itemname"></Exp>
+      <Exp Field="wsp_supply_sendmst.recorddate" paramName="recorddate1" Target="Client" Oper="GreaterThanOrEqual" Value="recorddate1"/>
+      <Exp Field="wsp_supply_sendmst.recorddate" paramName="recorddate2" Target="Client" Oper="LessThanOrEqual" Value="recorddate2" />
+      <Exp Field="wsp_supply_sendmst.sendno" paramName="sendno" Target="Client" Value="sendno"/>
+      <Exp Field="itemdata.descript" paramName="descript" Target="Client" Value="descript"/>
+      <Exp Field="wsp_supply_sendmst.senddate" paramName="senddate1" Target="Client" Oper="LessThanOrEqual" Value="senddate1"/>
+      <Exp Field="wsp_supply_sendmst.senddate" paramName="senddate2" Target="Client" Oper="LessThanOrEqual" Value="senddate2"/>
+    </Query>
+    <OrderBy format="{sendno}">
+      <Exp Field="sendno" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table]
+      left join secuser secuser1 on secuser1.logid=[table].recordman
+      left join secuser secuser2 on secuser2.logid=[table].appman [where]
+    </Sql>
+    <Where>
+      <Exp Field="sendid" Target="Client" Value="sendid" />
+    </Where>
+    <Values>
+      <Exp Field="recordman" Target="AppInfo" Value="LoginID"/>
+      <Exp Field="senddate" Target="Express" Value="now|yyyy-MM-dd"/>
+      <Exp Field="recorddate" Target="Express" Value="now|yyyy-MM-dd"/>
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="wsp_supply_sendmst">
+      <Values>
+
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+    
+  </Delete>
+  <Destroy>
+    <Table Name="wsp_supply_sendmst">
+      <Values>
+      </Values>
+      <Query>
+        <Exp Field="sendid"  Target="Client" Value="sendid" />
+      </Query>
+    </Table>
+  </Destroy>
+  <GetSendSchame>
+    <Sql>
+      select wsp_supply_sendmst.*,'' as recordmanname from wsp_supply_sendmst where 1=2
+    </Sql>
+  </GetSendSchame>
+  <GetSendMst>
+    <Sql>
+      select wsp_supply_sendmst.* from wsp_supply_sendmst [where]
+    </Sql>
+    <Query>
+      <Exp Field="sendid"  Target="Client" Value="sendid"/>
+    </Query>
+  </GetSendMst>
+  <SetAppStatus>
+    <Sql>
+      update wsp_supply_sendmst [values] [where]
+    </Sql>
+    <Values>
+      <Exp Field="appman" Target="AppInfo" Value="loginid" />
+      <Exp Field="appdate" Target="Express" Value="now|yyyy-MM-dd" />
+      <Exp Field="appflg"  Value="1" />
+    </Values>
+    <Where format="({appflg1} or {appflg2})">
+      <Exp Field="sendid" Target="Field" Value="sendid" />
+      <Exp Field="appflg" ParamName="appflg1"  Oper="NotEqual" Value="1" />
+      <Exp Field="appflg" ParamName="appflg2" Oper="IsNull"/>
+    </Where>
+  </SetAppStatus>
+  <SetUnAppStatus>
+    <Sql>
+      update wsp_supply_sendmst [values] [where]
+    </Sql>
+    <Values>
+      <Exp Field="appman" Value="{Null}" />
+      <Exp Field="appdate" Value="{Null}" />
+      <Exp Field="appflg"  Value="0" />
+    </Values>
+    <Query>
+      <Exp Field="sendid" Target="Field" Value="sendid" />
+    </Query>
+  </SetUnAppStatus>
+  <GetSendMstData>
+    <Sql>
+      select * from wsp_supply_sendmst [where]
+    </Sql>
+    <Query>
+      <Exp Field="sendid" Target="Client" Value="sendid"/>
+    </Query>
+  </GetSendMstData>
+</DataService>

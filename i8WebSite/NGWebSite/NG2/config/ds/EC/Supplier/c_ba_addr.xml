@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="c_ba_addr">
+      <Field Name="c_row" IsKey="true" />
+      <Field Name="c_bcode" IsKey="true" />
+      <Field Name="main_flg" />
+      <Field Name="c_descript"  />
+      <Field Name="tele1" />
+      <Field Name="fax" />
+      <Field Name="postcode" />
+    </Table>
+    <Table Name="province">
+      <Field Name="prvcname"></Field>
+    </Table>
+    <Table Name="city">
+      <Field Name="cityname"></Field>
+    </Table>
+    <Table Name="enterprise">
+      <Field Name="compname"></Field>
+    </Table>
+    
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join province on [table].provinceno = province.provinceno and [table].nationno = province.nationno
+      left join city on [table].cityno = city.cityno and [table].provinceno = city.provinceno and [table].nationno = city.nationno 
+      inner join enterprise on [table].c_bcode = enterprise.compno
+      [where]
+    </Sql>
+    <Where>
+      <Exp Field="c_bcode"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+     
+    </Sql>
+    <Where>
+ 
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Record>
+  <Create>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

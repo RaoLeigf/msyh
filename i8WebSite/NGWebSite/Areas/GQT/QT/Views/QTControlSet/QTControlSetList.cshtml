@@ -1,0 +1,272 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QTControlSetEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_Button.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add', /*'edit',*/ 'delete', 'view', 'save',{ id: "OrgChange", text: "设置组织", width: this.itemWidth, iconCls: "icon-Operate" },
+                    '->', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "ControlObject",
+    "type": "string",
+    "mapping": "ControlObject"
+  },
+  {
+    "name": "BZ",
+    "type": "string",
+    "mapping": "BZ"
+  },
+  {
+    "name": "ControlOrgName",
+    "type": "string",
+    "mapping": "ControlOrgName"
+  },
+  {
+    "name": "ControlOrNot",
+    "type": "string",
+    "mapping": "ControlOrNot"
+  },
+                {
+                    "name": "BEGINFDATE",
+                    "type": "date",
+                    "mapping": "BEGINFDATE"
+                },
+                {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'grid');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+                autoLoad: true,
+                url: C_ROOT + 'GQT/QT/QTControlSet/GetQTControlSetList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '4c556e03-d1ad-47bb-9014-47711eaacb49',
+				buskey: 'PhId', //对应的业务表主键属性
+				/*layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},*/
+                bbar: [pagingbar],
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1    //单击编辑，单元格修改
+                        //autoEncode: false  //不解析成html
+                    })
+                ]
+			};
+
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['grid']);
+			gridSet = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, gridSet]
+            });
+
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/QTControlSet/QTControlSetEdit?otype=add');
+            });
+
+            //修改
+            //ngToolbar.get('edit').on('click', function () {
+            //    var data = gridSet.getSelectionModel().getSelection();
+
+            //    if (data.length > 0) {
+            //        var id = data[0].get('PhId');
+            //        $OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/QTControlSet/QTControlSetEdit?otype=edit&id=' + id);
+            //    }
+            //});
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = gridSet.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/QTControlSet/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        NGMsg.Info('删除成功！');
+                                    } else {
+                                        NGMsg.Info('删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = gridSet.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/QTControlSet/QTControlSetEdit?otype=view&id=' + id);
+                }
+            });
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                var ModifieData = [];
+                if (store.getModifiedRecords().length > 0) {
+                    for (var i = 0; i < store.getModifiedRecords().length; i++) {
+                        ModifieData.push({ 'PhId': store.getModifiedRecords()[i].data.PhId, 'ControlOrNot': store.getModifiedRecords()[i].data.ControlOrNot, 'BEGINFDATE': store.getModifiedRecords()[i].data.BEGINFDATE });
+                    }
+                }
+                Ext.Ajax.request({
+                    params: { 'ModifieData': ModifieData },
+                    url: C_ROOT + 'GQT/QT/QTControlSet/SaveIfControl',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            store.load(); 
+                            NGMsg.Info('保存成功！');
+                        } else {
+                            NGMsg.Info('保存失败！');
+                        }
+                    }
+                });
+            });
+
+            //设置组织
+            ngToolbar.get('OrgChange').on('click', function () {
+                var data = gridSet.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+                    });
+                    win.show();
+                }
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/QTControlSet/GetQTControlSetList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            gridSet.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+            gridSet.getColumn('BEGINFDATE').renderer = function (val) {
+                if (val) {
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+            
+            //代码转名称
+            gridSet.getColumn('ControlOrNot').renderer = function (val) {
+                switch (val) {
+                    case "1":
+                        return "是";
+                    case "2":
+                        return "否";
+                }
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

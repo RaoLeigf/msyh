@@ -1,0 +1,163 @@
+﻿@{
+    ViewBag.Title = "字段自定义";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+      
+      <script type="text/javascript">
+
+          Ext.onReady(function () {
+
+              var busid;//业务id
+              var bustype;
+              var busname;
+
+              var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                  region: 'north',
+                  //rightName: "EmpinfoList", //权限名称
+                  ngbuttons: [{ itemId: "edit", text: "字段维护", width: this.itemWidth, iconCls: "icon-Edit" }, 'view', { itemId: "uisetting", text: "字段UI设置", width: this.itemWidth, iconCls: "icon-New" }, '->', 'close']
+              });
+
+
+              Ext.define('Model', {
+                  extend: 'Ext.data.Model',
+                  fields: [ {
+                      name: 'tname',
+                      type: 'string',
+                      mapping: 'tname'
+                  }, {
+                      name: 'chn',
+                      type: 'string',
+                      mapping: 'chn'
+                  }]
+              });
+
+              var store = Ext.create('Ext.ng.JsonStore', {
+                  model: 'Model',
+                  pageSize: 50,
+                  autoLoad: false,
+                  //url: '../IndividualProperty/GetTableRegList'
+                  url: '../IndividualProperty/GetBusTables'
+              })
+              //store.load();
+
+              var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                  store: store
+              });
+
+              var grid = Ext.create('Ext.ng.GridPanel', {
+                  region: 'center',
+                  //frame: true,
+                  width: 200,
+                  stateful: true,
+                  stateId: 'IndividualPropertyList',
+                  store: store,
+                  buskey: 'code', //对应的业务表主键
+                  columnLines: true,                 
+                  columns: [ {
+                      header: '表名',
+                      flex: 1,
+                      sortable: false,
+                      dataIndex: 'tname',
+                      isNeedQueryField: true //是否需要查询
+                  }, {
+                      header: '表中文名',
+                      flex: 1,
+                      sortable: false,
+                      isNeedQueryField: true, //是否需要查询
+                      dataIndex: 'chn'
+                  }],
+                  bbar: pagingbar
+              });
+
+              //var busTree = Ext.create('Ext.ng.TreePanel', {
+              //    region: 'west',
+              //    title:'业务类型',
+              //    autoLoad: true,
+              //    treeFields: [{ name: 'text', type: 'string' },
+              //        { name: 'bustype', string: 'string' },
+              //        { name: 'phid', type: 'string' }
+              //    ],
+              //    url:C_ROOT +  'SUP/IndividualProperty/LoadBusTree'
+              //})
+
+              var leftPanel = Ext.create('Ext.ng.BusTreePanel', {
+                  tablename: 'metadata_bustable'
+              });
+              var busTree = leftPanel.getTree();
+              //布局
+              var viewport = Ext.create('Ext.container.Viewport', {
+                  id: "viewPort",
+                  layout: 'border',
+                  items: [ngToolbar, leftPanel, grid]
+              });
+
+              //修改
+              ngToolbar.get('edit').on('click', function () {
+
+                  var data = grid.getSelectionModel().getSelection();
+
+                  if (data.length > 0) {
+                      var code = data[0].get('c_code');
+                      var tname = data[0].get('tname');
+
+                      $OpenTab('字段设计', '@Url.Content("~/")' + 'SUP/Designer/IndividualPropertyEdit?code=' + code + '&tname=' + tname + '&busid=' + busid + '&bustype=' + bustype + '&busname=' + busname + '&otype=' + $Otype.EDIT);
+                  }
+
+              });
+
+              //修改
+              ngToolbar.get('view').on('click', function () {
+
+                  var data = grid.getSelectionModel().getSelection();
+
+                  if (data.length > 0) {
+                      var code = data[0].get('c_code');
+                      var tname = data[0].get('tname');
+
+                      $OpenTab('字段设计', '@Url.Content("~/")' + 'SUP/Designer/IndividualPropertyEdit?code=' + code + '&tname=' + tname + '&busid=' + busid + '&otype=' + $Otype.VIEW);
+                  }
+
+              });
+
+
+
+              ngToolbar.get('uisetting').on('click', function () {
+
+                  var data = grid.getSelectionModel().getSelection();
+
+                  if (data.length > 0) {
+                      var tname = data[0].get('tname');
+
+                      $OpenTab('字段UI设置', '@Url.Content("~/")' + 'SUP/Designer/IndividualPropertyUIEdit?bustype=' + bustype + '&busname=' + busname + '&tname=' + tname + '&otype=' + $Otype.EDIT);
+                  }
+
+              });
+
+
+              busTree.on('cellclick', function (treePanel, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+
+                  if (record.data.bustype != bustype) {
+                      if (record.data.leaf) {
+                          //Ext.apply(store.proxy.extraParams, { 'busid': record.data.phid });
+                          busid = record.data.phid;
+                          bustype = record.data.bustype;
+                          busname = record.data.text;
+
+                          store.proxy.extraParams = { 'busid': record.data.phid };
+                          store.load();
+                      }
+                  }
+
+              });
+
+
+
+
+          })
+
+      </script>
+}
+

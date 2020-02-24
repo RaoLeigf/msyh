@@ -1,0 +1,377 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+	<script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_GKXM.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript">
+
+        Ext.onReady(function () {
+			var orgphid;
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+					{ id: "DeptSet", text: "对应部门设置", width: this.itemWidth, iconCls: "icon-Edit", langkey: "DeptSet"},
+                    '->',  'close'
+                ]
+            });
+
+
+			
+			var storeBM = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 200,
+				fields: [
+				
+				{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+
+  
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetBMListDYGXdtl',
+				autoLoad:false 
+			});
+			
+			
+			
+			gridBM = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				//height: 390,
+				height:document.documentElement.clientHeight-86,
+				store: storeBM,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [ {
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '部门代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '部门名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+				}],
+				listeners: {
+					
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					}
+				
+					
+					
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				}
+			});
+			
+
+			var storeGKXM = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "FProjCode",
+    "type": "string",
+    "mapping": "FProjCode"
+  },
+  {
+    "name": "FProjName",
+    "type": "string",
+    "mapping": "FProjName"
+
+				}],
+                url: C_ROOT + 'GYS/YS/BudgetMst/GetGKXM',
+				autoLoad:false
+			});
+			var pagingbarGKXM = Ext.create('Ext.ng.PagingBar', {
+                store: storeGKXM
+            });
+
+		    gridGKXM = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-86,
+				//height: 390,
+				store: storeGKXM,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				bbar: [pagingbarGKXM],
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '项目代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FProjCode'
+				}, {
+					header: '项目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FProjName'
+					//renderer: function (value, parm, record) {
+					//    if (record.data.ctype == "1") {
+					//        return me.getEmpName(value, record.data.assigntype);
+					//    }
+					//    return value;
+					//}
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						var params={'Dwdm':record.get('FProjCode')};
+						Ext.apply(storeBM.proxy.extraParams,params);
+						storeBM.load(function(){
+							
+						})
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				}
+			});
+			
+		    mainPanel_form = Ext.create('Ext.ng.TableLayoutForm',
+                {
+                    region: 'north',
+                    /*xtype: '',
+                    height: 50,
+                    border: false,
+                    layout: 'border',
+					columnsPerRow: 2,
+					labelWidth: 120,
+                    items: [{
+                        fieldLabel: "组织选择",
+                        xtype: "ngRichHelp",
+                        helpid: "gxm_orglist_all",
+                        valueField: "phid",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+                        isInGrid: true,
+                        helpResizable: true,
+                        //margin: '10 0 10 10',
+                        itemId: "Org",
+                        name: "Org"
+                    },
+					{
+                        fieldLabel: "部门选择",
+                        xtype: "ngRichHelp",
+                        helpid: "gxm_orglist_all",
+                        valueField: "ocode",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+                        isInGrid: true,
+                        helpResizable: true,
+                        //margin: '10 0 10 500',
+                        itemId: "Dept",
+                        name: "Dept"
+					}]*/
+					fields: [
+					{
+						fieldLabel: "组织选择",
+						itemId: "Org",
+						name: "Org",
+						langKey: "Org",
+						helpid: "gxm_orglist_all",
+						valueField: "phid",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+						xtype: "ngRichHelp"
+					},
+					{
+						fieldLabel: "部门选择",
+						itemId: "Dept",
+						name: "Dept",
+						langKey: "Dept",
+						helpid: "gxm_orglist_all",
+						valueField: "ocode",
+                        displayField: "oname",
+                        userCodeField: "ocode",
+                        ORMMode: false,
+						xtype: "ngRichHelp",
+					}]
+					
+				
+					
+
+            });
+			
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,mainPanel_form,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridGKXM],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridBM]
+				
+				}]
+            });
+			
+			mainPanel_form.queryById("Org").on("beforetriggerclick", function (str) {
+                var sqlFilter = "fg_orglist.IFCORP='" + 'Y' + "'" + "AND fg_orglist.ISACTIVE='" + '1' + "'";
+                mainPanel_form.queryById("Org").setClientSqlFilter(sqlFilter);
+            });
+			mainPanel_form.queryById("Org").on("helpselected", function (str) {
+				if(orgphid!=parseInt(str.data.phid)){
+					orgphid = parseInt(str.data.phid);
+					mainPanel_form.queryById("Dept").setValue("");
+					gridGKXM.getStore().removeAll();
+					gridBM.getStore().removeAll();
+				}
+            });
+
+
+			mainPanel_form.queryById("Dept").on("beforetriggerclick", function (str) {
+				if (orgphid != undefined) {
+                    var sqlFilter = "fg_orglist.IFCORP='" + 'N' + "'" + "AND fg_orglist.ISACTIVE='" + '1' + "'" + "AND fg_orglist.PARENT_ORGID='" + orgphid + "'";
+                    mainPanel_form.queryById("Dept").setClientSqlFilter(sqlFilter);
+                } else {
+                    Ext.MessageBox.alert("提示", '请先选择组织');
+                    return false;
+                }
+            });
+			mainPanel_form.queryById("Dept").on("helpselected", function (str) {
+                var params = { 'Dept': str.code};
+                Ext.apply(storeGKXM.proxy.extraParams, params);
+                storeGKXM.load(function () {
+
+                });
+            });
+
+			
+            //对应部门设置
+            ngToolbar.get('DeptSet').on('click', function () {
+				var data = gridGKXM.getSelectionModel().getSelection();
+				if(data.length > 0){
+					var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {				   
+					});
+					win.show();
+				}
+            });
+
+
+			//删除
+            /*ngToolbar.get('delete').on('click', function () {
+                var data = gridBM.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    //recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            storeBM.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+										var data = gridGKXM.getSelectionModel().getSelection();
+										var FProjCode=data[0].data.FProjCode;
+										var params={'Dwdm':FProjCode};
+										Ext.apply(storeBM.proxy.extraParams,params);
+										storeBM.load(function(){
+											
+										})
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });*/
+
+        });
+		
+		function findStoreIndex(store,name,value){
+			for(var i=0;i<store.getCount();i++){
+				if(store.getAt(i).get(name)==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+
+
+    </script>
+}
+
+

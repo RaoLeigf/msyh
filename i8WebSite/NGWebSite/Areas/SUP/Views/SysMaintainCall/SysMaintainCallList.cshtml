@@ -1,0 +1,289 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script>
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: ['add', 'edit', 'view', 'delete', 'copy',
+                    { itemId: "start", text: "维护开始", iconCls: "icon-Complete" },
+                    { itemId: "stop", text: "维护结束", iconCls: "icon-stop" },
+                    { itemId: "overtime", text: "维护时间变更", iconCls: "icon-CheckHistory" },
+                     '->', 'close']
+            });
+            
+            Ext.define('gridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'phid', type: 'string', mapping: 'phid' },
+                    { name: 'sn', type: 'string', mapping: 'sn' },
+                    { name: 'title', type: 'string', mapping: 'title' },
+                    { name: 'preenddate', type: 'string', mapping: 'preenddate' },           
+                    { name: 'filldate', type: 'string', mapping: 'filldate' },
+                    { name: 'endtype', type: 'string', mapping: 'endtype' },
+                    { name: 'state', type: 'string', mapping: 'state' },
+                    { name: 'startdate', type: 'string', mapping: 'startdate' },
+                    { name: 'enddate', type: 'string', mapping: 'enddate' }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'gridmodel',
+                autoLoad: false,
+                url: '../SysMaintainCall/GetSysMaintainCall'
+            }); 
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: gridStore,
+                buskey: 'phid', //对应的业务表主键属性
+                columnLines: true,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'phid',
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '序号',
+                        dataIndex: 'sn',
+                        width: '5%',
+                        sortable: false
+                    },
+                    {
+                        header: '标题',
+                        dataIndex: 'title',
+                        width: '20%',
+                        sortable: false
+                    },
+                    {
+                        header: '预计维护结束时间',
+                        dataIndex: 'preenddate',
+                        width: '14%',
+                        sortable: false
+                    },
+                    {
+                        header: '录入时间',
+                        dataIndex: 'filldate',
+                        width: '14%',
+                        sortable: false
+                    },
+                    {
+                        header: '维护结束方式',
+                        dataIndex: 'endtype',
+                        width: '10%',
+                        sortable: false
+                    },
+                    {
+                        header: '状态',
+                        dataIndex: 'state',
+                        width: '9%',
+                        sortable: false
+                    },                   
+                    {
+                        header: '维护开始时间',
+                        dataIndex: 'startdate',
+                        width: '14%',
+                        sortable: false
+                    },
+                    {
+                        header: '维护结束时间',
+                        dataIndex: 'enddate',
+                        width: '14%',
+                        sortable: false
+                    }
+                ]
+            });
+
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                pageid: "Web:SysMaintainCall", //对应内嵌查询业务点标识
+                grid: grid,
+                queryAutoLoad: false, //自动load
+                columnsPerRow: 4 //每行4列
+            });
+
+            ngToolbar.get('add').on('click', function () {
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/SysMaintainCall/CheckSysMaintainCallState',
+                    success: function (response) {
+                        if (response.responseText == '0') {
+                            $OpenTab('系统维护通知-新增', C_ROOT + 'SUP/SysMaintainCall/Edit?otype=add');
+                        } else {
+                            Ext.MessageBox.alert('提示', '还有状态为维护开始/维护中的单据，不允许新增！');
+                        }
+                    }
+                });
+            });
+
+            ngToolbar.get('edit').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.state == '新增') {
+                        $OpenTab('系统维护通知-修改', C_ROOT + 'SUP/SysMaintainCall/Edit?otype=edit&phid=' + select.raw.phid);
+                    } else {
+                        Ext.MessageBox.confirm('提示', '单据非新增状态不允许修改，是否以查看方式打开', function (e) {
+                            if (e == "yes") {
+                                $OpenTab('系统维护通知-查看', C_ROOT + 'SUP/SysMaintainCall/Edit?otype=view&phid=' + select.raw.phid);
+                            }
+                        });
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要修改的单据！');
+                }
+            });
+
+            ngToolbar.get('view').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    $OpenTab('系统维护通知-查看', C_ROOT + 'SUP/SysMaintainCall/Edit?otype=view&phid=' + select.raw.phid);
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要查看的单据！');
+                }
+            });
+
+            ngToolbar.get('delete').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.state == '新增') {                     
+                        Ext.Ajax.request({
+                            params: { 'phid': select.raw.phid },
+                            url: C_ROOT + 'SUP/SysMaintainCall/DelSysMaintainCall',
+                            success: function (response) {
+                                if (response.responseText == 'True') {
+                                    Ext.MessageBox.alert('提示', '单据删除成功！');
+                                    gridStore.load();
+                                }
+                            }
+                        });
+                    } else {
+                        Ext.MessageBox.alert('提示', '单据非新增状态不允许删除！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要删除的单据！');
+                }
+            });
+
+            ngToolbar.get('copy').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    Ext.Ajax.request({
+                        url: C_ROOT + 'SUP/SysMaintainCall/CheckSysMaintainCallState',
+                        success: function (response) {
+                            if (response.responseText == '0') {
+                                var select = grid.getSelectionModel().getSelection()[0];
+                                $OpenTab('系统维护通知-复制', C_ROOT + 'SUP/SysMaintainCall/Edit?otype=copy&phid=' + select.raw.phid);
+                            } else {
+                                Ext.MessageBox.alert('提示', '还有状态为维护开始/维护中的单据，不允许复制！');
+                            }
+                        }
+                    });                  
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要复制的单据！');
+                }
+            });
+
+            ngToolbar.get('start').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.state == '新增') {
+                        var time = new Date().getTime() + parseInt(select.raw.starttime) * 60000;
+                        if (time >= new Date(select.raw.preenddate).getTime()) {
+                            Ext.MessageBox.alert('提示', '预计结束时间必须大于当前时间加上系统维护开始所选分钟！');
+                            return;
+                        }
+                        if (time >= new Date(select.raw.enddate).getTime()) {
+                            Ext.MessageBox.alert('提示', '结束时间必须大于当前时间加上系统维护开始所选分钟！');
+                            return;
+                        }
+                       
+                        Ext.Ajax.request({
+                            params: { 'phid': select.raw.phid },
+                            url: C_ROOT + 'SUP/SysMaintainCall/StartSysMaintainCall',
+                            success: function (response) {
+                                if (response.responseText == 'Success') {
+                                    Ext.MessageBox.alert('提示', '单据开始维护！');
+                                    gridStore.load();
+                                } else {
+                                    Ext.MessageBox.alert('提示', response.responseText);
+                                }
+                            }
+                        });
+                    } else {
+                        Ext.MessageBox.alert('提示', '单据非新增状态不允许开始维护！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要开始维护的单据！');
+                }
+            });
+
+            ngToolbar.get('stop').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.state == '维护开始' || select.raw.state == '维护中') {
+                        Ext.Ajax.request({
+                            params: { 'phid': select.raw.phid },
+                            url: C_ROOT + 'SUP/SysMaintainCall/CloseSysMaintainCall',
+                            success: function (response) {
+                                if (response.responseText == 'True') {
+                                    Ext.MessageBox.alert('提示', '单据结束维护！');
+                                    gridStore.load();
+                                }
+                            }
+                        });
+                    } else {
+                        Ext.MessageBox.alert('提示', '单据处于维护中或维护开始状态才允许结束维护！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要结束维护的单据！');
+                }
+            });
+
+            ngToolbar.get('overtime').on('click', function () {
+                if (grid.getSelectionModel().getSelection().length > 0) {
+                    var select = grid.getSelectionModel().getSelection()[0];
+                    if (select.raw.state == '维护开始' || select.raw.state == '维护中') {
+                        if (select.raw.endtype == '手动结束') {
+                            Ext.MessageBox.alert('提示', '本单据为手动结束维护方式，无需变更维护时间。');
+                        } else {
+                            $OpenTab('系统维护通知-维护时间变更', C_ROOT + 'SUP/SysMaintainCall/Edit?otype=view&overtime=1&phid=' + select.raw.phid);
+                        }
+                    } else {
+                        Ext.MessageBox.alert('提示', '单据处于维护中或维护开始状态才允许变更维护时间！');
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要变更维护时间的单据！');
+                }
+            });
+
+            Ext.defer(function () {
+                gridStore.load();
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items:
+                [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        layout: 'border',
+                        items: [queryPanel, grid]
+                    }
+                ]
+            });
+
+        });
+
+        function NG3Refresh() {
+            window.location.reload();
+        }
+
+    </script>
+}

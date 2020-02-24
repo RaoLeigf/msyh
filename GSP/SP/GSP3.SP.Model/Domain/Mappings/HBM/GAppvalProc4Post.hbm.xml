@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GSP3.SP.Model.Domain" assembly="GSP3.SP.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GAppvalProc4PostModel" table="sp3_appval_proc4post">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="ProcPhid" column="proc_phid" type="System.Int64" not-null="false" />
+		<property name="PostPhid" column="post_phid" type="System.Int64" not-null="false" />
+		<property name="FSeq" column="f_seq" type="System.Int32" not-null="false" />
+		<property name="FMode" column="f_mode" type="System.Byte" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

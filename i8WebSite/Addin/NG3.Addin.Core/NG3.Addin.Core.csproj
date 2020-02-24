@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5F5DDDC5-8BF6-4416-A441-EE3D183775FA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NG3.Addin.Core</RootNamespace>
+    <AssemblyName>NG3.Addin.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>..\..\..\..\tfstest\test\Ruleset\NGBaseRuleset.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\Dlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.WebApi.SDK, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.WebApi.SDK.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\opensourcedll\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BaseClass\dlls\NG3.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>..\..\dlls\NG3.Data.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Log">
+      <HintPath>..\..\..\Dlls\NG3.Log.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BaseClass\opensourcedll\NHibernate.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NHibernate.Validator">
+      <HintPath>..\opensourcedll\NHibernate.Validator.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Spring.Aop">
+      <HintPath>..\opensourcedll\Spring.Aop.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\opensourcedll\Spring.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Spring.Data">
+      <HintPath>..\opensourcedll\Spring.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Spring.Data.NHibernate4">
+      <HintPath>..\opensourcedll\Spring.Data.NHibernate4.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\SUP.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\SUP.Common.DataEntity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cfg\AddinCache.cs" />
+    <Compile Include="Cfg\AddinEnvironment.cs" />
+    <Compile Include="Cfg\InterceptedServiceScanner.cs" />
+    <Compile Include="Cfg\AddinOperator.cs" />
+    <Compile Include="Interceptor\AddinMethodInvocation.cs" />
+    <Compile Include="Interceptor\AfterAdvice.cs" />
+    <Compile Include="Interceptor\BeforeAdvice.cs" />
+    <Compile Include="LogHelper.cs" />
+    <Compile Include="Parameter\BizParameter.cs" />
+    <Compile Include="ExpressionUtils.cs" />
+    <Compile Include="Extend\AbstractExtendAssemblyAction.cs" />
+    <Compile Include="Extend\IExtendAssemblyAction.cs" />
+    <Compile Include="Interceptor\AbstractAssemblyInterceptorAction.cs" />
+    <Compile Include="Interceptor\AbstractMethodAfterInterceptor.cs" />
+    <Compile Include="Interceptor\AbstractMethodBeforeInterceptor.cs" />
+    <Compile Include="AddinException.cs" />
+    <Compile Include="Cfg\AddinConfigure.cs" />
+    <Compile Include="Cfg\AddinConfigureEntityKey.cs" />
+    <Compile Include="Expression\BasicFunctionEval.cs" />
+    <Compile Include="Expression\BasicOperatorEval.cs" />
+    <Compile Include="Expression\FuncExpression.cs" />
+    <Compile Include="Expression\IExpression.cs" />
+    <Compile Include="Expression\Operand.cs" />
+    <Compile Include="Expression\Operator.cs" />
+    <Compile Include="Expression\OperatorExprssion.cs" />
+    <Compile Include="Expression\OperatorType.cs" />
+    <Compile Include="Expression\Parser.cs" />
+    <Compile Include="Expression\RegsitryManager.cs" />
+    <Compile Include="Expression\VariableExpression.cs" />
+    <Compile Include="Extend\AbstractExtendAction.cs" />
+    <Compile Include="Extend\ExtendActionFactory.cs" />
+    <Compile Include="Extend\ExtendAssemblyAction.cs" />
+    <Compile Include="Cfg\ExtendConfigure.cs" />
+    <Compile Include="Extend\ExtendExecutor.cs" />
+    <Compile Include="Extend\ExtendSqlAction.cs" />
+    <Compile Include="Extend\ExtendUrlAction.cs" />
+    <Compile Include="Extend\IExtendAction.cs" />
+    <Compile Include="Interceptor\IAfterInterceptor.cs" />
+    <Compile Include="Interceptor\IAssemblyInterceptorAction.cs" />
+    <Compile Include="Interceptor\IBeforeInterceptor.cs" />
+    <Compile Include="Interceptor\InterceptorExecutor.cs" />
+    <Compile Include="Interceptor\MethodAfterAssemblyInterceptor.cs" />
+    <Compile Include="Interceptor\MethodAfterExpInterceptor.cs" />
+    <Compile Include="Interceptor\MethodAfterSqlInterceptor.cs" />
+    <Compile Include="Interceptor\MethodBeforeAssemblyInterceptor.cs" />
+    <Compile Include="Interceptor\MethodBeforeExpInterceptor.cs" />
+    <Compile Include="Interceptor\MethodBeforeSqlInterceptor.cs" />
+    <Compile Include="Interceptor\AroundInterceptor.cs" />
+    <Compile Include="Interceptor\AddinInterceptorFactory.cs" />
+    <Compile Include="Parameter\JsonParser.cs" />
+    <Compile Include="Parameter\ParameterManager.cs" />
+    <Compile Include="Parameter\UIParameter.cs" />
+    <Compile Include="AddinParameterUtils.cs" />
+    <Compile Include="Parameter\UnResolvedText.cs" />
+    <Compile Include="Parameter\EnumParameterType.cs" />
+    <Compile Include="Parameter\IAddinParameter.cs" />
+    <Compile Include="SqlResultEntity.cs" />
+    <Compile Include="SqlUtils.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Parameter\SystemParameter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NG3.Addin.Model\NG3.Addin.Model.csproj">
+      <Project>{229f2520-c7ca-4086-9da9-cccc9abe0f75}</Project>
+      <Name>NG3.Addin.Model</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\BaseClass\dlls\Enterprise3.Common.Model.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\Rules</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

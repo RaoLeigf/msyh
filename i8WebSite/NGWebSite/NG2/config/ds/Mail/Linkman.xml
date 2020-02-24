@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="mail_linkman">
+      <Field Name="id" IsKey="true" />
+      <Field Name="name" />
+      <Field Name="typeid" />
+      <Field Name="email" />
+      <Field Name="mobile" />
+      <Field Name="telephone" />
+      <Field Name="remark" />
+    </Table>
+  </Tables>
+  <Read sql="select [fields] from [Table] [where] [orderby]">
+    <Where format="{orgid} and {userid}">
+      <exp Field="orgid" Oper="Equal" Target="AppInfo" Value="orgid" />
+      <exp Field="userid" Oper="Equal" Target="AppInfo" Value="userid" />
+    </Where>
+    <OrderBy format="{name}">
+      <exp Field="name" value="asc"></exp>
+    </OrderBy>
+  </Read>
+  <Create sql="insert [Table] [values]">
+    <Values>
+      <exp Field="orgid" Target="AppInfo" Value="orgid" />
+      <exp Field="userid" Target="AppInfo" Value="userid" />
+    </Values>
+  </Create>
+  <Update sql="update [Table] [values] [where]">
+  </Update>
+  <Destroy sql="delete [Table] [where]">
+  </Destroy>
+  <!--其他表达式-->
+  <ExpNameUnique sql="select 1 from [Table] [where]">
+    <Where format="{orgid} and {userid}">
+      <exp Field="orgid" Oper="Equal" Target="AppInfo" Value="orgid" />
+      <exp Field="userid" Oper="Equal" Target="AppInfo" Value="userid" />
+      <exp Field="name" Target="Client" Oper="Equal" />
+    </Where>
+  </ExpNameUnique>
+</DataService>

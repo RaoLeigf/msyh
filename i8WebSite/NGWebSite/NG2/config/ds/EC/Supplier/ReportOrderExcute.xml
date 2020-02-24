@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_orderdtl">
+      <Field Name="orderid" IsKey="true" />
+      <Field Name="orderno" />
+      <Field Name="lineid"  />
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="ordersum"/>
+      <Field Name="remarks"/>
+      <Field Name="reqdate"/>
+      <Field Name="sendflg"/>
+      <Field Name="sendqty"/>
+      <Field Name="sendsum"/>
+      <Field Name="recid" format="''" />
+      <Field Name="progressreport" format="'进度报告'" />
+      <Field Name="progressrhis" format="'进度历史'" />
+      <Field Name="deliverdate" format="case when wsp_supply_orderdtl.deliverdate is null then wsp_supply_ordermst.deliverdate else wsp_supply_orderdtl.deliverdate end) deliverdate"/>
+      <Field Name="accept" format="(select top 1 1 from wsp_supply_senddtl where relid=wsp_supply_ordermst.orderid and scmacceptflg > 0)" />
+      <Field Name="income" format="(select top 1 1 from ec_recdtl where ec_recdtl.purid=wsp_supply_ordermst.relid and actqty > 0)" />
+      <Field Name="invoice" format="(select top 1 1 from ec_recdtl where purid=wsp_supply_ordermst.relid and invqty > 0)" />
+      <Field Name="invqty" format="(select sum(invqty) from ec_recdtl where purid=wsp_supply_ordermst.relid and invqty > 0)" />
+      <Field Name="invsum" format="(select sum(invsum) from ec_recdtl where purid=wsp_supply_ordermst.relid and invqty > 0)" />
+      <Field Name="scmacceptqty" format="(select sum(actqty) from ec_recdtl where purid=wsp_supply_ordermst.relid and invqty > 0)" />
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname" />
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname" />
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="descript"/>
+      <Field Name="itemname"/>
+    </Table>
+    <Table Name="wsp_supply_ordermst">
+      <Field Name="relno" AsName="purno" />
+      <Field Name="relid" AsName="purid" />
+      <Field Name="supcomp" />
+      <Field Name="ocode" />
+    </Table>
+    <Table Name="ec_purmst">
+      <Field Name="recorddate" AsName="purdate"></Field>
+    </Table>
+    <Table Name="uic_supplier_progress">
+      <Field Name="supplystateno"></Field>
+      <Field Name="supplystatename"></Field>
+      <Field Name="supplyisnew"></Field>
+      <Field Name="groupstateno"></Field>
+      <Field Name="groupstatename"></Field>
+      <Field Name="groupisnew"></Field>
+      <Field Name="supplyremark"></Field>
+      <Field Name="groupremark"></Field>
+      <Field Name="supplyrecordocode"></Field>
+      <Field Name="supplyrecordtime"></Field>
+      <Field Name="grouprecordocode"></Field>
+      <Field Name="recordtype"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      inner join wsp_supply_ordermst on wsp_supply_ordermst.orderid = [table].orderid
+      left join itemdata on itemdata.itemno=[table].itemno
+      left join msunit on msunit.msunit = [table].msunit 
+      left join ranks on ranks.ranks = [table].ranks
+      left join ec_purmst on wsp_supply_ordermst.relid = ec_purmst.purid 
+      [where] [orderby]
+    </Sql>
+    <Where>
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+      <Exp Field="supcomp"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+    <Query>
+      <Exp Name="accept" format=" exists ( select 1 from wsp_supply_senddtl where relid=wsp_supply_ordermst.orderid and scmacceptflg > 0 ) "></Exp>
+      <Exp Name="income" format=" exists ( select 1 from ec_recdtl where ec_recdtl.purid=wsp_supply_ordermst.relid and actqty > 0 ) "></Exp>
+      <Exp Name="invoice" format="  exists ( select 1 from ec_recdtl where purid=wsp_supply_ordermst.relid and invqty > 0 ) "></Exp>
+      <Exp Name="unsend" format=" (  wsp_supply_orderdtl.sendflg is null or wsp_supply_orderdtl.sendflg = 0 ) "></Exp>
+      <Exp Name="send" format=" (  wsp_supply_orderdtl.sendflg > 0 ) "></Exp>
+      <Exp Field="itemname" paramName="itemname" Target="Client" Value="itemname"></Exp>
+      <Exp Field="ec_purmst.recorddate" paramName="purdate1" Target="Client" Oper="GreaterThanOrEqual" Value="purdate1"/>
+      <Exp Field="ec_purmst.recorddate" paramName="purdate2" Target="Client" Oper="LessThanOrEqual" Value="purdate2" />
+      <Exp Field="wsp_supply_ordermst.relno" paramName="relno" Target="Client" Value="relno"/>
+      <Exp Field="descript" paramName="descript" Target="Client" Value="descript"/>
+    </Query>
+    <OrderBy format="{wsp_supply_orderdtl.orderno}">
+      <Exp Field="wsp_supply_orderdtl.orderno" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    
+  </Record>
+  <Create>
+    
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    
+  </Destroy>
+  <GetRecId>
+    <Sql>
+      select recid from ec_recdtl right join wsp_supply_senddtl on ec_recdtl.uicsendid = wsp_supply_senddtl.sendid
+      and ec_recdtl.uicsendmxid = wsp_supply_senddtl.lineid right join wsp_supply_orderdtl on wsp_supply_orderdtl.orderid
+      = wsp_supply_senddtl.relid and wsp_supply_orderdtl.lineid = wsp_supply_senddtl.relmxid [where]
+    </Sql>
+    <Query>
+      <Exp Field="orderid" Target="Client" Value="orderid"></Exp>
+      <Exp Field="lineid" Target="Client" Value="lineid"></Exp>
+    </Query>
+  </GetRecId>
+</DataService>

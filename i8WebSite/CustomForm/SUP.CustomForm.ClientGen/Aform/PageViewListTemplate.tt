@@ -1,0 +1,35 @@
+﻿Ext.define('Aform.view.List', {
+    extend: 'Ext.dataview.List',
+    xtype: 'viewlist',
+    requires: ['Aform.store.List'],
+
+    config: {        
+        itemTpl: '<#= Common.GetPageItemTplApp(gridPanel) #>',
+        store: 'List',
+        onItemDisclosure: true,
+        id: 'viewportList',
+
+        items: [
+            {
+                xtype: 'titlebar',
+                title: '<#= ClassName #>List',
+                docked: 'top',
+                items: [
+                    {
+                        xtype: 'button',
+                        iconMask: true,
+                        itemId: 'add',
+                        iconCls: 'add'
+                    },
+                	{
+                	    xtype: 'button',
+                	    align: 'right',
+                	    itemId: 'delete',
+                	    text: '删除'
+                	}
+                ]
+            }
+        ]
+    }
+});
+

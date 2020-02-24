@@ -1,0 +1,466 @@
+@using NG3.Web.Controller.Extensions
+@{
+    Layout = null;
+    if (string.IsNullOrEmpty(ViewBag.mTitle))
+    {
+        ViewBag.mTitle = "PDF预览";
+    }
+}
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />
+    <meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1" />
+    <meta name="CODE_LANGUAGE" content="C#" />
+    <meta name="vs_defaultClientScript" content="JavaScript" />
+    <meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5" />
+    <title>@ViewBag.mTitle</title>
+    <script type="text/javascript">
+        var $PageName = "",
+            C_ROOT = '@ViewBag.Root',
+            C_PATH = '@ViewBag.Path',
+            $gridStateInfo = '',
+            $queryPanelInfo = '',
+            $toolbarRightInfo = '';
+    </script>
+    <script type="text/javascript" src="@Url.Script(" ~=~/NG3Resource/js/KingGrid/jquery-1.4.2.min.js")"></script>
+    @*
+    <script type="text/javascript" src="@Url.Script(" ~=~/NG3Resource/js/KingGrid/iWebPDF2015.js")" charset="utf-8"></script>*@
+    <script type="text/javascript">
+        var url = '@ViewBag.mServerUrl';
+        var mRecordID = '@ViewBag.mRecordID';
+        var mIsExsitRId = ('@ViewBag.isExsitRId' == 'True');
+        var mFileType = '@ViewBag.mFileType';
+        var mFrom = '@ViewBag.mFrom';
+        var mTitle = '@ViewBag.mTitle';
+        var mBillCode = '@ViewBag.mBillCode';
+
+        var LogId = "@ViewBag.LogId";
+        var LogName = "@ViewBag.LogName";
+        var OCode = "@ViewBag.OCode";
+        var UCode = "@ViewBag.UCode";
+        var Product = "@ViewBag.Product";
+        var UserType = "@ViewBag.UserType";
+        var OrgID = "@ViewBag.OrgID";
+        var UserID = "@ViewBag.UserID";
+    </script>
+
+    <script language="javascript" type="text/javascript">
+
+        function init() {
+            self.moveTo(0, 0);
+            self.resizeTo(window.parent.innerWidth, screen.availHeight);
+            if (document.documentElement.clientHeight > 0) {
+                document.getElementById('iWebPDF2015').width = document.documentElement.clientWidth - 10 + "px";
+                document.getElementById('iWebPDF2015').height = document.documentElement.clientHeight - 10 + "px";
+            }
+        }
+
+        function load() {
+            init();
+            if (mRecordID != 'null' && mIsExsitRId) {
+                WebOpen();
+            }
+        }
+
+        function initialize_chrome() {
+            KGChromePlugin = document.getElementById('iWebPDF2015');
+            load();
+        }
+
+        function initialize_ie() {
+            load();
+        }
+
+        if (document.addEventListener) {
+            window.addEventListener('DOMContentLoaded', initialize_chrome, false);
+        } else if (document.attachEvent) {
+            window.attachEvent("onload", initialize_ie);
+        }
+
+
+        var nClick = 1; //鼠标点击次数
+        var ToolBarId;
+        var MenuId;
+
+        //打开文档
+        function WebOpen() {
+            var pdfServer = iWebPDF2015.COMAddins.Item("KingGrid.MsgServer2000").Object;
+            pdfServer.WebUrl = url;
+            var tempFile = pdfServer.CreateTempFileName();
+
+            pdfServer.SetMsgByName("LogId", LogId);
+            pdfServer.SetMsgByName("LogName", LogName);
+            pdfServer.SetMsgByName("OCode", OCode);
+            pdfServer.SetMsgByName("UCode", UCode);
+            pdfServer.SetMsgByName("Product", Product);
+            pdfServer.SetMsgByName("UserType", UserType);
+            pdfServer.SetMsgByName("OrgID", OrgID);
+            pdfServer.SetMsgByName("UserID", UserID);
+            pdfServer.SetMsgByName("DBSTEP", "DBSTEP");
+            pdfServer.SetMsgByName("OPTION", "LOADFILE");
+            pdfServer.SetMsgByName("FILETYPE", mFileType);
+            pdfServer.SetMsgByName("USERNAME", LogName);
+            pdfServer.SetMsgByName("mBillCode", mBillCode);
+            pdfServer.SetMsgByName("RECORDID", mRecordID);
+            pdfServer.SetMsgByName("mFrom", mFrom);
+            pdfServer.SetMsgByName("mTitle", mTitle);
+            pdfServer.SetMsgByName("FILENAME", mRecordID + mFileType);
+            if (pdfServer.PostDBPacket(false)) {
+                pdfServer.MsgFileSave(tempFile);
+                iWebPDF2015.Documents.Open(tempFile);
+                iWebPDF2015.Documents.ActiveDocument.Views.ActiveView.Zoom = 100;
+                addState("打开成功");
+                iWebPDF2015.Options.TabBarVisible = false;
+            } else {
+                addState("打开失败");
+            }
+        }
+
+        function SavePdfFile() {
+            var pdfServer = iWebPDF2015.COMAddins.Item("KingGrid.MsgServer2000").Object;
+            try {
+                //在线保存文档
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有要保存的文档");
+                    return;
+                }
+                pdfServer.WebUrl = url;
+                var tempFile = pdfServer.CreateTempFileName();
+                iWebPDF2015.Documents.ActiveDocument.Save(tempFile);
+                pdfServer.MsgFileLoad(tempFile);
+
+                pdfServer.SetMsgByName("LogId", LogId);
+                pdfServer.SetMsgByName("LogName", LogName);
+                pdfServer.SetMsgByName("OCode", OCode);
+                pdfServer.SetMsgByName("UCode", UCode);
+                pdfServer.SetMsgByName("Product", Product);
+                pdfServer.SetMsgByName("UserType", UserType);
+                pdfServer.SetMsgByName("OrgID", OrgID);
+                pdfServer.SetMsgByName("UserID", UserID);
+
+                pdfServer.SetMsgByName("DBSTEP", "DBSTEP");
+                pdfServer.SetMsgByName("OPTION", "SAVEFILE");
+                pdfServer.SetMsgByName("FILETYPE", "PDF");
+                pdfServer.SetMsgByName("USERNAME", LogName);
+                pdfServer.SetMsgByName("RECORDID", mRecordID);
+
+                if (pdfServer.PostDBPacket(false)) {
+                    var phid = pdfServer.GetMsgByName("PHID"); //保存文档返回的phid
+                    addState("保存成功！文档编号是：" + mRecordID);
+                    return phid;
+                } else {
+                    addState("保存失败！");
+                    return '';
+                }
+            } catch (e) {
+                addState("打开失败");
+                alert(e.description);
+            }
+        }
+
+        //状态信息
+        function addState(value) {
+            $("#state").html(value);
+        }
+
+        //获得活动pdf的页数
+        function GetPageCount() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    //  alert("没有已打开文档");
+                    return 0;
+                }
+                var nPage = iWebPDF2015.Documents.ActiveDocument.Pages.Count;
+                return nPage;
+            } catch (e) {
+                alert(e.description);
+            }
+        }
+
+        //清空批注
+        function DelAllAnnots() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+
+                var nPage = iWebPDF2015.Documents.ActiveDocument.Pages.Count;
+                for (var i = 0; i < nPage; i++) {
+                    var nAnnot = iWebPDF2015.Documents.ActiveDocument.Pages(i).Annots.Count;
+                    for (var j = nAnnot - 1; j >= 0; j--) {
+                        //				iWebPDF2015.Documents.ActiveDocument.pages(i).Annots(j).Delete();
+                        var annot = iWebPDF2015.Documents.ActiveDocument.pages(i).Annots(j);
+
+                        if (annot.Subtype != "Widget") //批注对象为构件类型时不能删除，会崩溃
+                        {
+                            annot.Delete();
+                        }
+                        //如果是要指定删除的可以==“Text”  Text为文字批注  Line为线 Square为矩形 Circle为圆形批注 Stamp为图章批注
+                    }
+                    iWebPDF2015.Documents.ActiveDocument.Pages(i).Refresh();
+                }
+                iWebPDF2015.Documents.ActiveDocument.Views.ActiveView.Refresh();
+            } catch (e) {
+                alert(e.description);
+            }
+        }
+
+        //锁定批注
+        function LockAnnots() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+                var nAnnot = iWebPDF2015.Documents.ActiveDocument.Pages.Item(0).Annots.Count;
+                for (var i = 0; i < nAnnot; i++) {
+                    iWebPDF2015.Documents.ActiveDocument.Pages.Item(0).Annots.item(i).Locked = true;
+
+                }
+
+            } catch (e) {
+                alert(e.description);
+            }
+        }
+
+        //解除锁定批注
+        function UnlockAnnots() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+                var nAnnot = iWebPDF2015.Documents.ActiveDocument.Pages.Item(0).Annots.Count;
+                for (var i = 0; i < nAnnot; i++) {
+                    iWebPDF2015.Documents.ActiveDocument.Pages.Item(0).Annots.item(i).Locked = false;
+                }
+
+            } catch (e) {
+                alert(e.description);
+            }
+        }
+
+        //普通模式
+        function NormalMode() {
+            try {
+
+                var n = iWebPDF2015.CommandBars.Count;
+
+                for (var i = 0; i < n; i++) {
+                    var CommandBar = iWebPDF2015.CommandBars.item(i);
+                    CommandBar.Visible = true;
+                }
+
+                addState("普通模式。");
+            } catch (e) {
+                addState("普通模式进入失败。");
+                alert(e.description);
+            }
+        }
+
+        //批注模式
+        function AnnotMode() {
+            try {
+
+                var n = iWebPDF2015.CommandBars.Count;
+
+                for (var i = 0; i < n; i++) {
+                    var CommandBar = iWebPDF2015.CommandBars.item(i);
+
+                    var name = CommandBar.Name;
+                    if (name == "MenuBar" || name == "Rotate" || name == "Zoom" || name == "Find" || name == "DigitalSignature") {
+                        CommandBar.Visible = false;
+                    } else {
+                        CommandBar.Visible = true;
+                    }
+                }
+
+                addState("批注模式设置成功。");
+            } catch (e) {
+                addState("批注模式设置失败。");
+                alert(e.description);
+            }
+        }
+
+        //盖章模式
+        function SigMode() {
+            try {
+
+                var n = iWebPDF2015.CommandBars.Count;
+
+                for (var i = 0; i < n; i++) {
+                    var CommandBar = iWebPDF2015.CommandBars.item(i);
+
+                    var name = CommandBar.Name;
+                    if (name == "MenuBar" || name == "File" || name == "Rotate" || name == "Zoom" || name == "Standard" || name == "Find" || name == "Annots" || name == "Comments") {
+                        CommandBar.Visible = false;
+                    } else {
+                        CommandBar.Visible = true;
+                    }
+                }
+
+                addState("盖章模式设置成功。");
+            } catch (e) {
+                addState("盖章模式设置失败。");
+                alert(e.description);
+            }
+        }
+
+        //添加文本域
+        function addTextField() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+
+                var nCount = iWebPDF2015.Documents.ActiveDocument.Fields.Count;
+                var field = iWebPDF2015.Documents.ActiveDocument.Fields.Add(3);
+
+                var widget = field.AddToPage(0);
+                widget.FromUserRect(100, 750, 250, 780);
+                widget.UpdateAppearance();
+
+                field.Name = "TextField";
+                field.Value = "KingGrid";
+                field.Visible = true;
+
+                iWebPDF2015.Documents.ActiveDocument.Views.ActiveView.Refresh();
+
+                addState("添加文本域成功。");
+            } catch (e) {
+                addState("添加文本域失败。");
+                alert(e.description);
+            }
+
+        }
+
+
+        //跳转到第一个域
+        function gotoFields() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+                var fields = iWebPDF2015.Documents.ActiveDocument.Fields;
+                if (fields.Count != 0) {
+                    fields(0).Goto();
+                } else {
+                    alert("文档中不存在域");
+                }
+                addState("跳转至第一个域成功。");
+            } catch (e) {
+                addState("跳转至第一个域失败。");
+                alert(e.description);
+            }
+        }
+
+        //获取域个数
+        function GetFileds() {
+
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    retrun;
+                }
+                var fields = iWebPDF2015.Documents.ActiveDocument.Fields;
+                var count = fields.Count;
+                alert("域的个数" + count);
+
+                addState("获取域个数成功。");
+            } catch (e) {
+                addState("获取域个数失败。");
+                alert(e.description);
+            }
+
+
+        }
+
+        //删除所有域
+        function delAllFields() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+                var fields = iWebPDF2015.Documents.ActiveDocument.Fields;
+                var count = fields.Count;
+
+                for (var i = 0; i < count; i++) {
+                    var sigfield = fields(0);
+                    sigfield.Delete();
+                }
+                iWebPDF2015.Documents.ActiveDocument.Views.ActiveView.Refresh();
+                addState("删除成功");
+            } catch (e) {
+                addState("删除失败");
+                alert(e.description);
+            }
+        }
+
+        //是否允许文本域输入 (域交互)
+        function IsAllowInteraction() {
+            try {
+                if (0 == iWebPDF2015.Documents.Count) {
+                    alert("没有已打开文档");
+                    return;
+                }
+
+                var Res = false;
+                var document = iWebPDF2015.Documents.ActiveDocument;
+                var fields = document.Fields;
+                var cnt = fields.Count;
+                if (cnt) {
+                    nClick++;
+                    if (nClick % 2) {
+                        Res = false;
+                        alert("禁止文本域输入！");
+                    } else {
+                        Res = true;
+                        alert("允许文本域输入！");
+                    }
+                    for (var i = 0; i < cnt; i++) {
+                        fields.Item(i).AllowInteraction = Res;
+                    }
+                    addState("域交互控制成功！");
+                }
+            } catch (e) {
+                addState("域交互控制失败");
+                alert(e.description);
+            }
+        }
+
+        //文档转图片
+        function FileToPic() {
+            try {
+                var picPath = "c:\\p1.png";
+                var res = iWebPDF2015.Documents.ActiveDocument.Pages.Item(0).ExportPNG(picPath);
+                if (!res) {
+                    alert("首页图片保存为：" + picPath);
+                }
+                addState("图片转文档成功！");
+            } catch (e) {
+                addState("图片转文档失败！");
+                alert(e.description);
+            }
+        }
+
+    </script>
+</head>
+<body onresize="init()" style="overflow-y: hidden; overflow-x: hidden">
+    <div id="webPdf" style="height: 99%">
+        <script type="text/javascript" src="@Url.Script(" ~=~/NG3Resource/js/KingGrid/iWebPDF2015.js")" charset="utf-8"></script>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+
+
+
+</script>
+

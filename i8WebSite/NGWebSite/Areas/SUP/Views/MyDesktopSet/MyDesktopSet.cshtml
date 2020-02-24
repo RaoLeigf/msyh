@@ -1,0 +1,821 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{    
+    <link href=@Url.Script("~/NG3Resource/css/mainTreeTab.css") rel="stylesheet" type="text/css" />
+    <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>
+
+    <script>
+
+        var LoadEnFuncTreeRight = Ext.htmlDecode('@ViewBag.LoadEnFuncTreeRight');
+        var selectionrecord;
+        var selectionview;
+        var changed = false;
+
+        Ext.onReady(function () {
+
+            var sysFuncTree = Ext.create('Ext.ng.sysFuncTree', {
+                title: '系统功能',
+                itemId: 'sysFuncTree'
+            });//新建系统功能树       
+            var enFuncTree;
+            var myFuncTree = Ext.create('Ext.ng.myFuncTree', {
+                title: '我的功能',
+                itemId: 'myFuncTree',
+                hasToolbar: true
+            });//新建我的功能树
+
+            var tabItems = [];
+            tabItems.push(myFuncTree);
+            if (LoadEnFuncTreeRight.substr(0, 1) == 1) {
+                if (LoadEnFuncTreeRight.substr(1, 1) == 1) {
+                    enFuncTree = Ext.create('Ext.ng.enFuncTree', {
+                        title: '企业功能',
+                        itemId: 'enFuncTree'
+                    });//新建企业功能树
+                    tabItems.push(enFuncTree);
+                }
+                if (LoadEnFuncTreeRight.substr(2, 1) == 1) {
+                    tabItems.push(sysFuncTree);
+                }
+            }
+            else {
+                if (LoadEnFuncTreeRight.substr(1, 1) == 1) {
+                    enFuncTree = Ext.create('Ext.tree.Panel', {
+                        title: '企业功能',
+                        itemId: 'enFuncTree',
+                        tbar: [{ xtype: 'label', text: '未启用企业功能' }]
+                    });//新建企业功能树
+                    tabItems.push(enFuncTree);
+                }
+                tabItems.push(sysFuncTree);
+            }
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: ['save', '->', 'close']
+            });
+            
+            var tabPanel = Ext.create('Ext.tab.Panel', {
+                width: '30%',
+                region: 'west',
+                layout: 'fit',
+                height: 25,
+                hasCtl: false,
+                outBar: '',
+                activeTab: 'myFuncTree',
+                items: tabItems
+            });
+            
+            var addRemoveButtons = Ext.create("Ext.form.Panel", {
+                region: 'center',
+                border: false,
+                layout: 'border',
+                defaults: {
+                    height: 35,
+                    style: 'margin-left:2px;margin-right:0px',
+                },
+                items: [
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        text: '>',
+                        margin: '240 5 0 10',
+                        handler: function () {
+                            var node, json = '', groupname = '';
+                            if (tabPanel.activeTab.itemId == "sysFuncTree") {
+                                node = sysFuncTree.currentTree.selModel.selected.items[0];
+                            } else if (tabPanel.activeTab.itemId == "enFuncTree") {
+                                node = enFuncTree.currentTree.selModel.selected.items[0];
+                            } else if (tabPanel.activeTab.itemId == "myFuncTree") {
+                                node = myFuncTree.selModel.selected.items[0];
+                            }
+                            if (node != undefined) {
+                                if (node.childNodes.length > 0) {
+                                    AddMyDesktopNode(node);
+                                } else {
+                                    if (groupGrid.getSelectionModel().getSelection().length > 0) {
+                                        var select = groupGrid.getSelectionModel().getSelection()[0];
+                                        var index = select.data.index;
+                                        groupname = select.data.name;
+                                        if (groupname == '') {
+                                            groupname = node.parentNode.raw.text;                 
+                                            json = "[" + JSON.stringify(node.raw) + "]";
+                                            Ext.Ajax.request({
+                                                params: { 'json': json, 'groupname': groupname, 'index': index },
+                                                url: '../SUP/MyDesktopSet/AddMyDesktopNode',
+                                                success: function (response) {
+                                                    groupGridStore.load();
+                                                    groupExGridStore.load({ params: { "index": index } });
+                                                    nodeGridStore.load({ params: { "index": index } });
+                                                    changed = false;
+                                                }
+                                            });
+                                        } else {
+                                            json = "[" + JSON.stringify(node.raw) + "]";
+                                            Ext.Ajax.request({
+                                                params: { 'json': json, 'groupname': groupname, 'index': index },
+                                                url: '../SUP/MyDesktopSet/AddMyDesktopNode',
+                                                success: function (response) {
+                                                    nodeGridStore.load({ params: { "index": index } });
+                                                    changed = false;
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        Ext.MessageBox.alert('提示', '请选择想要插入节点的分组！');
+                                    }
+                                }
+                            } else {
+                                Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                            }
+                        }
+                    },
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        text: '<',
+                        margin: '80 5 0 10',
+                        handler: function () {
+                            if (nodeGrid.getSelectionModel().getSelection().length > 0) {
+                                var node = nodeGrid.getSelectionModel().getSelection()[0];
+                                var groupex = groupExGridStore.getAt(0);
+                                Ext.Ajax.request({
+                                    params: { 'groupindex': groupex.data.index, 'nodeindex': node.data.index },
+                                    url: '../SUP/MyDesktopSet/DelMyDesktopNode',
+                                    success: function (response) {
+                                        nodeGridStore.load({ params: { "index": groupex.data.index } });
+                                        changed = false;
+                                    }
+                                });
+                            } else {
+                                Ext.MessageBox.alert('提示', '请选择想要从分组中移除的节点！');
+                            }
+                        }
+                    }
+                ]
+            });
+
+            Ext.define('groupgridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'index',
+                        type: 'string',
+                        mapping: 'index'
+                    }, {
+                        name: 'name',
+                        type: 'string',
+                        mapping: 'name'
+                    }
+                ]
+            });
+
+            var groupGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'groupgridmodel',
+                autoLoad: false,
+                url: '../SUP/MyDesktopSet/GetMyDesktopGroup'
+            });
+
+            var groupCellEditing = new Ext.grid.plugin.CellEditing({
+                clicksToEdit: 2
+            });
+
+            var groupGrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                stateful: true,
+                stateId: 'nggrid',
+                store: groupGridStore,
+                buskey: 'index',
+                hideHeaders: true,
+                border: false,
+                needfocusRow: true,
+                plugins: [groupCellEditing],
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'index',
+                        width: 100,
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '分组名称',
+                        dataIndex: 'name',
+                        width: '100%',
+                        sortable: false,
+                        editor: new Ext.form.TextField({
+                            listeners: {
+                                'change': function (obj) {
+                                    groupExGridStore.getAt(0).set('name', obj.value);
+                                    groupExGridStore.getAt(0).data.name = obj.value;
+                                    changed = true;
+                                },
+                                'blur': function (obj) {
+                                    if (obj.value.length > 10) {
+                                        Ext.MessageBox.alert('提示', '分组名称长度不能超过10，请修改！');
+                                    }
+                                }
+                            }
+                        })
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected[0] != undefined && selected[0].data != undefined) {
+                            var json = ConstructJson();
+                            Ext.Ajax.request({
+                                params: { 'json': json },
+                                url: '../SUP/MyDesktopSet/ChangeMyDesktopInfo',
+                                success: function (response) {
+                                    groupExGridStore.load({ params: { "index": selected[0].data.index } });
+                                    nodeGridStore.load({ params: { "index": selected[0].data.index } });
+                                    changed = false;
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            var groupToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                border: false,
+                height: 30,
+                showArrowBtn: false,
+                layout: {
+                    overflowHandler: 'Menu'
+                },
+                ngbuttons: [
+                    'add',
+                    {
+                        //itemId: "delete",
+                        text: "删除",
+                        iconCls: "icon-delete",
+                        handler: function () {
+                            if (groupGrid.getSelectionModel().getSelection().length > 0) {
+                                var select = groupGrid.getSelectionModel().getSelection()[0];
+                                Ext.MessageBox.confirm('提示', '确定要删除' + select.data.name + '分组?', function (btn) {
+                                    if (btn == 'yes') {
+                                        var index = select.data.index;
+                                        Ext.Ajax.request({
+                                            params: { 'index': index },
+                                            url: '../SUP/MyDesktopSet/DelMyDesktopGroup',
+                                            success: function (response) {
+                                                groupGridStore.reload({
+                                                    callback: function (records) {
+                                                        groupGrid.getSelectionModel().select(records[index]);
+                                                    }
+                                                })
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                Ext.MessageBox.alert('提示', '请选择想要删除的分组！');
+                            }
+                        }
+                    },
+                    {
+                        itemId: "groupup",
+                        text: "上移",
+                        iconCls: "icon-ArrowUp",
+                        handler: function () {
+                            if (groupGrid.getSelectionModel().getSelection().length > 0) {
+                                var select = groupGrid.getSelectionModel().getSelection()[0];
+                                var index = select.data.index;
+                                if (index == '0') {
+                                    Ext.MessageBox.alert('提示', '请选择不是最前的分组！');
+                                } else {
+                                    Ext.Ajax.request({
+                                        params: { 'index': index },
+                                        url: '../SUP/MyDesktopSet/UpMyDesktopGroup',
+                                        success: function (response) {
+                                            var name1 = groupGridStore.getAt(index).get('name');
+                                            var name2 = groupGridStore.getAt(index - 1).get('name');
+                                            groupGridStore.getAt(index).set('name', name2);
+                                            groupGridStore.getAt(index - 1).set('name', name1);
+                                            groupGrid.getSelectionModel().select(index - 1);
+                                        }
+                                    });
+                                }
+                            } else {
+                                Ext.MessageBox.alert('提示', '请选择想要上移的分组！');
+                            }
+                        }
+                    },
+                    {
+                        itemId: "groupdown",
+                        text: "下移",
+                        iconCls: "icon-ArrowDown",
+                        handler: function () {
+                            if (groupGrid.getSelectionModel().getSelection().length > 0) {
+                                var select = groupGrid.getSelectionModel().getSelection()[0];
+                                var index = select.data.index;
+                                if (index == groupGridStore.getCount() - 1) {
+                                    Ext.MessageBox.alert('提示', '请选择不是最后的分组！');
+                                } else {
+                                    Ext.Ajax.request({
+                                        params: { 'index': index },
+                                        url: '../SUP/MyDesktopSet/DownMyDesktopGroup',
+                                        success: function (response) {
+                                            var name1 = groupGridStore.getAt(index).get('name');
+                                            var name2 = groupGridStore.getAt(parseInt(index) + 1).get('name');
+                                            groupGridStore.getAt(index).set('name', name2);
+                                            groupGridStore.getAt(parseInt(index) + 1).set('name', name1);
+                                            groupGrid.getSelectionModel().select(parseInt(index) + 1);
+                                        }
+                                    });
+                                }
+                            } else {
+                                Ext.MessageBox.alert('提示', '请选择想要下移的分组！');
+                            }
+                        }
+                    }
+                ],
+                listeners: {
+                    'afterrender': function (toolbar, eOpts) {
+                        toolbar.el.dom.style.width = toolbar.el.dom.offsetWidth + 2 + 'px';
+                    }
+                }
+            });
+
+            groupToolbar.get('add').on('click', function () {
+                if (groupGridStore.getCount() >= 45) {
+                    Ext.MessageBox.alert('提示', '我的桌面分组数不能超过45!');
+                } else {
+                    Ext.Ajax.request({
+                        url: '../SUP/MyDesktopSet/AddMyDesktopGroup',
+                        success: function (response) {
+                            var r = Ext.create('groupgridmodel', {
+                                index: groupGridStore.getCount(),
+                                name: ''
+                            });
+                            groupGridStore.insert(groupGridStore.getCount(), r);
+                        }
+                    });
+                }
+            });              
+
+            var groupList = Ext.create('Ext.panel.Panel', {
+                title: '分组列表',
+                layout: 'border',
+                border: true,
+                items: [groupToolbar, groupGrid]
+            });
+
+            var groupPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                border: false,
+                layout: 'border',
+                items: [                    
+                    {
+                        region: 'west',
+                        layout: 'border',
+                        width: 80,
+                        border: false,
+                        items: [addRemoveButtons]
+                    },
+                    {
+                        region: 'center',
+                        layout: 'fit',
+                        margin: '5 0 0 6',
+                        border: false,
+                        items: [groupList]
+                    }
+                ]
+            });
+
+            Ext.define('nodegridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'index',
+                        type: 'string',
+                        mapping: 'index'
+                    }, {
+                        name: 'name',
+                        type: 'string',
+                        mapping: 'name'
+                    }, {
+                        name: 'size',
+                        type: 'string',
+                        mapping: 'size'
+                    }, {
+                        name: 'color',
+                        type: 'string',
+                        mapping: 'color'
+                    }
+                ]
+            });
+
+            var groupExGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'nodegridmodel',
+                autoLoad: false,
+                url: '../SUP/MyDesktopSet/GetMyDesktopGroupEx'
+            });
+
+            var nodeGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'nodegridmodel',
+                autoLoad: false,
+                url: '../SUP/MyDesktopSet/GetMyDesktopNode'
+            });
+            
+            var groupExGrid = Ext.create('Ext.ng.GridPanel', {
+                title: '分组',
+                region: 'north',
+                stateful: true,
+                stateId: 'nggrid',
+                margin: '5 5 0 10',
+                store: groupExGridStore,
+                autoheight: true,
+                buskey: 'index',
+                border: true,
+                needfocusRow: true,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'index',
+                        width: 100,
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '名称',
+                        dataIndex: 'name',
+                        width: '65%',
+                        sortable: false,
+                    },
+                    {
+                        header: '背景色',
+                        dataIndex: 'color',
+                        width: '35%',
+                        sortable: false,
+                        renderer: function (v, m) {
+                            m.style = 'background-color:' + v;
+                            return v;
+                        }
+                    }
+                ],
+                listeners: {
+                    'itemclick': function (view, selected, eOpts) {
+                        selectionview = view;
+                        selectionrecord = selected;
+                    }
+                }
+            });
+
+            var nodeCellEditing = new Ext.grid.plugin.CellEditing({
+                clicksToEdit: 1
+            });
+
+            var nodeGrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                stateful: true,
+                stateId: 'nggrid',                
+                store: nodeGridStore,
+                buskey: 'index',
+                plugins: [nodeCellEditing],
+                border: false,
+                needfocusRow: true,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'index',
+                        width: 100,
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '名称',
+                        dataIndex: 'name',
+                        width: '40%',
+                        sortable: false
+                    },
+                    {
+                        header: '大小',
+                        dataIndex: 'size',
+                        width: '25%',
+                        sortable: false,
+                        editor: new Ext.form.field.ComboBox({
+                            selectOnTab: true,
+                            store: [
+                                ['大', '大'],
+                                ['小', '小']
+                            ],
+                            lazyRender: true,
+                            editable: false,
+                            listClass: 'x-combo-list-small'
+                        })
+                    },
+                    {
+                        header: '背景色',
+                        dataIndex: 'color',
+                        width: '35%',
+                        sortable: false,
+                        renderer: function (v, m) {
+                            m.style = 'background-color:' + v;
+                            return v;
+                        }
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        selectionview = view;
+                        selectionrecord = selected[0];
+                    }
+                }
+            });
+
+            var nodeToolbar= Ext.create('Ext.ng.Toolbar', {
+                 region: 'north',
+                 border: false,
+                 height: 30,
+                 showArrowBtn: false,
+                 //style: { 'background-color': 'rgb(223,232,246)' },
+                 ngbuttons: [                     
+                     { itemId: "nodeup", text: "上移", iconCls: "icon-ArrowUp" },
+                     { itemId: "nodedown", text: "下移", iconCls: "icon-ArrowDown" }
+                 ]
+             });
+
+            nodeToolbar.get('nodeup').on('click', function () {
+                if (nodeGrid.getSelectionModel().getSelection().length > 0) {
+                    var select = nodeGrid.getSelectionModel().getSelection()[0];
+                    var index = select.data.index;
+                    if (index == '0') {
+                        Ext.MessageBox.alert('提示', '请选择不是最前的功能点！');
+                    } else {
+                        var groupindex = groupGrid.getSelectionModel().getSelection()[0].data.index;
+                        Ext.Ajax.request({
+                            params: { 'groupindex': groupindex, 'nodeindex': index },
+                            url: '../SUP/MyDesktopSet/UpMyDesktopNode',
+                            success: function (response) {
+                                var node1 = nodeGridStore.getAt(index);
+                                var node2 = nodeGridStore.getAt(parseInt(index) - 1);
+                                var property = ['name', 'size', 'color'];
+                                var value1,value2;
+                                for (var i = 0; i < property.length; i++) {
+                                    value1 = node1.get(property[i]);
+                                    value2 = node2.get(property[i]);
+                                    nodeGridStore.getAt(index).set(property[i], value2);
+                                    nodeGridStore.getAt(parseInt(index) - 1).set(property[i], value1);
+                                    if (property[i] == 'color') {
+                                        ChangeColor(index, value2);
+                                        ChangeColor(parseInt(index) - 1, value1);
+                                    }
+                                }
+                                nodeGrid.getSelectionModel().select(parseInt(index) - 1);
+                                changed = true;
+                            }
+                        });
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要上移的功能点！');
+                }
+            });
+            nodeToolbar.get('nodedown').on('click', function () {
+                if (nodeGrid.getSelectionModel().getSelection().length > 0) {
+                    var select = nodeGrid.getSelectionModel().getSelection()[0];
+                    var index = select.data.index;
+                    if (index == nodeGridStore.getCount() - 1) {
+                        Ext.MessageBox.alert('提示', '请选择不是最后的功能点！');
+                    } else {
+                        var groupindex = groupGrid.getSelectionModel().getSelection()[0].data.index;
+                        Ext.Ajax.request({
+                            params: { 'groupindex': groupindex, 'nodeindex': index },
+                            url: '../SUP/MyDesktopSet/DownMyDesktopNode',
+                            success: function (response) {
+                                var node1 = nodeGridStore.getAt(index);
+                                var node2 = nodeGridStore.getAt(parseInt(index) + 1);
+                                var property = ['name', 'size', 'color'];
+                                var value1, value2;
+                                for (var i = 0; i < property.length; i++) {
+                                    value1 = node1.get(property[i]);
+                                    value2 = node2.get(property[i]);
+                                    nodeGridStore.getAt(index).set(property[i], value2);
+                                    nodeGridStore.getAt(parseInt(index) + 1).set(property[i], value1);
+                                    if (property[i] == 'color') {
+                                        ChangeColor(index, value2);
+                                        ChangeColor(parseInt(index) + 1, value1);
+                                    }
+                                }
+                                nodeGrid.getSelectionModel().select(parseInt(index) + 1);
+                                changed = true;
+                            }
+                        });
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要下移的功能点！');
+                }
+            });
+
+            Ext.define('colormodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'color', type: 'string' }
+                ]
+            });
+
+            var colorStore = Ext.create('Ext.data.JsonStore', {
+                id: 'colorStore',
+                model: 'colormodel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: '../SUP/MyDesktopSet/GetColor',
+                    reader: {
+                        type: 'json',
+                        root: 'items'
+                    }
+                }
+            });
+
+            var colorView = Ext.create('Ext.view.View', {
+                store: Ext.data.StoreManager.lookup('colorStore'),
+                tpl: new Ext.XTemplate(
+                    '<ul style="list-style-type:none;-webkit-padding-start: 0px">',
+                        '<tpl for=".">',
+                            '<li style="background-color:{color};width:45px;height:45px;float:left;margin:2px" class="colorview" onclick=ClickColor("{color}")>',
+                            '</li>',
+                        '</tpl>',
+                    '</ul>'
+                ),
+                itemSelector: 'li.colorview',
+                style: { 'top': '-12px' }
+            });
+
+            var colorViewPanel = Ext.create('Ext.panel.Panel', {
+                region: 'south',
+                border: false,
+                layout: 'absolute',
+                height: 202,
+                //bodyStyle: 'background:rgb(223,232,246)',
+                items: [
+                    {
+                        xtype: 'panel',
+                        layout: 'fit',
+                        id: 'colorpanel',
+                        x: 145,
+                        y: 0,
+                        width: 198,
+                        height: 198,
+                        items: [colorView]
+                    }
+                ]
+            });
+
+            var nodePanel = Ext.create('Ext.panel.Panel', {
+                title: '功能',
+                layout: 'border',
+                region: 'center',
+                margin: '0 5 5 10',
+                items: [nodeToolbar,nodeGrid]
+            });
+
+            var funcPanel = Ext.create('Ext.panel.Panel', {
+                region: 'east',
+                width: '55%',
+                border: false,
+                layout: 'border',
+                items: [groupExGrid, nodePanel, colorViewPanel]
+            });
+
+            Ext.defer(function () {
+                groupGridStore.load();
+                colorStore.load();
+                if (window.screen.width <= 1152) {
+                    Ext.getCmp('colorpanel').x = 100;
+                }
+            });
+
+            ngToolbar.get('save').on('click', function () {
+                var json = ConstructJson();
+                Ext.Ajax.request({
+                    params: { 'json': json },
+                    url: '../SUP/MyDesktopSet/SaveMyDesktopInfo',
+                    success: function (response) {
+                        var result = Ext.JSON.decode(response.responseText);
+                        if (result.success == "true") {
+                            if (window.external.RefreshWebListPage != undefined) {
+                                window.external.RefreshWebListPage();
+                            } else {
+                                $NG3Refresh();
+                            }
+                            Ext.MessageBox.alert('提示', '保存成功!');
+                        } else {
+                            Ext.MessageBox.alert('提示', result.error);
+                        }
+                    }
+                });
+            });
+
+            var centerPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                layout: 'border',
+                items: [groupPanel, funcPanel]
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, tabPanel, centerPanel]
+            });
+
+            function AddMyDesktopNode(node) {
+                var json = '', groupname = '', count = 0;
+
+                if (node.childNodes.length > 0) {
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        AddMyDesktopNode(node.childNodes[i]);
+                    }
+
+                    groupname = node.raw.text;
+                    json += "[";
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        if (!node.childNodes[i].raw.leaf) continue;
+                        json += JSON.stringify(node.childNodes[i].raw);
+                        if (i != node.childNodes.length - 1) {
+                            json += ",";
+                        }
+                        count++;
+                    }
+                    json += "]";
+
+                    if (count > 0) {
+                        Ext.Ajax.request({
+                            params: { 'json': json, 'groupname': groupname, 'index': '' },
+                            url: '../SUP/MyDesktopSet/AddMyDesktopNode',
+                            success: function (response) {                               
+                                var result = Ext.JSON.decode(response.responseText);
+                                if (result.success == "true") {
+                                    groupGridStore.load();
+                                } else {
+                                    Ext.MessageBox.alert('提示', result.error);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            function ConstructJson() {
+                var json = '';
+                if (nodeGridStore.getModifiedRecords().length > 0 || changed) {
+                    var record = groupExGridStore.getAt(0);
+                    json += '{"group":{"index":"' + record.data.index + '","name":"' + record.data.name + '","color":"' + record.data.color + '"}';
+
+                    json += ',"node":[';
+                    for (var i = 0; i < nodeGridStore.getCount() ; i++) {
+                        record = nodeGridStore.getAt(i);
+                        json += '{"index":"' + record.data.index + '","name":"' + record.data.name + '","size":"' + record.data.size + '","color":"' + record.data.color + '"}';
+                        if (i != nodeGridStore.getCount() - 1) {
+                            json += ',';
+                        }
+                    }
+                    json += ']}';
+                }
+                return json;
+            }
+
+            function ChangeColor(index, color) {
+                var innerhtml = '<div class="x-grid-cell-inner" style="text-align:left;background-color:' + color + '">' + color + '</div>';
+                nodeGrid.getSelectionModel().select(index);
+                try {
+                    nodeGrid.view.focusedRow.cells[nodeGrid.view.focusedRow.cells.length - 1].innerHTML = innerhtml;
+                } catch (e) { }
+            }
+
+        });
+        
+        function ClickColor(color) {
+            if (selectionrecord != undefined && selectionrecord.data.color != color) {
+                selectionrecord.data.color = color;
+                var innerhtml = '<div class="x-grid-cell-inner" style="text-align:left;background-color:' + color + '">' + color + '</div>';
+                var cells;
+                if (selectionview.view != undefined) {
+                    if (selectionview.view.focusedRow.cells != undefined) {
+                        cells = selectionview.view.focusedRow.cells;
+                    } else {
+                        cells = selectionview.views[0].focusedRow.dom.cells;
+                    }
+                } else {
+                    cells = selectionview.focusedRow.cells;
+                }
+
+                var index;
+                for (var i = 0; i < cells.length; i++) {
+                    if (cells[i].innerHTML.indexOf('background-color') > -1) {
+                        index = i;
+                        break;
+                    }
+                }
+                cells[index].innerHTML = innerhtml;
+
+                changed = true;
+            }
+        }
+
+    </script>
+}

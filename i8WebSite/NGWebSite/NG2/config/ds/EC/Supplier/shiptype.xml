@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="shiptype">
+      <Field Name="shiptype" IsKey="true" />
+      <Field Name="shipname"  />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+    </Sql>
+    <Where>
+    </Where>
+    <OrderBy>
+    </OrderBy>
+  </Read>
+</DataService>

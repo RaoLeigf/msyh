@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="esb_report_datasource">
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+    </Sql>
+    <Where>
+    </Where>
+    <OrderBy>
+    </OrderBy>
+  </Read>
+  <List>
+    <Sql>
+      select * from esb_report_datasource
+    </Sql>
+    <Query>
+      <Exp Field="id" Target="Client" Value="id" />
+    </Query>
+  </List>
+</DataService>

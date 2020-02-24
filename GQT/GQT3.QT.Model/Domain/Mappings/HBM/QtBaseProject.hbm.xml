@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QtBaseProjectModel" table="z_QtBaseProject">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="Fphid" column="f_phid" type="System.Int64" not-null="false" />
+		<property name="FKmdm" column="F_Kmdm" type="System.String" length="20" not-null="false" />
+		<property name="Fkmmc" column="F_kmmc" type="System.String" length="100" not-null="false" />
+		<property name="FKMLB" column="F_KMLB" type="System.String" not-null="false" />
+		<property name="FProjCode" column="f_ProjCode" type="System.String" length="40" not-null="false" />
+		<property name="FProjName" column="f_ProjName" type="System.String" length="100" not-null="false" />
+		<property name="FFillDept" column="f_FillDept" type="System.String" length="200" not-null="false" />
+    <property name="FFillDept_Name" column="f_FillDept_Name" type="System.String" length="200" not-null="false" />
+		<property name="FDwdm" column="f_dwdm" type="System.String" length="255" not-null="false" />
+		<property name="FDwmc" column="f_dwmc" type="System.String" length="255" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="FType" column="f_Type" type="System.String" length="2" not-null="false" />
+    <property name="FYear" column="f_year" type="System.String" length="4" not-null="false" />
+	</class>
+</hibernate-mapping>

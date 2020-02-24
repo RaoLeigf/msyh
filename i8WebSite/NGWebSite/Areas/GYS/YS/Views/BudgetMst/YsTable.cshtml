@@ -1,0 +1,345 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/ExMergeGrid.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        @*//多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }*@
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+        var FType = '@ViewBag.FType';
+    </script>
+    <script type="text/javascript">
+        Ext.onReady(function () {
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                //pageSize: 25,
+                fields: [{
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "FYear",
+                    "type": "string",
+                    "mapping": "FYear"
+                },
+                {
+
+                    "name": "FProjCode",
+                    "type": "string",
+                    "mapping": "FProjCode"
+                },
+                {
+                    "name": "FProjName",
+                    "type": "string",
+                    "mapping": "FProjName"
+                },
+                {
+                    "name": "FDeclarationUnit",
+                    "type": "string",
+                    "mapping": "FDeclarationUnit"
+                },
+                {
+                    "name": "FDeclarationUnit_EXName",
+                    "type": "string",
+                    "mapping": "FDeclarationUnit_EXName"
+				},
+                {
+                    "name": "FDeclarationDept",
+                    "type": "string",
+                    "mapping": "FDeclarationDept"
+				},
+                {
+                    "name": "FDeclarationDept_EXName",
+                    "type": "string",
+                    "mapping": "FDeclarationDept_EXName"
+				},
+                {
+                    "name": "FBudgetDept",
+                    "type": "string",
+                    "mapping": "FBudgetDept"
+				},
+                {
+                    "name": "FBudgetDept_EXName",
+                    "type": "string",
+                    "mapping": "FBudgetDept_EXName"
+				},
+                {
+                    "name": "FNum",
+                    "type": "string",
+                    "mapping": "FNum"
+				},
+                {
+                    "name": "FDtlName",
+                    "type": "string",
+                    "mapping": "FDtlName"
+				},
+                {
+                    "name": "FBudgetAccounts",
+                    "type": "string",
+                    "mapping": "FBudgetAccounts"
+				},
+                {
+                    "name": "FBudgetAccounts_EXName",
+                    "type": "string",
+                    "mapping": "FBudgetAccounts_EXName"
+				},
+                {
+                    "name": "FExpensesChannel",
+                    "type": "string",
+                    "mapping": "FExpensesChannel"
+				},
+                {
+                    "name": "FExpensesChannel_EXName",
+                    "type": "string",
+                    "mapping": "FExpensesChannel_EXName"
+				},
+                {
+                    "name": "FBudgetAmount",
+                    "type": "float",
+                    "mapping": "FBudgetAmount"
+				},
+                {
+                    "name": "FAmountAddEdit",
+                    "type": "float",
+                    "mapping": "FAmountAddEdit"
+				},
+                {
+                    "name": "FAmountCutEdit",
+                    "type": "float",
+                    "mapping": "FAmountCutEdit"
+				},
+                {
+                    "name": "FAmountAfterEdit",
+                    "type": "float",
+                    "mapping": "FAmountAfterEdit"
+				},
+                {
+                    "name": "FAmountAfterEditApprove",
+                    "type": "float",
+                    "mapping": "FAmountAfterEditApprove"
+				},
+                {
+                    "name": "UseAmount",
+                    "type": "float",
+                    "mapping": "UseAmount"
+				},
+                {
+                    "name": "RemainAmount",
+                    "type": "float",
+                    "mapping": "RemainAmount"
+				},
+                {
+                    "name": "FUserPer",
+                    "type": "float",
+                    "mapping": "FUserPer"
+                }],
+                //url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsListDYGXdtl',
+                url: C_ROOT + 'GQT/QT/QtBaseProject/GetQtBaseProjectSelect?FKMLB=1&userCode=' + $appinfo.logid + '&FType=' + FType,
+                autoLoad: false,
+            });
+
+            grid = Ext.create('Ext.ng.GridPanel', {
+                columnWidth: .5,
+                height: document.documentElement.clientHeight - 82,
+                store: store,
+                autoScroll: true,
+                columnLines: true,
+                border: false,
+                //selModel: { mode: "SIMPLE" },
+                columns: [{
+                    xtype: 'rownumberer',
+                    header: '行号',
+                    width: 80
+
+                }, {
+                    header: '主表主键',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:100,
+                    dataIndex: 'PhId',
+                    hidden: true
+                }, {
+                    header: '项目年度',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:100,
+                    dataIndex: 'FYear',
+                    hidden:true
+                }, {
+                    header: '项目编码',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FProjCode',
+					hidden:true
+                }, {
+                    header: '申报单位',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FDeclarationUnit_EXName',
+				}, {
+                    header: '预算部门',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FBudgetDept_EXName',
+                }, {
+                    header: '申报部门',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FDeclarationDept_EXName',
+				}, {
+                    header: '序号',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:100,
+                    dataIndex: 'FNum',
+                }, {
+                    header: '项目名称',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:300,
+                    dataIndex: 'FProjName',
+				}, {
+                    header: '项目明细',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:300,
+                    dataIndex: 'FDtlName',
+				}, {
+                    header: '预算科目',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FBudgetAccounts_EXName',
+				}, {
+                    header: '核算单位',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FExpensesChannel_EXName',
+				}, {
+                    header: '核定年初预算数',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FBudgetAmount',
+				}, {
+                    header: '调增数',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FAmountAddEdit',
+				}, {
+                    header: '调减数',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FAmountCutEdit',
+				}, {
+                    header: '调整后预算数',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FAmountAfterEdit',
+				}, {
+                    header: '核定预算数',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FAmountAfterEditApprove',
+				}, {
+                    header: '已用额度',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'UseAmount',
+				}, {
+                    header: '未用额度',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'RemainAmount',
+				}, {
+                    header: '执行率',
+                    sortable: false,
+                    menuDisabled: true,
+                    draggable: false,
+					width:200,
+                    dataIndex: 'FUserPer',
+                }],
+                listeners: {
+                    'itemdblclick': function (item, record, it, index, e, eOpts) {
+
+                    },
+
+                },
+                viewConfig: {
+                    style: {
+                        overflowX: 'hidden !important'
+                    }
+                },
+                bodyStyle: {
+                    top: '24px !important'
+                },
+            });
+
+           
+
+            store.load(function () {
+                ExMergeGrid(grid, [4, 5, 6, 8], false); // 最后一个参数为false逐个列合并
+
+            });
+            
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [grid]
+            });
+
+        });
+
+        
+    </script>
+}
+
+

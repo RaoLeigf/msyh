@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="AddinServiceModel" table="addin_service">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="ServiceName" column="servicename" type="System.String" length="100" not-null="false" />
+		<property name="ServiceFuncName" column="servicefuncname" type="System.String" length="100" not-null="false" />
+		<property name="TargetAssemblyName" column="targetassemblyname" type="System.String" length="100" not-null="false" />
+		<property name="TargetClassName" column="targetclassname" type="System.String" length="100" not-null="false" />
+		<property name="TargetMethodName" column="targetmethodname" type="System.String" length="100" not-null="false" />
+		<property name="MatchCondition" column="matchcondition" type="System.String" length="255" not-null="false" />
+	</class>
+</hibernate-mapping>

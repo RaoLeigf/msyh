@@ -1,0 +1,1409 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@section Script
+{
+    <style type="text/css">
+        .gray {
+            background-color: gray;
+        }
+    </style>
+    <script src="@Url.Script("~/NG3Resource/js/BusIntegration/OrgTree.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/js/DMC/DMCCommon.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js")" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript">
+
+        //获取页面url的参数，判断是初始化设置界面还是选项设置界面
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", 'i');
+            var r = window.location.search.substr(1).match(reg);//window.location.search代表从?开始的url
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        var type = GetQueryString("type");//type = 0代表初始化界面,type=1代表选项设置界面
+        var moduleid = GetQueryString("moduleid");
+        if (moduleid == null)
+            moduleid = '';
+        //var request = new GetRequest();
+        //var type = request.type;//type = 0代表初始化界面,type=1代表选项设置界面
+        if (type == 0) {
+            document.title = '初始化设置';
+        }
+        else {
+            document.title = '选项设置';
+        }
+
+        var panel;
+        var tabMain;//右边的tab页
+        var nodeid = '';//树节点的id
+        var editWin;//参数值设置窗口
+        var itemsPerPage = 20;//grid列表每页显示二十条
+        var tabItems = [];//tab页里面的内容
+        var ngtoolbar;//初始化设置会比选项设置多一个按钮
+        var flag = 0;//判断是否确认
+        var check = true;//判断切换到下个列表时页面是否有改动
+        var detailPhid;//明细表phid
+        var option_type;//选项类型
+        var treegrid;//treegrid不同的三个树
+        var thestore;
+
+
+        function setPhid(phid) {
+            detailPhid = phid;
+        }
+        function getPhid() {
+            return detailPhid;
+        }
+        //var winItem;//弹出窗口显示的grid或者treegrid
+
+        var isEnable = '@ViewBag.isEnable';
+
+        Ext.onReady(function () {
+
+            var treeStore = Ext.create('Ext.data.TreeStore', {
+                autoLoad: false,
+                expanded: true,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/OptionSetting/GetOptionTree?moduleid=' + moduleid + ''
+                },
+                root: {
+                    expanded: true
+                },
+                fields: [
+                    { name: 'phid', type: 'string' },
+                    { name: 'name', type: 'string' },
+			        { name: 'text', type: 'string' },
+                    { name: 'url', type: 'string' },
+                ],
+                listeners: {//展开根节点下的第一层节点
+                    load: function () {
+                        var rootNode = tree.getRootNode();
+                        //var rootNode = this.getRootNode();
+                        if (rootNode.childNodes.length > 0) {
+                            rootNode.childNodes[0].expand();
+                        }
+                    }
+                }
+            });
+
+            var tree = Ext.create('Ext.tree.Panel', {
+                region: 'west',
+                store: treeStore,
+                rootVisible: false,
+                width: 200,
+                height: 500,
+                autoScroll: true,
+                expanded: true,
+                listeners: {
+                    'itemclick': function (view, record, item, idx, event, eOpts) {
+                        if (record.raw.leaf) {
+                            if (record.data.url != '' && record.data.url != null) {
+                                CloseTab("otherOption");
+                                OpenTab(C_ROOT + record.data.url, "otherOption", "其它选项");
+                            }
+                            else {
+                                CloseTab("otherOption");
+                            }
+                            var gridData = gridPanel.getChange();
+                            //var gridData = gridPanel.getRow();
+                            if (gridData.indexOf("modifiedRow") > 0) {
+                                Ext.MessageBox.confirm('提示', '当前页面数据未保存，你确定要离开么？', callBack);
+                                function callBack(id) {
+                                    if (id == 'yes') {
+                                        check = false;
+                                        nodeid = record.get("id");
+                                        gridPanel.store.reload();
+                                    }
+                                }
+                            }
+                            else {
+                                check = false;
+                                nodeid = record.get("id");
+                                gridPanel.store.reload();
+                            }
+                        }
+                    },
+                }
+            });
+            //tree.expandAll();//展开所有节点
+
+            Ext.define('gridModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'option_group',
+                    type: 'string',
+                    mapping: 'option_group'
+                }, {
+                    name: 'option_code',
+                    type: 'string',
+                    mapping: 'option_code'
+                }, {
+                    name: 'option_name',
+                    type: 'string',
+                    mapping: 'option_name'
+                }, {
+                    name: 'option_value',
+                    mapping: 'option_value',
+                    type: 'string'
+                }, {
+                    name: 'option_value_name',
+                    mapping: 'option_value_name',
+                    type: 'string'
+                },
+                {
+                    name: 'range',
+                    mapping: 'range',
+                    type: 'string'
+                },
+                {
+                    name: 'option_type',
+                    mapping: 'option_type',
+                    type: 'int'
+                },
+                {
+                    name: 'isunify',
+                    mapping: 'isunify',
+                    type: 'bool'
+                },
+                {
+                    name: 'scope',
+                    mapping: 'scope',
+                    type: 'string'
+                },
+                {
+                    name: 'modifytime',
+                    mapping: 'modifytime',
+                    type: 'date'
+                },
+                {
+                    name: 'modifyuser',
+                    mapping: 'modifyuser',
+                    type: 'string'
+                },
+                {
+                    name: 'tips',
+                    mapping: 'tips',
+                    type: 'string'
+                },
+                {
+                    name: 'control_type',
+                    mapping: 'control_type',
+                    type: 'int'
+                },
+                {
+                    name: 'username',
+                    mapping: 'username',
+                    type: 'string'
+                }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'gridModel',
+                autoLoad: false,
+                pageSize: itemsPerPage,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/OptionSetting/GetGridList?type=' + type + '',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            gridStore.on('beforeload', function (store, operation, eOpts) {
+                Ext.apply(store.proxy.extraParams, { 'phid': nodeid });
+            });
+
+            Ext.define('optionModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'option_code',
+                    type: 'string',
+                    mapping: 'option_code'
+                },
+                {
+                    name: 'option_name',
+                    type: 'string',
+                    mapping: 'option_name'
+                }]
+            });
+
+            if (type == 0) {
+                ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                    region: 'north',
+                    height: 30,
+                    ngbuttons: ['save', 'ok', '->', 'close'],
+                });
+            }
+            else {
+                ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                    region: 'north',
+                    height: 30,
+                    ngbuttons: ['save', '->', 'close'],
+                });
+            }
+
+            var langfindtext = Ext.create('Ext.ng.Text', {
+                id: 'langfindtext',
+                width: 200,
+                listeners: {
+                }
+            });
+
+            var langfindtextpnl = new Ext.panel.Panel({
+                region: 'north',
+                height: 30,
+                border: false,
+                columnWidth: 0.5,
+                //style: 'margin-top:1px;margin-bottom:1px',
+                items: [{
+                    layout: {
+                        type: 'hbox',
+                        padding: '0 3 0 0',
+                        pack: 'start',
+                        align: 'middle'
+                    },
+                    border: false,
+                    defaults: { margins: '10 5 0 0' },
+                    bodyStyle: "background-color:transparent", //#dfe8f6
+                    items: [langfindtext,
+                    {
+                        xtype: 'button',
+                        text: '搜索',
+                        width: 60,
+                        height: 25,
+                        handler: function () {
+                            //var findstr = Ext.getCmp("langfindtext").getValue(); //获取输入框的值
+
+                            //langStore.load({ params: { "busphid": choosebusphid, "buslangtype": choosebuslangtype, "findstr": findstr, "helpid": '', } });
+                        }
+                    }]
+                }]
+            });
+
+            var searchPanel = new Ext.panel.Panel({
+                id: 'searchPanel',
+                region: 'north',
+                layout: 'border',
+                layout: 'column',
+                //width:
+                height: 40,
+                items: [
+                    langfindtextpnl,
+                ]
+            });
+
+            var search = Ext.define('Ext.ng3.QueryPanel', {
+                height: 30,
+                columnsPerRow: 4,
+                fields: [{
+                    xtype: 'ngCommonHelp',
+                    fieldLabel: '权限模块:',
+                    id: 'qry_moduleno',
+                    name: 'qry_moduleno',
+                    helpid: 'module',
+                    valueField: "moduleno",
+                    displayField: 'funcname',
+                    labelWidth: 60,
+                    anchor: '95%'
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: '权限编号:',
+                    name: 'qry_rightid',
+                    id: 'qry_rightid',
+                    labelWidth: 60,
+                    // colspan : 2,
+                    anchor: '95%'
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: '权限名称:',
+                    name: 'qry_rightname',
+                    id: 'qry_rightname',
+                    labelWidth: 60,
+                    anchor: '95%'
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: '权限Key:',
+                    name: 'qry_rightkey',
+                    id: 'qry_rightkey',
+                    labelWidth: 60,
+                    anchor: '95%'
+                }]
+
+            });
+
+            var optionStore = Ext.create('Ext.data.Store', {
+                model: 'optionModel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/OptionSetting/GetOptionValue',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            optionStore.on('beforeload', function (store, operation, eOpts) {
+                var data = gridPanel.getSelectionModel().getSelection();
+                Ext.apply(store.proxy.extraParams, { 'phid': data[0].data['phid'] });
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: gridStore
+            });
+
+            var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: gridStore,
+                tbar: ngToolbar,
+                buskey: 'phid',
+                stateful: true,
+                stateId: '8e539b45-8c96-4193-b1f4-64e867ec60a1',
+                columns: [
+                    { header: '', dataIndex: 'phid', sortable: true, editable: false, hidden: true },
+                    { header: '分组', dataIndex: 'option_group', width: 100, sortable: true, editable: false },
+                    { header: '选项代码', dataIndex: 'option_code', width: 200, sortable: true, editable: false },
+                    {
+                        header: '选项名称', dataIndex: 'option_name', width: 200, sortable: true, editable: false,
+                        renderer: function (value, metaData, record, colIndex, store, view) {
+                            metaData.tdAttr = 'data-qtip="' + value + '"';
+                            return value;
+                        },
+                    },
+                    {
+                        header: '选项值', dataIndex: 'option_value_name', width: 120, sortable: true,
+                    },
+                    {
+                        header: '取值范围', dataIndex: 'range', width: 100, sortable: true,
+                        renderer: function (value, metaData, record, colIndex, store, view) {
+                            metaData.tdAttr = 'data-qtip="' + value + '"';
+                            return value;
+                        },
+                    },
+                    {
+                        header: '选项类型', dataIndex: 'option_type', width: 80, sortable: false,
+                        renderer: function (val) {
+                            if (val == 1) {
+                                return '组织';
+                            }
+                            else if (val == 2) {
+                                return '项目';
+                            }
+                            else if (val == 3) {
+                                return '功能';
+                            }
+                            else if (val == 4) {
+                                return '纳税组织';
+                            }
+                            else {
+                                return '';
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'ngcheckcolumn', header: '统一设置', width: 80, dataIndex: 'isunify', sortable: false,
+                        listeners: {
+                            'beforeedit':function(){
+                                if (isEnable == 1 || flag == 1) {
+                                    gridPanel.setGridReadOnly(true);
+                                }
+                                else {
+                                    gridPanel.setGridReadOnly(false);
+                                }
+                            }
+
+                        }
+                    },
+                    {
+                        header: '范围', dataIndex: 'scope', width: 80, sortable: false,
+                        listeners: {
+                            'dblclick': function (obj, record, item, index, e, eOpts) {
+                                if (type == 1) {
+                                    detailPhid = eOpts.data.phid;
+                                    option_type = eOpts.data.option_type;
+                                    if (!eOpts.data.isunify) {
+                                        if (eOpts.data.option_type == '3') {
+                                            changeTreeGrid(3)
+                                            showEditWin("", "功能设置", 3)
+                                        }
+                                        else if (eOpts.data.option_type == '2') {
+                                            changeTreeGrid(2)
+                                            showEditWin("", "项目设置", 2)
+                                        }
+                                        else if (eOpts.data.option_type == '1') {
+                                            changeTreeGrid(1)
+                                            showEditWin("", "组织设置", 1)
+                                        }
+                                        else if (eOpts.data.option_type == '4') {
+                                            setPhid(detailPhid);
+                                            showEditWin(taxGridPanel, "纳税组织设置", 4)
+                                        }
+                                    }
+                                    else {
+                                    }
+                                }
+                            },
+                        },
+                    },
+                    {
+                        header: '修改时间', dataIndex: 'modifytime', width: 100, sortable: true,
+                        renderer: function (val) {
+                            if (val) {
+                                var str = Ext.util.Format.date(val, 'Y-m-d');
+                                return str;
+                            } else {
+                                return '';
+                            }
+                        }
+                    },
+                    { header: '修改人', dataIndex: 'username', width: 100, sortable: true },
+                    {
+                        header: '注释', dataIndex: 'tips', width: 200, sortable: true,
+                        renderer: function (value, metaData, record, colIndex, store, view) {
+                            metaData.tdAttr = 'data-qtip="' + value + '"';
+                            return value;
+                        },
+                    },
+                ],
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1,
+                        listeners: {
+                            'beforeedit': function (editor, e, eOpts) {
+                                if (e.field == 'option_value_name') {
+                                    if (e.record.data.control_type == 1) {
+                                        e.column.setEditor({
+                                            xtype: 'ngText',
+                                            displayField: 'option_value',
+                                            valueField: 'option_value',
+                                            isInGrid: true,
+                                            listeners: {
+                                                'blur': function (obj) {
+                                                    var data = gridPanel.getSelectionModel().getSelection();
+                                                    data[0].set('option_value', obj.value);
+                                                },
+                                            },
+                                        });
+                                    }
+                                    else {
+                                        e.column.setEditor({
+                                            xtype: 'ngComboBox',
+                                            displayField: 'option_name',
+                                            valueField: 'option_code',
+                                            store: optionStore,
+                                            editable: false,
+                                            isInGrid: true,
+                                            ORMMode: false,
+                                            listeners: {
+                                                helpselected: function (obj) {
+                                                    var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+                                                    data[0].set('option_value', obj.code);
+                                                    data[0].set('option_value_name', obj.name);
+                                                },
+                                                beforetriggerclick: function () {
+                                                    optionStore.load();
+                                                }
+                                            },
+                                        });
+                                    }
+                                }
+                            },
+                        },
+                    })
+                ],
+            });
+
+            gridPanel.on('beforeedit', function (editor, e, eOpts) {
+                if (type = 1)
+                    return true;
+                else {
+                    if (flag == 1 || isEnable == 1) {
+                        //gridPanel.getColumn('isunify').readOnly == true;
+                        //gridPanel.setGridReadOnly(true);
+                        //setGridReadOnly(true)
+                        //setReadOnlyCol("isunify", true)
+                        return false;
+                    }
+                    else
+                        return true;
+                }
+
+            });
+
+            var myFuncTree = Ext.create('Ext.ng.myFuncTree', {
+                region: 'west',
+                itemId: 'myFuncTree',
+                hasRightClickMenu: true,
+                hasToolbar: true,
+            });//新建我的功能树
+
+            Ext.define('node.store.NodeStore', {
+                extend: 'Ext.data.TreeStore',
+                autoLoad: false,
+                expanded: true,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/OptionSetting/GetargumentTree'
+                },
+                fields: [
+                     { name: 'phid', type: 'string' },
+                     { name: 'name', type: 'string' },
+                     { name: 'text', type: 'string' },
+                     { name: 'url', type: 'string' },
+                     { name: 'argument', type: 'string' },
+                ],
+            });
+
+            //组织树
+            Ext.define('itemmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'PhId',
+                        type: 'string',
+                        mapping: 'PhId'
+                    }, {
+                        name: 'RelatId',
+                        type: 'string',
+                        mapping: 'RelatId'
+                    }, {
+                        name: 'OCode',
+                        type: 'string',
+                        mapping: 'OCode'
+                    }, {
+                        name: 'ParentOrg',
+                        type: 'string',
+                        mapping: 'ParentOrg'
+                    }, {
+                        name: 'RelaIndex',
+                        type: 'string',
+                        mapping: 'RelaIndex'
+                    }, {
+                        name: 'RelId',
+                        type: 'string',
+                        mapping: 'RelId'
+                    }, {
+                        name: 'OrderType',
+                        type: 'string',
+                        mapping: 'OrderType'
+                    }, {
+                        name: 'OrgId',
+                        type: 'string',
+                        mapping: 'OrgId'
+                    }, {
+                        name: 'ParentOrgId',
+                        type: 'string',
+                        mapping: 'ParentOrgId'
+                    }, {
+                        name: 'NgRecordVer',
+                        type: 'int',
+                        mapping: 'NgRecordVer'
+                    }, {
+                        name: 'OName',
+                        type: 'string',
+                        mapping: 'OName'
+                    }, {
+                        name: 'Text',
+                        type: 'string',
+                        mapping: 'text'
+                    }
+                ]
+            });
+            var itemStore = Ext.create('Ext.data.TreeStore', {
+                model: 'itemmodel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'DMC/Org/OrgRelat/GetUserLoginOrg',
+                    extraParams: {
+                        parentphid: '',
+                        searchkey: ''
+                    }
+                },
+                listeners: {
+                    'beforeload': function (store, opration, eOpts) {
+                        //store.proxy.extraParams.parentphid = opration.id;
+                    }
+                }
+            });
+
+            //功能(业务类型)树
+            var treeStore = Ext.create('Ext.data.TreeStore', {
+                autoLoad: false, //Ext的BUG，这个属性没用，都会自动加载
+                fields: [
+                    { name: 'text', type: 'string' },
+                    { name: 'customsort', type: 'string' },
+                    { name: 'expanded', type: 'bool' },
+                    { name: 'id', type: 'string' },
+                    { name: 'iconCls', type: 'string' },
+                    { name: 'PhId', type: 'string' },
+                    { name: 'code', type: 'string' },
+                    { name: 'name', type: 'string' },
+                    { name: 'nodeType', type: 'string' },
+                    { name: 'checked', type: 'auto' }
+                ],
+                sorters: [{
+                    property: 'customsort',
+                    direction: 'ASC'
+                }]
+
+            });
+
+            //var orgTree = Ext.create("Ext.ng.BusOrgTreePanel", { showTreeProj: false, includeFinTree: false });
+
+            //修改treegrid store
+            function changeTreeGrid(type) {
+                var store;
+                //组织树
+                if (type == 1) {
+
+                    thestore = Ext.create('Ext.data.TreeStore', {
+                        autoLoad: true,
+                        nodeParam: 'nodeid',
+                        root: {
+                            expanded: true
+                        },
+                        fields: [{ name: 'text', type: 'string' },
+                            { name: 'id', type: 'string' },
+                            { name: 'orgid', type: 'string' },
+                            { name: 'name', type: 'string' },
+                            { name: 'argument', type: 'string' },
+                            { name: 'phid', type: 'string' },
+                            { name: 'option_value_name', type: 'string' },
+                        ],
+                        proxy: {
+                            type: 'ajax',
+                            url: C_ROOT + 'SUP/OptionSetting/GetOrgTree?detailPhid=' + getPhid() + '',
+                        }
+                    });
+
+                    treegrid = Ext.define('node.view.tree.TreeGrid', {
+                        extend: 'Ext.tree.Panel',
+                        xtype: 'tree-grid',
+                        height: 500,
+                        useArrows: true,
+                        rootVisible: false,
+                        multiSelect: true,
+                        singleExpand: false,
+                        store: thestore,
+                        columns: [
+                            {
+                                xtype: 'treecolumn',
+                                header: '功能对象', dataIndex: 'text', flex: 1, sortable: false
+                            },
+                            {
+                                header: '参数值', dataIndex: 'option_value_name', flex: 1, sortable: false
+                            },
+                        ],
+                        plugins: [
+                           Ext.create('Ext.grid.plugin.CellEditing', {
+                               clicksToEdit: 1,
+                               listeners: {
+                                   'beforeedit': function (editor, e, eOpts) {
+                                       if (e.field == 'option_value_name') {
+                                           //组织树所有节点都可设置选项值
+                                           //if (e.record.data.leaf) {
+                                           e.column.setEditor({
+                                               xtype: 'ngComboBox',
+                                               displayField: 'option_name',
+                                               valueField: 'option_code',
+                                               store: optionStore,
+                                               editable: false,
+                                               isInGrid: true,
+                                               ORMMode: false,
+                                               listeners: {
+                                                   helpselected: function (obj) {
+                                                       var data = this.findParentByType('tree-grid').getSelectionModel().getSelection();
+                                                       data[0].set('argument', obj.code);
+                                                       data[0].set('option_value_name', obj.name);
+                                                   },
+                                                   beforetriggerclick: function () {
+                                                       optionStore.load();
+                                                   }
+                                               },
+                                           });
+                                           //}
+                                           //else {
+                                           //    e.column.setEditor(null);
+                                           //}
+                                       }
+                                   },
+                               },
+                           })
+                        ],
+                    });
+                }
+                else if (type == 2) {
+                    var proTree = Ext.create('Ext.ng.BusOrgTreePanel', {
+                        extend: 'Ext.panel.Panel',
+                        alias: 'widget.ngBusOrgTreePanel', //别名,可通过设置xtype构建,或者通过Ext.widget()方法构建
+                        title: '',
+                        autoScroll: false,//滚动条,设置为true时非常变态，会一直启用滚动条
+                        collapsible: true,// 折叠
+                        hideCollapseTool: true, //隐藏折叠按钮
+                        titleCollapse: true,//点击标题可以折叠
+                        split: true,//是否能左右拖动
+                        region: 'center',//默认布局
+                        width: 242,
+                        border: false,
+                        layout: 'border',
+                        emptyText: "输入关键字定位",
+
+                        ngToolbar: null, //需要权限根据组织刷新的toolbar
+
+                        autoSelectFirstNode: false,//第一次加载树的时候是否自动选择第一个节点
+                        autoSelectCurOrg: false,//第一次加载树的时候是否自动选择当前组织,优先级高于autoSelectFirstNode
+
+                        //imposeArea计征区域 默认显示所有,1:本区,2:外区,3:海外,显示本区的话填1,多个的话以,隔开
+                        //imposeType计征方式 默认显示所有,1:简易计征,2:'一般计征 显示简易计征的话填1 多个的话以,隔开
+                        //appStatus 审核状态 默认显示已审核为1，all显示所有，多个的话以,隔开
+                        projFilter: { imposeArea: "all", imposeType: "all", appStatus: "1" },
+
+                        //----**********在树的正上方显示可见的功能**********----
+                        showEasyProj: false,//是否显示剔除简易项目
+                        showIncludeSub: true, //是否显示包含下级
+                        showLocation: true,//是否显示定位功能
+
+                        //----**********在树的正上方显示可见的功能**********----
+                        includeProjTree: true, //是否有项目管理树
+                        includeFinTree: true, //是否有财务组织树
+                        includeTaxRptTree: false,//是否有内部纳税申报表树
+                        includeBudgetTree: false,//是否有预算组织关系树
+
+                        //----**********树功能**********----
+                        showTreeProj: true, //组织树上需要带出项目
+                        showTreeCheckbox: false,//是否需要显示复选框多选
+                        limitFilter: true, //是否按照组织和项目权限过滤,目前这个是有问题
+
+                        //事件：ckOutEasyProjChange 剔除简易项目的复选框改变之后触发
+                        //事件para1:true/false 改变后的值
+
+                        //事件treeNodeChange 树节点选择改变之后触发事件，也可以通过方法(getSelectedTreeNode)主动去获取
+                        //事件para1(方法返回Json对象的curNode):返回当前选择节点
+                        //事件para2(方法返回Json对象的subOrgNodes):如果勾选了包含下级,返回下级所有组织数组(不包括当前选择节点)
+                        //事件para3(方法返回Json对象的subProjNodes):如果勾选了包含下级,返回下级所有项目数组(不包括当前选择节点)
+                        //事件para4(方法返回Json对象的parentNode):当前选择节点的父节点，如果父节点没有，则为null
+                        //该方法为主动获取选择的节点信息，返回json对象,curNode, subOrgNodes, subProjNodes, parentNode
+                        getSelectedTreeNode: function () {
+                            //四个参数，selected[0]为当前选择节点
+                            //如果勾选了包含下级，则subOrgNode，subProjNode表示所有当前节点的下级所有组织和下级所有项目节点，不包括当前选择节点
+                            //parentNode表示当前选择节点的父节点，如果父节点没有，则为null
+                            var ret = { curNode: {}, subOrgNodes: [], subProjNodes: [], parentNode: null };
+
+                            var tree = this.queryById("treePanel");
+                            if (tree.getSelectionModel().getSelection().length <= 0) {
+                                return ret;
+                            }
+
+                            var curNode = tree.getSelectionModel().getSelection()[0];
+                            var subOrgNodes = []; var subProjNodes = [];
+
+                            if (this.showIncludeSub && this.queryById("ckIncludeSub").getValue()) {
+                                curNode.cascadeBy(function (node) {
+                                    if (curNode.data.id == node.data.id) return true;
+                                    if (node.data.nodeType == "ORG") {
+                                        subOrgNodes.push(node);
+                                    } else if (node.data.nodeType == "PRO") {
+                                        subProjNodes.push(node);
+                                    }
+                                })
+                            }
+                            var parentNode = curNode.parentNode;
+                            if (!parentNode || (parentNode.isRoot() && !tree.rootVisible)) {
+                                parentNode = null;
+                            }
+                            ret.curNode = curNode;
+                            ret.subOrgNodes = subOrgNodes;
+                            ret.subProjNodes = subProjNodes;
+                            ret.parentNode = parentNode;
+
+                            return ret;
+
+                        },
+                    });
+
+                    Ext.define('busTreeModel', {
+                        extend: 'Ext.data.Model',
+                        fields: [{
+                            name: 'phid',
+                            type: 'string',
+                            mapping: 'phid'
+                        }, {
+                            name: 'id',
+                            type: 'string',
+                            mapping: 'id'
+                        }, {
+                            name: 'name',
+                            type: 'string',
+                            mapping: 'name'
+                        }, {
+                            name: 'option_value_name',
+                            type: 'string',
+                            mapping: 'option_value_name'
+                        }, {
+                            name: 'argument',
+                            mapping: 'argument',
+                            type: 'string'
+                        }, {
+                            name: 'ocode',
+                            type: 'string',
+                            mapping: 'ocode'
+                        }
+                        ]
+                    });
+                    store = itemStore;
+
+                }
+                else if (type == 3) {
+
+                    var busTree = Ext.create('Ext.ng.BusTreePanel', {
+                    });
+
+                    thestore = Ext.create('Ext.data.TreeStore', {
+                        autoLoad: true,
+                        nodeParam: 'nodeid',
+                        root: {
+                            expanded: true
+                        },
+                        fields: [{ name: 'text', type: 'string' },
+                            //{ name: 'phid', type: 'string' },
+                            { name: 'Suite', type: 'string' },
+                            { name: 'bustype', type: 'string' },
+                            { name: 'customsort', type: 'string' },//替换为参数表phid
+                            { name: 'exparams', type: 'string' },//替换为选项值
+                            { name: 'cls', type: 'string' },//替换为选项值名称
+
+                        ],
+                        proxy: {
+                            type: 'ajax',
+                            url: C_ROOT + 'SUP/OptionSetting/GetFunTree?detailPhid=' + detailPhid + '',
+                        }
+                    });
+
+                    treegrid = Ext.define('node.view.tree.TreeGrid', {
+                        extend: 'Ext.tree.Panel',
+                        xtype: 'tree-grid',
+                        
+                        height: 500,
+                        useArrows: true,
+                        rootVisible: false,
+                        multiSelect: true,
+                        singleExpand: false,
+                        store: thestore,
+                        columns: [
+                            {
+                                xtype: 'treecolumn',
+                                header: '功能对象', dataIndex: 'text', flex: 1, sortable: false
+                            },
+                            {
+                                header: '参数值', dataIndex: 'cls', flex: 1, sortable: false
+                            },
+                        ],
+                        plugins: [
+                           Ext.create('Ext.grid.plugin.CellEditing', {
+                               clicksToEdit: 1,
+                               listeners: {
+                                   'beforeedit': function (editor, e, eOpts) {
+                                       if (e.field == 'cls') {
+                                           if (e.record.data.leaf) {
+                                               e.column.setEditor({
+                                                   xtype: 'ngComboBox',
+                                                   displayField: 'option_name',
+                                                   valueField: 'option_code',
+                                                   store: optionStore,
+                                                   editable: false,
+                                                   isInGrid: true,
+                                                   ORMMode: false,
+                                                   listeners: {
+                                                       helpselected: function (obj) {
+                                                           var data = this.findParentByType('tree-grid').getSelectionModel().getSelection();
+                                                           data[0].set('exparams', obj.code);
+                                                           data[0].set('cls', obj.name);
+                                                       },
+                                                       beforetriggerclick: function () {
+                                                           optionStore.load();
+                                                       }
+                                                   },
+                                               });
+                                           }
+                                           else {
+                                               e.column.setEditor(null);
+                                           }
+                                       }
+                                   },
+                               },
+                           })
+                        ],
+                    });
+
+                }
+            }
+
+            //纳税组织列表
+            Ext.define('taxGridModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'id',
+                    type: 'string',
+                    mapping: 'id'
+                }, {
+                    name: 'name',
+                    type: 'string',
+                    mapping: 'name'
+                }, {
+                    name: 'option_value_name',
+                    type: 'string',
+                    mapping: 'option_value_name'
+                }, {
+                    name: 'argument',
+                    mapping: 'argument',
+                    type: 'string'
+                }, {
+                    name: 'ocode',
+                    type: 'string',
+                    mapping: 'ocode'
+                }
+                ]
+            });
+
+            //纳税组织数据源
+            var taxGridStore = Ext.create('Ext.data.Store', {
+                model: 'taxGridModel',
+                autoLoad: false,
+                pageSize: itemsPerPage,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/OptionSetting/GetTaxOrgGrid',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            taxGridStore.on('beforeload', function (store, operation, eOpts) {
+                Ext.apply(store.proxy.extraParams, { 'detailPhid': getPhid() });
+            });
+
+            var taxGridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: taxGridStore,
+                //tbar: ngToolbar,
+                buskey: 'phid',
+                stateful: true,
+                stateId: '8e549b45-8c96-4193-b1f4-64e867ec60a1',
+                columns: [
+                    { header: '', dataIndex: 'phid', sortable: true, editable: false, hidden: true },
+                    { header: '', dataIndex: 'id', sortable: true, editable: false, hidden: true },
+                    { header: '参数值', dataIndex: 'argument', sortable: true, editable: false, hidden: true },
+                    { header: '组织编码', dataIndex: 'ocode', flex: 1, sortable: true, editable: false },
+                    { header: '组织名称', dataIndex: 'name', flex: 3, sortable: true, editable: false },
+                    {
+                        header: '选项值', dataIndex: 'option_value_name', flex: 1, sortable: true,
+                        editor: {
+                            xtype: 'ngComboBox',
+                            displayField: 'option_name',
+                            valueField: 'option_code',
+                            store: optionStore,
+                            editable: false,
+                            isInGrid: true,
+                            ORMMode: false,
+                            listeners: {
+                                helpselected: function (obj) {
+                                    var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+                                    data[0].set('argument', obj.code);
+                                    data[0].set('option_value_name', obj.name);
+                                },
+                                beforetriggerclick: function () {
+                                    optionStore.load();
+                                }
+                            },
+                        }
+                    },
+                ],
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1,
+                    })
+                ],
+            });
+
+            //打开编辑窗口
+            function showEditWin(winItem, title, type) {
+                //纳税组织
+                if (type == 4) {
+                    taxGridPanel.store.load();
+                }
+                    //项目树
+                else if (type == 2) {
+
+                    var proTree = Ext.create('Ext.ng.BusOrgTreePanel', {
+                    });
+
+                    var taxGridStore = Ext.create('Ext.data.Store', {
+                        model: 'busTreeModel',
+                        autoLoad: false,
+                        pageSize: itemsPerPage,
+                        proxy: {
+                            type: 'ajax',
+                            url: C_ROOT + 'SUP/OptionSetting/GetTaxOrgGrid',
+                            reader: {
+                                type: 'json',
+                                root: 'Record',
+                                totalProperty: 'totalRows'
+                            }
+                        }
+                    });
+
+                    taxGridStore.on('beforeload', function (store, operation, eOpts) {
+                        Ext.apply(store.proxy.extraParams, { 'detailPhid': detailPhid });
+                    });
+
+                    var busGridPanel = Ext.create('Ext.ng.GridPanel', {
+                        region: 'center',
+                        store: taxGridStore,
+                        //tbar: ngToolbar,
+                        buskey: 'phid',
+                        //stateful: true,
+                        //stateId: '8e549b45-8c96-4193-b1f4-64e867ec60a1',
+                        columns: [
+                            { header: '', dataIndex: 'phid', sortable: true, editable: false, hidden: true },
+                            { header: '', dataIndex: 'id', sortable: true, editable: false, hidden: true },
+                            { header: '组织编码', dataIndex: 'ocode', flex: 1, sortable: true, editable: false },
+                            { header: '组织名称', dataIndex: 'name', flex: 3, sortable: true, editable: false },
+                            {
+                                header: '选项值', dataIndex: 'option_value_name', flex: 1, sortable: true,
+                                editor: {
+                                    xtype: 'ngComboBox',
+                                    displayField: 'option_name',
+                                    valueField: 'option_code',
+                                    store: optionStore,
+                                    editable: false,
+                                    isInGrid: true,
+                                    ORMMode: false,
+                                    listeners: {
+                                        helpselected: function (obj) {
+                                            var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+                                            data[0].set('argument', obj.code);
+                                            data[0].set('option_value_name', obj.name);
+
+                                        },
+                                        beforetriggerclick: function () {
+                                            optionStore.load();
+                                        }
+                                    },
+                                }
+                            },
+                        ],
+                        plugins: [
+                            Ext.create('Ext.grid.plugin.CellEditing', {
+                                clicksToEdit: 1,
+                            })
+                        ],
+                    });
+
+                    winItem = proTree;
+                }
+                    //功能树
+                else if (type == 3 || type == 1) {
+                    winItem = treegrid;
+                }
+                //    //组织树
+                //else if (type == 1) {
+                //    winItem = treegrid;
+                //}
+
+                editWin = Ext.create("Ext.window.Window", {
+                    title: title,
+                    modal: true,
+                    width: 650,
+                    height: 500,
+                    constrain: true,
+                    closeable: true,
+                    resizable: false,
+                    closeAction: "hide",
+                    layout: 'fit',
+                    items: winItem,
+                    buttons: [
+                            {
+                                text: '保 存',
+                                handler: function () {
+                                    //组织保存
+                                    if (type == 1) {
+                                        var modfiedData = thestore.getModifiedRecords();
+                                        var arr = new Array();
+                                        if (modfiedData.length > 0) {
+                                            for (var i = 0; i < modfiedData.length; i++) {
+                                                var model = new Object();
+                                                model.phid = modfiedData[i].data.phid;
+                                                model.id = modfiedData[i].data.orgid;
+                                                model.argument = modfiedData[i].data.argument;
+                                                model.name = modfiedData[i].data.option_value_name;
+                                                arr.push(model);
+                                            }
+                                        }
+                                        else {
+                                            Ext.MessageBox.alert('提示', '选项值没有改变！');
+                                            return;
+                                        }
+                                        var Mask = new Ext.LoadMask(document.body, { msg: "正在保存选项值,请稍候..." });
+                                        Mask.show();
+
+                                        Ext.Ajax.request({
+                                            url: C_ROOT + 'SUP/OptionSetting/SaveFunData?gridData=' + JSON.stringify(arr) + '',
+                                            params: {
+                                                "detailPhid": detailPhid,
+                                                "option_type": option_type
+                                            },
+                                            success: function (response) {
+                                                if (response.text > 0) {
+                                                    Ext.MessageBox.alert('提示', '选项值保存成功！');
+                                                    thestore.load();
+                                                    Mask.hide();
+                                                }
+                                                else {
+                                                    Ext.MessageBox.alert('提示', '选项值没有改变！');
+                                                    Mask.hide();
+                                                }
+                                            },
+                                            failure: function (response) {
+                                                Mask.hide();
+                                            }
+                                        });
+                                    }
+                                        //项目保存
+                                    else if (type == 2) { }
+                                        //功能保存
+                                    else if (type == 3) {
+
+                                        var modfiedData = thestore.getModifiedRecords();
+                                        var arr = new Array();
+                                        if (modfiedData.length > 0) {
+                                            for (var i = 0; i < modfiedData.length; i++) {
+                                                var model = new Object();
+                                                model.phid = modfiedData[i].data.customsort;
+                                                model.id = modfiedData[i].data.bustype;
+                                                model.argument = modfiedData[i].data.exparams;
+                                                model.name = modfiedData[i].data.cls;
+                                                arr.push(model);
+                                            }
+                                        }
+                                        else {
+                                            Ext.MessageBox.alert('提示', '选项值没有改变！');
+                                            return;
+                                        }
+                                        var Mask = new Ext.LoadMask(document.body, { msg: "正在保存选项值,请稍候..." });
+                                        Mask.show();
+
+                                        Ext.Ajax.request({
+                                            url: C_ROOT + 'SUP/OptionSetting/SaveFunData?gridData=' + JSON.stringify(arr) + '',
+                                            params: {
+                                                //"gridData": gridData,
+                                                "detailPhid": detailPhid,
+                                                "option_type": option_type
+                                            },
+                                            success: function (response) {
+                                                if (response.text > 0) {
+                                                    Ext.MessageBox.alert('提示', '选项值保存成功！');
+                                                    thestore.load();
+                                                    Mask.hide();
+                                                }
+                                                else {
+                                                    Ext.MessageBox.alert('提示', '选项值没有改变！');
+                                                    Mask.hide();
+                                                }
+                                            },
+                                            failure: function (response) {
+                                                Mask.hide();
+                                            }
+                                        });
+                                        //var gridData = thestore.getChange();
+
+                                    }
+                                        //纳税组织保存
+                                    else if (type == 4) {
+
+
+                                        for (var i = 0; i < taxGridPanel.store.getCount() ; i++) {
+                                            if (taxGridPanel.store.data.items[i].data.phid == '' || taxGridPanel.store.data.items[i].data.phid == null) {
+                                                taxGridPanel.store.data.items[i].phantom = true;
+                                            }
+                                        }
+                                        var gridData = taxGridPanel.getChange();
+
+                                        var myMask = new Ext.LoadMask(document.body, { msg: "正在保存选项值,请稍候..." });
+                                        myMask.show();
+
+                                        Ext.Ajax.request({
+                                            url: C_ROOT + 'SUP/OptionSetting/SaveTaxOrg',
+                                            params: {
+                                                "gridData": gridData,
+                                                "detailPhid": getPhid(),
+                                                "option_type": option_type
+                                            },
+                                            success: function (response) {
+
+                                                if (response.text > 0) {
+                                                    Ext.MessageBox.alert('提示', '选项值保存成功！');
+                                                    //taxGridPanel.getView().refresh();
+                                                    taxGridPanel.store.removeAll();
+                                                    taxGridPanel.store.load();
+
+                                                    myMask.hide();
+                                                }
+                                                else {
+                                                    Ext.MessageBox.alert('提示', '选项值没有改变！');
+                                                    myMask.hide();
+                                                }
+                                            },
+                                            failure: function (response) {
+                                                myMask.hide();
+                                            }
+                                        });
+                                    }
+                                }
+                            },
+                            {
+                                text: '关 闭',
+                                handler: function () {
+                                    editWin.hide();
+                                }
+                            }
+                    ]
+                });
+                editWin.show();
+            }
+
+            ngToolbar.get('save').on('click', function () {
+                var gridData = gridPanel.getChange();
+                //var gridData = gridPanel.getRow();
+                if (gridData.indexOf("modifiedRow") > 0) {
+                    Ext.Ajax.request({
+                        url: C_ROOT + 'SUP/OptionSetting/SaveDetailData',
+                        params: { "gridData": gridData },
+                        success: function (response) {
+                            if (response.text > 0) {
+                                check = true;
+                                Ext.MessageBox.alert('提示', '保存成功');
+                                gridPanel.store.reload();
+                            }
+                        }
+                    });
+                }
+                else {
+                    Ext.MessageBox.alert('提示', '数据没有更改!');
+                }
+            })
+
+            if (type == 0) {
+                if (isEnable == 0) {
+
+                    ngToolbar.get('ok').on('click', function () {
+                        Ext.MessageBox.confirm('提示', '确认设置后将不能更改，是否确认？', callBack);
+                        function callBack(id) {
+                            if (id == 'yes') {
+                                Ext.Ajax.request({
+                                    url: C_ROOT + 'SUP/OptionSetting/SaveInitSetting',
+
+                                    success: function (response) {
+                                        ngToolbar.get('save').disable();
+                                        ngToolbar.get('ok').disable();
+                                        gridPanel.setGridReadOnly(true);
+                                        isEnable = 1;
+                                        flag = 1;
+
+                                    },
+                                    failure: function (response) {
+
+                                    }
+                                });
+
+                            }
+                        }
+                    })
+
+                }
+                else {
+                    gridPanel.setGridReadOnly(true);
+                    flag = 1;
+                    ngToolbar.get('save').disable();
+                    ngToolbar.get('ok').disable();
+                    ngToolbar.get('ok').on('click', function () {
+                        Ext.MessageBox.alert('提示', '该数据已经过初始化，不能修改!');
+                    });
+                }
+            }
+
+            tabItems.push({ layout: 'border', title: '选项列表', id: 'listStyle', items: [gridPanel] });
+            tabMain = Ext.create('Ext.tab.Panel', {
+                region: 'center',
+                items: tabItems
+            });
+
+            function OpenTab(url, id, text) {
+
+                var frame1 = document.createElement("IFRAME");
+                frame1.id = "frame1";
+                frame1.frameBorder = 0;
+                frame1.src = url;
+                frame1.height = "100%";
+                frame1.width = "100%";
+
+                panel = Ext.create("Ext.Panel", {
+                    title: text,
+                    id: id,
+                    closable: true,
+                    listeners: {
+                    },
+                    contentEl: frame1
+                });
+
+                if (!tabMain.getComponent(id)) {
+                    tabMain.add(panel);
+                }
+
+                frame1.parentContainer = panel;
+            }
+
+            function CloseTab(id) {
+                if (tabMain.getComponent(id)) {
+                    tabMain.remove(panel);
+                }
+            }
+
+            Ext.create('Ext.container.Viewport', {
+                title: 'Border Layout',
+                layout: 'border',
+                items: [
+                tree,
+                tabMain
+                ],
+            });
+
+        });
+
+    </script>
+}
+
+

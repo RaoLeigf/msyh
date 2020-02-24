@@ -1,0 +1,445 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@*<script src="@Url.Content("~/NG3Resource/extjs/ext-all-debug.js")" type="text/javascript"></script>*@
+
+@section Script
+{
+    <script type="text/javascript">
+
+        var tabMain;
+
+        Ext.onReady(function () {
+
+            Ext.define('gridModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'userid',
+                    type: 'string',
+                    mapping: 'userid'
+                }, {
+                    name: 'userno',
+                    type: 'string',
+                    mapping: 'userno'
+                }, {
+                    name: 'username',
+                    type: 'string',
+                    mapping: 'username'
+                }, {
+                    name: 'usertype',
+                    type: 'string',
+                    mapping: 'usertype'
+                }, {
+                    name: 'dateflag',
+                    type: 'date',
+                    //dateFormat: 'Y-m-d H: i: s',//解决IE时间列乱码
+                    mapping: 'dateflag'
+                }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'gridModel',
+                autoLoad: true,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/SchemeAllocation/GetUserSchemeAllocation',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            gridStore.on('beforeload', function (store, operation, eOpts) {
+                Ext.apply(store.proxy.extraParams, { 'code': ngToolbar.get('code').value, 'name': ngToolbar.get('name').value });
+            });
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                height: 30,
+                ngbuttons: [
+                    {
+                        width: 80,
+                        xtype: 'button',
+                        itemId: 'assign',
+                        iconCls: "icon-Assign",
+                        text: '方案分配'
+                    },
+                'delete', {
+                    width: 140,
+                    xtype: 'textfield',
+                    fieldLabel: '代码',
+                    labelWidth: 40,
+                    itemId: 'code',
+                    name: 'code',
+                    enableKeyEvents: true,
+                }, {
+                    width: 140,
+                    xtype: 'textfield',
+                    fieldLabel: '名称',
+                    labelWidth:40,
+                    itemId: 'name',
+                    name: 'name',
+                    enableKeyEvents: true,
+                }, 'query', '->', 'close']
+            });
+
+            var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: gridStore,
+                tbar: ngToolbar,
+                autoScroll: true,
+                buskey: 'phid',
+                stateful: true,
+                stateId: '7e439b45-8c96-4193-b1f4-64e867ec60a2',
+                columns: [
+                    { header: '代码', dataIndex: 'userno', editable: false, flex: 1, sortable: true, },
+                    { header: '名称', dataIndex: 'username', editable: false, flex: 1, sortable: true, },
+                    {
+                        header: '类型', dataIndex: 'usertype', editable: false, flex: 1, sortable: true,
+                        renderer: function (val) {
+                            if (val == 0)
+                                return '操作员';
+                            else
+                                return '角色';
+                        }
+                    },
+                    {
+                        header: '方案生成时间', dataIndex: 'dateflag', editable: false, flex: 1, sortable: true,
+                        renderer: function (val) {
+                            if (val) {
+                                var str = Ext.util.Format.date(val, 'Y/m/d H: i: s');
+                                return str;
+                            } else {
+                                return '';
+                            }
+                        }
+                    },
+                ],
+            });
+
+            Ext.define('roleModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'roleno',
+                    type: 'string',
+                    mapping: 'roleno'
+                }, {
+                    name: 'rolename',
+                    type: 'string',
+                    mapping: 'rolename'
+                }
+                ]
+            });
+
+            var roleStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'roleModel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/SchemeAllocation/GetRoleList',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            //角色
+            var roleGridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: roleStore,
+                buskey: 'phid',
+                stateful: true,
+                stateId: '6e439b45-8c96-4193-b1f4-64e867ec61a2',
+                columns: [
+                    { header: '代码', dataIndex: 'roleno', editable: false, flex: 1, sortable: true },
+                    { header: '名称', dataIndex: 'rolename', editable: false, flex: 1, sortable: true },
+                ],
+            });
+
+
+            Ext.define('userModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'userno',
+                    type: 'string',
+                    mapping: 'userno'
+                }, {
+                    name: 'username',
+                    type: 'string',
+                    mapping: 'username'
+                }
+                ]
+            });
+
+            var userStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'userModel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/SchemeAllocation/GetUserList',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            //操作员选择框
+            var checkBox = Ext.create('Ext.selection.CheckboxModel');
+
+            var userGridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: userStore,
+                selModel: checkBox,
+                columnLines: true,
+                buskey: 'phid',
+                stateful: true,
+                stateId: '4e439b45-8c96-4193-b1f4-64e867ec61a2',
+                columns: [
+                    { header: '代码', dataIndex: 'userno', editable: true, flex: 1, sortable: true },
+                    { header: '名称', dataIndex: 'username', editable: false, flex: 1, sortable: true },
+                ],
+            });
+
+            var tabItems = [];
+            tabItems.push({ layout: 'border', title: '角色', id: 'roleTab', items: [roleGridPanel] });
+            tabItems.push({ layout: 'border', title: '操作员', id: 'userTab', items: [userGridPanel] });
+            tabMain = Ext.create('Ext.tab.Panel', {
+                region: 'center',
+                items: tabItems
+            });
+
+            tabMain.on('tabchange', function (tabPanel, newCard, oldCard, eOpts) {
+                if (newCard.id.indexOf("roleTab") >= 0) {
+                    roleGridPanel.store.load();
+                }
+                else {
+                    userGridPanel.store.load();
+                }
+            });
+
+            //检测操作员或者方案是否已经存在方案分配
+            function CheckScheme(oriuserid, oriusertype, userid, usertype) {
+                var userNo = '';//返回存在方案分配的操作员或者角色的列表
+                var typeName;
+                if (usertype == '1') {//角色每次只能选择一条
+                    typeName = '角色';
+                    for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                        if (gridPanel.store.data.items[i].data.userid == userid && gridPanel.store.data.items[i].data.usertype == '1') {
+                            userNo = gridPanel.store.data.items[i].data.userno;
+                        }
+                    }
+                }
+                else {
+                    typeName = '操作员';
+                    for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                        var userArr = userid.split('#');
+                        for (var j = 0; j < userArr.length; j++) {
+                            if (gridPanel.store.data.items[i].data.userid == userArr[j] && gridPanel.store.data.items[i].data.usertype == '0') {
+                                userNo += gridPanel.store.data.items[i].data.userno + ',';
+                            }
+                        }
+                    }
+                    userNo = userNo.substring(0, userNo.length - 1);
+                }
+                if (userNo != '') {
+                    Ext.MessageBox.confirm('提示', '所选的' + userNo + '' + typeName + '已经存在个性化方案，方案复制会覆盖原来的个性化方案，是否覆盖？', callBack);
+                    function callBack(id) {
+                        if (id == 'yes') {
+                            Ext.Ajax.request({
+                                url: C_ROOT + 'SUP/SchemeAllocation/SaveUserSchemeAllocation',
+                                params: {
+                                    "oriuserid": oriuserid,
+                                    "oriusertype": oriusertype,
+                                    "userid": userid,
+                                    "usertype": usertype,
+                                },
+
+                                success: function (response) {
+                                    if (response.text == 'success') {
+                                        Ext.MessageBox.alert('提示', '方案复制成功！');
+                                        editWin.close();
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert('提示', response.text);
+                                    }
+                                },
+                                failure: function (response) {
+
+                                }
+                            });
+                        }
+                    }
+                }
+                else {
+                    Ext.Ajax.request({
+                        url: C_ROOT + 'SUP/SchemeAllocation/SaveUserSchemeAllocation',
+                        params: {
+                            "oriuserid": oriuserid,
+                            "oriusertype": oriusertype,
+                            "userid": userid,
+                            "usertype": usertype,
+                        },
+
+                        success: function (response) {
+                            if (response.text == 'success') {
+                                Ext.MessageBox.alert('提示', '方案复制成功！');
+                                editWin.close();
+                            }
+                            else {
+                                Ext.MessageBox.alert('提示', response.text);
+                            }
+                        },
+                        failure: function (response) {
+
+                        }
+                    });
+                }
+            }
+
+            var editWin = Ext.create("Ext.window.Window", {
+                title: '帮助窗口',
+                modal: true,
+                width: 650,
+                height: 500,
+                constrain: true,
+                closeable: true,
+                resizable: false,
+                closeAction: "hide",
+                layout: 'fit',
+                items: tabMain,
+                buttons: [
+                        {
+                            text: '保 存',
+                            handler: function () {
+                                //选中行
+                                var data = gridPanel.getSelectionModel().getSelection();
+                                oriuserid = data[0].data.userid;
+                                oriusertype = data[0].data.usertype;
+
+                                var gridData, oriuserid, oriusertype, usertype;//操作员或者角色grid行
+                                var userid = '';
+                                if (tabMain.activeTab.id == 'roleTab') {
+                                    usertype = 1;
+                                    gridData = roleGridPanel.getSelectionModel().getSelection();
+                                }
+                                else {
+                                    usertype = 0;
+                                    gridData = userGridPanel.getSelectionModel().getSelection();
+                                }
+
+                                if (gridData.length == 0) {
+                                    Ext.MessageBox.alert('提示', '请选择你要分配的角色或者操作员！');
+                                    return;
+                                }
+                                //操作员可以复制多个
+                                for (var i = 0; i < gridData.length; i++) {
+                                    userid += gridData[i].data.phid + '#';
+                                }
+                                userid = userid.substring(0, userid.length - 1);
+
+                                Ext.MessageBox.confirm('提示', '请确认本次分配的角色所对应的操作员未在线，如操作员在线会导致方案分配失败，是否继续分配方案？', callBack);
+                                function callBack(id) {
+                                    if (id == 'yes') {
+                                        CheckScheme(oriuserid, oriusertype, userid, usertype);
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            text: '关 闭',
+                            handler: function () {
+                                editWin.hide();
+                            }
+                        }
+                ],
+            });
+            editWin.on('beforeshow', function () {
+                roleGridPanel.store.load();
+            });
+
+
+            var oriphid;
+
+            //删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选中你要删除的角色或者操作员！');
+                }
+                else {
+                    Ext.MessageBox.confirm('提示', '删除个性化方案时会删除我的功能、我的桌面、快捷功能等一切桌面布局，确定要删除？', callBack);
+                    function callBack(id) {
+                        if (id == 'yes') {
+                            Ext.Ajax.request({
+                                url: C_ROOT + 'SUP/SchemeAllocation/DeleteUserSchemeAllocation',
+                                params: {
+                                    "phid": data[0].data.phid,
+                                },
+
+                                success: function (response) {
+                                    if (response.text == 'success') {
+                                        Ext.MessageBox.alert('提示', '方案删除成功！');
+                                        gridPanel.store.reload();
+                                    }
+                                },
+                                failure: function (response) {
+
+                                }
+                            });
+
+                        }
+                    }
+                }
+            })
+
+
+            //方案分配
+            ngToolbar.get('assign').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选中你要复制的角色或者操作员！');
+                }
+                else {
+                    oriphid = data[0].data.phid;
+                    editWin.show();
+                }
+            })
+
+            //查询
+            ngToolbar.get('query').on('click', function () {
+                gridPanel.store.load();
+            })
+
+            Ext.create('Ext.container.Viewport', {
+                title: 'Border Layout',
+                layout: 'fit',
+                items: [gridPanel]
+            });
+
+        });
+
+    </script>
+}
+
+

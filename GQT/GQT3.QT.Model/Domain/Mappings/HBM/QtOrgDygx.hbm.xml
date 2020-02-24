@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QtOrgDygxModel" table="z_qtorgdygx">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="Xmorg" column="xmorg" type="System.String" length="50" not-null="false" />
+		<property name="Oldorg" column="oldorg" type="System.String" length="50" not-null="false" />
+    <property name="Oldbudget" column="oldbudget" type="System.String" length="50" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="IfCorp" column="ifcorp" type="System.String" not-null="false" />
+    <property name="ParentOrgId" column="parent_orgid" type="System.Int64" not-null="false" />
+	</class>
+</hibernate-mapping>

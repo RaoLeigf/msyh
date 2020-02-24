@@ -1,0 +1,362 @@
+@media only screen and (min-width:1920px)
+{
+.box img {
+    width: 95%;
+    height: 100%;
+    margin: auto;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+.li1{
+	width: 273px;
+    height: 89px;
+    left: 26%;
+    top: 23.5%;
+}
+.li2{
+    width: 291px;
+    height: 89px;
+    left: 13%;
+    top: 38.5%;
+}
+.li3 {
+    width: 315px;
+    height: 133px;
+    left: 18.5%;
+    top: 55%;
+}
+.li4 {
+    width: 281px;
+    height: 100px;
+    left: 26.5%;
+    top: 69%;
+}
+.li5 {
+    width: 356px;
+    height: 177px;
+    left: 55.5%;
+    top: 69%;
+}
+.li6 {
+    width: 321px;
+    height: 162px;
+    left: 65.5%;
+    top: 53%;
+}
+.li7 {
+    width: 321px;
+    height: 132px;
+    left: 71.5%;
+    top: 37%;
+}
+.li8 {
+    width: 280px;
+    height: 96px;
+    left: 59.5%;
+    top: 23%;
+}
+.img_box{
+	width: 35%;
+    height: 89px;
+    float: left;
+	position: relative;
+}
+.img1{
+    width: 60% !important;
+    height: 63% !important;
+    position: absolute !important;
+    left: 16px !important;
+    top: 6px !important;
+}
+.img2 {
+	width: 69% !important;
+    height: 76% !important;
+    position: absolute !important;
+    left: 1px !important;
+    top: 6px !important;
+}
+.img3 {
+    width: 63% !important;
+    height: 76% !important;
+    position: absolute !important;
+    left: 1px !important;
+    top: 54px !important;
+}
+.img4 {
+    width: 71% !important;
+    height: 76% !important;
+    position: absolute !important;
+    left: 1px !important;
+    top: 16px !important;
+}
+.img5 {
+    width: 59% !important;
+    height: 81% !important;
+    position: absolute !important;
+    left: 46px !important;
+    top: 89px !important;
+}
+.img6 {
+    width: 64% !important;
+    height: 81% !important;
+    position: absolute !important;
+    left: 240px !important;
+    top: 73px !important;
+}
+.img7 {
+    width: 64% !important;
+    height: 81% !important;
+    position: absolute !important;
+    left: 220px !important;
+    top: 22px !important;
+}
+.img8 {
+    width: 60% !important;
+    height: 66% !important;
+    position: absolute !important;
+    left: 208px !important;
+    top: 3px !important;
+}
+.p1{
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 40%;
+    line-height: 61px;
+}
+.p2{
+	position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 29%;
+    line-height: 72px;
+}
+.p3 {
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 28%;
+    line-height: 72px;
+    margin-top: 48px;
+}
+.p4 {
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 30%;
+    line-height: 72px;
+    margin-top: 11px;
+}
+.p5 {
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 63%;
+    line-height: 221px;
+    margin-top: 11px;
+}
+.p6 {
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 242%;
+    line-height: 221px;
+    margin-top: -4px;
+}
+.p7 {
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 224%;
+    line-height: 221px;
+    margin-top: -55px;
+}
+.p8 {
+    position: relative;
+    z-index: 20;
+    color: #FFF;
+    font-size: 20px;
+    margin-left: 237%;
+    line-height: 221px;
+    margin-top: -81px;
+}
+.a1 {
+    font-size: 30px;
+    top: 30px;
+    display: block;
+    position: relative;
+    left: -13px;
+}
+.a2 {
+    font-size: 30px;
+    top: 30px;
+    display: block;
+    position: relative;
+    left: -13px;
+}
+.li1:hover img{
+	animation:mymove1 10s infinite;
+}
+.li2:hover img{
+	animation:mymove1 10s infinite;
+}
+.li3:hover img{
+	animation:mymove1 10s infinite;
+}
+.li4:hover img{
+	animation:mymove1 10s infinite;
+}
+.li5:hover img{
+	animation:mymove1 10s infinite;
+}
+.li6:hover img{
+	animation:mymove1 10s infinite;
+}
+.li7:hover img{
+	animation:mymove1 10s infinite;
+}
+.li8:hover img{
+	animation:mymove1 10s infinite;
+}
+
+.a1{
+    font-size: 30px;
+    top: 28px;
+    display: block;
+    position: relative;
+    left: -11px;;
+}
+.a2 {
+    font-size: 30px;
+    top: 22px;
+    display: block;
+    position: relative;
+    left: 0px;
+}
+.a3 {
+	font-size: 30px;
+    top: 32px;
+    display: block;
+    position: relative;
+    left: 19px;
+}
+.a4 {
+    font-size: 30px;
+    top: 36px;
+    display: block;
+    position: relative;
+    left: -5px;
+}
+.a5 {
+    font-size: 30px;
+    top: 68px;
+    display: block;
+    position: relative;
+    left: 58px;
+}
+.a6 {
+    font-size: 30px;
+    top: 48px;
+    display: block;
+    position: relative;
+    left: -55px;
+}
+.a7 {
+    font-size: 30px;
+    top: 32px;
+    display: block;
+    position: relative;
+    left: -88px;
+}
+.a8 {
+    font-size: 30px;
+    top: 35px;
+    display: block;
+    position: relative;
+    left: -21px;
+}
+.cb{
+	width: 200px;
+    height: 100px;
+    position: absolute;
+    top: 46%;
+    left: 32%;
+    z-index: 50;
+	animation:mymove3 3s infinite;
+}
+.cb1{
+    width: 200px;
+    height: 100px;
+    position: absolute;
+    top: 46%;
+    right: 32%;
+    z-index: 50;
+	animation:mymove2 3s infinite;
+}
+.y1{
+	width: 358px;
+    height: 362px;
+    position: absolute;
+    left: 40.5%;
+    top: 32%;
+    z-index: 50;
+    animation: mymove4 50s infinite;
+}
+.y1 img{
+	width:100%;
+	height:100%;
+}
+.logo{
+	width: 358px;
+    height: 362px;
+    position: absolute;
+    left: 40.5%;
+    top: 32%;
+    z-index:100;
+	
+}
+.logo img {
+    width: 40%;
+    height: 40%;
+    display: block;
+    margin: 31% auto 0;
+}
+.cb img{
+	width:100%;
+	height:100%;
+}
+.cb1 img{
+	width:100%;
+	height:100%;
+}
+.txt{
+	position: absolute;
+    display: block;
+    top: 0;
+    z-index: 100;
+    color: #0db7da;
+    left: 50%;
+    margin-left: -17%;
+    top: 10%;
+}
+.txt1{
+    position: absolute;
+    display: block;
+    /* top: 0; */
+    z-index: 100;
+    color: #0db7da;
+    left: 50%;
+    margin-left: -4.8%;
+    /* top: 10%; */
+    bottom: 2%;
+    font-size: 25px;
+}
+}	

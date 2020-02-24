@@ -1,0 +1,143 @@
+﻿@{
+    ViewBag.Title = "明细打印";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+@section script
+{
+    <script src="@Url.Content("~/NG3/supcan/dynaload.js")" type="text/javascript" charset="gb2312"></script>
+    <script type="text/javascript">
+        var pageid = '@ViewBag.PageId';
+        var filename = '@ViewBag.FileName';
+        var typeFile = '@ViewBag.TypeFile';
+        var mTitle = '@ViewBag.MTitle';
+        var printId = '@ViewBag.PrintId';
+        var moudleType = '@ViewBag.MoudleType';
+        var tempDir = '@ViewBag.TempDir';
+        var datapath = '@ViewBag.DataPath';
+        var previeweditflg = '@ViewBag.PreViewEditFlg';
+        var showpreview = '@ViewBag.ShowPreView';        
+        var isMoudleReady = false;
+        var isAbsolutePath = false;
+        if (datapath&&datapath!=''){
+            isAbsolutePath = true;
+            datapath = decodeURIComponent(datapath);
+        }
+        var fileExists = -1;
+        function CheckPrintFileCreated() {
+            Ext.Ajax.request({
+                params: { "filename": filename },
+                url: '@Url.Content("~/SUP/Print/CheckPrintFileCreated")',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.status === "ok") {
+                        fileExists = 1;
+                    }
+                    else {
+                        fileExists = -1;
+                    }
+                }
+            });
+        }
+
+        //#region 3、报表控件的回调函数--OnReady
+        function OnReady(id) {
+            if (id == "AFEX") {
+                document.AFEX.func("SetSource", C_ROOT + 'ESB/DataServiceCenter/DataCenter');
+                if (previeweditflg == "1") {
+                } else {
+                    document.AFEX.func("Swkrntpomzqa", "1, 2");
+                }
+                var interId = setInterval(function () {
+                    if (fileExists == -1)
+                    {
+                        fileExists = 0;
+                        CheckPrintFileCreated();
+                        return;
+                    }
+                    if (fileExists == 1) {
+                        clearInterval(interId);
+                        document.AFEX.func("Build", $path(tempDir + "/" + filename + ".xml"));
+                        isMoudleReady = true;
+                        if (isAbsolutePath) {
+                            document.AFEX.func('SetSource', 'ds1\r\n' + datapath);
+                        }
+                        else {
+                            document.AFEX.func('SetSource', 'ds1\r\n' + $path(tempDir + "/" + filename + ".txt"));  //json字符串
+                        }
+                        document.AFEX.func('Calc', '');
+                        if (showpreview == "1") {
+                            document.AFEX.func('CallFunc', '18')
+                        }
+                    }
+                }, 300);
+            }
+        }
+        //#endregion
+
+        //#region 4、报表控件相关操作的回调函数--OnEvent
+        function OnEvent(id, Event, p1, p2, p3, p4) {
+            if (!isMoudleReady) {
+                document.AFEX.func("CancelEvent", ""); //阻止事件
+                return false;
+            }
+            if (Event === "Saved") {
+                document.AFEX.func("CancelEvent", ""); //阻止系统事件
+                if (!typeFile || typeFile.length === 0) { //单据类型为空时，不支持模板保存
+                    document.AFEX.func('Calc', '');
+                    return false;
+                }
+                var xmlDoc = document.AFEX.func("GetFileXML", "");
+                Ext.Ajax.request({
+                    params: { "mTitle": mTitle, "typeFile": typeFile, "printId": (printId.length > 0 && moudleType != "2") ? "" : printId, "xmlDoc": xmlDoc },
+                    url: '@Url.Content("~/SUP/Print/SaveXmlMouldForDetail")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.status === "ok") {
+                            moudleType = "2";
+                            printId = resp.printId;
+                            document.AFEX.func("Build", $path(resp.xmlName));
+                            if (isAbsolutePath) {
+                                document.AFEX.func('SetSource', 'ds1\r\n' + datapath);
+                            }
+                            else {
+                                document.AFEX.func('SetSource', 'ds1\r\n' + $path(tempDir + "/" + filename + ".txt"));  //json字符串
+                            }
+                            document.AFEX.func('Calc', '');
+                        } else {
+                            //Ext.MessageBox.alert('出错', resp.status);
+                            document.AFEX.func("MessageBoxFloat", resp.status + "\r\n title=Error; icon=Info; center=true");
+                        }
+                    }
+                });
+            }
+        }
+        //#endregion
+
+        //#region 5、页面自适应相关事件
+        window.onload = function () {
+            SetPrintDivHeight();
+        }
+
+        window.onresize = function () {
+            SetPrintDivHeight();
+        }
+        function SetPrintDivHeight() {
+            var w = window, doc = document, de = 'documentElement';
+            var width = w.innerWidth ? w.innerWidth : (doc[de] && doc[de].clientWidth) ? doc[de].clientWidth : doc.body.offsetWidth;
+            var height = w.innerHeight ? w.innerHeight : (doc[de] && doc[de].clientHeight) ? doc[de].clientHeight : doc.body.offsetHeight;
+            document.getElementById("PrintDetailDiv").style.height = height + "px";
+        }
+        //#endregion
+    </script>
+}
+<div id="PrintDetailDiv" style="width: 100%; height: 300px; overflow: hidden;">
+    <script type="text/javascript">
+        //   insertReport('AFEX', '');
+        if (previeweditflg == "1"){
+            insertReport('AFEX', 'Main=1074,105,100,189,20,32,106,107;TabScrollBar=show;CollapseToolbar=true;print=11,216,18;TabScrollBar=outofsize;Form=110,162,164,163,140;');
+        }
+        else{
+            insertReport('AFEX', 'Rebar=Main,Print;Main=105;print=11,216,18;TabScrollBar=outofsize;');
+        }      
+    </script>
+</div>

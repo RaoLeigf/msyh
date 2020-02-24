@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="ExpenseHxModel" table="ys3_expense_hx">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="FCode" column="f_Code" type="System.String" length="255" not-null="false" />
+		<property name="FContentCode" column="f_ContentCode" type="System.String" length="255" not-null="false" />
+		<property name="FName" column="f_Name" type="System.String" length="500" not-null="false" />
+		<property name="FQty" column="f_qty" type="System.Decimal" not-null="false" />
+		<property name="FPrice" column="f_Price" type="System.Decimal" not-null="false" />
+		<property name="FAmount" column="f_Amount" type="System.Decimal" not-null="false" />
+		<property name="FSpecification" column="f_Specification" type="System.String" length="500" not-null="false" />
+		<property name="FRemark" column="f_Remark" type="System.String" length="500" not-null="false" />
+		<property name="FHxdateTime" column="f_hxdateTime" type="System.DateTime" not-null="false" />
+		<property name="Defint1" column="defint1" type="System.Int64" not-null="false" />
+		<property name="Defint2" column="defint2" type="System.Int64" not-null="false" />
+		<property name="DefDate1" column="defDate1" type="System.DateTime" not-null="false" />
+		<property name="DefDate2" column="defDate2" type="System.DateTime" not-null="false" />
+		<property name="DefStr1" column="defStr1" type="System.String" length="500" not-null="false" />
+		<property name="DefStr2" column="defStr2" type="System.String" length="500" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

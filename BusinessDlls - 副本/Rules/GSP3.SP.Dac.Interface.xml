@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GSP3.SP.Dac.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GSP3.SP.Dac.Interface.IGAppvalPost4OperDac">
+            <summary>
+            GAppvalPost4Oper数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.Interface.IGAppvalPostDac">
+            <summary>
+            GAppvalPost数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.Interface.IGAppvalProc4PostDac">
+            <summary>
+            GAppvalProc4Post数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.Interface.IGAppvalProcCondsDac">
+            <summary>
+            GAppvalProcConds数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.Interface.IGAppvalProcDac">
+            <summary>
+            GAppvalProc数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.Interface.IGAppvalRecordDac">
+            <summary>
+            GAppvalRecord数据访问层接口
+            </summary>
+        </member>
+    </members>
+</doc>

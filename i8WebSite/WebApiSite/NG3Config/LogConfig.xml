@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="yes"?>
+<NewDataSet>
+  <LogConfig>
+    <Debug>1</Debug>
+    <LogSelfDebug>0</LogSelfDebug>
+    <SaveInFile>1</SaveInFile>
+    <Level>DEBUG</Level>
+    <MaxStoreLen>500</MaxStoreLen>
+    <QueueCount>9</QueueCount>
+    <SingleDB>1</SingleDB>
+    <LogDb>ConnectType=ORACLEClient;Data Source=orcl;User ID=ng0001;Password={0}</LogDb>
+    <LogPass>eb1a61ck3dopyh11p2vo1xjrx9it51274212n1s8o2hpugb3p94622752iwp11x28y32uk2ua2doifhx22kry1tjayq24246131m5aneiha3021fn5r12w2k1wwsa000</LogPass>
+    <LogServer>http://</LogServer>
+    <LogServerType>server</LogServerType>
+    <RabbitMQServer>10.0.17.12</RabbitMQServer>
+    <RabbitMQPort>5672</RabbitMQPort>
+    <RabbitMQUser>jin_server</RabbitMQUser>
+    <RabbitMQPwd>123</RabbitMQPwd>
+    <RabbitMQHost>way_server_host</RabbitMQHost>
+  </LogConfig>
+</NewDataSet>

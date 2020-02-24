@@ -1,0 +1,337 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/BudgetAccountsEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add', 'edit', 'delete', 'view', 'import', 'export',
+                    '->', 'print', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "KMDM",
+    "type": "string",
+    "mapping": "KMDM"
+  },
+  {
+    "name": "KMMC",
+    "type": "string",
+    "mapping": "KMMC"
+  },
+  {
+    "name": "KMLB",
+    "type": "int",
+    "mapping": "KMLB"
+                },
+                {
+                    "name": "HB",
+                    "type": "string",
+                    "mapping": "HB"
+                }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'yskmList');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '48e790f4-1938-40ec-87a5-72757dee799b',
+				buskey: 'PhId', //对应的业务表主键属性
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				bbar: [pagingbar]
+			};
+
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['yskmList']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+		    //内嵌查询
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+				pageid: "Web1:BudgetAccountsList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 2 //每行2列
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, queryPanel, grid]
+            });
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/BudgetAccounts/BudgetAccountsEdit?otype=add');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/BudgetAccounts/BudgetAccountsEdit?otype=edit&id=' + id);
+                }
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    //recoderefresh(data);
+
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/BudgetAccounts/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+                                    } else {
+                                        Ext.MessageBox.alert('提示', resp.Msg);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/BudgetAccounts/BudgetAccountsEdit?otype=view&id=' + id);
+                }
+            });
+
+            //导入
+            ngToolbar.get("import").on('click', function () {
+                Ext.MessageBox.confirm('提示', '是否清空当前已有科目？', callBack);
+                function callBack(callBackid) {
+                    if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                        var panel = Ext.create('Ext.form.Panel', {
+                            title: '导入',
+                            width: 450,
+                            bodyPadding: 10,
+                            frame: true,
+                            closable: true,
+                            renderTo: Ext.getBody(),
+                            items: [{
+                                xtype: 'filefield',
+                                name: 'file',
+                                fieldLabel: 'Excel文件',
+                                labelWidth: 100,
+                                allowBland: false,
+                                anchor: '100%',
+                                buttonText: '选择文件'
+                            }],
+                            buttons: [{
+                                text: '导入',
+                                handler: function () {
+                                    var form = this.up('form').getForm();
+                                    if (form.isValid()) {
+                                        form.submit({
+                                            url: C_ROOT + 'GQT/QT/BudgetAccounts/ImportData?clear=0',
+                                            waitMsg: '正在导入',
+                                            success: function (fp, o) {
+                                                Ext.Msg.alert('Success', o.result.message);
+                                                panel.close();
+                                            },
+                                            failure: function (fp, o) {
+                                                Ext.Msg.alert('Failed', o.result.message);
+                                                panel.close();
+                                            }
+                                        });
+                                    }
+
+                                }
+                            }]
+                        });
+                        panel.el.center();
+                    } else {
+                        var panel = Ext.create('Ext.form.Panel', {
+                            title: '导入',
+                            width: 450,
+                            bodyPadding: 10,
+                            frame: true,
+                            closable: true,
+                            renderTo: Ext.getBody(),
+                            items: [{
+                                xtype: 'filefield',
+                                name: 'file',
+                                fieldLabel: 'Excel文件',
+                                labelWidth: 100,
+                                allowBland: false,
+                                anchor: '100%',
+                                buttonText: '选择文件'
+                            }],
+                            buttons: [{
+                                text: '导入',
+                                handler: function () {
+                                    var form = this.up('form').getForm();
+                                    if (form.isValid()) {
+                                        form.submit({
+                                            url: C_ROOT + 'GQT/QT/BudgetAccounts/ImportData?clear=1',
+                                            waitMsg: '正在导入',
+                                            success: function (fp, o) {
+                                                Ext.Msg.alert('Success', o.result.message);
+                                                panel.close();
+                                                store.load();
+                                            },
+                                            failure: function (fp, o) {
+                                                Ext.Msg.alert('Failed', o.result.message);
+                                                panel.close();
+                                            }
+                                        });
+                                    }
+
+                                }
+                            }]
+                        });
+                        panel.el.center();
+                    }
+                }
+            });
+
+            //导出
+            ngToolbar.get("export").on('click', function () {
+                Ext.MessageBox.confirm('提示', '是否导出数据？', callBack);
+                function callBack(callBackid) {
+                    if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                        return;
+                    } else {
+
+                        window.location.href = C_ROOT + 'GQT/QT/BudgetAccounts/ExportData';
+
+                    }
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+		grid.getColumn('KMLB').renderer = function (val) {
+                switch (val) {
+                    case 0:
+                        return "收入";
+                    case 1:
+                        return "支出";
+
+                }
+            };
+
+            grid.getColumn('HB').renderer = function (val) {
+                switch (val) {
+                    case "":
+                        return "否";
+                    case "1":
+                        return "是";
+
+                }
+            };
+            grid.getColumn('PhId').hidden = true;
+        });
+
+        
+       
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

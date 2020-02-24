@@ -1,0 +1,250 @@
+﻿@{
+    //Layout = null;
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>@ViewBag.Title</title>
+    @*<meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge,IE=11,IE=10,IE=9,IE=8" />*@
+    <meta name="renderer" content="ie-comp" />
+    @*<meta name="renderer" content="webkit" />*@
+    @*<meta name="renderer" content="ie-stand" />*@
+
+    <link href=@Url.Script("~/NG3Resource/extjs/Resources/css/ext-all-neptune.css") rel="stylesheet" type="text/css" id="themestyle" />
+    <link href=@Url.Script("~/NG3Resource/icons/icon.css") rel="stylesheet" type="text/css" />
+    <link href=@Url.Script("~/NG3Resource/css/datetime.css") rel="stylesheet" type="text/css" />
+    <link href=@Url.Theme("~/NG3Resource/css/NG3-neptune") rel="stylesheet" type="text/css" />
+
+    <script src=@Url.Script("~/NG3Resource/extjs/ext-all.js") type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/extjs/locale/ext-lang-zh_CN.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/json2.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/datetime.js") type="text/javascript" charset="utf-8"></script>
+
+
+    <script src="@Url.Content("~/NG3Resource/New_Login/js/CallPB.js")" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="~/NG3Resource/Desk/css/index.css" />
+    <link rel="stylesheet" href="~/NG3Resource/Desk/EasyUI/easyui.css" />
+    <link rel="stylesheet" href="~/NG3Resource/Desk/EasyUI/icon.css" />
+    <script type="text/javascript" src="~/NG3Resource/Desk/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="~/NG3Resource/Desk/EasyUI/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/NG3Resource/Desk/js/respond.js"></script>
+
+    <script type="text/javascript">
+        C_ROOT = '@ViewBag.Root';
+        C_PATH = '@ViewBag.Path';
+        window.onload = function () {
+            var GetBrowserType = BrowserType();
+            if (GetBrowserType == "isChrome" || GetBrowserType == "isSafari" || GetBrowserType == "isFF" || GetBrowserType == "isOpera" ) {
+
+                alert("请切换当前页面为360兼容模式!");
+            } else {
+                downLoadPb();
+            }
+
+        }
+        function downLoadPb() {
+            var source = "";
+            var productModule = "";
+            var G6HUserid = "";
+            var moduleProuctLogin = "";
+            //console.log(sessionStorage);
+            //productModule = JSON.parse(sessionStorage.getItem("productModule"));//
+            //G6HUserid = JSON.parse(sessionStorage.getItem("G6HUserid"));//
+            //moduleProuctLogin = JSON.parse(sessionStorage.getItem("module_prouct"));//
+            //productModule = localStorage.productModule;
+            // sessionStorage.clear();
+            var data = getUrlArgStr();
+            productModule = data["productModule"];
+            G6HUserid = data["G6HUserid"];
+            moduleProuctLogin = data["module_prouct"];
+
+            function getUrlArgStr() {
+                var args = new Object();
+                var query = location.search.substr(1);
+                var pairs = query.split('&');
+                for (var i = 0; i < pairs.length; i++) {
+                    var pos = pairs[i].indexOf('=');
+                    if (pos == -1) {
+                        continue;
+                    }
+                    var argname = pairs[i].substring(0, pos);
+                    var value = pairs[i].substring(pos + 1);
+                    args[argname] = unescape(value);
+                }
+                return args;
+
+            }
+
+
+            //var appurl = "http://10.0.16.187:6666/gsoftserver";
+            var appurl = "";
+            var connect = "";//"MSSQL;10.0.2.101\\UPEPM;1433;USER66592018;sa;123456gj";  //(该串由如下组)
+            var orgcode = "";// "101000001";
+            var orgNo = "";//"6659";//账套代码(注：必须要有)
+            var orgName = "";//账套名称(注：可为空)
+            var year = "";//"2018";//年度(注：必须要有)
+            var userName = "";//操作员名称
+            var userNo = "";//"888888";//操作员代码
+            var URL_Server = "";//appurl + "/servlet"; //(注：应用服务器地址(下载地址))
+            var NSURL = "";// appurl + "/licenseserver/nsserver"; //(注：加密验证服务器，即狗的地址)
+            var netcallserver = "";//"http://:36984/nsserver";//netcall服务器(注：可为空)
+            var parameter = "";//具体传参数的集合,消息类型(注：“Query_Voucher;gia3_base_auditmethodcon.phid（条件表的主键）”为凭证查询)
+            var connecting = connect;//数据库连接串(注：可为空)
+            connecting = "";
+            var userPwd = "";//用户密码注：可为空)
+            var module = "";//调用的模块或是产品(注：固定为“Web_Gia”)
+            var enterNo = "";//默认组织代码(注：必须要有，且必须是末级组织)
+            var depno = "";//默认部门代码(注：可为空)
+            var pid = "";//窗口打开父类的句柄(注：可为空)
+            var url = "";
+            var ProductUserCode = "";
+            var verify = "";
+
+            loginToG6(moduleProuctLogin);
+
+            function loginToG6(module_prouct) {
+                url = "";
+                Ext.Ajax.request({
+                    params: { 'ProductBZ': module_prouct },
+                    url: C_ROOT + 'GQT/QT/QTProduct/GetQTProductByBZ',
+                    async: false,
+                    success: function (response) {
+                        if (response.responseText == null || response.responseText == "") {
+                            Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+                            return;
+                        }
+                        var resp = Ext.JSON.decode(response.responseText);
+                        url = resp.ProductUrl;
+                    }
+                });
+                if (url != null && url.length > 0) {
+                    var len = url.indexOf('year');
+                    if (len <= 0) {
+                        Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+                        return;
+                    }
+                    appurl = url.substring(0, len - 1);
+                    year = url.substring(len + 5, len + 9);
+                    len = url.indexOf('account');
+                    if (len <= 0) {
+                        Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+                        return;
+                    }
+                    orgNo = url.substring(len + 8, url.length);
+                } else {
+                    Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+                    return;
+                }
+                URL_Server = appurl + "/servlet"; //(注：应用服务器地址(下载地址))
+                NSURL = appurl + "/licenseserver/nsserver"; //(注：加密验证服务器，即狗的地址)
+                Ext.Ajax.request({
+                    params: { 'ProductBZ': module_prouct, 'UserNo': G6HUserid },
+                    url: C_ROOT + 'GQT/QT/QTProductUser/getUserByProduct',
+                    async: false,
+                    success: function (response) {
+                        if (response.responseText == null || response.responseText == "") {
+                            Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+                            return;
+                        }
+                        var resp = Ext.JSON.decode(response.responseText);
+                        ProductUserCode = resp.ProductUserCode;
+                        userPwd = resp.ProductUserPwd;
+                        userName = resp.ProductUserName;
+                    }
+                });
+                if (url != null && url.length > 0) {
+                    userNo = ProductUserCode;
+                } else {
+                    setTimeout(function () {
+                        Ext.MessageBox.alert('提示', "打开集中财务失败，请先设置账号对应关系！");
+                    }, 100);
+                    return;
+                }
+                insertActiveX('ngdiv', appurl + "/nsserver/Newgrand.cab#Version=6,3,0,8", appurl + "/fileserver", appurl);
+
+            }
+            function insertActiveX(elm, downLoadCodebase, URL_NSServer, URL_Shortcut) {
+                var htmlstr = CallPBCommon.$insertActiveX(downLoadCodebase, URL_NSServer, URL_Shortcut);
+                document.getElementById(elm).innerHTML = htmlstr;
+                Run("login");
+            }
+            function Run(data) {
+                source = data;
+                //  window.open('GXM/XM/DefinedDesk/Index_DownLoadPB');
+                //window.open('http://10.0.20.50/g6h/web');
+                //window.open('http://10.0.16.187:6666/gsoftserver/nsserver/Newgrand.cab');
+
+                $("#ngdiv").show();
+                var AF = document.all('AF');
+                if (source == "login") {
+                    var params = CallPBCommon.$params(orgNo, orgName, year, userName, userNo, URL_Server, NSURL, netcallserver, parameter, connecting, userPwd, module, enterNo, depno, pid);
+                    $("#ngdiv").show();
+                    var AF = document.all('AF');
+                    //AF.Run("zw", 1, params);
+                    AF.Run(productModule, 1, params);
+
+                    setTimeout(function () {
+                        window.opener = null;
+                        window.open('', '_self');
+                        window.close();
+                    }, 10000000);
+
+
+                   @*// Response.Write("<script language=\"javascript\">window.opener=null;window.close();</script>");*@
+                } else {
+                    AF.Run(productModule, 1, params);
+                    setTimeout(function () {
+                        window.opener = null;
+                        window.open('', '_self');
+                        window.close();
+                    }, 10000000);
+                    //AF.Run("zw", 0, "");
+                }
+
+            }
+        }
+
+        function BrowserType() {
+            var userAgent = navigator.userAgent;
+            var isOpera = userAgent.indexOf("Opera") > -1; //判断是否Opera浏览器
+            var isIe = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; //判断是否ie浏览器
+            var isEdge = userAgent.indexOf("Windows NT 6.1;Trident/7.0;") > -1 && !isIe;//判断是否IE的Edge浏览器
+            var isFF = userAgent.indexOf("Firefox") > -1;//判断是否火狐浏览器
+            var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1;//判断是否Safari浏览器
+            var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1;//判断是否Chrome浏览器
+            if (isOpera) {
+                return "isOpera";
+            }
+            if (isIe) {
+                return "isIe";
+            }
+            if (isEdge) {
+                return "isEdge";
+            }
+            if (isFF) {
+                return "isFF";
+            }
+            if (isSafari) {
+                return "isSafari";
+            }
+            if (isChrome) {
+                return "isChrome";
+            }
+            return "Other";
+        }
+    </script>
+</head>
+<body>
+    <table style="border: 0px; width: 100%">
+        <tr>
+            <td>
+                <div id="ngdiv" align="center" style="position: absolute; bottom: 0; left:10%; width: 80%; height: 100px;"></div>
+                <div id="bg"></div>
+                <div id="show">正在下载模块，请稍候...</div>
+                @* <input type="button" value="打开" onclick="Login()" />*@
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GBK3.BK.Rule</name>
+    </assembly>
+    <members>
+        <member name="T:GBK3.BK.Rule.PaymentDtlRule">
+            <summary>
+            PaymentDtl业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GBK3.BK.Rule.PaymentDtlRule.PaymentDtlDac">
+            <summary>
+            PaymentDtl数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GBK3.BK.Rule.PaymentDtlRule.DataCheck(System.Collections.Generic.IList{GBK3.BK.Model.Domain.PaymentDtlModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GBK3.BK.Rule.PaymentDtlRule.DataHandling``1(System.Collections.Generic.IList{GBK3.BK.Model.Domain.PaymentDtlModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GBK3.BK.Rule.PaymentMstRule">
+            <summary>
+            PaymentMst业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GBK3.BK.Rule.PaymentMstRule.PaymentMstDac">
+            <summary>
+            PaymentMst数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GBK3.BK.Rule.PaymentMstRule.DataCheck(System.Collections.Generic.IList{GBK3.BK.Model.Domain.PaymentMstModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GBK3.BK.Rule.PaymentMstRule.DataHandling``1(System.Collections.Generic.IList{GBK3.BK.Model.Domain.PaymentMstModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="M:GBK3.BK.Rule.PaymentMstRule.GetPaymentList(System.Int64)">
+            <summary>
+            获取资金拨付主列表
+            </summary>
+            <param name="fPhid"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

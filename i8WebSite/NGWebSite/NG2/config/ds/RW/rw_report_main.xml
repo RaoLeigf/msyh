@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_report_main">
+      <Field Name="rep_id" IsKey="true" IsUpdate="false" isCreate="false"/>
+      <Field Name="rep_code" />
+      <Field Name="rep_name"  />
+      <Field Name="rep_format"/>
+      <Field Name="catalog_id"/>
+      <Field Name="rep_classid"/>
+      <Field Name="rep_type"/>
+      <Field Name="rep_keys"/>
+      <Field Name="rep_summary"/>
+      <Field Name="rep_xml" Datatype="Binary"/>
+      <Field Name="rep_creater" IsUpdate="false"/>
+      <Field Name="rep_createdate" IsUpdate="false"/>
+      <Field Name="rep_updater"/>
+      <Field Name="rep_updatedate"/>
+      <Field Name="rep_status"/>
+      <Field Name="ocode"/>
+      <Field Name="rightstr" format="'3'" />
+      <Field Name="rep_src" />
+      <Field Name="externallink" />
+    </Table>
+    <Table Name="secuser" AsName="secuser1">
+      <Field Name="u_name" AsName="rep_creater_name"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser2">
+      <Field Name="u_name" AsName="rep_updater_name"/>
+    </Table>
+    <Table Name="rw_data_catalog">
+      <Field Name="catalog_index" AsName="catalog_index"/>
+    </Table>
+    <Table Name="rw_report_class">
+      <Field Name="class_name"/>
+    </Table>
+    <Table Name="rw_calc_scheme">
+      <Field Name="status" AsName="calcscheme_status"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join secuser secuser1 on secuser1.logid=[table].rep_creater
+      left join secuser secuser2 on secuser2.logid=[table].rep_updater
+      left join rw_data_catalog on rw_data_catalog.id = [table].catalog_id
+      left join rw_report_class on rw_report_class.class_id = [table].rep_classid
+      left join rw_calc_scheme on rw_calc_scheme.rep_id = [table].rep_id
+      [where] [orderby]
+    </Sql>
+    <Where>
+
+    </Where>
+    <Query>
+      <Exp Field="rep_id" Target="Client" Value="rep_id" />
+      <Exp Field="rep_code" Target="Client" Oper="Like" Value="rep_code" />
+      <Exp Field="rep_name" Target="Client" Oper="Like" Value="rep_name" />
+      <Exp Field="rep_format" Target="Client" Value="rep_format"/>
+      <Exp Field="rep_type" Target="Client" Value="rep_type" />
+      <Exp Field="rep_classid" Target="Client" Value="rep_classid"/>
+      <Exp Field="rep_keys" Target="Client" Oper="Like" Value="rep_keys"/>
+      <Exp Field="rep_summary" Target="Client" Oper="Like" Value="rep_summary"/>
+      <Exp Field="rep_createdate" paramName="rep_createdate1" Target="Client" Oper="GreaterThanOrEqual" Value="rep_createdate1"/>
+      <Exp Field="rep_createdate" paramName="rep_createdate2" Target="Client" Oper="LessThanOrEqual" Value="rep_createdate2"/>
+      <Exp Field="rep_updatedate" paramName="rep_updatedate1" Target="Client" Oper="GreaterThanOrEqual" Value="rep_updatedate1"/>
+      <Exp Field="rep_updatedate" paramName="rep_updatedate2" Target="Client" Oper="LessThanOrEqual" Value="rep_updatedate2"/>
+      <Exp Field="rep_creater_name" Target="Client"  Oper="Like" Value="rep_creater_name"/>
+      <Exp Field="rep_updater_name" Target="Client"  oper="Like" Value="rep_updater_name"/>
+      <Exp Field="catalog_index" paramName="catalog_index" Oper="LikeRight" Target="Client"  Value="catalog_index"/>
+      <Exp Field="rep_status" Target="Client" Value="rep_status" />
+    </Query>
+    <OrderBy format="{rep_code}">
+      <Exp Field="rep_code" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table]
+      left join secuser secuser1 on secuser1.logid=[table].rep_creater
+      left join secuser secuser2 on secuser2.logid=[table].rep_updater
+      [where]
+    </Sql>
+    <Values>
+      <Exp Field="rep_creater_name" Target="AppInfo" Value="LoginID"/>
+      <Exp Field="rep_createdate" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      <Exp Field="rep_updater_name" Target="AppInfo" Value="LoginID"/>
+      <Exp Field="rep_updatedate" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      <Exp Field="rep_format" Value="1" />
+      <Exp Field="rep_type" Value="2" />
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="rw_report_main">
+      <Values>
+        <Exp Field="rep_creater" Target="AppInfo" Value="LoginID"/>
+        <Exp Field="rep_createdate" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+        <Exp Field="rep_updater" Target="AppInfo" Value="LoginID"/>
+        <Exp Field="rep_updatedate" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+        <Exp Field="ocode" Target="AppInfo" Value="OCode"/>
+        <Exp Field="rep_src" Value="0"/>
+        <Exp Field="rep_status" Value="0"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table Name="rw_report_main">
+      <sql></sql>
+      <Values>
+        <Exp Field="rep_updater" Target="AppInfo" Value="LoginID"/>
+        <Exp Field="rep_updatedate" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+
+    </Values>
+  </Destroy>
+
+  <SelectMaxID>
+    <Sql>
+      select max(rep_id) from rw_report_main
+    </Sql>
+  </SelectMaxID>
+
+  <GetRepXML>
+    <Sql>
+      select rep_xml from rw_report_main [where]
+    </Sql>
+    <Where>
+      <Exp Field="rep_id" Target="client" Value="rep_id"/>
+    </Where>
+  </GetRepXML>
+
+  <UpdateRepXML>
+    <Sql>
+      update rw_report_main [values] [where]
+    </Sql>
+    <Values>
+      <Exp Field="rep_xml"  Dbtype="Binary" Target="client" Value="rep_xml" />
+      <Exp Field="rep_updater" Target="AppInfo" Value="LoginID"/>
+      <Exp Field="rep_updatedate" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+    </Values>
+    <Where>
+      <Exp Field="rep_id" Target="client" Value="rep_id" />
+    </Where>
+  </UpdateRepXML>
+
+  <SelectCurentDatalogReport>
+    <Sql>
+      select rep_id,rep_code,rep_name from rw_report_main
+      left join rw_data_catalog on rw_data_catalog.id = rw_report_main.catalog_id
+      [where] order by rep_code asc
+    </Sql>
+    <Query>
+      <Exp Field="rw_data_catalog.catalog_index" paramName="catalog_index" Target="Client"  Value="catalog_index"/>
+      <Exp Field="rep_id"  Target="Client" Value="rep_id" Type="Array">
+        <Exp Field="rw_report_main.rep_id" ParamName ="rep_id"  TypeKey="0"/>
+      </Exp>
+    </Query>
+  </SelectCurentDatalogReport>
+
+  <ReportByRef>
+    <Sql>
+      select 1 from rw_report_log [where]
+    </Sql>
+    <Where >
+      <Exp Field="rw_report_log.rep_id" ParamName="repid" Target="Client" Value="repid"/>
+    </Where>
+  </ReportByRef>
+
+</DataService>
+

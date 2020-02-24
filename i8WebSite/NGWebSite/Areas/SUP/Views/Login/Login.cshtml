@@ -1,0 +1,253 @@
+﻿@{
+    ViewBag.Title = "新中大供应商门户";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+@section Script
+{
+    <link href="@Url.Content("~/Resource/css/login.css")" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+
+        var ServerNameCookie = Cookie.get('DDLServerValue');
+        var EnterPriseCookie = Cookie.get('DDLAccValue');
+        var UserIDCookie = Cookie.get('EditUserName');
+
+        Ext.onReady(function() {
+
+            Ext.Loader.setConfig({ enabled: true });
+
+            var ServerNamestore = Ext.create('Ext.data.Store',
+                {
+                    autoLoad: true,                   
+                    fields: [{name: 'ByName' }, { name: 'ServerName' }],
+                    proxy: {                    
+                    type: 'ajax', 
+                    url: "@Url.Content("~/SUP/Login/GetServerList")",
+                    reader: {
+                          type: 'json',
+                          root: 'Record',
+                          totalProperty: 'totalRows'
+                      }
+                     },
+
+                });
+
+            var Enterprisestore = Ext.create('Ext.data.Store', {
+                autoLoad: false,
+                fields: [{ name: 'ucode' },{ name: 'uname' }],
+                proxy: { 
+                type: 'ajax', 
+                url: "@Url.Content("~/SUP/Login/GetAccList")",
+                  reader: {
+                          type: 'json',
+                          root: 'Record',
+                          totalProperty: 'totalRows'
+                      }
+                 }             
+            });
+
+            var StoreloadMarsk = new Ext.LoadMask(document.body, {
+                msg: '加载单位信息中...',
+                disabled: false
+            });
+
+            function ServerNameChange(newvalue) {
+                StoreloadMarsk.show();
+                Enterprisestore.load({ params: { svrName: newvalue.value }, callback: function() { StoreloadMarsk.hide(); } });
+            }
+
+            function InitilLoad() {
+                if (EnterPriseCookie && EnterPriseCookie != "") {
+                    StoreloadMarsk.show();
+                    Enterprisestore.load({
+                        params: { svrName: ServerNameCookie },
+                        callback: function(records, options, success) {
+
+                            Enterprisestore.each(function(record) {
+                                if (record.get('ucode') == EnterPriseCookie) {
+                                    Ext.getCmp("EnterpriseName").setValue(EnterPriseCookie);
+                                }
+                            });
+                            StoreloadMarsk.hide();
+                        },
+                        scope: Enterprisestore,
+                        add: true
+                    });
+
+                }
+            }
+
+            var LoginForm = new Ext.FormPanel({
+                renderTo: "loginDiv",
+                width: 275,
+                height: 160,
+                bodyPadding: 20,
+                frame: false,
+                border: false,
+                floating: false,
+                defaultType: "textfield",
+                buttonAlign: 'center',
+                fieldDefaults: {
+                    labelAlign: 'left',
+                    labelWidth: 50,
+                    msgTarget: 'side'
+                },
+                items: [
+                    {
+                        xtype: 'combobox',
+                        fieldLabel: '服务器',
+                        id: "ServerName",
+                        name: 'ServerName',
+                        valueField: 'ByName',
+                        displayField: 'ServerName',
+                        typeAhead: true,
+                        queryMode: 'local',
+                        emptyText: '请选择服务器',
+                        editable: false,
+                        width: 250,
+                        store: ServerNamestore,
+                        listeners: {
+                            change: ServerNameChange
+                        },
+                        value: ServerNameCookie
+                    },
+                    {
+                        xtype: 'combobox',
+                        fieldLabel: '单位',
+                        id: "EnterpriseName",
+                        name: 'EnterpriseName',
+                        valueField: 'ucode',
+                        displayField: 'uname',
+                        typeAhead: true,
+                        queryMode: 'local',
+                        emptyText: '请选择单位',
+                        editable: false,
+                        width: 250,
+                        store: Enterprisestore
+                    },
+                    {
+                        id: "UserID",
+                        name: "UserID",
+                        fieldLabel: "用户名",
+                        width: 250,
+                        value: UserIDCookie
+                    },
+                    {
+                        id: "UserPwd",
+                        name: "UserPwd",
+                        inputType: "password",
+                        fieldLabel: "密码",
+                        width: 250
+                    }],
+                buttons: ["->", { text: "登 录", iconCls: 'icon-LockGo', handler: LoginIn },{ text: "重 置", iconCls: 'icon-ArrowUndo', handler: Reset }],
+                listeners: {
+                    afterlayout: InitilLoad
+                }
+            });
+
+            function LoginIn() {
+                var servername = Ext.getCmp("ServerName").getValue();
+                var enterprisename = Ext.getCmp("EnterpriseName").getValue();
+                var userid = Ext.getCmp("UserID").getValue();
+                var pwd = Ext.getCmp("UserPwd").getValue() == null ? '' : Ext.getCmp("UserPwd").getValue();
+
+                if (servername == "" || !servername) {
+                    ShowInfo("请先选择服务器!");
+                    return;
+                }
+                if (enterprisename == "" || !enterprisename) {
+                    ShowInfo("请先选择单位!");
+                    return;
+                }
+                if (userid == "" || !userid) {
+                    ShowInfo("请先输入用户名!");
+                    return;
+                }
+                var myMask = new Ext.LoadMask(document.body, { msg: "登录中,请稍候..." });
+                myMask.show();
+                var LoginEntity = { ServerName: servername, EnterPriseName: enterprisename, UserID: userid, UserPwd: pwd };
+
+                Ext.Ajax.request({
+                    url: '@Url.Content("~/SUP/Login/Login")',
+                    params: LoginEntity,
+                    success: function(res, opts) {
+                        
+                        //var json = eval('(' + res.responseText + ')');
+                        var json = Ext.decode(res.responseText);
+
+                        if (json.success == false) {
+                            myMask.hide();
+                            ShowInfo(json.msg)
+                        } else {
+                            SetCookies(LoginEntity);
+                            window.location.href = "@Url.Content("~/Home/Main")";
+                        }
+                    },
+                    failure: function() { myMask.hide(); }
+                });
+
+
+            }
+
+            function ShowInfo(msg) {
+                Ext.MessageBox.show({
+                    title: '提示',
+                    msg: msg,
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.MessageBox.INFO,
+                    animEl: "loginDiv",
+                    closable: false
+                });
+            }
+
+            function Reset() {
+                Ext.getCmp("EnterpriseName").setValue("");
+                Ext.getCmp("ServerName").setValue("");
+
+                Ext.getCmp("UserID").setValue("");
+                Ext.getCmp("UserPwd").setValue("");
+            }
+
+            function SetCookies(entity) {
+                Cookie.set('DDLServerValue', entity.ServerName);
+                Cookie.set('DDLAccValue', entity.EnterPriseName);
+                Cookie.set('EditUserName', entity.UserID);
+            }
+
+            var map = new Ext.KeyMap("UserPwd", [
+                {
+                    key: [10, 13],
+                    fn: LoginIn
+                }]);
+
+            var map2 = new Ext.KeyMap("UserID", [
+                {
+                    key: [10, 13],
+                    fn: LoginIn
+                }]);
+
+            Ext.EventManager.onWindowResize(function() {
+                SetWindow();
+            });
+
+            SetWindow();
+
+            function SetWindow() {
+                var bodyheight = window.screen.height;
+
+                if (bodyheight >= 900 && bodyheight < 1024) {
+                    document.getElementById("mainDiv").style.marginTop = 80 + "px";
+                }
+
+                if (bodyheight >= 1024) {
+                   document.getElementById("mainDiv").style.marginTop = 150 + "px";
+                }
+            }
+        });
+
+    </script>
+}
+<div class="container" id="mainDiv">
+    <div class="content">
+        <div class="login" id="loginDiv"></div>
+    </div>
+</div>

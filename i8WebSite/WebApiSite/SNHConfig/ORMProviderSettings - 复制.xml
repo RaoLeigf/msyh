@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<objects xmlns="http://www.springframework.net" xmlns:db="http://www.springframework.net/database">
+  <object id="DbProviderDictionary" type="Spring.Collections.SynchronizedHashtable, Spring.Core">
+    <property name="['DefaultDbProvider']" ref="DefaultDbProvider" />
+    <property name="['NG0001']" ref="NG0001DbProvider" />
+    <property name="['NG0002']" ref="NG0002DbProvider" />
+    <property name="['NG0003']" ref="NG0003DbProvider" />
+    <property name="['NG0004']" ref="NG0004DbProvider" />
+    <property name="['NG0005']" ref="NG0005DbProvider" />
+    <property name="['NG0006']" ref="NG0006DbProvider" />
+    <property name="['NGSoft']" ref="NGSoftDbProvider" />
+    <property name="['NGLog']" ref="NGLogDbProvider" />
+  </object>
+  <db:provider id="DefaultDbProvider" provider="${provider}" connectionString="${defaultConnection}" />
+  <db:provider id="NG0001DbProvider" provider="${provider}" connectionString="${NG0001Connection}" />
+  <db:provider id="NG0002DbProvider" provider="${provider}" connectionString="${NG0002Connection}" />
+  <db:provider id="NG0003DbProvider" provider="${provider}" connectionString="${NG0003Connection}" />
+  <db:provider id="NG0004DbProvider" provider="${provider}" connectionString="${NG0004Connection}" />
+  <db:provider id="NG0005DbProvider" provider="${provider}" connectionString="${NG0005Connection}" />
+  <db:provider id="NG0006DbProvider" provider="${provider}" connectionString="${NG0006Connection}" />
+  <db:provider id="NGSoftDbProvider" provider="${provider}" connectionString="${NGSoftConnection}" />
+  <db:provider id="NGLogDbProvider" provider="${provider}" connectionString="${NGLogConnection}" />
+</objects>

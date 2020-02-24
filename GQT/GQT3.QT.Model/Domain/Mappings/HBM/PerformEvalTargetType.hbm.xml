@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="PerformEvalTargetTypeModel" table="Z_QTPerformEvalTargetType">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="FCode" column="f_Code" type="System.String" length="30" not-null="false" />
+		<property name="FName" column="f_Name" type="System.String" length="255" not-null="false" />
+		<property name="FRemark" column="f_Remark" type="System.String" length="100" not-null="false" />
+		<property name="FParentCode" column="f_ParentCode" type="System.String" length="30" not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+    <property name="Orgid" column="orgid" type="System.Int64" not-null="false" />
+    <property name="Orgcode" column="orgcode" type="System.String" length="50" not-null="false" />
+	</class>
+</hibernate-mapping>

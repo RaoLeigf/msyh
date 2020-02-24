@@ -1,0 +1,215 @@
+﻿@{    
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css
+{
+ <link rel="stylesheet" href="~/NG3Resource/CodeMirror/lib/codemirror.css">
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/addon/hint/show-hint.css">
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/addon/fold/foldgutter.css" />
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/addon/lint/lint.css">
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/addon/display/fullscreen.css">
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/theme/night.css">
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/addon/dialog/dialog.css">
+<link rel="stylesheet" href="~/NG3Resource/CodeMirror/addon/search/matchesonscrollbar.css">
+
+@*<style>
+   * {  
+   font-size: 12pt !important;
+}
+</style>*@
+
+}
+
+@section script
+{
+
+<script src="~/NG3Resource/CodeMirror/lib/codemirror.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/hint/show-hint.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/hint/anyword-hint.js"></script>
+<script src="~/NG3Resource/CodeMirror/mode/javascript/javascript.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/edit/matchbrackets.js"></script>
+
+<script src="~/NG3Resource/CodeMirror/addon/fold/foldcode.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/fold/foldgutter.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/fold/brace-fold.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/fold/xml-fold.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/fold/indent-fold.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/fold/markdown-fold.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/fold/comment-fold.js"></script>
+
+<script src="~/NG3Resource/CodeMirror/lib/jshint.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/lint/lint.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/lint/javascript-lint.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/lint/json-lint.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/lint/css-lint.js"></script>
+
+<script src="~/NG3Resource/CodeMirror/addon/display/fullscreen.js"></script>
+
+<script src="~/NG3Resource/CodeMirror/addon/dialog/dialog.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/search/searchcursor.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/search/search.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/scroll/annotatescrollbar.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/search/matchesonscrollbar.js"></script>
+<script src="~/NG3Resource/CodeMirror/addon/search/jump-to-line.js"></script>
+
+
+      <script type="text/javascript">
+
+          var id = '@ViewBag.ID';
+          var bustype = '@ViewBag.BusType';
+
+          Ext.onReady(function () {
+
+
+              var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                  region: 'north',
+                  //rightName: "EmpinfoList", //权限名称
+                  ngbuttons: ['save',
+                      { itemId: 'undo', text: "撤销",tooltip:'Ctrl+Z', width: this.itemWidth, iconCls: "icon-ArrowUndo" },
+                      { itemId: 'redo', text: "恢复", tooltip: 'Ctrl+Y', width: this.itemWidth, iconCls: "icon-reback" },
+                      { itemId: 'publish', text: "发布", width: this.itemWidth, iconCls: "icon-ArrowUndo" },
+                       '->', 'close']
+              });
+
+              //布局
+              var viewport = Ext.create('Ext.container.Viewport', {
+                  id: "viewPort",
+                  layout: 'border',
+                  items: [ngToolbar, {
+                      region: 'center',
+                      //xtype: 'container',
+                      id: 'container',
+                      layout: 'fit',
+                      items: [{ xtype: 'textarea', id: 'code' }]
+                  }]
+              });
+
+
+
+              //Ext.getCmp('container').on('afterrender', function () {
+
+              //});
+
+              var editor = CodeMirror.fromTextArea(document.getElementById("code-inputEl"), {
+                  lineNumbers: true,
+                  foldGutter: true,//折叠
+                  //lint: true,	//提示
+                  //theme: "night",
+                  matchBrackets: true,
+                  //fullScreen:true,
+                  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],//折叠
+                  extraKeys: {
+                      "Ctrl-Space": "autocomplete",
+                      highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
+                      "F11": function (cm) {
+                          cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                      },
+                      "Esc": function (cm) {
+                          if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                      }
+                  }
+              });
+
+              //editor.setSize('auto', '100%');
+              editor.setSize('auto', '666');
+
+
+              var codeDiv = Ext.query("*[class=CodeMirror cm-s-default]");
+              if (codeDiv.length > 0) {
+                  codeDiv[0].style.fontSize = '13pt';//设置字体大小
+              }
+              editor.setOption("fullScreen", true);
+              editor.setOption("fullScreen", false);
+
+              Ext.Ajax.request({
+                  params: { 'id': id},
+                  url: C_ROOT + 'SUP/Designer/GetScriptCode',
+                  success: function (response) {
+                      //var resp = Ext.JSON.decode(response.responseText);
+                      editor.setValue(response.responseText);
+                  }
+              });
+
+
+              ngToolbar.get('save').on('click', function () {
+
+                  var codeScript = editor.getValue();
+                  //alert(editor.getValue());
+
+                  Ext.Ajax.request({
+                      params: { 'id':id,'bustype':bustype,'codeScript': codeScript },
+                      url: C_ROOT + 'SUP/Designer/SaveScript',
+                      success: function (response) {
+                          var resp = Ext.JSON.decode(response.responseText);
+                          if (resp.status === "ok") {
+                              NGMsg.Info('保存成功');
+                          } else {
+                              NGMsg.Error('保存失败');                             
+                          }
+                          haveChange = false;
+                      }
+                  });
+
+
+
+              });
+
+              ngToolbar.get('undo').on('click', function () {
+                  editor.undo();
+              });
+
+              ngToolbar.get('redo').on('click', function () {
+                  editor.redo();
+              });
+
+
+              //发布
+              ngToolbar.get('publish').on('click', function () {
+
+                  var codeScript = editor.getValue();
+                  //alert(editor.getValue());
+
+                  Ext.Ajax.request({
+                      params: { 'id': id, 'bustype': bustype, 'codeScript': codeScript },
+                      url: C_ROOT + 'SUP/Designer/PublishScript',
+                      success: function (response) {
+                          var resp = Ext.JSON.decode(response.responseText);
+                          if (resp.status === "ok") {                            
+                              NGMsg.Info('发布成功');
+                          } else {                              
+                              NGMsg.Error('发布失败');
+                          }
+
+                          haveChange = false;
+                      }
+                  });
+
+              });
+
+
+              //检测变化
+              var haveChange = false;
+              editor.on('change', function (Editor, changes) {
+                  if (changes.origin != 'setValue')
+                  {
+                      haveChange = true;
+                  }
+              });
+
+              ngToolbar.get('close').on('beforeclose', function () {
+                  if (haveChange) {
+                      Ext.create('Ext.ng.MessageBox').Warning('代码已经发生修改，请先保存才能关闭！');
+                      return false;
+                  }
+
+                  return true;
+              })
+
+          })
+
+      </script>
+}
+
+
+

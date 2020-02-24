@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net" default-lazy-init="true" >
+
+
+  <!--fg3_user-->
+  <!--<object id="GCW3.CW.Dac.User" type="GCW3.CW.Dac.UserDac, GCW3.CW.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>-->
+  <!--GXM3.XM-->
+  <object id="GXM3.XM.Dac.ProjectMst" type="GXM3.XM.Dac.ProjectMstDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlImplPlan" type="GXM3.XM.Dac.ProjectDtlImplPlanDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlTextContent" type="GXM3.XM.Dac.ProjectDtlTextContentDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlFundAppl" type="GXM3.XM.Dac.ProjectDtlFundApplDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlBudgetDtl" type="GXM3.XM.Dac.ProjectDtlBudgetDtlDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlPurchaseDtl" type="GXM3.XM.Dac.ProjectDtlPurchaseDtlDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlPurDtl4SOF" type="GXM3.XM.Dac.ProjectDtlPurDtl4SOFDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GXM3.XM.Dac.ProjectDtlPerformTarget" type="GXM3.XM.Dac.ProjectDtlPerformTargetDac, GXM3.XM.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>  
+  
+  <!--GXM3.QT-->
+  <object id="GQT3.QT.Dac.BudgetAccounts" type="GQT3.QT.Dac.BudgetAccountsDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.ExpenseCategory" type="GQT3.QT.Dac.ExpenseCategoryDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.CorrespondenceSettings" type="GQT3.QT.Dac.CorrespondenceSettingsDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+  <object id="GQT3.QT.Dac.SourceOfFunds" type="GQT3.QT.Dac.SourceOfFundsDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.CorrespondenceSettings2" type="GQT3.QT.Dac.CorrespondenceSettings2Dac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.PaymentMethod" type="GQT3.QT.Dac.PaymentMethodDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.QtSysCodeSeq" type="GQT3.QT.Dac.QtSysCodeSeqDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.ProjLibProj" type="GQT3.QT.Dac.ProjLibProjDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.GHProjDtlShare" type="GQT3.QT.Dac.GHProjDtlShareDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.User" type="GQT3.QT.Dac.UserDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.Organization" type="GQT3.QT.Dac.OrganizationDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.VCorrespondenceSetting2" type="GQT3.QT.Dac.VCorrespondenceSetting2Dac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.UserOrg" type="GQT3.QT.Dac.UserOrgDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+
+  <object id="GQT3.QT.Dac.OrgRelatitem2" type="GQT3.QT.Dac.OrgRelatitem2Dac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.RWReport" type="GQT3.QT.Dac.RWReportDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.ProcurementType" type="GQT3.QT.Dac.ProcurementTypeDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.ProcurementProcedures" type="GQT3.QT.Dac.ProcurementProceduresDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.PerformEvalTargetType" type="GQT3.QT.Dac.PerformEvalTargetTypeDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.PerformEvalTarget" type="GQT3.QT.Dac.PerformEvalTargetDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.PerformEvalTargetClass" type="GQT3.QT.Dac.PerformEvalTargetClassDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.ProcurementCatalog" type="GQT3.QT.Dac.ProcurementCatalogDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.PerformEvalType" type="GQT3.QT.Dac.PerformEvalTypeDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.ProjectThreshold" type="GQT3.QT.Dac.ProjectThresholdDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.QtBaseProject" type="GQT3.QT.Dac.QtBaseProjectDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.QtZcgnfl" type="GQT3.QT.Dac.QtZcgnflDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GQT3.QT.Dac.QtOrgDygx" type="GQT3.QT.Dac.QtOrgDygxDac, GQT3.QT.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+
+
+
+
+
+  <!--GYS3.YS-->
+  <object id="GYS3.YS.Dac.BudgetMst" type="GYS3.YS.Dac.BudgetMstDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlImplPlan" type="GYS3.YS.Dac.BudgetDtlImplPlanDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlTextContent" type="GYS3.YS.Dac.BudgetDtlTextContentDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlFundAppl" type="GYS3.YS.Dac.BudgetDtlFundApplDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlBudgetDtl" type="GYS3.YS.Dac.BudgetDtlBudgetDtlDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetProcessCtrl" type="GYS3.YS.Dac.BudgetProcessCtrlDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BuDeptReport" type="GYS3.YS.Dac.BuDeptReportDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlPerformTarget" type="GYS3.YS.Dac.BudgetDtlPerformTargetDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlPurDtl4SOF" type="GYS3.YS.Dac.BudgetDtlPurDtl4SOFDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.BudgetDtlPurchaseDtl" type="GYS3.YS.Dac.BudgetDtlPurchaseDtlDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+
+  <object id="GYS3.YS.Dac.GHSubject" type="GYS3.YS.Dac.GHSubjectDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.SubjectMst" type="GYS3.YS.Dac.SubjectMstDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.SubjectMstBudgetDtl" type="GYS3.YS.Dac.SubjectMstBudgetDtlDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+
+  <object id="GYS3.YS.Dac.ExpenseMst" type="GYS3.YS.Dac.ExpenseMstDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GYS3.YS.Dac.ExpenseDtl" type="GYS3.YS.Dac.ExpenseDtlDac, GYS3.YS.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+
+
+  <!--GJX3.JX-->
+  <object id="GJX3.JX.Dac.PerformanceMst" type="GJX3.JX.Dac.PerformanceMstDac, GJX3.JX.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GJX3.JX.Dac.PerformanceDtlEval" type="GJX3.JX.Dac.PerformanceDtlEvalDac, GJX3.JX.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GJX3.JX.Dac.PerformanceDtlTextCont" type="GJX3.JX.Dac.PerformanceDtlTextContDac, GJX3.JX.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GJX3.JX.Dac.PerformanceDtlBuDtl" type="GJX3.JX.Dac.PerformanceDtlBuDtlDac, GJX3.JX.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+  <object id="GJX3.JX.Dac.PerformanceDtlTarImpl" type="GJX3.JX.Dac.PerformanceDtlTarImplDac, GJX3.JX.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+   
+  </object>
+
+
+  <!--GSP3.SP-->
+  <object id="GSP3.SP.Dac.GAppvalPost" type="GSP3.SP.Dac.GAppvalPostDac, GSP3.SP.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+  <object id="GSP3.SP.Dac.GAppvalPost4Oper" type="GSP3.SP.Dac.GAppvalPost4OperDac, GSP3.SP.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+  <object id="GSP3.SP.Dac.GAppvalProc" type="GSP3.SP.Dac.GAppvalProcDac, GSP3.SP.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+  <object id="GSP3.SP.Dac.GAppvalProcConds" type="GSP3.SP.Dac.GAppvalProcCondsDac, GSP3.SP.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+  <object id="GSP3.SP.Dac.GAppvalProc4Post" type="GSP3.SP.Dac.GAppvalProc4PostDac, GSP3.SP.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+  <object id="GSP3.SP.Dac.GAppvalRecord" type="GSP3.SP.Dac.GAppvalRecordDac, GSP3.SP.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+  </object>
+
+
+  <!--GBK.BK-->
+  <object id="GBK3.BK.Dac.PaymentDtl" type="GBK3.BK.Dac.PaymentDtlDac, GBK3.BK.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+
+  </object>
+  <object id="GBK3.BK.Dac.PaymentMst" type="GBK3.BK.Dac.PaymentMstDac, GBK3.BK.Dac" >
+    <property name="HibernateTemplate" ref="HibernateTemplate"/>
+
+  </object>
+
+</objects>
+

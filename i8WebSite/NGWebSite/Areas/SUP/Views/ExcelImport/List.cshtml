@@ -1,0 +1,409 @@
+﻿@{
+    ViewBag.Title = (ViewBag.Title == "" || ViewBag.Title == null) ? "数据导入" : ViewBag.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+    <script type="text/javascript">
+
+        //获取页面url的参数，判断是初始化设置界面还是选项设置界面
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", 'i');
+            var r = window.location.search.substr(1).match(reg);//window.location.search代表从?开始的url
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var panel;
+        var tabMain;
+
+        var id = GetQueryString("id");//过滤树节点
+        //id = '7a69766c-4383-470f-b383-86ad1e28788f';
+        if (id == null)
+            id = '';
+
+        Ext.onReady(function () {
+            Ext.QuickTips.init();
+            //创建toolbar
+            var toolBar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                border: false,
+                //split: true,
+                height: 26,
+                minSize: 26,
+                maxSize: 26,
+                ngbuttons: [
+                   { itemId: 'submit', text: "保存", iconCls: 'icon-save' },
+                    { itemId: 'edit', text: '模板编辑', iconCls: 'icon-Edit' },
+                    { itemId: 'import', text: "数据导入", iconCls: 'icon-New' },
+                   '->',
+                   'help',
+                   'close'
+                ],
+
+            });
+
+            toolBar.get('help').on('click', function () {
+                    $OpenOnlineHelp('List.cshtml');               
+            });
+
+            var treePanel = Ext.create('Ext.ng.TreePanel', {
+                collapsible: true,
+                title: '数据列表',
+                width: 220,
+                region: 'west',
+                url: 'ExcelImport/LoadMenu?id=' + id,
+            });
+
+            var states = Ext.create('Ext.data.Store', {
+                fields: ['selectedValue', 'name'],
+                data: [
+                    { "selectedValue": "0", "name": "覆盖" },
+                    { "selectedValue": "1", "name": "不覆盖" },
+                    { "selectedValue": "2", "name": "终止导入" }
+                ]
+            });
+            var formPanel = Ext.create('Ext.form.Panel', {
+                frame: true,
+                region: 'north',
+                layout: 'absolute',
+                items: [
+                    {
+                        xtype: 'filefield',
+                        name: 'file',
+                        id: 'filefieldId',
+                        fieldLabel: '选择导入文件,并点击左边的模板',
+                        labelWidth: 200,
+                        msgTarget: 'side',
+                        allowBlank: false,
+                        buttonText: '...',
+                        x: 10,
+                        y: 0,
+                    },
+                    {
+                        xtype: 'combobox',
+                        //xtype: 'ngComboBox',
+                        id: 'selected',
+                        labelWidth: 120,
+                        fieldLabel: '是否覆盖重复记录',
+                        store: states,
+                        queryMode: 'local',
+                        displayField: 'name',
+                        valueField: 'selectedValue',
+                        value: '0',
+                        x: 500,
+                        y: 0,
+                    },
+                    {
+                        xtype: 'displayfield',
+                        id: 'status',
+                        text: '&nbsp;&nbsp;&nbsp;&nbsp;',
+                        x: 800,
+                        y: 0,
+                    },
+                ],
+
+            });
+
+            tabMain = Ext.create('Ext.tab.Panel', {
+                region: 'center',
+                id: 'tabPanel',
+                items: [
+                    //{
+                    //    title: "首页"
+                    //},
+                ]
+            });
+
+            //创建Viewport
+            Ext.create('Ext.container.Viewport', {
+                renderTo: Ext.getBody(),
+                layout: 'border',
+                items: [
+                    treePanel,
+                   toolBar,
+                    formPanel,
+                    //gridPanel,
+                    tabMain,
+                ]
+            });
+
+            //上传文件类型判断
+            Ext.get("filefieldId").addListener('change', function (obj, v, eOpts) {
+                if (v.value != "" && !/\.xls$|\.xlsx$/.test(v.value)) {
+                    //alert("请导入Excel文件");
+                    Ext.MessageBox.alert('提示', "请导入Excel文件! ");
+                    var formobj = formPanel.getForm();
+                    formobj.findField('filefieldId').setRawValue('');
+                }
+            });
+
+
+            //导入文件
+            toolBar.get('import').on('click', function () {
+                var form = formPanel.getForm();
+                var templateId = treePanel.getSelectionModel().getSelection();
+                if (templateId.length == 0) {
+                    //alert("请选择数据模板");
+                    Ext.MessageBox.alert('提示', "请选择数据模板! ");
+                    return;
+                }
+                if (templateId[0].data.leaf == false) {
+                    //alert("请选择数据模板");
+                    Ext.MessageBox.alert('提示', "请选择数据模板! ");
+                    return;
+                } else {
+                    if (form.isValid()) {
+
+                        var myMask = new Ext.LoadMask(document.body, { msg: "保存中,请稍候..." });
+                        myMask.show();
+                        //Ext.Ajax.request({
+                        formPanel.submit({
+                            url: 'ExcelImport/Upload?templateId=' + templateId[0].data.id,
+                            waitMsg: '文件加载中...',
+                            method: 'post',
+                            success: function (obj, response) {
+
+                                var json = Ext.JSON.decode(response.response.responseText);
+                                if (json.success == 'true') {
+                                    //Ext.get("status").dom.innerHTML = "<a>" + json.message + "</a>";
+                                    tabMain.removeAll();
+
+                                    loadExcelData();
+                                    //toolBar.items.get("load").on('click', loadExcelData);
+                                } else {
+                                    //alert(json.message);
+                                    Ext.MessageBox.alert('提示', json.message);
+                                }
+                                myMask.hide();
+                            },
+                            failure: function (obj, response) {
+                                var json = Ext.JSON.decode(response.response.responseText);
+                                //alert(json.message);
+                                Ext.MessageBox.alert('提示', json.message);
+                            }
+                        });
+                    } else {
+                        //alert("请选择导入文件！");
+                        Ext.MessageBox.alert('提示', "请选择导入文件！");
+                    }
+                }
+            });
+
+            //模板编辑
+            toolBar.get('edit').on('click', EditTable);
+            //双击树节点
+            treePanel.addListener('celldblclick', openTemplateEditTable);
+            function openTemplateEditTable() {
+                var selectModel = treePanel.getSelectionModel();
+                if (selectModel.hasSelection()) {
+                    var obj = selectModel.getSelection()[0];
+                    if (obj.data.leaf == true) {
+                        var id = obj.data.id;
+                        var name = obj.data.text;
+                        $OpenTab('模板编辑', C_ROOT + '/SUP/ExcelImport/EditIndex?otype=edit&id=' + id, '');
+                    } else {
+                        //alert("请单击选择模板");
+                        //Ext.MessageBox.alert('提示', "请单击选择模板！");
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', "请单击选择模板！");
+                }
+            }
+
+            function EditTable() {
+                var selectModel = treePanel.getSelectionModel();
+                if (selectModel.hasSelection()) {
+                    var obj = selectModel.getSelection()[0];
+                    if (obj.data.leaf == true) {
+                        var id = obj.data.id;
+                        var name = obj.data.text;
+                        $OpenTab('模板编辑', C_ROOT + '/SUP/ExcelImport/EditIndex?otype=edit&id=' + id, '');
+                    } else {
+                        //alert("请单击选择模板");
+                        Ext.MessageBox.alert('提示', "请单击选择模板！");
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', "请单击选择模板！");
+                }
+            }
+
+            //打开新tab页，加载Excel数据到界面
+            function loadExcelData() {
+                Ext.Ajax.request({
+                    url: 'ExcelImport/GetTableName',
+                    method: 'post',
+                    success: function (response) {
+                        json = Ext.JSON.decode(response.responseText);
+                        if (json.success == "true") {
+                            if (json.tableName.length > 0) {
+                                for (var i = 0; i < json.tableName.length; i++) {
+                                    var text = json.tableName[i];
+                                    var id = text;
+                                    var url = C_ROOT + '/SUP/ExcelImport/GridIndex?tableName=' + text;
+                                    OpenTab(url, id, text);
+                                }
+                            }
+                        } else {
+                            //alert(json.message);
+                            Ext.MessageBox.alert('提示', json.message);
+                        }
+                    }
+                });
+            }
+            function OpenTab(url, id, text) {
+                var frame2 = document.createElement("IFRAME");
+                frame2.id = "frame" + id;
+                frame2.frameBorder = 0;
+                frame2.src = url;
+                frame2.height = "100%";
+                frame2.width = "100%";
+
+                panel = Ext.create("Ext.Panel", {
+                    title: text,
+                    id: id,
+                    //closable: true,
+                    listeners: {
+                        //beforeclose: beforeRemoveTab
+                    },
+                    contentEl: frame2
+                });
+
+                if (!tabMain.getComponent(id)) {
+                    //Ext.getCmp("tabMain").add(panel);
+                    tabMain.add(panel);
+                }
+
+                frame2.parentContainer = panel;
+
+                var curtab = tabMain.getComponent(id)
+                tabMain.setActiveTab(curtab);
+                tabMain.setActiveTab(0);
+            }
+
+
+            //重新加载上传的Excel文件
+            function reloadData() {
+                loadExcelData();
+            }
+
+            //保存Excel表格数据到服务端
+            toolBar.get('submit').on('click', function () {
+                //var data = '{"record":[';
+                var myMask = new Ext.LoadMask(document.body, { msg: "保存中,请稍候..." });
+                myMask.show();
+                var data = "{";
+                var tableName = "{";
+                var count = 0;
+                if (typeof (json) != 'undefined') {
+                    if (json.success == "true") {
+                        if (json.tableName.length > 0) {
+                            for (var i = 0; i < json.tableName.length; i++) {
+                                var id = json.tableName[i];
+                                var frame = document.getElementById('frame' + id)
+                                if (frame != undefined) {
+                                    var griddata = frame.contentWindow.getData();
+                                    if (griddata == 'error') {
+                                        Ext.MessageBox.alert('提示', '你要保存的数据不正确，请重新导入文件');
+                                        tabMain.removeAll();
+                                        myMask.hide();
+                                        return;
+                                    } else {
+                                        if (!griddata) {
+                                            tabMain.setActiveTab(id);
+                                            myMask.hide();
+                                            return;
+                                        }
+                                    }
+                                    tableName += '"' + count + '":' + '"' + id + '"';
+                                    count++;
+                                    data += '"' + id + '":';
+                                    data += griddata;
+                                    if (i < json.tableName.length - 1) {
+                                        data += ',';
+                                        tableName += ',';
+                                    }
+                                }
+                            }
+                            tableName += '}';
+                            data += '}';
+
+
+                            var sel = Ext.getCmp('selected').getValue();
+                            Ext.Ajax.request({
+                                timeout: 600000,//600秒
+                                url: 'ExcelImport/Save',
+                                method: 'post',
+                                params: {
+                                    data: data,
+                                    tableName: tableName,
+                                    count: count,
+                                    selected: sel,
+                                },
+                                success: function (response) {
+                                    var result = response.text.substr(0, 1);
+                                    var count = response.text.indexOf('#');
+                                    var message = response.text.substr(count + 1, response.length).replace(new RegExp('\r\n', 'g'), '<br>');
+                                    if (result == 1) {
+                                        if (window.external.IsInWebBrowser != undefined) {
+                                            window.external.RefreshWebListPage();
+                                        }
+                                        myMask.hide();
+                                        if (message == '' || message == null)
+                                            Ext.MessageBox.alert('保存成功', "保存成功!");
+                                        else
+                                            Ext.MessageBox.alert('保存成功', message);
+                                        tabMain.removeAll();//防止重复上传
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert('保存失败', message);
+                                        myMask.hide();
+                                    }
+
+                                    //res = Ext.JSON.decode(response.responseText);
+                                    //if (res.success == 'true') {
+                                    //    //alert("保存到服务端成功! " + res.message);
+                                    //    myMask.hide();
+                                    //    Ext.MessageBox.alert('保存成功', "保存成功! " + res.message);
+                                    //    tabMain.removeAll();//防止重复上传
+                                    //} else {
+                                    //    //alert(res.message);
+                                    //    Ext.MessageBox.alert('保存失败', res.message);
+                                    //    myMask.hide();
+                                    //}
+                                },
+                            });
+
+                        }
+                    }
+                    else {
+                        Ext.MessageBox.alert('保存失败', "无数据! ");
+                        myMask.hide();
+                    }
+                } else {
+                    //alert("没有文件上传");
+                    Ext.MessageBox.alert('保存失败', "无数据! ");
+                    myMask.hide();
+                }
+
+
+            });
+
+        });
+
+        function CloseTab(id, message) {
+            Ext.MessageBox.alert('保存失败', message);
+            if (tabMain.getComponent(id)) {
+                tabMain.remove(panel);
+            }
+
+        }
+
+    </script>
+
+}
+
+
+
+

@@ -1,0 +1,253 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GYS3.YS.Service.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GYS3.YS.Service.Interface.IBudgetMstService">
+            <summary>
+            BudgetMst服务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.SaveBudgetMst(GYS3.YS.Model.Domain.BudgetMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlImplPlanModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlTextContentModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlFundApplModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlBudgetDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPerformTargetModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPurchaseDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPurDtl4SOFModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="budgetMstEntity"></param>
+            <param name="budgetDtlImplPlanEntities"></param>
+            <param name="budgetDtlTextContentEntities"></param>
+            <param name="budgetDtlFundApplEntities"></param>
+            <param name="budgetDtlBudgetDtlEntities"></param>
+            <param name="budgetDtlPerformTargetEntities"></param>
+            <param name="budgetDtlPurchaseDtlEntities"></param>
+            <param name="budgetDtlPurDtl4SOFEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.SaveBudgetMst(GYS3.YS.Model.Domain.BudgetMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlImplPlanModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlTextContentModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlFundApplModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlBudgetDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPerformTargetModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="budgetMstEntity"></param>
+            <param name="budgetDtlImplPlanEntities"></param>
+            <param name="budgetDtlTextContentEntities"></param>
+            <param name="budgetDtlFundApplEntities"></param>
+            <param name="budgetDtlBudgetDtlEntities"></param>
+            <param name="budgetDtlPerformTargetEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlImplPlanByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlImplPlan明细数据
+            </summary> 
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlTextContentByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlTextContent明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlFundApplByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlFundAppl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlBudgetDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlBudgetDtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlPerformTargetByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlPerformTarget明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlPurchaseDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlDtlPurchaseDtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetDtlPurDtl4SOFByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取BudgetDtlPurDtl4SOF明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgeAccount(System.String)">
+            <summary>
+            通过科目代码获取BudgetDtlBudgetDtl明细数据
+            </summary>
+            <param name="kmdm">科目代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgeAccountByZJDM(System.String)">
+            <summary>
+            通过资金来源代码获取BudgetDtlBudgetDtl明细数据
+            </summary>
+            <param name="ZJDM">科目代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindBudgetMst(System.String)">
+            <summary>
+            通过代码获取BudgetMstModel
+            </summary>
+            <param name="dm">代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.FindPaymentMethod(System.String)">
+            <summary>
+            通过代码获取BudgetDtlBudgetDtlModel
+            </summary>
+            <param name="dm">代码</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.BudgetLoadWithPage(System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Object},System.String[])">
+            <summary>
+            获取已经完成的预算（相同的项目编码 取最新的一条）
+            </summary>
+            <param name="pageIndex"></param>
+            <param name="pageSize"></param>
+            <param name="dicWhere"></param>
+            <param name="sorts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetMstService.DeleteProjectDtlPurchase(System.Int64)">
+            <summary>
+            删除集中采购明细和资金来源
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="T:GYS3.YS.Service.Interface.IBudgetProcessCtrlService">
+            <summary>
+            BudgetProcessCtrl服务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetProcessCtrlService.GetBudgetProcessCtrlDistinctList(SUP.Common.DataEntity.DataStoreParam,System.String,System.String)">
+            <summary>
+            取列表数据
+            </summary>
+            <returns>返回</returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetProcessCtrlService.GetBudgetProcessCtrlPorcessList(SUP.Common.DataEntity.DataStoreParam,System.String,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetProcessCtrlModel}@)">
+            <summary>
+            返回未添加到进度控制表中的部门数据
+            </summary>
+            <returns>返回</returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetProcessCtrlService.GetBudgetProcessCtrlPorcessList2(SUP.Common.DataEntity.DataStoreParam,System.String)">
+            <summary>
+            取列表数据
+            </summary>
+            <returns>返回</returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetProcessCtrlService.FindBudgetProcessCtrlModelByList(System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetProcessCtrlModel})">
+            <summary>
+            取列表数据
+            </summary>
+            <returns>List</returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetProcessCtrlService.FindBudgetProcessCtrl(System.String,System.String)">
+            <summary>
+            根据预算单位和预算部门查找部门所在预算进度
+            </summary>
+            <param name="oCode"></param>
+            <param name="deptCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IBudgetProcessCtrlService.SaveProcessSetting(System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetProcessCtrlModel},System.String)">
+            <summary>
+            保存数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Service.Interface.IBuDeptReportService">
+            <summary>
+            Examples服务组装处理接口类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Service.Interface.IExamplesService">
+            <summary>
+            Examples服务组装处理接口类
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IExamplesService.GetAllEffectiveOrgs">
+            <summary>
+            获取所有有效的组织信息
+            </summary>
+            <returns>组织集合</returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IExamplesService.GetAllEffectiveDepts(System.String)">
+            <summary>
+            获取指定组织所有有效的部门信息
+            </summary>
+            <param name="ocode">组织编码（目前通过编码设置关系）</param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Service.Interface.IExpenseMstService">
+            <summary>
+            ExpenseMst服务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IExpenseMstService.SaveExpenseMst(GYS3.YS.Model.Domain.ExpenseMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.ExpenseDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="expenseMstEntity"></param>
+            <param name="expenseDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IExpenseMstService.FindExpenseDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取ExpenseDtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Service.Interface.IGHSubjectService">
+            <summary>
+            GHSubject服务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IGHSubjectService.SaveGHSubject(GYS3.YS.Model.Domain.GHSubjectModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="gHSubjectEntity"></param>
+            <param name="subjectMstEntities"></param>
+            <param name="subjectMstBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IGHSubjectService.FindSubjectMstByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取SubjectMst明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IGHSubjectService.FindSubjectMstBudgetDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取SubjectMstBudgetDtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Service.Interface.IGHSubjectService.FindSubjectMstBudgetDtl(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            查找各子项目明细项目
+            </summary>
+            <param name="dicWhere"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

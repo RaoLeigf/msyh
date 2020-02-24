@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{90557AD7-5FB8-4793-B049-05B479E64177}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GYS3.YS.UnitTest</RootNamespace>
+    <AssemblyName>GYS3.YS.UnitTest</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Common.Logging.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Common.Logging.Log4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Base">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.BizBase">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.Common.BizBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.ExceptionHandling">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.HttpContextSimulator">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.Common.HttpContextSimulator.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Controller">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.NHORM.Controller.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Dac">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.NHORM.Dac.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.DynamicLoading">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.NHORM.DynamicLoading.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Facade">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.NHORM.Facade.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=1.0.0.4001, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BaseDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Rule">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Enterprise3.NHORM.Rule.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data.Service, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Works\NG3\NG3_Business\BusinessBaseClass\Enterprise3\NGDlls\NG3.Data.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Validator">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\NHibernate.Validator.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Aop">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Spring.Aop.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Core">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Spring.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Data">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Spring.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Data.NHibernate4">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Spring.Data.NHibernate4.dll</HintPath>
+    </Reference>
+    <Reference Include="Spring.Testing.Microsoft">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\Spring.Testing.Microsoft.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Frame.DataEntity">
+      <HintPath>..\..\..\Works\NG3\NG3_Business\SuitCode\DMC\BaseDlls\SUP.Frame.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions, Version=1.0.61025.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Config\APIConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\DataBases.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\LogConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="hibernate.cfg.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Objects.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="SNHConfig\ORMDaoBase.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SNHConfig\ORMFacadeBase.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SNHConfig\ORMProviderSettings.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Config\log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SNHConfig\log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SNHConfig\ORMMappingAssembliesSettings.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SNHConfig\Examples\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GYS3.YS.Dac.Interface\GYS3.YS.Dac.Interface.csproj">
+      <Project>{2e01bed0-b55e-4864-9e17-a47b4154d06c}</Project>
+      <Name>GYS3.YS.Dac.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GYS3.YS.Dac\GYS3.YS.Dac.csproj">
+      <Project>{dea0f5ac-3587-42b5-86a5-de8e6bc065f8}</Project>
+      <Name>GYS3.YS.Dac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GYS3.YS.Facade.Interface\GYS3.YS.Facade.Interface.csproj">
+      <Project>{5072505e-c383-492a-8108-f0edf4882db7}</Project>
+      <Name>GYS3.YS.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GYS3.YS.Model\GYS3.YS.Model.csproj">
+      <Project>{dd639bb1-92fc-4da9-a0a0-c5f1ac91b7f5}</Project>
+      <Name>GYS3.YS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GYS3.YS.Rule.Interface\GYS3.YS.Rule.Interface.csproj">
+      <Project>{20c3c546-6a8c-4bfe-83c2-241c99a926e2}</Project>
+      <Name>GYS3.YS.Rule.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GYS3.YS.Service.Interface\GYS3.YS.Service.Interface.csproj">
+      <Project>{3a283fb2-32b7-4114-b5d9-9db4b265583e}</Project>
+      <Name>GYS3.YS.Service.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
+      <ItemGroup>
+        <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Microsoft.VisualStudio.TestTools.UITesting, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+          <Private>False</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,594 @@
+﻿//------------------------------全局函数------------------------------
+//附件接收返回值
+function AttachReturnValue(key, value) {
+    AttachReturnRefresh(key, value);
+}
+
+//接收记账凭证回调
+function PbFormCallback(data) {
+    NG3IadCallback(data);
+}
+
+//编辑窗口保存关闭后回刷列表
+function NG3Refresh() { 
+	Ext.getCmp('<#= gridPanel.TableName #>grid').store.load();
+}
+
+
+//------------------------------全局变量------------------------------
+var attfrom;  //附件打开自form、grid还是list
+var Guid = new GUID();  //用于生成guid
+var eform = '<#= EForm #>';  //工作流等的key 
+var busname = '<#= PForm #>';
+var classname = '<#= ClassName #>';
+var tablenameM = '<#= gridPanel.TableName #>';
+var istask = '<#= IsTask #>';
+
+var curToolbar;  //当前工具栏
+var curGrid;  //当前grid
+var curStore;  //当前store
+
+var isMultiSelect = false;  //grid是否复选
+
+//------------------------------onReady------------------------------
+Ext.onReady(function () {
+	//布局前初始化函数
+    if (typeof allInitList === "function") {
+        allInitList();
+    }
+
+	//工具栏
+	var toolbarStr;
+
+	if (IsSso == 'true') {
+		toolbarStr = ['add', '->', '', 'close'];  //单点登录预览按钮特殊处理
+	}
+	else if (IsIad == '1') {
+		toolbarStr = NG3IadButton();  //记账
+	}
+	else {
+		toolbarStr = [<#= Common.GetButtons(Toolbar, "List") #>];
+	}
+
+	var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+		region: 'north',
+		rightName: '<#= QForm #>', //权限名称
+		id: 'toolbar',
+		ngbuttons: toolbarStr
+	});
+
+	//定义模型
+	Ext.define('model', {
+		extend: 'Ext.data.Model',
+		fields: [
+			{
+				name: '<#= PkPropertyname #>',
+				type: 'string',
+				mapping: '<#= PkPropertyname #>'
+			},
+			<#= Common.GetPageModelFields(gridPanel,"List",5) #>
+		]
+	});
+
+	var store = Ext.create('Ext.ng.JsonStore', {
+		model: 'model',
+		pageSize: 25,
+		autoLoad: false,
+		url: C_ROOT + '<#= Area #>/<#= ClassName #>List/GetList'
+	});
+
+	var pagingbar = Ext.create('Ext.ng.PagingBar', {
+		itemId: '<#= gridPanel.TableName #>pagingbar',
+		stateId: '<#= gridPanel.TableName #>grid',
+		store: store
+	});
+
+	//列表panel
+	var grid = Ext.create('Ext.ng.GridPanel', {
+		id: '<#= gridPanel.TableName #>grid',
+		region: 'center',
+		stateful: true,
+		stateId: '<#= gridPanel.TableName #>grid',
+		multiSelect: isMultiSelect,	
+		store: store,
+		buskey: '<#= PkPropertyname #>', //对应的业务表主键属性               
+		columnLines: true,
+		DbClickToView: false,
+		columns: [<#= Common.GetPageGridColumns(gridPanel,"List",5) #>
+			,{
+				header: '主键',
+				dataIndex: '<#= PkPropertyname #>',
+				hidden: true
+			}],
+		bbar: pagingbar
+	});
+
+	//内嵌查询panel，这个panel不放里面界面会错乱
+	var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+		toolbar: ngToolbar,
+		pageid: "Web:<#=PForm #>List", //对应内嵌查询业务点标识
+		grid: grid,
+		queryAutoLoad: Product.toUpperCase() == 'I8' ? false : true, //i8有项目树不自动load
+		columnsPerRow: 4 //每行4列
+	});
+
+	//预览时内嵌查询设置按钮隐藏
+	if (IsSso == 'true' && queryPanel.down('#queryset')) {
+		queryPanel.down('#queryset').setVisible(false);
+	}
+
+	//布局面板数组
+	var layoutItem = [ngToolbar, queryPanel, grid];
+
+	//组织树
+	var treeorgid = '';   //组织树上选中的组织
+	var treeprojid = '';  //组织树上选中的项目
+	if (Product.toUpperCase() == 'I8') {    
+		var orgTreePanel = Ext.create('Ext.Gc.CommonLeftLayout', {
+			id: 'CommonLeftLayout',
+			region: 'west',
+			cntmodel: '',
+			width: 220,
+			split: true,
+			funcKey: '<#= EForm #>',  //业务点主键，不同的业务点记忆值不一样，树记忆有效的话该属性必须填
+			changeCallBack: function () {
+				treeorgid = this.belongorg;
+				treeprojid = this.belongproj;
+				store.load();
+			}
+		});
+
+		store.on("beforeload", function (me, operation, eOpts) {
+			Ext.apply(me.proxy.extraParams, {
+				'clientfilter': Ext.JSON.encode({ CntType: Ext.getCmp("CommonLeftLayout").typefilter, OrgQuery: Ext.getCmp("CommonLeftLayout").orgfilter })
+			});
+		});
+
+		layoutItem.push(orgTreePanel);
+	}
+
+           
+    //布局
+    var viewport = Ext.create('Ext.container.Viewport', {
+        id: "viewPort",
+        layout: 'border',
+        items: layoutItem
+    });
+
+
+	//list 列表初始化时公共代码
+	CommonReadyList();
+
+<# if(Toolbar.LNgButtons.Contains("add") || Toolbar.RNgButtons.Contains("add")) { #>
+    //新增
+	if (ngToolbar.get('add')) {
+		ngToolbar.get('add').on('click', function () {
+			var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=add&issso=' + IsSso;
+			<# if(HasBlobdoc != "0" || HasReport != "0") { #>
+			url += '&ie=1';
+			<# } #>
+
+			if(defaultPc != 0) { 
+				treeprojid = defaultPc;
+			}
+
+			url += '&treeorgid=' + treeorgid;
+			url += '&treeprojid=' + treeprojid;
+
+			$OpenTab('<#= Title #>-新增', url);
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("edit") || Toolbar.RNgButtons.Contains("edit")) { #>
+    //修改
+	if (ngToolbar.get('edit')) {
+		ngToolbar.get('edit').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+        
+			if (data.length > 0) {
+				if (!RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList')) { return; }
+
+				var ischeck = data[0].get('ischeck');
+				var is_wf = data[0].get('is_wf');
+
+				if (EditBySelf=="Y"&&$appinfo.userID!=data[0].get('fillpsn')) {
+					Ext.MessageBox.confirm('提示', '已设置仅允许修改自己的单据，是否以查看方式打开？', function (e) {
+						if (e == "yes") {
+							ngToolbar.get('view').fireEvent('click');
+						} else {
+							return;
+						}
+					});
+				}
+
+				else if (ischeck == '1' || is_wf == '1') {
+					Ext.MessageBox.confirm('提示', '该单据已送审或已审核，不允许修改，是否以查看方式打开？', function (e) {
+						if (e == "yes") {
+							ngToolbar.get('view').fireEvent('click');
+						} else {
+							return;
+						}
+					});
+				}
+				else {
+					var id = data[0].get('phid');
+					var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=edit&id=' + id;
+					<# if(HasBlobdoc != "0" || HasReport != "0") { #>
+					url += '&ie=1';
+					<# } #>
+					$OpenTab('<#= Title #>-修改', url);
+				}  
+			}
+			else {
+				Ext.MessageBox.alert('提示', '请选择行');
+			}
+
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("copy") || Toolbar.RNgButtons.Contains("copy")) { #>
+    //复制
+	if (ngToolbar.get('copy')) {
+		ngToolbar.get('copy').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+        
+			if (data.length > 0) {
+				var id = data[0].get('<#= PkPropertyname #>');
+
+				var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=copy&id=' + id;
+				<# if(HasBlobdoc != "0" || HasReport != "0") { #>
+				url += '&ie=1';
+				<# } #>
+				$OpenTab('<#= Title #>-复制', url);
+			}
+			else{
+				Ext.MessageBox.alert('提示', '请选择行！');
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("delete") || Toolbar.RNgButtons.Contains("delete")) { #>
+	//删除
+	if (ngToolbar.get('delete')) {
+		ngToolbar.get('delete').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+
+			if (data.length > 0) {
+				if (!RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList')) { return; }
+
+				//删除前检测函数
+				if (typeof beforeDeleteList === "function") {
+					if (!beforeDeleteList()) {
+						return;
+					}
+				}
+
+				if (DeleteBySelf == 'Y' && $appinfo.userID!=data[0].get('fillpsn') ) {
+					Ext.MessageBox.alert('提示', '已设置为仅删除自己的单据，无法删除!');
+					return;
+				}
+
+				var chkflg = data[0].get('ischeck');
+				if (chkflg == "1") {
+					Ext.MessageBox.alert('提示', '该单据已经审核，无法删除!');
+					return;
+				}
+
+				chkflg = data[0].get('is_wf');
+				if (chkflg == "1") {
+					Ext.MessageBox.alert('提示', '该单据已送审，无法删除!');
+					return;
+				}
+				
+
+				var id = data[0].get('<#= PkPropertyname #>');
+				Ext.MessageBox.confirm('提示', '是否删除此记录？', function (e) {
+					if (e == "yes") {
+						Ext.Ajax.request({
+							params: { 
+								'id': id,
+								'extendParam': typeof getSaveDataList === "function" ? getSaveDataList('Delete') : ''  //获取需保存数据
+							},
+							url: C_ROOT + '<#= Area #>/<#= ClassName #>List/Delete',
+							success: function (response) {
+								var resp = Ext.JSON.decode(response.responseText);
+								if (resp.status == "OK") {
+									//刷新
+									Ext.Array.each(data, function (record) {
+										store.remove(record); //前端删除
+									});
+									Ext.MessageBox.alert('提示', '删除成功！');
+								} else {
+									Ext.MessageBox.alert('提示', '删除失败！');
+								}
+							}
+						});
+					} else {
+						return;
+					}  
+				});
+			}
+			else{
+				Ext.MessageBox.alert('提示', '请选择行！');
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("view") || Toolbar.RNgButtons.Contains("view")) { #>
+    //查看
+	if (ngToolbar.get('view')) {
+		ngToolbar.get('view').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+
+			if (data.length > 0) {
+				var id = data[0].get('<#= PkPropertyname #>');
+
+				var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=view&id=' + id;
+				<# if(HasBlobdoc != "0" || HasReport != "0") { #>
+				url += '&ie=1';
+				<# } #>
+				$OpenTab('<#= Title #>-查看', url);
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("refresh") || Toolbar.RNgButtons.Contains("refresh")) { #>
+	//刷新
+	if (ngToolbar.get('refresh')) {
+		ngToolbar.get('refresh').on('click', function () {
+			store.load();
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("verify") || Toolbar.RNgButtons.Contains("verify")) { #>
+	//审核
+	if (ngToolbar.get('verify')) {
+		ngToolbar.get('verify').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+
+			if (data.length > 0) {
+				if (!RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList')) { return; }
+			
+			    if (CheckBySelf == 'Y' && $appinfo.userID==data[0].get('fillpsn') ) {
+					Ext.MessageBox.alert('提示', '已设置为仅允许他人审核自己的单据!');
+					return;
+				}
+
+				if (data[0].get('ischeck') == '1') {
+                    Ext.MessageBox.alert('提示', '该单据已审核，不能重复审核!');
+                    return;
+                }
+
+				//审核前检测函数
+				if (typeof beforeVerifyList === "function") {
+					if (!beforeVerifyList()) {
+						return;
+					}
+				}
+				
+				var id = data[0].get('phid');
+            
+				Ext.Ajax.request({
+					params: { 
+						'id': id,
+						'extendParam': typeof getSaveDataList === "function" ? getSaveDataList('Verify') : ''  //获取需保存数据
+					},
+					url: C_ROOT + '<#= Area #>/<#= ClassName #>List/Verify',
+					async: false, //同步请求
+					success: function (response) {
+						var resp = Ext.JSON.decode(response.responseText);
+						if (resp.status === "OK") {
+							Ext.MessageBox.alert('提示', ngToolbar.get('verify').text + "成功!");
+							RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList');
+						} else {
+							Ext.MessageBox.alert( '提示', ngToolbar.get('verify').text + "失败!");
+						}
+					}
+				});
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("unverify") || Toolbar.RNgButtons.Contains("unverify")) { #>
+	//去审核
+	if (ngToolbar.get('unverify')) {
+		ngToolbar.get('unverify').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+
+			if (data.length > 0) {
+				if (!RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList')) { return; }
+			
+			    if (CheckBySelf == 'Y' && $appinfo.userID==data[0].get('fillpsn') ) {
+					Ext.MessageBox.alert('提示', '已设置为仅允许他人去审核自己的单据!');
+					return;
+				}
+
+				if (data[0].get('ischeck') != '1') {
+                    Ext.MessageBox.alert('提示', '该单据未审核，不能重复去审!');
+                    return;
+                }
+
+				//去审核前检测函数
+				if (typeof beforeUnVerifyList === "function") {
+					if (!beforeUnVerifyList()) {
+						return;
+					}
+				}
+
+				var id = data[0].get('phid');
+            
+				Ext.Ajax.request({
+					params: { 
+						'id': id,
+						'extendParam': typeof getSaveDataList === "function" ? getSaveDataList('UnVerify') : ''  //获取需保存数据
+					},
+					url: C_ROOT + '<#= Area #>/<#= ClassName #>List/Verify',
+					async: false, //同步请求
+					success: function (response) {
+						var resp = Ext.JSON.decode(response.responseText);
+						if (resp.status === "OK") {
+							Ext.MessageBox.alert('提示', ngToolbar.get('unverify').text + "成功!");
+							RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList');
+						} else {
+							Ext.MessageBox.alert( '提示', ngToolbar.get('unverify').text + "失败!");
+						}
+					}
+				});
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("check") || Toolbar.RNgButtons.Contains("check")) { #>
+    //送审
+	if (ngToolbar.get('check')) {
+		ngToolbar.get('check').on('click',function(){
+			var data = grid.getSelectionModel().getSelection();
+			if(data.length > 0){
+				if (!RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList')) { return; }
+
+				chkflg = data[0].get('is_wf');
+				if (chkflg == "1") {
+					Ext.MessageBox.alert('提示', '该单据已送审，无法送审!');
+					return;
+				}
+				//if (chkflg == "2") {
+					//Ext.MessageBox.alert('提示', '该单据已送审完成，无法送审!');
+					//return;
+				//}
+
+				var id = data[0].get('phid');
+				$WorkFlow.startFlow('<#= EForm #>', id, function () {
+					RecodeRefresh(data, '<#= PkPropertyname #>', C_ROOT + '<#= Area #>/<#=ClassName#>List/GetList');
+				});
+			}
+			else{
+				Ext.MessageBox.alert('提示', '请选择行！');
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("history") || Toolbar.RNgButtons.Contains("history")) { #>
+	//送审追踪
+	if (ngToolbar.get('history')) {
+		ngToolbar.get('history').on('click',function(){ 
+			var data = grid.getSelectionModel().getSelection();
+			if(data.length > 0){
+				var id = data[0].get('phid');
+				$WorkFlow.showFlowInfo('<#=EForm #>', id);
+			}
+			else{
+				Ext.MessageBox.alert('提示', '请选择行！');
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("applycheck") || Toolbar.RNgButtons.Contains("applycheck")) { #>
+	//申请去审
+	if (ngToolbar.get('applycheck')) {
+		ngToolbar.get('applycheck').on('click',function(){ 
+			if (!grid.getColumn('ocode')) {
+				Ext.MessageBox.alert('提示', "[设计问题]列表没有组织列");
+				return;
+			}
+			if (!grid.getColumn('checkpsn')) {
+				Ext.MessageBox.alert('提示', "[设计问题]列表没有审核人列");
+				return;
+			}
+
+			var data = grid.getSelectionModel().getSelection();
+			if (data.length > 0) {
+
+				var chkflg = data[0].get('ischeck');
+				if (chkflg != "1") {
+					Ext.MessageBox.alert('提示', '该单据未审核，不能申请去审!');
+					return;
+				}
+
+				var id = data[0].get('phid');
+				var billno = data[0].get('bill_no');
+				var busTitle = '<#= Title #>';
+				var ocode = data[0].get('ocode');
+				var receiverid = data[0].get('checkpsn');
+				var receivername = '';
+				var url = C_ROOT + '<#= Area #>/<#= ClassName #>Edit?otype=view&id=' + id + '&ie=1&isapplycheck=1*web';
+
+				if (grid.getColumn('checkpsn_name')) {
+					receivername = data[0].get('checkpsn_name');
+				}
+
+				Ext.Ajax.request({
+					params: {
+						id: id,
+						billno: billno,
+						busTitle: busTitle,
+						ocode: ocode,
+						receiverid: receiverid,
+						receivername: receivername,
+						urlLink: url
+					},
+					url: C_ROOT + 'SUP/CustomCommon/ApplyCheckParam',
+					async: false, //同步请求
+					success: function (response) {
+						var ret = response.responseText;                        
+						var url = C_ROOT + 'SUP/ApplyCheck/ApplyCheck?params=' + ret;
+						$OpenTab(busTitle + '-申请去审', url);
+					}
+				});
+			}
+		});
+	}
+<# } #>
+
+<# if(Toolbar.LNgButtons.Contains("attachment") || Toolbar.RNgButtons.Contains("attachment")) { #>
+	//附件
+	if (ngToolbar.get('attachment')) {
+		ngToolbar.get('attachment').on('click', function () {
+			var data = grid.getSelectionModel().getSelection();
+			if (data.length > 0) {
+				OpenAttachment('list', '<#= gridPanel.TableName #>');
+			}
+			else{
+				Ext.MessageBox.alert('提示', '请选择行！');
+			}
+		});
+	}
+<# }#>
+
+<# if(Toolbar.LNgButtons.Contains("print") || Toolbar.RNgButtons.Contains("print")) { #>
+    //打印
+	if (ngToolbar.get('print')) {
+		ngToolbar.get('print').on('click', function () {
+			$Print("<#= ClassName #>", grid, "<#= Title #>");
+		});
+	}
+<# }#>
+
+	//布局后初始化函数
+	if (typeof allReadyList === "function") {
+		allReadyList();
+	}
+
+	var frame = $GetWFrame();
+    if (frame) {
+        var listref = Ext.create('Ext.ng.ListRefresher', {
+            listeners: {
+                refreshlist: function () {
+                    store.load();
+                }
+            }
+        });
+
+        frame.ListObserver.add(eform, listref);
+    }
+
+});

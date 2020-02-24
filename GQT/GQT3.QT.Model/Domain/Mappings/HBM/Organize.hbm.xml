@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="OrganizeModel" table="fg_orglist">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="ParentOrgId" column="parent_orgid" type="System.Int64" not-null="false" />
+		<property name="OCode" column="ocode" type="System.String" length="20" not-null="false" />
+		<property name="OName" column="oname" type="System.String" length="80" not-null="false" />
+		<property name="ForeignFn" column="foreign_fn" type="System.String" length="255" not-null="false" />
+		<property name="ForeignAb" column="foreign_ab" type="System.String" length="50" not-null="false" />
+		<property name="Bopomofo" column="bopomofo" type="System.String" length="500" not-null="false" />
+		<property name="CodeValue" column="codevalue" type="System.String" length="30" not-null="false" />
+		<property name="OrgIndex" column="orgindex" type="System.String" length="40" not-null="false" />
+		<property name="IfCorp" column="ifcorp" type="System.String" not-null="false" />
+		<property name="IfLogin" column="iflogin" type="System.String" not-null="false" />
+		<property name="IsActive" column="isactive" type="System.String" length="1" not-null="false" />
+		<property name="EbDt" column="eb_dt" type="System.DateTime" not-null="false" />
+		<property name="EeDt" column="ee_dt" type="System.DateTime" not-null="false" />
+		<property name="CloseOrgDt" column="closeorgdt" type="System.DateTime" not-null="false" />
+		<property name="OTax" column="otax" type="System.String" length="40" not-null="false" />
+		<property name="OAddr" column="oaddr" type="System.String" length="80" not-null="false" />
+		<property name="OZip" column="ozip" type="System.String" length="20" not-null="false" />
+		<property name="OTel" column="otel" type="System.String" length="40" not-null="false" />
+		<property name="OFax" column="ofax" type="System.String" length="40" not-null="false" />
+		<property name="OEmail" column="oemail" type="System.String" length="80" not-null="false" />
+		<property name="OMemo" column="omemo" type="System.String" length="200" not-null="false" />
+		<property name="OOwner" column="oowner" type="System.String" length="255" not-null="false" />
+		<property name="OCfo" column="ocfo" type="System.String" length="255" not-null="false" />
+		<property name="OCbo" column="ocbo" type="System.String" length="255" not-null="false" />
+		<property name="OCio" column="ocio" type="System.String" length="255" not-null="false" />
+		<property name="OrgType" column="orgtype" type="System.String" length="5" not-null="false" />
+		<property name="StationCode" column="stationcode" type="System.String" length="40" not-null="false" />
+		<property name="EmpCode" column="empcode" type="System.String" length="255" not-null="false" />
+		<property name="EnterpriseNo" column="enterprise_no" type="System.String" length="60" not-null="false" />
+		<property name="TradeTypeId" column="tradetypeid" type="System.Int64" not-null="false" />
+		<property name="RelProject" column="relproject" type="System.Int64" not-null="false" />
+		<property name="GfiImport" column="gfi_import" type="System.String" length="10" not-null="false" />
+		<property name="PrStatus" column="pr_status" type="System.String" length="10" not-null="false" />
+		<property name="IsSalary" column="issalary" type="System.String" length="2" not-null="false" />
+		<property name="EnableFlg" column="enableflg" type="System.String" length="1" not-null="false" />
+		<property name="IsNfcShow" column="isnfcshow" type="System.String" length="1" not-null="false" />
+		<property name="IsRatePay" column="is_ratepay" type="System.String" length="1" not-null="false" />
+		<property name="IsTaxOrg" column="is_taxorg" type="System.String" length="1" not-null="false" />
+		<property name="IsStat" column="isstat" type="System.String" length="1" not-null="false" />
+		<property name="IsEnd" column="isend" type="System.String" length="1" not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+		<property name="IsWeChat" column="iswechat" type="System.String" length="1" not-null="false" />
+		<property name="WeChatId" column="wechatid" type="System.String" length="40" not-null="false" />
+	</class>
+</hibernate-mapping>

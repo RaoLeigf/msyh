@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="GHProjDtlShareModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="MK" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="XMDM" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DM" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="MC" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="STR1" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="STR2" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="STR3" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="STR4" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="STR5" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="STR6" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="STR7" >
+			<length min="0" max="40" message ="长度不超过40！"/>
+		</property>
+		<property name="STR8" >
+			<length min="0" max="40" message ="长度不超过40！"/>
+		</property>
+		<property name="STR9" >
+			<length min="0" max="40" message ="长度不超过40！"/>
+		</property>
+		<property name="STR10" >
+			<length min="0" max="40" message ="长度不超过40！"/>
+		</property>
+		<property name="STR11" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="STR12" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="STR13" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="STR14" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="STR15" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="STR16" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="STR17" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="STR18" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="STR19" >
+			<length min="0" max="250" message ="长度不超过250！"/>
+		</property>
+		<property name="STR20" >
+			<length min="0" max="250" message ="长度不超过250！"/>
+		</property>
+	</class>
+</nhv-mapping>

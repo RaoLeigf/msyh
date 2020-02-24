@@ -1,0 +1,752 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge,IE=11,IE=10,IE=9,IE=8" />
+    <link rel="stylesheet" href="~/NG3Resource/Desk/css/index.css" />
+    <link rel="stylesheet" href="~/NG3Resource/Desk/EasyUI/easyui.css" />
+    <link rel="stylesheet" href="~/NG3Resource/Desk/EasyUI/icon.css" />
+    <script type="text/javascript" src="~/NG3Resource/Desk/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="~/NG3Resource/Desk/EasyUI/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/NG3Resource/Desk/js/respond.js"></script>
+    <script type="text/javascript">
+
+
+        var $PageName = "",
+        C_ROOT = '@ViewBag.Root',
+        C_PATH = '@ViewBag.Path',
+        $user = { id: '@ViewBag.Logid', loginname: '@ViewBag.Logid' },
+        $appinfo = {
+            logid: '@ViewBag.Logid', username: '@ViewBag.UserName', ocode: '@ViewBag.OCode',
+            userID: '@ViewBag.userID', orgID: '@ViewBag.orgID',
+            dbServer: '@ViewBag.DbServerName', uCode: '@ViewBag.UCode'
+        },
+        $sessionid = '@ViewBag.SessionID',
+        SupCanVersion = '@ViewBag.SupCanVersion';
+        FuncName = '@ViewBag.FuncName';
+        Product = '@ViewBag.Product';
+        $ToolbarLang = '@ViewBag.ToolbarLang';
+        var $gridStateInfo = '@ViewBag.GridStateInfo';
+        var $queryPanelInfo = '@ViewBag.QueryPanelInfo';
+        var $toolbarRightInfo = '@ViewBag.ToolbarRightInfo';
+        var menuData;
+        var menuData2;
+        var menuData3;
+        var menuData4;
+    </script>
+    <script type="text/javascript">
+        window.onload = function () {
+            //低版本的IE浏览器不支持getElementByClassName方法，考虑兼容性,重写方法。
+            if (!document.getElementByClassName) {
+                document.getElementByClassName = function (cls) {
+                    var ret = [];
+                    var clsElments = document.getElementsByTagName('*');
+                    for (var i = 0, len = clsElments.length; i < len; i++) {
+                        //考虑一个标签有多个class的情况,这里用正则表达式会好一点
+                        if (clsElments[i].className == cls
+                            || (clsElments[i].className.indexOf(cls + " ") >= 0)
+                            || (clsElments[i].className.indexOf(" " + cls + " ") >= 0)
+                            || (clsElments[i].className.indexOf(" " + cls) >= 0)) {
+                            ret.push(clsElments[i]);
+                        }
+                    }
+                    return ret;
+                }
+            }
+
+            var nEi = document.getElementById('nei');
+            var oLi = nEi.getElementsByTagName('li');
+            var oa = document.getElementsByClassName('single');
+            var op = document.getElementsByClassName('title');
+
+            var cLs = document.getElementsByClassName('nei');
+            var ttt = document.getElementsByClassName('ttt');
+            for (var i = 0; i < oLi.length; i++) {
+                oLi[i].index = i
+                oLi[i].onclick = function () {
+                    for (var i = 0; i < oLi.length; i++) {
+                        oLi[i].style.background = '';
+                        var temp1 = oa[i].style.backgroundColor;
+                        var temp2 = oa[this.index].style.backgroundColor;
+
+                        if (temp1 == 'rgb(119, 136, 153)') {
+
+                        } else {
+                            oa[i].style.background = '#0f8bd8';
+                            op[i].style.border = '1px solid #0f8bd8';
+                        }
+                        //oa[i].style.background = '#0f8bd8';
+                        //op[i].style.color = '#000';
+                        //op[i].style.border = '1px solid #0f8bd8';
+                        cLs[i].style.display = 'none';
+                        ttt[i].style.display = 'none';
+                        //this.style.background = '#fd7549';
+                        //oa[this.index].style.background = '#fd7549';
+                        //op[this.index].style.color = '#fff';
+                        //op[this.index].style.border = '1px solid #fd7549';
+                        if (temp2 == "rgb(119, 136, 153)") {
+
+                        } else {
+                            oa[this.index].style.background = '#fd7549';
+                            op[this.index].style.border = '1px solid #fd7549';
+                        }
+                        cLs[this.index].style.display = 'block';
+                        ttt[this.index].style.display = 'block';
+                    }
+                }
+            }
+
+            $.ajax({
+                url: "@Url.Content("~/GQT/QT/UserOrg/GetList")",
+                type: 'POST',
+                data: { "userId": $appinfo.userID },
+                success: function (response) {
+                    if (response != null && response != undefined) {
+                        var response = response.replace("Record", '"Record"').replace("totalRows", '"totalRows"');
+                        var data = $.parseJSON(response);
+						//debugger;
+						$("#rw_report").on("click",".baobiao",function(){
+							var me = $(this);
+							var url = me.attr("url");
+							var title = me.attr("title");
+							if (url != undefined && url != null)
+								MPIshowWebForm(title, url);
+						});
+						if(data.Record.length <=3){
+							for (var i = 0; i < data.Record.length; i++) {
+								$("#rw_report").append("<p><a class='baobiao' href='javascript:void(0);' url='/RW/DesignFrame/ReportView?rep_id=" + data.Record[i].PhId + "&rep_src=0&rep_format=1&rep_code=" + data.Record[i].RepCode + "' title='" + data.Record[i].RepName + "'>" + data.Record[i].RepName +"</a></p>");
+							}
+							$("#rw_report").append("<p><a class='baobiao' href='javascript:void(0);' url='/RW/DesignFrame/DesignFrame?rep_genre=1&is_template=2' title='查询式报表'>更多</a></p>");
+						}else{
+							for (var i = 0; i < 3; i++) {
+								$("#rw_report").append("<p><a class='baobiao' href='javascript:void(0);' url='/RW/DesignFrame/ReportView?rep_id=" + data.Record[i].PhId + "&rep_src=0&rep_format=1&rep_code=" + data.Record[i].RepCode + "' title='" + data.Record[i].RepName + "'>" + data.Record[i].RepName +"</a></p>");
+							}
+							$("#rw_report").append("<p><a class='baobiao' href='javascript:void(0);' url='/RW/DesignFrame/DesignFrame?rep_genre=1&is_template=2' title='查询式报表'>更多</a></p>");
+						}
+                    }
+                }
+            });
+            $.ajax({
+
+	            url:"@Url.Content("~/SUP/MainTree/LoadMenu")",
+                data: { "ng3_logid": $appinfo.userID, "flag": true, "treeFilter": '', "_dc": 1540520816811, "suite": "GYS", "node": "root" },
+                async:false,
+	            success:function(response){
+		            if (response != null && response != undefined) {
+                        menuData = response;
+                        $.ajax({
+
+							url:"@Url.Content("~/SUP/MainTree/LoadMenu")",
+                            data: { "ng3_logid": $appinfo.userID, "flag": true, "treeFilter": '', "_dc": 1541572258144, "suite": "EPM", "node": "root" },
+                            async: false,
+							success:function(response){
+								if (response != null && response != undefined) {
+                                    menuData2 = response;
+                                    $.ajax({
+
+                                        url: "@Url.Content("~/SUP/MainTree/LoadMenu")",
+                                        data: { "ng3_logid": $appinfo.userID, "flag": true, "treeFilter": '', "_dc": 1544419436720, "suite": "GSZ", "node": "root" },
+                                        async: false,
+                                        success: function (response) {
+                                            menuData3 = response;	
+                                            $.ajax({
+                                                url: "@Url.Content("~/SUP/MainTree/LoadMenu")",
+                                                data: { "ng3_logid": $appinfo.userID, "flag": true, "treeFilter": '', "_dc": 1548300470714, "suite": "WM", "node": "root" },
+                                                async: false,
+                                                success: function (response) {
+                                                    menuData4 = response;
+                                                    $('a').each(function () {
+                                                        var url = $(this).attr('url');
+
+                                                        if (url != null && url != undefined && !checkUrlExist(menuData, url) && !checkUrlExist(menuData2, url) && !checkUrlExist(menuData3, url) && !checkUrlExist(menuData4, url)) {
+                                                            var element = $(this).children('img');
+                                                            if (element.length > 0) {
+                                                                var imgEle = element[0];
+                                                                var oldImage = imgEle.src;
+                                                                //debugger;
+                                                                $(this).css({ "background-color": "#778899" });
+                                                                $(this).next().css({ "border": "1px solid #778899" });
+                                                            }
+                                                            //debugger;
+                                                        }
+                                                    });
+                                                }
+                                            })
+											
+                                        }
+                                    });
+								}
+							}
+						});
+		            }
+	            }
+            });
+        }
+        $.formTabs = function () {
+            function tag(name, elem) {
+                return (elem || document).getElementsByTagName(name);
+            }
+            //获得相应ID的元素
+            function id(name) {
+                return document.getElementById(name);
+            }
+            function first(elem) {
+                elem = elem.firstChild;
+                return elem && elem.nodeType == 1 ? elem : next(elem);
+            }
+            function next(elem) {
+                do {
+                    elem = elem.nextSibling;
+                } while (
+                    elem && elem.nodeType != 1
+                )
+                return elem;
+            }
+            return {
+                set: function (elemId, tabId) {
+                    var elem = tag("li", id(elemId));
+                    var tabs = $('#' + tabId).children('div');
+                    var listNum = elem.length;
+                    var tabNum = tabs.length;
+                    for (var i = 0; i < listNum; i++) {
+                        elem[i].onclick = (function (i) {
+                            return function () {
+                                for (var j = 0; j < tabNum; j++) {
+                                    if (i == j) {
+                                        tabs[j].style.display = "block";
+                                        elem[j].className = "active";
+                                    }
+                                    else {
+                                        tabs[j].style.display = "none";
+                                        elem[j].className = "";
+                                    }
+                                }
+                            }
+                        })(i)
+                    }
+                }
+            }
+        }();
+
+        //我的消息提示框
+        function MPIMessgeShow(mesg, msgtype) {
+            if (!msgtype) {
+                msgtype = "提示";
+            }
+            if (mesg) {
+                $.messager.show({ title: msgtype, msg: mesg, showType: "slide", timeout: 2000 });
+            }
+        }
+
+        function MPIshowWebForm(title, url) {
+            if (window.external.ShowWeb) {
+                window.external.ShowWeb(url);
+            }
+            else if (window.parent.$OpenTab) {
+                window.parent.$OpenTab(title, url);
+            }
+            else if ($OpenTab) {
+                $OpenTab(title, url);
+            }
+
+        }
+
+        function MPIshowWinFromWithParm(url, urlparam) {
+            if (window.external.ShowManagerWithParm) {
+                window.external.ShowManagerWithParm(url, -1, urlparam);
+            } else {
+
+                MPIMessgeShow('不支持打开非web单据！');
+            }
+        }
+
+
+        function refreshMainFrame() {
+            getDataCount();
+
+            getDataApproveCount();
+        }
+    </script>
+    <script>
+
+        $(function () {
+            //tab切换注册
+            $.formTabs.set("myTab", "menu_con");
+
+            $(".myTab li a").click(function () {
+                var me = $(this);
+                var url = me.attr("url");
+                //var title = me.children(" p.z2").text();
+                var title = me.attr("title");
+
+                if (url != undefined && url != null) {
+                    MPIshowWebForm(title, url);
+                }
+            });
+
+            $("ul.biao li").click(function () {
+
+                //var id = $(this).attr("divid");
+
+                //if (id != null && id != '' && id != undefined) {
+                //    $("#" + id).show();
+                //}
+
+                //var liarry = $(this).parent().parent().parent().find("li");
+
+                //$(this).parent().parent().parent().find("a[name='single']").removeClass().addClass('tab-nav');
+                //$(this).find("a[name='single']").removeClass().addClass('tab-nav-action').siblings().removeClass().addClass('tab-nav');
+
+                //$(this).parent().children().find('div').each(function () {
+                //    $(this).css("display", "none");
+                //})
+                //$(this).children("div").css("display", "block");
+            });
+
+            $("ul.biao div a").click(function () {
+                var me = $(this);
+                var url = me.attr("url");
+                var title = me.attr("title");
+                if (url != undefined && url != null)
+                {
+                    if (checkUrlExist(menuData, url) || checkUrlExist(menuData2, url) || checkUrlExist(menuData3, url) || checkUrlExist(menuData4, url)) {
+                        MPIshowWebForm(title, url);
+                    } else {
+                        MPIMessgeShow('您没有当前权限');
+                        //Ext.MessageBox.alert('提示', '您没有当前权限');
+                        //$.messager.alert("提示","您没有当前权限");
+                    }
+                }
+            });
+
+            $("ul.biao li a").click(function () {
+                var me = $(this);
+                var url = me.attr("url");
+                var title = me.attr("title");
+                if (url != undefined && url != null)
+                {
+                    if (checkUrlExist(menuData, url) || checkUrlExist(menuData2, url) || checkUrlExist(menuData3, url) || checkUrlExist(menuData4, url)) {
+                        MPIshowWebForm(title, url);
+                    } else {
+                        MPIMessgeShow('您没有当前权限');
+                        //Ext.MessageBox.alert('提示', '您没有当前权限');
+                        //$.messager.alert("提示","您没有当前权限");
+                    }
+                }
+            });
+
+            $(".kuang ul li").click(function () {
+                var activity = $(this).attr("class");
+
+                if (activity != "selected") {
+                    alert("正在开发....");
+                }
+
+            });
+
+            getDataCount();
+
+            getDataApproveCount();
+        });
+
+        function checkUrlExist(data,urlStr) {
+            if (data != null && data != undefined) {
+                //debugger;
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].url == urlStr) {
+                        return true;
+                    }
+                    for (var j = 0; j < data[i].children.length; j++) {
+                        if (data[i].children[j].url == urlStr) {
+                            //debugger;
+                            return true;
+                        }
+                        if (data[i].children[j].children != null) {
+                            for (var k = 0; k < data[i].children[j].children.length; k++) {
+                                //debugger;
+                                if (data[i].children[j].children[k].url == urlStr) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        function getDataCount() {
+            var ran = Math.random();
+            $.ajax({
+                url: "@Url.Content("~/GXM/XM/DefinedDesk/ProjectDataCount")",
+                type: 'POST',
+                data: { "ng3_logid": $appinfo.userID, "ng3_usercode": $appinfo.logid, "random": ran},
+                dataType: "json",
+                async: true,
+                success: function (response) {
+                    if (response != null && response != undefined) {
+                        //var data = $.parseJSON(response);
+                        $("#procount").text(response.ProjectCount);
+                        $("#budcount").text(response.BudgetCount);
+                        //$("#proapprove").text(response.ProjectApproval);
+                        //$("#budapprove").text(response.BudgetApproval);
+                        $("#budapprove").text(response.WorkFlowList);
+
+                        var notice = response.noticeList;
+                    }
+                }
+            });
+
+            //获取通知内容
+            $.ajax({
+                url: "@Url.Content("~/GXM/XM/DefinedDesk/GetNotice")",
+                type: 'POST',
+                data: {},
+                //dataType: "json",
+                async: true,
+                success: function (response) {
+                    if (response != null && response != undefined) {
+                        var response = response.replace("Record", '"Record"').replace("totalRows", '"totalRows"');
+                        var data = $.parseJSON(response);
+
+                        var notice = data.Record;
+                        //清除原来的内容
+                        $(".notice").empty();
+                        for (var i = 0; i < notice.length; i++) {
+
+                            $(".notice").append("<li><a href=\"javascript: void(0);\"><p class=\"nowrap\" style=\"float:left; width:70%\">" + notice[i].title + "</p><div style=\"float:left;width:30%\"><div style=\"text-align:center;\">" + notice[i].datetime + "</div></div></a></li>");
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+
+
+        };
+
+        function getDataApproveCount() {
+            var ran = Math.random();
+            $.ajax({
+                url: "@Url.Content("~/WorkFlow3/FlowManager/GetPendingTaskByUser")",
+                type: 'POST',
+                data: { "page": 0, "start": 0, "limit": 1, "ng3_logid": $appinfo.userID, "random": ran, "queryfilter": '{ "act_ru_task.FORM_RESOURCE_KEY_*str*like*1": "GH" }'},
+                //data: { "page": 0, "queryfilter": '{ "act_ng_bizinfo.bizid*str*eq*1": "GHProject" }', "start": 0, "limit": 1, "ng3_logid": $appinfo.userID, "random": ran },
+                //dataType: "json",
+                async: true,
+                success: function (response) {
+                    if (response != null && response != undefined) {
+                        //console.log(response);
+                        var response = response.replace("Record", '"Record"').replace("totalRows", '"totalRows"');
+                        var data = $.parseJSON(response);
+
+                        $("#proapprove").text(data.totalRows);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+
+            //待预算
+            $.ajax({
+                url: "@Url.Content("~/WorkFlow3/FlowManager/GetPendingTaskByUser")",
+                type: 'POST',
+                data: { "page": 0, "start": 0, "limit": 1, "ng3_logid": $appinfo.userID, "random": ran, "queryfilter": '{ "act_ru_task.FORM_RESOURCE_KEY_*str*like*1": "Projectnew_Select" }'},
+                //data: { "page": 0, "queryfilter": '{ "act_ng_bizinfo.bizid*str*eq*1": "GHProject" }', "start": 0, "limit": 1, "ng3_logid": $appinfo.userID, "random": ran },
+                //dataType: "json",
+                async: true,
+                success: function (response) {
+                    if (response != null && response != undefined) {
+                        //console.log(response);
+                        var response = response.replace("Record", '"Record"').replace("totalRows", '"totalRows"');
+                        var data = $.parseJSON(response);
+
+                        $("#budapprove").text(data.totalRows);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            });
+
+            @*$.ajax({
+                url: "@Url.Content("~/WorkFlow3/FlowManager/GetPendingTaskByUser")",
+                type: 'POST',
+                data: { "page": 0, "queryfilter": '{"act_ng_bizinfo.bizid*str*eq*1":"GHBudget"}', "start": 0, "limit": 1, "ng3_logid": $appinfo.userID, "random": ran },
+                //dataType: "json",
+                async: true,
+                success: function (response) {
+                    if (response != null && response != undefined) {
+                        //console.log(response);
+                        var response = response.replace("Record", '"Record"').replace("totalRows", '"totalRows"');
+                        var data = $.parseJSON(response);
+                        $("#budapprove").text(data.totalRows);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(textStatus);
+                }
+            })*@
+
+        };
+    </script>
+</head>
+<body>
+    <div class="box">
+        <div class="left_box">
+            <div class="left_box1">
+                <ul id="myTab">
+                    <li class="active"><p class="zi">待办任务</p></li>
+                    <li><p class="zi">通知公告</p></li>
+                </ul>
+            </div>
+            <div class="tab-content" id="menu_con">
+                <div class="left_box2 active">
+                    <img class="left_box_img" src="~/NG3Resource/Desk/img/1.png" />
+                    <div class="tu">
+                        @*<div class="tou"><img src="~/NG3Resource/Desk/img/tou.png" /></div>*@
+                        <img class="left_box_img" src="~/NG3Resource/Desk/img/dt.jpg" />
+                    </div>
+                    <div class="neirong">
+                        <ul class="myTab">
+                            <li class="bian">
+                                <a href="javascript:void(0);" url="/GXM/XM/ProjectMst/ProjectMstList?FApproveStatus=1" title="待上报项目">
+                                    <p id="procount" class="z1">0</p>
+                                    <p class="z2">待上报项目</p>
+                                </a>
+                            </li>
+                            <li class="bian1">
+                                @*<a href="javascript:void(0);" url="/WorkFlow3/FlowManager/MyProcessInstanceList" title="我的工作任务">*@
+                                <a href="javascript:void(0);" url="/WorkFlow3/FlowManager/WorkFlowTaskList" title="我的工作任务">
+                                    <p id="proapprove" class="z1">0</p>
+                                    <p class="z2">待审批任务</p>
+                                </a>
+                            </li>
+                            <li class="bian2">
+                                <a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList?FApproveStatus=1" title="预算项目">
+                                    <p id="budcount" class="z1">0</p>
+                                    <p class="z2">待上报预算</p>
+                                </a>
+                            </li>
+                            <li>
+                                @*<a href="javascript:void(0);" url="/GXM/XM/ProjectMst/WorkFlowTaskListG6H?workType=1" title="待预算通过">*@
+                                <a href="javascript:void(0);" url="/WorkFlow3/FlowManager/WorkFlowTaskList?workType=1" title="待预算通过">
+                                    <p id="budapprove" class="z1">0</p>
+                                    <p class="z2">待预算通过</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="left_box2" style="display:none">
+                    <div class="left_box2_content">
+                        <ul class="notice">
+
+
+                            @*<li><a href="javascript:void(0);"><p class="nowrap" style="float:left;width:70%">关于推荐申报全国模范职工之家、全国模</p><div style="float:left;width:30%"><div style="text-align: center;">2018-09-03</div></div></a></li>
+                                <li><a href="javascript:void(0);"><p class="nowrap" style="float:left;width:70%">关于推荐申报全国模范职工之家、全国模</p><div style="float:left;width:30%"><div style="text-align: center;">2018-09-03</div></div></a></li>*@
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="nei" class="right_box">
+            @*<img class="left_box_img cen" src="~/NG3Resource/Desk/img/2.png" />*@
+            <div class="bn">
+                <p class="zi1">项目管理</p>
+                <ul class="biao">
+                    <li style="margin-left:0;">
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/GXM/XM/ProjectMst/ProjectMstList?ProjStatus=1" title="预立项"><img src="~/NG3Resource/Desk/img/t7.png" /></a>
+                        <p class="menu-p title" name="title">预立项</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;"></i>
+                        <div class="nei" style="width:400px"></div>
+                    </li>
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/GXM/XM/ProjectMst/ProjectMstList?ProjStatus=2" title="项目立项"><img src="~/NG3Resource/Desk/img/t1.png" /></a>
+                        <p class="menu-p title" name="title">项目立项</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;"></i>
+                        <div class="nei" style="width:400px"></div>
+                    </li>
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/GXM/XM/ProjectMst/ProjectMstList" title="项目查询"><img src="~/NG3Resource/Desk/img/t6.png" /></a>
+                        <p class="menu-p title" name="title">项目查询</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;"></i>
+                        <div class="nei" style="width:400px"></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="bn">
+                <p class="zi1">预算管理</p>
+                <ul class="biao">
+                    <li style="margin-left:0; position:relative;" divid="a1">
+                        <a class="menu-a single" name="single">
+                            <img src="~/NG3Resource/Desk/img/t2.png" />
+                        </a>
+                        <p class="menu-p title" name="title">年初申报</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-21px; display:none;">
+                            <img src="~/NG3Resource/Desk/img/ttt.png" style="width: 100%;" />
+                        </i>
+                        <div id="a1" class="nei" style="width:400px;">
+                            <div class="chlid-title">
+                                <p><a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList?workType=c" title="项目支出申报">项目支出申报</a></p>
+                                <p><a href="javascript:void(0);" url="/GYS/YS/GHSubject/GHSubjectList?FKmlb=1" title="基本支出申报">基本支出申报</a></p>
+                                <p><a href="javascript:void(0);" url="/GYS/YS/GHSubject/GHSubjectList?FKmlb=0" title="收入预算申报">收入预算申报</a></p>
+                                <p><a href="javascript:void(0);" url="/GYS/YS/GHSubject/GHSubjectSelect?FKmlb=1" title="基本收/支申报汇总">基本收/支申报汇总</a></p>
+                                @*<p><a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList?workType=z" title="年中预算调整">年中预算调整</a></p>*@
+                                @*<p><a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList" title="特殊专项申报">特殊专项申报</a></p>*@
+                            </div>
+                        </div>
+                    </li>
+                    <li style="position:relative;" divid="a2">
+                        <a class="menu-a single" name="single"><img src="~/NG3Resource/Desk/img/tz.png" /></a>
+                        <p class="menu-p title" name="title">年中调整</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-21px; display:none;">
+                            <img src="~/NG3Resource/Desk/img/ttt.png" style="width: 100%;" />
+                        </i>
+                        <div id="a2" class="nei" style="width:400px;">
+                            <div class="chlid-title">
+                                <p><a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList?workType=z" title="项目支出调整">项目支出调整</a></p>
+                                <p><a href="javascript:void(0);" title="基本支出调整">基本支出调整</a></p>
+                                <p><a href="javascript:void(0);" title="收入预算调整">收入预算调整</a></p>
+                                @*<p><a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList?workType=z" title="年中预算调整">年中预算调整</a></p>*@
+                                @*<p><a href="javascript:void(0);" url="/GYS/YS/BudgetMst/BudgetMstList" title="特殊专项申报">特殊专项申报</a></p>*@
+                            </div>
+                        </div>
+                    </li>
+                    <li style="position:relative;" divid="a2">
+                        <a class="menu-a single" name="single"><img src="~/NG3Resource/Desk/img/t3.png" /></a>
+                        <p class="menu-p title" name="title">查询统计</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-21px; display:none;">
+                            <img src="~/NG3Resource/Desk/img/ttt.png" style="width: 100%;" />
+                        </i>
+                        <div id="a2" class="nei">
+                            <div class="chlid-title" id="rw_report">
+                                @*<p><a href="javascript:void(0);" url="/RW/DesignFrame/ReportView?rep_id=459180924000001&rep_src=0&rep_format=1&rep_code=201809240001" title="预算汇总申报表">预算汇总申报表</a></p>
+                    <p><a href="javascript:void(0);" url="/RW/DesignFrame/ReportView?rep_id=445180926000002&rep_src=0&rep_format=1&rep_code=201809260002" title="部门预算安排表">部门预算安排表</a></p>
+                    <p><a href="javascript:void(0);" url="/RW/DesignFrame/ReportView?rep_id=459180924000002&rep_src=0&rep_format=1&rep_code=201809240002" title="部门经费预算通知书">部门经费预算通知书</a></p>
+                    <p><a href="javascript:void(0);" url="/RW/DesignFrame/ReportView?rep_id=459180925000001&rep_src=0&rep_format=1&rep_code=201809250001" title="经费预算支出类别表">经费预算支出类别表</a></p>
+                    <p><a href="javascript:void(0);" url="/RW/DesignFrame/ReportView?rep_id=487180919000015&rep_src=0&rep_format=1&rep_code=201809190004" title="经费收支预算表">工会经费收支预算表</a></p>*@
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="WM/Archive/ArcDispatch/ArcDispatchList" title="编报说明"><img src="~/NG3Resource/Desk/img/t17.png" /></a>
+                        <p class="menu-p title" name="title">编报说明</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;"></i>
+                        <div class="nei" style="width:400px"></div>
+                    </li>
+
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/GYS/YS/BudgetProcessCtrl/BudgetProcessCtrlList" title="进度控制">
+                            <img src="~/NG3Resource/Desk/img/t4.png" />
+                        </a>
+                        <p class="menu-p title" name="title">进度控制</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+
+                        </i>
+                        <div class="nei" style="width:400px">
+
+                        </div>
+                    </li>
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="GQT/QT/QtBaseProject/QtBaseProjectList" title="任务指派">
+                            <img src="~/NG3Resource/Desk/img/ys.png" />
+                        </a>
+                        <p class="menu-p title" name="title">任务指派</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+
+                        </i>
+                        <div class="nei" style="width:400px">
+
+                        </div>
+
+                    </li>
+                </ul>
+            </div>
+            <div class="bn">
+                <p class="zi1">绩效管理</p>
+                <ul class="biao">
+                    <li style="margin-left:0;">
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/GJX/JX/PerformanceMst/PerformanceMstList" title="绩效评价">
+                            <img src="~/NG3Resource/Desk/img/t5.png" />
+                        </a>
+                        <p class="menu-p title" name="title">绩效评价</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+
+                        </i>
+                        <div class="nei">
+
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="bn">
+                <p class="zi1">数据填报</p>
+                <ul class="biao">
+                    <li style="margin-left:0;">
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/RW/DesignFrame/DesignFrameFill?rep_genre=2&is_template=2" title="填报报表">
+                            <img src="~/NG3Resource/Desk/img/tb.png" />
+                        </a>
+                        <p class="menu-p title" name="title">填报报表</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+                        </i>
+                        <div class="nei">
+                        </div>
+                    </li>
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/RW/DesignFrame/DesignFrameSummary?rep_genre=3&is_template=2" title="汇总报表">
+                            <img src="~/NG3Resource/Desk/img/hz.png" />
+                        </a>
+                        <p class="menu-p title" name="title">汇总报表</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+                        </i>
+                        <div class="nei">
+                        </div>
+                    </li>
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="/RW/ReportFillPlan/ExcuteRemindList" title="追踪报表">
+                            <img src="~/NG3Resource/Desk/img/zz.png" />
+                        </a>
+                        <p class="menu-p title" name="title">追踪报表</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+                        </i>
+                        <div class="nei">
+                        </div>
+                    </li>
+                    <li>
+                        <a class="menu-a single" href="javascript:void(0);" name="single" url="" title="项目申报">
+                            <img src="~/NG3Resource/Desk/img/xm.png" />
+                        </a>
+                        <p class="menu-p title" name="title">项目申报</p>
+                        <i class="ttt" style="width:14px; position:absolute; left:50%; margin-left:-7px; bottom:-12px; display:none;">
+                        </i>
+                        <div class="nei">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        @*<div class="bottom_box">
+                <img class="left_box_img cen" src="~/NG3Resource/Desk/img/3.png" />
+                <div class="kuang">
+                    <ul>
+                        <li class="selected"><img src="~/NG3Resource/Desk/img/b1.png" /></li>
+                        <li><img src="~/NG3Resource/Desk/img/j.png" /></li>
+                        <li><img src="~/NG3Resource/Desk/img/j.png" /></li>
+                        <li><img src="~/NG3Resource/Desk/img/j.png" /></li>
+                        <li><img src="~/NG3Resource/Desk/img/j.png" /></li>
+                        <li><img src="~/NG3Resource/Desk/img/j.png" /></li>
+                    </ul>
+                    <div class="aniiu"><p class="gd">更多</p></div>
+                </div>
+            </div>*@
+    </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+﻿@{
+    ViewBag.Title = (ViewBag.Title == "" || ViewBag.Title == null) ? "申请去审" : ViewBag.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script type="text/javascript">
+
+        //获取页面url的参数
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", 'i');
+            var r = window.location.search.substr(1).match(reg);//window.location.search代表从?开始的url
+            if (r != null)
+                return unescape(r[2]);
+            return '';
+        }
+
+        var params = '@ViewBag.pa';
+        var json = Ext.JSON.decode(Ext.htmlDecode(params));
+        //var json = Ext.JSON.decode(params);
+
+        var _ucode = (json.ucode == undefined || json.ucode == null) ? '' : json.ucode;
+        var _ocode = (json.ocode == undefined || json.ocode == null) ? '' : json.ocode;
+        var _logid = (json.logid == undefined || json.logid == null) ? '' : json.logid;
+        var _ccode = (json.ccode == undefined || json.ccode == null) ? '' : json.ccode;
+        var paramvalue = json.paramvalue;
+        var msgdescription = json.msgdescription;
+        var sortdate = json.sortdate;
+        var receiverName = json.receiverName;
+        var receiver = json.receiver;
+        var sender = json.sender;
+        var targetcboo = json.targetcboo;
+
+        Ext.onReady(function () {
+
+            var toolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                height: 30,
+                margin: '0 100 0 0',
+                showArrowBtn: false,
+                ngbuttons: ['->', 'ok', 'cancel'],
+            });
+
+            var form = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                columnsPerRow: 1,
+                frame: true,
+                fields: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '接收人',
+                        id: 'receiverName',
+                        name: 'receiverName',
+                        readOnly: true
+                    }, {
+                        xtype: 'ngTextArea',
+                        fieldLabel: '消息内容',
+                        id: 'msgdescription',
+                        name: 'msgdescription',
+                        height: 100,
+                        readOnly: true
+                    }
+                ]
+            });
+
+
+            form.queryById('receiverName').setValue(receiverName);
+            form.queryById('msgdescription').setValue(msgdescription);
+
+            Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items:
+                  [
+                    form, toolbar
+                  ]
+            });
+
+            toolbar.get('cancel').on('click', function () {
+                $CloseTab();
+            })
+
+            toolbar.get('ok').on('click', function () {
+                if (!receiverName) {
+                    Ext.MessageBox.alert('提示', '接收人不能为空');
+                    return;
+                }
+                if (!msgdescription) {
+                    Ext.MessageBox.alert('提示', '消息内容不能为空');
+                    return;
+                }
+                Ext.Ajax.request({
+                    url: '@Url.Content("~/SUP/ApplyCheck/ConfirmApplyCheckWithMsg")',
+                    params: {
+                        '_ucode': _ucode,
+                        '_ocode': _ocode,
+                        '_logid': _logid,
+                        '_ccode': _ccode,
+                        'paramvalue': paramvalue,
+                        'msgdescription': msgdescription,
+                        'sortdate': sortdate,
+                        'receiver': receiver,
+                        'sender': sender,
+                        'targetcboo': targetcboo
+                    },
+                    success: function (response) {
+                        var result = Ext.JSON.decode(response.text);
+                        //var result = eval('('+response.text+')')
+                        if (result.success == "True") {
+                            Ext.MessageBox.confirm('提示', '申请去审成功，是否关闭当前页面？', callBack);
+                            function callBack(id) {
+                                if (id == 'yes') {
+                                    $CloseTab();
+                                }
+                            }
+                            //Ext.MessageBox.alert('提示', '申请去审失败');
+
+                        }
+                        //else if (result.success == "False" && result.msg != "") {
+                        //    Ext.MessageBox.alert('提示', result.msg);
+                        //}
+                        else {
+                            Ext.MessageBox.alert('提示', result.msg);
+                        }
+                    }
+                })
+            })
+        })
+
+    </script>
+}

@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="uic_supplier_progress_his">
+      <Field Name="hisid" IsKey="true"/>
+      <Field Name="purid" />
+      <Field Name="lineid" />
+      <Field Name="isnew" />
+      <Field Name="recordocode" />
+      <Field Name="recordtime"/>
+      <Field Name="recordtype"/>
+      <Field Name="remark"/>
+      <Field Name="statename"/>
+      <Field Name="stateno"/>
+    </Table>
+    <Table Name="enterprise">
+      <Field Name="compname"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+       
+    </Sql>
+    <Where>
+      
+    </Where>
+  </Read>
+  <Record>
+  </Record>
+  <Create>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+  <GetSupplyProgressHisData>
+    <Sql>
+      select c_name statusname,uic_supplier_progress_his.remarks,recordocode,recordtime 
+      from fg_simple_data inner join uic_supplier_progress_his
+      on fg_simple_data.c_no = uic_supplier_progress_his.stateno [where]
+    </Sql>
+    <Where>
+      <Exp Field="c_type"  Value="supplierorderstate"/>
+      <Exp Field="recordtype" Value="0"></Exp>
+    </Where>
+    <Query>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>
+    </Query>
+  </GetSupplyProgressHisData>
+  <GetGroupProgressHisData>
+    <Sql>
+      select statename,remarks,recordocode,recordtime from uic_supplier_progress_his [where]
+    </Sql>
+    <Where>
+      <Exp Field="recordtype"  Value="1"/>
+    </Where>
+    <Query>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>
+    </Query>
+  </GetGroupProgressHisData>
+  <GetHisData>
+    <Sql>
+      select purno,supcompname,recordtime from uic_supplier_progress_his [where]
+    </Sql>
+    <Where>
+      <Exp Field="recordtype"  Value="1"/>
+    </Where>
+    <Query>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>
+    </Query>
+  </GetHisData>
+  <GetMaxHisId>
+    <Sql>
+      select max(hisid) from uic_supplier_progress_his 
+    </Sql>
+  </GetMaxHisId>
+</DataService>
+

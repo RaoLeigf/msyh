@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+	<Tables>
+		<Table Name="wsp_shippack">
+			<Field Name="id" IsKey="true" />
+			<Field Name="packid" />
+			<Field Name="packqty"  />
+			<Field Name="packstandard"/>
+			<Field Name="shipid"/>
+		</Table>
+	</Tables>
+	<Read>
+		<Sql>
+			select [fields] from [table] [where] 
+		</Sql>
+		<Where>
+			<Exp Field="shipid"  Target="Client" Value="shipid"/>
+		</Where>
+		<Query>
+			
+		</Query>
+		<OrderBy>
+
+		</OrderBy>
+	</Read>
+	<Record>
+
+	</Record>
+	<Create>
+
+	</Create>
+	<Update>
+
+	</Update>
+	<Delete>
+
+	</Delete>
+	<Destroy>
+
+	</Destroy>
+	<GetMaxId>
+		<Sql>
+			select max(id) from wsp_shippack 
+		</Sql>
+	</GetMaxId>
+</DataService>

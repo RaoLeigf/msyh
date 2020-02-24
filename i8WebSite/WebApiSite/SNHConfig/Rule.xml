@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net" default-lazy-init="true" >
+
+
+  <!--fg3_user-->
+  <!--<object id="GCW3.CW.Rule.User" type="GCW3.CW.Rule.UserRule, GCW3.CW.Rule" >
+    <property name="CurrentDac" ref="GCW3.CW.Dac.User"/>
+  </object>-->
+
+  <!--GXM3.XM-->
+  <object id="GXM3.XM.Rule.ProjectMst" type="GXM3.XM.Rule.ProjectMstRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectMst"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlTextContent" type="GXM3.XM.Rule.ProjectDtlTextContentRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlTextContent"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlPurchaseDtl" type="GXM3.XM.Rule.ProjectDtlPurchaseDtlRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlPurchaseDtl"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlPurDtl4SOF" type="GXM3.XM.Rule.ProjectDtlPurDtl4SOFRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlPurDtl4SOF"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlPerformTarget" type="GXM3.XM.Rule.ProjectDtlPerformTargetRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlPerformTarget"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlFundAppl" type="GXM3.XM.Rule.ProjectDtlFundApplRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlFundAppl"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlBudgetDtl" type="GXM3.XM.Rule.ProjectDtlBudgetDtlRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlBudgetDtl"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlImplPlan" type="GXM3.XM.Rule.ProjectDtlImplPlanRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlImplPlan"/>
+  </object>
+  <object id="GXM3.XM.Rule.ProjectDtlPersonnel" type="GXM3.XM.Rule.ProjectDtlPersonnelRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlPersonnel"/>
+  </object>
+
+  <object id="GXM3.XM.Rule.ProjectDtlPersonName" type="GXM3.XM.Rule.ProjectDtlPersonNameRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.ProjectDtlPersonName"/>
+  </object>
+
+  <object id="GXM3.XM.Rule.XmReportMst" type="GXM3.XM.Rule.XmReportMstRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.XmReportMst"/>
+  </object>
+  <object id="GXM3.XM.Rule.XmReportDtl" type="GXM3.XM.Rule.XmReportDtlRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.XmReportDtl"/>
+  </object>
+
+
+  <!--GQT3.QT-->
+  <object id="GQT3.QT.Rule.BudgetAccounts" type="GQT3.QT.Rule.BudgetAccountsRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.BudgetAccounts"/>
+  </object>
+  <object id="GQT3.QT.Rule.ExpenseCategory" type="GQT3.QT.Rule.ExpenseCategoryRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.ExpenseCategory"/>
+  </object>
+  <object id="GQT3.QT.Rule.CorrespondenceSettings" type="GQT3.QT.Rule.CorrespondenceSettingsRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.CorrespondenceSettings"/>
+  </object>
+  <object id="GQT3.QT.Rule.SourceOfFunds" type="GQT3.QT.Rule.SourceOfFundsRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.SourceOfFunds"/>
+  </object>
+  <object id="GQT3.QT.Rule.CorrespondenceSettings2" type="GQT3.QT.Rule.CorrespondenceSettings2Rule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.CorrespondenceSettings2"/>
+  </object>
+  <object id="GQT3.QT.Rule.PaymentMethod" type="GQT3.QT.Rule.PaymentMethodRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.PaymentMethod"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtSysCodeSeq" type="GQT3.QT.Rule.QtSysCodeSeqRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtSysCodeSeq"/>
+  </object>
+  <object id="GQT3.QT.Rule.ProjLibProj" type="GQT3.QT.Rule.ProjLibProjRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.ProjLibProj"/>
+  </object>
+  <object id="GQT3.QT.Rule.GHProjDtlShare" type="GQT3.QT.Rule.GHProjDtlShareRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.GHProjDtlShare"/>
+  </object>
+  <object id="GQT3.QT.Rule.User" type="GQT3.QT.Rule.UserRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.User"/>
+  </object>
+  <object id="GQT3.QT.Rule.Organization" type="GQT3.QT.Rule.OrganizationRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.Organization"/>
+  </object>
+
+  <object id="GQT3.QT.Rule.VCorrespondenceSetting2" type="GQT3.QT.Rule.VCorrespondenceSetting2Rule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.VCorrespondenceSetting2"/>
+  </object>
+  <object id="GQT3.QT.Rule.UserOrg" type="GQT3.QT.Rule.UserOrgRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.UserOrg"/>
+  </object>
+
+  <object id="GQT3.QT.Rule.OrgRelatitem2" type="GQT3.QT.Rule.OrgRelatitem2Rule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.OrgRelatitem2"/>
+  </object>
+  <object id="GQT3.QT.Rule.RWReport" type="GQT3.QT.Rule.RWReportRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.RWReport"/>
+  </object>
+  <object id="GQT3.QT.Rule.ProcurementType" type="GQT3.QT.Rule.ProcurementTypeRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.ProcurementType"/>
+  </object>
+  <object id="GQT3.QT.Rule.ProcurementProcedures" type="GQT3.QT.Rule.ProcurementProceduresRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.ProcurementProcedures"/>
+  </object>
+  <object id="GQT3.QT.Rule.PerformEvalTargetType" type="GQT3.QT.Rule.PerformEvalTargetTypeRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.PerformEvalTargetType"/>
+  </object>
+  <object id="GQT3.QT.Rule.PerformEvalTarget" type="GQT3.QT.Rule.PerformEvalTargetRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.PerformEvalTarget"/>
+  </object>
+  <object id="GQT3.QT.Rule.PerformEvalTargetClass" type="GQT3.QT.Rule.PerformEvalTargetClassRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.PerformEvalTargetClass"/>
+  </object>
+  <object id="GQT3.QT.Rule.ProcurementCatalog" type="GQT3.QT.Rule.ProcurementCatalogRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.ProcurementCatalog"/>
+  </object>
+  <object id="GQT3.QT.Rule.PerformEvalType" type="GQT3.QT.Rule.PerformEvalTypeRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.PerformEvalType"/>
+  </object>
+  <object id="GQT3.QT.Rule.ProjectThreshold" type="GQT3.QT.Rule.ProjectThresholdRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.ProjectThreshold"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtBaseProject" type="GQT3.QT.Rule.QtBaseProjectRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtBaseProject"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtZcgnfl" type="GQT3.QT.Rule.QtZcgnflRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtZcgnfl"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtOrgDygx" type="GQT3.QT.Rule.QtOrgDygxRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtOrgDygx"/>
+  </object>
+  <object id="GQT3.QT.Rule.BankAccount" type="GQT3.QT.Rule.BankAccountRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.BankAccount"/>
+  </object>
+  <object id="GQT3.QT.Rule.QTSysSet" type="GQT3.QT.Rule.QTSysSetRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QTSysSet"/>
+  </object>
+  <object id="GQT3.QT.Rule.QTMemo" type="GQT3.QT.Rule.QTMemoRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QTMemo"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtAttachment" type="GQT3.QT.Rule.QtAttachmentRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtAttachment"/>
+  </object>
+  <object id="GQT3.QT.Rule.QTControlSet" type="GQT3.QT.Rule.QTControlSetRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QTControlSet"/>
+  </object>
+  <object id="GQT3.QT.Rule.QTIfApprove" type="GQT3.QT.Rule.QTIfApproveRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QTIfApprove"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtCoverUpData" type="GQT3.QT.Rule.QtCoverUpDataRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtCoverUpData"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtCoverUpForOrg" type="GQT3.QT.Rule.QtCoverUpForOrgRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtCoverUpForOrg"/>
+  </object>
+
+  <object id="GQT3.QT.Rule.QtNaviGation" type="GQT3.QT.Rule.QtNaviGationRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtNaviGation"/>
+  </object>
+
+  <object id="GQT3.QT.Rule.QtTableCustomize" type="GQT3.QT.Rule.QtTableCustomizeRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtTableCustomize"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtAccount" type="GQT3.QT.Rule.QtAccountRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtAccount"/>
+  </object>
+  <object id="GQT3.QT.Rule.QtXmDistribute" type="GQT3.QT.Rule.QtXmDistributeRule, GQT3.QT.Rule" >
+    <property name="CurrentDac" ref="GQT3.QT.Dac.QtXmDistribute"/>
+  </object>
+
+  <!--GYS3.YS-->
+
+  <object id="GYS3.YS.Rule.BudgetMst" type="GYS3.YS.Rule.BudgetMstRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetMst"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlImplPlan" type="GYS3.YS.Rule.BudgetDtlImplPlanRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlImplPlan"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlTextContent" type="GYS3.YS.Rule.BudgetDtlTextContentRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlTextContent"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlFundAppl" type="GYS3.YS.Rule.BudgetDtlFundApplRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlFundAppl"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlBudgetDtl" type="GYS3.YS.Rule.BudgetDtlBudgetDtlRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlBudgetDtl"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetProcessCtrl" type="GYS3.YS.Rule.BudgetProcessCtrlRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetProcessCtrl"/>
+  </object>
+  <object id="GYS3.YS.Rule.BuDeptReport" type="GYS3.YS.Rule.BuDeptReportRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BuDeptReport"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlPerformTarget" type="GYS3.YS.Rule.BudgetDtlPerformTargetRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlPerformTarget"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlPurchaseDtl" type="GYS3.YS.Rule.BudgetDtlPurchaseDtlRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlPurchaseDtl"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlPurDtl4SOF" type="GYS3.YS.Rule.BudgetDtlPurDtl4SOFRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlPurDtl4SOF"/>
+  </object>
+
+  <object id="GYS3.YS.Rule.GHSubject" type="GYS3.YS.Rule.GHSubjectRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.GHSubject"/>
+  </object>
+  <object id="GYS3.YS.Rule.SubjectMst" type="GYS3.YS.Rule.SubjectMstRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.SubjectMst"/>
+  </object>
+  <object id="GYS3.YS.Rule.SubjectMstBudgetDtl" type="GYS3.YS.Rule.SubjectMstBudgetDtlRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.SubjectMstBudgetDtl"/>
+  </object>
+
+  <object id="GYS3.YS.Rule.ExpenseMst" type="GYS3.YS.Rule.ExpenseMstRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.ExpenseMst"/>
+  </object>
+  <object id="GYS3.YS.Rule.ExpenseDtl" type="GYS3.YS.Rule.ExpenseDtlRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.ExpenseDtl"/>
+  </object>
+  <object id="GYS3.YS.Rule.ExpenseHx" type="GYS3.YS.Rule.ExpenseHxRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.ExpenseHx"/>
+  </object>
+  <object id="GYS3.YS.Rule.YsAccountMst" type="GYS3.YS.Rule.YsAccountMstRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.YsAccountMst"/>
+  </object>
+  <object id="GYS3.YS.Rule.YsAccount" type="GYS3.YS.Rule.YsAccountRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.YsAccount"/>
+  </object>
+  <object id="GYS3.YS.Rule.JxTracking" type="GYS3.YS.Rule.JxTrackingRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.JxTracking"/>
+  </object>
+  <object id="GYS3.YS.Rule.YsIncomeMst" type="GYS3.YS.Rule.YsIncomeMstRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.YsIncomeMst"/>
+  </object>
+  <object id="GYS3.YS.Rule.YsIncomeDtl" type="GYS3.YS.Rule.YsIncomeDtlRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.YsIncomeDtl"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlPersonnel" type="GYS3.YS.Rule.BudgetDtlPersonnelRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlPersonnel"/>
+  </object>
+  <object id="GYS3.YS.Rule.BudgetDtlPersonName" type="GYS3.YS.Rule.BudgetDtlPersonNameRule, GYS3.YS.Rule" >
+    <property name="CurrentDac" ref="GYS3.YS.Dac.BudgetDtlPersonName"/>
+  </object>
+
+  <!--GJX3.JX-->
+  <object id="GJX3.JX.Rule.PerformanceMst" type="GJX3.JX.Rule.PerformanceMstRule, GJX3.JX.Rule" >
+    <property name="CurrentDac" ref="GJX3.JX.Dac.PerformanceMst"/>
+  </object>
+  <object id="GJX3.JX.Rule.PerformanceDtlEval" type="GJX3.JX.Rule.PerformanceDtlEvalRule, GJX3.JX.Rule" >
+    <property name="CurrentDac" ref="GJX3.JX.Dac.PerformanceDtlEval"/>
+  </object>
+  <object id="GJX3.JX.Rule.PerformanceDtlTextCont" type="GJX3.JX.Rule.PerformanceDtlTextContRule, GJX3.JX.Rule" >
+    <property name="CurrentDac" ref="GJX3.JX.Dac.PerformanceDtlTextCont"/>
+  </object>
+  <object id="GJX3.JX.Rule.PerformanceDtlBuDtl" type="GJX3.JX.Rule.PerformanceDtlBuDtlRule, GJX3.JX.Rule" >
+    <property name="CurrentDac" ref="GJX3.JX.Dac.PerformanceDtlBuDtl"/>
+  </object>
+  <object id="GJX3.JX.Rule.PerformanceDtlTarImpl" type="GJX3.JX.Rule.PerformanceDtlTarImplRule, GJX3.JX.Rule" >
+    <property name="CurrentDac" ref="GJX3.JX.Dac.PerformanceDtlTarImpl"/>
+  </object>
+  <object id="GJX3.JX.Rule.ThirdAttachment" type="GJX3.JX.Rule.ThirdAttachmentRule, GJX3.JX.Rule" >
+    <property name="CurrentDac" ref="GJX3.JX.Dac.ThirdAttachment"/>
+  </object>
+
+  <!--GSP3.SP-->
+  <object id="GSP3.SP.Rule.GAppvalPost" type="GSP3.SP.Rule.GAppvalPostRule, GSP3.SP.Rule" >
+    <property name="CurrentDac" ref="GSP3.SP.Dac.GAppvalPost"/>
+  </object>
+  <object id="GSP3.SP.Rule.GAppvalPost4Oper" type="GSP3.SP.Rule.GAppvalPost4OperRule, GSP3.SP.Rule" >
+    <property name="CurrentDac" ref="GSP3.SP.Dac.GAppvalPost4Oper"/>
+  </object>
+  <object id="GSP3.SP.Rule.GAppvalProc" type="GSP3.SP.Rule.GAppvalProcRule, GSP3.SP.Rule" >
+    <property name="CurrentDac" ref="GSP3.SP.Dac.GAppvalProc"/>
+  </object>
+  <object id="GSP3.SP.Rule.GAppvalProcConds" type="GSP3.SP.Rule.GAppvalProcCondsRule, GSP3.SP.Rule" >
+    <property name="CurrentDac" ref="GSP3.SP.Dac.GAppvalProcConds"/>
+  </object>
+  <object id="GSP3.SP.Rule.GAppvalProc4Post" type="GSP3.SP.Rule.GAppvalProc4PostRule, GSP3.SP.Rule" >
+    <property name="CurrentDac" ref="GSP3.SP.Dac.GAppvalProc4Post"/>
+  </object>
+  <object id="GSP3.SP.Rule.GAppvalRecord" type="GSP3.SP.Rule.GAppvalRecordRule, GSP3.SP.Rule" >
+    <property name="CurrentDac" ref="GSP3.SP.Dac.GAppvalRecord"/>
+  </object>
+
+
+
+  <!--GBK3.BK-->
+  <object id="GBK3.BK.Rule.PaymentDtl" type="GBK3.BK.Rule.PaymentDtlRule, GBK3.BK.Rule" >
+    <property name="CurrentDac" ref="GBK3.BK.Dac.PaymentDtl"/>
+  </object>
+  <object id="GBK3.BK.Rule.PaymentMst" type="GBK3.BK.Rule.PaymentMstRule, GBK3.BK.Rule" >
+    <property name="CurrentDac" ref="GBK3.BK.Dac.PaymentMst"/>
+    <property name="PaymentDtlDac" ref="GBK3.BK.Dac.PaymentDtl"/>
+  </object>
+  <object id="GBK3.BK.Rule.PaymentXm" type="GBK3.BK.Rule.PaymentXmRule, GBK3.BK.Rule" >
+    <property name="CurrentDac" ref="GBK3.BK.Dac.PaymentXm"/>
+  </object>
+
+  <!--GGK3.GK-->
+  <object id="GGK3.GK.Rule.GKPaymentMst" type="GGK3.GK.Rule.GKPaymentMstRule, GGK3.GK.Rule" >
+    <property name="CurrentDac" ref="GGK3.GK.Dac.GKPaymentMst"/>
+  </object>
+  <object id="GGK3.GK.Rule.GKPaymentDtl" type="GGK3.GK.Rule.GKPaymentDtlRule, GGK3.GK.Rule" >
+    <property name="CurrentDac" ref="GGK3.GK.Dac.GKPaymentDtl"/>
+  </object>
+
+  <object id="GGK3.GK.Rule.GK3_BankVauit" type="GGK3.GK.Rule.GK3_BankVauitRule, GGK3.GK.Rule" >
+    <property name="CurrentDac" ref="GGK3.GK.Dac.GK3_BankVauit"/>
+  </object>
+  
+  
+</objects>

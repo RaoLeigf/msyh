@@ -1,0 +1,252 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/BuDeptReport.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/ExMergeGrid.js") type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    // 'view', 
+                    '->', 'print', 'close'
+                ]
+            });
+
+            var fields = [
+                {
+                    "name": "f_year",
+                    "type": "string",
+                    "mapping": "f_year"
+                },
+                {
+                    "name": "f_DeclarationUnit",
+                    "type": "string",
+                    "mapping": "f_DeclarationUnit"
+                },
+                {
+                    "name": "f_DeclarationUnitName",
+                    "type": "string",
+                    "mapping": "f_DeclarationUnitName"
+                },
+                {
+                    "name": "f_BudgetDept",
+                    "type": "string",
+                    "mapping": "f_BudgetDept"
+                },
+                {
+                    "name": "f_BudgetDeptName",
+                    "type": "string",
+                    "mapping": "f_BudgetDeptName"
+                },
+                {
+                    "name": "f_ProjCode",
+                    "type": "string",
+                    "mapping": "f_ProjCode"
+                },
+                {
+                    "name": "f_ProjName",
+                    "type": "string",
+                    "mapping": "f_ProjName"
+                },
+                {
+                    "name": "f_ProjAmount",
+                    "type": "string",
+                    "mapping": "f_ProjAmount"
+                },
+                {
+                    "name": "f_BudgetAmount",
+                    "type": "string",
+                    "mapping": "f_BudgetAmount"
+                },
+                {
+                    "name": "f_DtlCode",
+                    "type": "string",
+                    "mapping": "f_DtlCode"
+                },
+                {
+                    "name": "f_DtlName",
+                    "type": "string",
+                    "mapping": "f_DtlName"
+                },
+                {
+                    "name": "f_Amount",
+                    "type": "string",
+                    "mapping": "f_Amount"
+                },
+                {
+                    "name": "f_DtlBuAmount",
+                    "type": "string",
+                    "mapping": "f_DtlBuAmount"
+                },
+                {
+                    "name": "f_ExpensesChannel",
+                    "type": "string",
+                    "mapping": "f_ExpensesChannel"
+                },
+                {
+                    "name": "f_ExpensesChannelName",
+                    "type": "string",
+                    "mapping": "f_ExpensesChannelName"
+                },
+                {
+                    "name": "f_Description",
+                    "type": "string",
+                    "mapping": "f_Description"
+                },              
+              {
+                "name": "NgRecordVer",
+                "type": "int",
+                "mapping": "NgRecordVer"
+              }
+            ];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'gridPanel');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+				url: C_ROOT + 'GYS/YS/BuDeptReport/GetBuDeptReportList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: 'baf846c1-211c-4545-8e39-1ccbdd9f0779',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				//layout: {
+				//	type: 'hbox',
+				//	align: 'stretch'
+				//},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['gridPanel']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+		    //内嵌查询
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+				pageid: "Web:GHBudgetDepartmentList",//对应内嵌查询业务点标识 
+                grid: grid,
+                columnsPerRow: 4 //每行4列               
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, queryPanel, grid]
+            });
+
+            
+            ////查看
+            //ngToolbar.get('view').on('click', function () {
+            //    ExMergeGrid(grid, [1, 2, 3, 4,5,6,7,8,9], false); // 最后一个参数为false逐个列合并
+            //});
+
+            //打印
+            ngToolbar.get('print').on('click', function () {               
+                queryPanel.buskey = "PhId";
+                var forms = [queryPanel];
+                var grids = [grid];
+                var titles = ['预算部门分解表', '详细信息'];
+                //$PrintForm("GHBuDeptReportList", forms, grids, titles);
+                $PrintHelp("BPM_GHBuDeptReport", 'BPM_GHBuDeptReport', forms, grids, titles)
+            });
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+
+            //通用帮助设置条件
+            //按当前操作员过滤申报单位
+            queryPanel.query("[name='mst.f_DeclarationUnit*str*eq*1']")[0].setOutFilter({ userid: $appinfo.userID });
+
+            //按当前申报单位过滤预算部门、支出类别
+            queryPanel.query("[name='mst.f_DeclarationUnit*str*eq*1']")[0].on("helpselected", function (obj) {
+                var unitCode = obj.code;
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.uCode + "' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                } else {
+                    filter = "(Z_QTDYGX2.DEF_STR1='" + $appinfo.uCode + "' )";
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.query("[name='mst.f_BudgetDept*str*eq*1']")[0].setClientSqlFilter(filter);
+                }
+            });
+
+            
+            grid.getColumn('f_ProjAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_BudgetAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_Amount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+            grid.getColumn('f_DtlBuAmount').renderer = Ext.util.Format.numberRenderer('0,000.00');
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

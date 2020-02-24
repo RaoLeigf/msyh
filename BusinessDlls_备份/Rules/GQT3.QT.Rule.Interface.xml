@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GQT3.QT.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GQT3.QT.Rule.Interface.IBudgetAccountsRule">
+            <summary>
+            BudgetAccounts业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.ICorrespondenceSettings2Rule">
+            <summary>
+            CorrespondenceSettings2业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.ICorrespondenceSettingsRule">
+            <summary>
+            CorrespondenceSettings业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IExpenseCategoryRule">
+            <summary>
+            ExpenseCategory业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IGHProjDtlShareRule">
+            <summary>
+            GHProjDtlShare业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IOrganizationRule">
+            <summary>
+            Organization业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IOrgRelatitem2Rule">
+            <summary>
+            OrgRelatitem业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IPaymentMethodRule">
+            <summary>
+            PaymentMethod业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IPerformEvalTargetClassRule">
+            <summary>
+            PerformEvalTargetClass业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IPerformEvalTargetRule">
+            <summary>
+            PerformEvalTarget业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IPerformEvalTargetTypeRule">
+            <summary>
+            PerformEvalTargetType业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IPerformEvalTypeRule">
+            <summary>
+            PerformEvalType业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IProcurementCatalogRule">
+            <summary>
+            ProcurementCatalog业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IProcurementProceduresRule">
+            <summary>
+            ProcurementProcedures业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IProcurementTypeRule">
+            <summary>
+            ProcurementType业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IProjectThresholdRule">
+            <summary>
+            ProjectThreshold业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IProjLibProjRule">
+            <summary>
+            ProjLibProj业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IQtBaseProjectRule">
+            <summary>
+            QtBaseProject业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IQtSysCodeSeqRule">
+            <summary>
+            QtSysCodeSeq业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IQtZcgnflRule">
+            <summary>
+            QtZcgnfl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IRWReportRule">
+            <summary>
+            RWReport业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.ISourceOfFundsRule">
+            <summary>
+            SourceOfFunds业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IUserOrgRule">
+            <summary>
+            UserOrg业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IUserRule">
+            <summary>
+            User业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Rule.Interface.IVCorrespondenceSetting2Rule">
+            <summary>
+            VCorrespondenceSetting2业务逻辑层接口
+            </summary>
+        </member>
+    </members>
+</doc>

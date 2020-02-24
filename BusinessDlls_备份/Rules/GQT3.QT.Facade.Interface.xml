@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GQT3.QT.Facade.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GQT3.QT.Facade.Interface.IBudgetAccountsFacade">
+            <summary>
+            BudgetAccounts业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.ICorrespondenceSettings2Facade">
+            <summary>
+            CorrespondenceSettings2业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.ICorrespondenceSettingsFacade">
+            <summary>
+            CorrespondenceSettings业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GQT3.QT.Facade.Interface.ICorrespondenceSettingsFacade.GetUserDepementList(System.String)">
+            <summary>
+            根据当前usercode 获取所拥有部门信息
+            </summary>
+            <param name="usercode"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IExpenseCategoryFacade">
+            <summary>
+            ExpenseCategory业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IGHProjDtlShareFacade">
+            <summary>
+            GHProjDtlShare业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IOrganizationFacade">
+            <summary>
+            Organization业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GQT3.QT.Facade.Interface.IOrganizationFacade.SaveOrganization(GQT3.QT.Model.Domain.OrganizeModel,System.Collections.Generic.List{GQT3.QT.Model.Domain.User2Model},System.Collections.Generic.List{GQT3.QT.Model.Domain.OrganizeModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="organizationEntity"></param>
+            <param name="userEntities"></param>
+            <param name="organizationEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IOrgRelatitem2Facade">
+            <summary>
+            OrgRelatitem业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IPaymentMethodFacade">
+            <summary>
+            PaymentMethod业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IPerformEvalTargetClassFacade">
+            <summary>
+            PerformEvalTargetClass业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IPerformEvalTargetFacade">
+            <summary>
+            PerformEvalTarget业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IPerformEvalTargetTypeFacade">
+            <summary>
+            PerformEvalTargetType业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IPerformEvalTypeFacade">
+            <summary>
+            PerformEvalType业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IProcurementCatalogFacade">
+            <summary>
+            ProcurementCatalog业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IProcurementProceduresFacade">
+            <summary>
+            ProcurementProcedures业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IProcurementTypeFacade">
+            <summary>
+            ProcurementType业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IProjectThresholdFacade">
+            <summary>
+            ProjectThreshold业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IProjLibProjFacade">
+            <summary>
+            ProjLibProj业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IQtBaseProjectFacade">
+            <summary>
+            QtBaseProject业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IQtSysCodeSeqFacade">
+            <summary>
+            QtSysCodeSeq业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IQtZcgnflFacade">
+            <summary>
+            QtZcgnfl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IRWReportFacade">
+            <summary>
+            RWReport业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GQT3.QT.Facade.Interface.IRWReportFacade.SaveRWReport(GQT3.QT.Model.Domain.RWReportModel,System.Collections.Generic.List{GQT3.QT.Model.Domain.RWReportModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="rWReportEntity"></param>
+            <param name="rWReportEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.ISourceOfFundsFacade">
+            <summary>
+            SourceOfFunds业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IUserFacade">
+            <summary>
+            User业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GQT3.QT.Facade.Interface.IUserFacade.SaveUser(GQT3.QT.Model.Domain.User2Model,System.Collections.Generic.List{GQT3.QT.Model.Domain.User2Model},System.Collections.Generic.List{GQT3.QT.Model.Domain.OrganizeModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="userEntity"></param>
+            <param name="userEntities"></param>
+            <param name="organizationEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IUserOrgFacade">
+            <summary>
+            UserOrg业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Facade.Interface.IVCorrespondenceSetting2Facade">
+            <summary>
+            VCorrespondenceSetting2业务组装层接口
+            </summary>
+        </member>
+    </members>
+</doc>

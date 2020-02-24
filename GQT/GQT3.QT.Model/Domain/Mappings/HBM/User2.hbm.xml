@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="User2Model" table="fg3_user">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="UserNo" column="userno" type="System.String" length="255" not-null="true" />
+		<property name="FirstName" column="firstname" type="System.String" length="20" not-null="false" />
+		<property name="LastName" column="lastname" type="System.String" length="40" not-null="false" />
+		<property name="UserName" column="username" type="System.String" length="60" not-null="false" />
+		<property name="LgSign" column="lg_sign" type="System.Int16" not-null="false" />
+		<property name="Status" column="status" type="GQT3.QT.Model.Enums.EnumUserStatus, GQT3.QT.Model"  not-null="false" />
+		<property name="UserClass" column="userclass" type="System.Int64" not-null="false" />
+		<property name="DeptId" column="deptid" type="System.Int64" not-null="false" />
+		<property name="Descript" column="descript" type="System.String" length="1000" not-null="false" />
+		<property name="StrDate" column="str_date" type="System.DateTime" not-null="false" />
+		<property name="EndDate" column="end_date" type="System.DateTime" not-null="false" />
+		<property name="PwdIdentity" column="pwdidentity" type="System.String" length="40" not-null="false" />
+		<property name="PwdDateTime" column="pwddatetime" type="System.DateTime" not-null="false" />
+		<property name="Question" column="question" type="System.String" length="250" not-null="false" />
+		<property name="Answer" column="answer" type="System.String" length="250" not-null="false" />
+		<property name="Email" column="email" type="System.String" length="255" not-null="false" />
+		<property name="MobileNo" column="mobileno" type="System.String" length="50" not-null="false" />
+		<property name="ChgPwdDate" column="chgpwd_date" type="System.DateTime" not-null="false" />
+		<property name="Errtimes" column="errtimes" type="System.String" length="10" not-null="false" />
+		<property name="DesktopActor" column="desktop_actor" type="System.String" length="50" not-null="false" />
+		<property name="IpCtrl" column="ipctrl" type="System.Int16" not-null="false" />
+		<property name="UiaKey" column="uiakey" type="System.String" length="50" not-null="false" />
+		<property name="GuestFlg" column="guestflg" type="System.Int16" not-null="false" />
+		<property name="MultiCorpFlg" column="multicorpflg" type="System.Int16" not-null="false" />
+		<property name="SingleSignOnOrg" column="singlesignonorg" type="System.Int64" not-null="false" />
+		<property name="LastLoginOrg" column="lastloginorg" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="HrId" column="hrid" type="System.Int64" not-null="false" />
+		<property name="DiffOrgRoleRight" column="difforgroleright" type="System.Int16" not-null="true" />
+		<property name="IsUbe" column="isube" type="System.Int16" not-null="false" />
+		<property name="CurrentPc" column="current_pc" type="System.Int64" not-null="false" />
+		<property name="WeChat" column="wechat" type="System.String" length="40" not-null="false" />
+	</class>
+</hibernate-mapping>

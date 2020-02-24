@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_report_group_mst">
+      <Field Name="group_id" IsKey="true"/>
+      <Field Name="group_name" />
+      <Field Name="group_memo"  />      
+    </Table>
+    <Table Name="rw_report_group_rights">
+      <Field Name="actor_id"/>      
+    </Table>
+    <Table Name="fg_actor">
+      <Field Name="memo"/>
+      <Field Name="actorid"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join rw_report_group_rights on [table].group_id = rw_report_group_rights.group_id
+      left join fg_actor on rw_report_group_rights.actor_id = fg_actor.actorid
+      [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{group_name}">
+      <Exp Field="group_name" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+    <where>
+      <Exp Field="group_id" Target="Client" Value="group_id" />
+    </where>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <RecordByRef>
+    <Sql>
+      select 1 from rw_report_group_rights [where]
+    </Sql>
+    <Where >
+      <Exp Field="rw_report_group_rights.group_id" paramName="groupid" Target="Client" Value="groupid"/>
+    </Where>
+  </RecordByRef>
+
+  <SelectMaxGroupID>
+    <Sql>
+      select max(group_id) from rw_report_group_mst
+    </Sql>
+  </SelectMaxGroupID>
+
+  <DeleteGroup>
+    <Sql>
+      delete from rw_report_group_mst [where]
+    </Sql>
+    <Where >
+      <Exp Field="group_id" Target="Client" Value="group_id"/>
+    </Where>
+  </DeleteGroup>
+
+
+</DataService>
+

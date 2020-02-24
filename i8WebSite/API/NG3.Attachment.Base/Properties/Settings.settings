@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NG3.Attachment.Base.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="NG3_Attachment_Base_UploadFileServiceProxy_UploadFileService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1/i6sfilesrv/UploadFileService.asmx</Value>
+    </Setting>
+    <Setting Name="NG3_Attachment_Base_NG3UploadFileSvcProxy_NG3UploadFileSvc" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1/i6sfilesrv/NG3UploadFileSvc.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

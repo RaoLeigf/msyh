@@ -1,0 +1,377 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/PerformEvalTargetEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var PerformEvalTargetTypeTreePanel;
+
+        Ext.onReady(function () {
+
+            //工具栏
+            
+			
+			var toolbar=new Ext.toolbar.Toolbar({
+				region: 'north',
+				items:[{
+					text:"新增分类",
+					handler:function(){
+						var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+						var selectNode = treeP.getSelectionModel().lastSelected;
+						if(selectNode!=undefined){
+							var FParentCode=selectNode.data.curentCode;
+							var FParentName=selectNode.data.text;
+							$OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/PerformEvalTargetType/PerformEvalTargetTypeEdit?otype=add&FParentCode='+FParentCode+'&FParentName='+FParentName);
+						}
+					}
+				},{
+					text:"修改分类",
+					handler:function(){
+						var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+						var selectNode = treeP.getSelectionModel().lastSelected;
+						if(selectNode!=undefined){
+							var parentNode=selectNode.parentNode;
+							
+							if(parentNode!=undefined){
+								var FParentCode=parentNode.data.curentCode;
+								var FParentName=parentNode.data.text;
+								var id=selectNode.data.PhId;
+								$OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/PerformEvalTargetType/PerformEvalTargetTypeEdit?otype=edit&id=' + id+'&FParentCode='+FParentCode+'&FParentName='+FParentName);
+							}
+						}
+					}
+				},{
+					text:"删除分类",
+					handler:function(){
+						var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+						var selectNode = treeP.getSelectionModel().lastSelected;
+
+						if (selectNode!=undefined&&selectNode.data.curentCode!='') {
+							//recoderefresh(data);
+							
+							//selectNode.expand();
+							//alert(selectNode.hasChildNodes()+"/"+selectNode.isExpanded());
+							
+							Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+							function callBack(callBackid) {
+								if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+									return;
+								} else {
+									if(store.getCount()>0)
+									{
+										Ext.MessageBox.alert('提示', "该分类下有指标，无法删除！");
+									}else{
+										Ext.Ajax.request({
+											params: { 'id': selectNode.data.PhId },
+											url: C_ROOT + 'GQT/QT/PerformEvalTargetType/Delete',
+											success: function (response) {
+												var resp = Ext.JSON.decode(response.responseText);
+												if (resp.Status === "success") {
+
+													PerformEvalTargetTypeTreePanel.store.reload();
+
+													Ext.MessageBox.alert('提示', "删除成功");
+												} else {
+													Ext.MessageBox.alert('提示', "删除失败");
+												}
+											}
+										});
+									}
+								}
+							}
+						}
+					}
+				},{
+					text:"新增指标",
+					handler:function(){
+						var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+						var selectNode = treeP.getSelectionModel().lastSelected;
+						if(selectNode!=undefined){
+							//alert(selectNode.data.curentCode);
+							var FTargetTypeCode=selectNode.data.curentCode;
+							var FTargetTypeName=selectNode.data.text;
+							$OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/PerformEvalTarget/PerformEvalTargetEdit?otype=add&FTargetTypeCode='+FTargetTypeCode+'&FTargetTypeName='+FTargetTypeName);
+						}
+						//$OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/PerformEvalTarget/PerformEvalTargetEdit?otype=add');
+					}
+				},{
+					text:"修改指标",
+					handler:function(){
+						var data = grid.getSelectionModel().getSelection();
+						var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+						var selectNode = treeP.getSelectionModel().lastSelected;
+                
+						if (data.length > 0&&selectNode!=undefined) {
+							var id = data[0].get('PhId');
+							var FTargetTypeCode=selectNode.data.curentCode;
+							var FTargetTypeName=selectNode.data.text;
+							$OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/PerformEvalTarget/PerformEvalTargetEdit?otype=edit&id=' + id+'&FTargetTypeCode='+FTargetTypeCode+'&FTargetTypeName='+FTargetTypeName);
+						}
+						//selectNode.attributes.checked=true;
+						//treeP.getSelectionModel().select(selectNode);
+					}
+				},{
+					text:"删除指标",
+					handler:function(){
+						var data = grid.getSelectionModel().getSelection();
+
+						if (data.length > 0) {
+							recoderefresh(data);
+						
+							Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+							function callBack(callBackid) {
+								if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+									return;
+								} else {
+									Ext.Ajax.request({
+										params: { 'id': data[0].get('PhId') },
+										url: C_ROOT + 'GQT/QT/PerformEvalTarget/Delete',
+										success: function (response) {
+											var resp = Ext.JSON.decode(response.responseText);
+											if (resp.Status === "success") {
+
+												Ext.Array.each(data, function (record) {
+													store.remove(record); //前端删除
+												});
+
+												//NGMsg.Info('删除成功！');
+												Ext.MessageBox.alert('提示', '删除成功！');
+											} else {
+												//NGMsg.Info(resp.Msg);
+												Ext.MessageBox.alert('提示', resp.Msg);
+											}
+										}
+									});
+								}
+							}
+						}
+					}
+				}]
+			})
+
+			
+			PerformEvalTargetTypeTreePanel = Ext.create('Ext.ng.TreePanel', {
+                id: "PerformEvalTargetTypeTree",
+                region: "center",
+                rootVisible: true,
+                root: {
+                    text: "根节点",
+                    expanded: true
+                },
+                treeFields: [
+                    { name: 'PhId', type: 'string' },
+                    { name: 'text', type: 'string' },
+                    { name: 'curentCode', type: 'string' },
+                    { name: 'parentCode', type: 'string' },
+                    //{ name: 'isProject', type: 'string' }
+                ],
+                url: '@Url.Content("~/GQT/QT/PerformEvalTargetType/LoadTree")',
+                listeners: {
+                    'itemclick': function (treepanel, record, item, index, e, eOpts) {
+                        var curentCode = record.data.curentCode;
+						var params={'TypeCode':curentCode};
+						Ext.apply(store.proxy.extraParams,params);
+						store.load(function(){
+							
+						})
+                    }
+                }
+            });
+			
+			//var iu =PerformEvalTargetTypeTreePanel.store;
+			var westPanel = Ext.create('Ext.panel.Panel', {
+                region: 'west',
+                layout: 'border',
+                style: 'margin-left:2px;margin-right:2px',
+                width: 220,
+                border: 0,
+                items:PerformEvalTargetTypeTreePanel
+            });
+			
+			
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "FTargetClassCode",
+    "type": "string",
+    "mapping": "FTargetClassCode"
+  },
+  {
+    "name": "FTargetCode",
+    "type": "string",
+    "mapping": "FTargetCode"
+  },
+  {
+    "name": "FTargetName",
+    "type": "string",
+    "mapping": "FTargetName"
+  },
+  {
+    "name": "FTargetValue",
+    "type": "string",
+    "mapping": "FTargetValue"
+  },
+  {
+    "name": "FTargetWeight",
+    "type": "string",
+    "mapping": "FTargetWeight"
+  },
+  {
+    "name": "FTargetDescribe",
+    "type": "string",
+    "mapping": "FTargetDescribe"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'list1');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                //url: C_ROOT + 'GQT/QT/PerformEvalTarget/GetPerformEvalTargetList'
+				url: C_ROOT + 'GQT/QT/PerformEvalTarget/GetPerformEvalTargetListByClassCode'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '3f207c81-61bc-4cbd-afce-c71c4f331c78',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				bbar: [pagingbar],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						var data = grid.getSelectionModel().getSelection();
+						var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+						var selectNode = treeP.getSelectionModel().lastSelected;
+                
+						if (data.length > 0&&selectNode!=undefined) {
+							var id = data[0].get('PhId');
+							var FTargetTypeCode=selectNode.data.curentCode;
+							var FTargetTypeName=selectNode.data.text;
+							$OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/PerformEvalTarget/PerformEvalTargetEdit?otype=view&id=' + id+'&FTargetTypeCode='+FTargetTypeCode+'&FTargetTypeName='+FTargetTypeName);
+						}
+					}
+				}
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['list1']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+			
+			var centerPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                layout: 'border',
+                style: 'margin-left:2px;margin-right:2px',
+                border: 0,
+                items: [westPanel, grid]
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [toolbar,centerPanel]
+            });
+
+            
+
+            
+
+			//刷新列表中想修改或删除的行数据
+            function recoderefresh(data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/PerformEvalTarget/GetPerformEvalTargetList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+			
+
+        });
+
+		function NG3Refresh() {
+			var treeP = Ext.getCmp("PerformEvalTargetTypeTree");
+			var selectNode = treeP.getSelectionModel().lastSelected;
+			var parentNode=selectNode.parentNode;
+			PerformEvalTargetTypeTreePanel.store.reload();
+			treeP.getSelectionModel().select(selectNode,true);
+			//treeP.getNodeById(selectNode.data.curentCode).checked;
+			Ext.getCmp("PerformEvalTargetTypeTree").getSelectionModel().lastSelected.parentNode=parentNode;
+			//Ext.getCmp("PerformEvalTargetTypeTree").getSelectionModel().lastSelected=selectNode;
+			
+			
+			var curentCode = selectNode.data.curentCode;
+			var params={'TypeCode':curentCode};
+			Ext.apply(store.proxy.extraParams,params);
+			store.load(function(){
+							
+			})
+			//store.load();
+			
+			
+			
+			
+        }
+		
+
+    </script>
+}
+
+

@@ -1,0 +1,438 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "二维码样式设置";
+}
+@section script
+{
+
+    <script type="text/javascript">
+        var busid = '@ViewBag.ID';
+        var otype = '@ViewBag.OType';
+        Ext.onReady(function () {
+            //上
+            var toolbar = Ext.create('Ext.Toolbar', {
+                region: 'north',
+                border: false,
+                //split: true,
+                height: 26,
+                minSize: 26,
+                maxSize: 26,
+                items: [
+                    { id: "save", text: "保存", iconCls: 'icon-save' },
+                    { id: "addIcon", text: "上传LOGO", iconCls: 'icon-Import' },
+                    "->",
+                    { id: "close", text: "关闭", iconCls: 'icon-Exit' }
+                ]
+            });
+
+            //中
+            var frontcolorSelector = Ext.create('Ext.ng.ComboBox', {
+                valueField: "mode",
+                displayField: 'name',
+                queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote
+                name: 'mode',
+                data: [{
+                    //编辑状态下,状态列的下拉菜单的 data
+                    "mode": "0",
+                    "name": "黑色"
+                }, {
+                    "mode": "1",
+                    "name": "闪光蓝"
+                },{
+                    "mode": "2",
+                    "name": "酱紫色"
+                },{
+                    "mode": "3",
+                    "name": "深橘色"
+                }]
+            });
+            var backcolorSelector = Ext.create('Ext.ng.ComboBox', {
+                valueField: "mode",
+                displayField: 'name',
+                queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote
+                name: 'mode',
+                data: [{
+                    //编辑状态下,状态列的下拉菜单的 data
+                    "mode": "0",
+                    "name": "白色"
+                }, {
+                    "mode": "1",
+                    "name": "粉蓝色"
+                }, {
+                    "mode": "2",
+                    "name": "土著白"
+                }, {
+                    "mode": "3",
+                    "name": "浅灰色"
+                }]
+            });
+            var form = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                //minWidth: 400,
+                autoScroll: true,
+                buskey: 'phid', //对应的业务表主键
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 1,
+                padding: '0 5 0 5',
+                fieldDefaults: {
+                    labelWidth: 100,
+                    anchor: '100%',
+                    margin: '0 10 5 5',
+                    msgTarget: 'side',
+                    anchor: '50%'
+                },
+                fields: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '主键',
+                        name: 'phid',
+                        mustInput: true,
+                        hidden: true,
+                        value: busid,
+                    }, {
+                        xtype: 'ngText',
+                        fieldLabel: '二维码大小',
+                        name: 'imgsize',
+                        mustInput: true,
+                        emptyText: '300',
+                        //value:'300'
+                    }, {
+                        xtype: 'ngComboBox',
+                        fieldLabel: '前景色',
+                        name: 'frontcolor',
+                        editor: frontcolorSelector,//showComb,
+                        //renderer: function (val) {
+                        //    var ret;
+                        //    if (val == 1) {
+                        //        ret = "闪光蓝";
+                        //    } else if (val == 2) {
+                        //        ret = "酱紫色";
+                        //    } else if (val == 3) {
+                        //        ret = "深橘色";
+                        //    } else {
+                        //        ret = "黑色";
+                        //    }
+                        //    return ret;
+                        //},
+                        valueField: "code",
+                        displayField: 'name',
+                        queryMode: 'local',
+                        emptyText: '黑色',
+                        data: [
+                            { "code": '1', "name": "黑色" },
+                            { "code": '2', "name": "闪光蓝" },
+                            { "code": '3', "name": "酱紫色" },
+                            { "code": '4', "name": "深橘色" }
+                        ],
+                    }, {
+                        xtype: 'ngComboBox',
+                        fieldLabel: '背景色',
+                        name: 'backcolor',
+                        editor: backcolorSelector,//showComb,
+                        //renderer: function (val) {
+                        //    var ret;
+                        //    if (val == 1) {
+                        //        ret = "粉蓝色";
+                        //    } else if (val == 2) {
+                        //        ret = "土著白";
+                        //    } else if (val == 3) {
+                        //        ret = "浅灰色";
+                        //    } else {
+                        //        ret = "白色";
+                        //    }
+                        //    return ret;
+                        //},
+                        valueField: "code",
+                        displayField: 'name',
+                        queryMode: 'local',
+                        emptyText: '白色',
+                        data: [
+                            { "code": '1', "name": "白色" },
+                            { "code": '2', "name": "粉蓝色" },
+                            { "code": '3', "name": "土著白" },
+                            { "code": '4', "name": "浅灰色" }
+                        ],
+                    }, {
+                        xtype: 'ngComboBox',
+                        fieldLabel: '添加LOGO',
+                        name: 'addlogo',
+                        editor: backcolorSelector,//showComb,
+                        valueField: "code",
+                        displayField: 'name',
+                        queryMode: 'local',
+                        emptyText: '否',
+                        data: [
+                            { "code": '0', "name": "否" },
+                            { "code": '1', "name": "是" }
+                        ],
+                    },
+                    //{
+                    //    //xtype: 'ngText',
+                    //    fieldLabel: '上传LOGO',
+                    //    name: 'logoSource',
+                    //    xtype: 'filefield',
+                    //    buttonText: '...',
+                    //    msgTarget: 'side',
+                    //    allowBlank: false,
+                    //    //margin: '12 8 3 8',
+                    //    regex: /^.*\.(jpg|png|ico)$/i,
+                    //    regexText: '请选择jpg,png,ico格式的图标文件'
+                    //},
+                    {
+                        xtype: 'ngText',
+                        id: 'content',
+                        fieldLabel: '内容',
+                        name: 'content',
+                        mustInput: true
+                    }]
+            });
+
+
+            //下
+            var icons = Ext.create("Ext.form.FieldSet", {
+                region: 'center',
+                layout: 'absolute',
+                height: 400,
+                style: {
+                    'background-color': '#FFF'
+                },
+                items: [
+                    {
+                        xtype: 'fieldset',
+                        title: 'logo预览',
+                        x: 2,
+                        y: 5,
+                        //width: 162,
+                        //height: 185,
+                        width: 300,
+                        height: 350,
+                        items: [
+                            {
+                                xtype: 'component',
+                                margin: '15 0 18 24',
+                                id: 'logoDisplay',
+                                style: {
+                                    'background-color': 'rgb(158,193,225)'
+                                },
+                                autoEl: {
+                                    tag: 'img',
+                                    src:  "",
+                                    //width: 90,
+                                    //height: 90
+                                    width: 200,
+                                    height: 200
+                                }
+                            },
+                            {
+                                xtype: 'button',
+                                x: 15,
+                                //y: 145,
+                                width: 110,
+                                text: '预览',
+                                handler: function () {
+                                    Ext.Ajax.request({
+                                        params: {},
+                                        url: '@Url.Content("~/SUP/QRCodeSet/GetImgName")',
+                                        success: function (response) {
+                                            if (response.responseText != "" && response.responseText != null) {
+                                                //var resp = Ext.JSON.decode(response.responseText);
+                                                Ext.getCmp("logoDisplay").getEl().dom.src = C_ROOT + 'NG3Resource/QRCodeLogo/' + response.responseText;
+                                            }
+                                        }
+                                    });}
+                            }
+                        ]
+                    },
+                    {
+                        xtype: 'fieldset',
+                        title: '二维码预览',
+                        //width: 162,
+                        //height: 185,
+                        width: 300,
+                        height: 350,
+                        x: 310,
+                        y: 5,
+                        items: [
+                            {
+                                xtype: 'component',
+                                margin: '15 0 18 24',
+                                id: 'qrcodeDisplay',
+                                style: {
+                                    'background-color': 'rgb(158,193,225)'
+                                },
+                                autoEl: {
+                                    tag: 'img',
+                                    src: "",
+                                    //width: 90,
+                                    //height: 90
+                                    width: 200,
+                                    height: 200
+                                }
+                            },
+                            {
+                                xtype: 'button',
+                                x: 15,
+                                //y: 145,
+                                width: 110,
+                                text: '预览',
+                                handler: function () {
+                                    var masterData = form.getFormData();
+                                    Ext.Ajax.request({
+                                        params: { 'masterData': masterData },
+                                        url: '@Url.Content("~/SUP/QRCodeSet/BuildQRCode")',
+                                        success: function (response) {
+                                            if (response.responseText != "" && response.responseText != null) {
+                                                var resp = Ext.JSON.decode(response.responseText);
+                                                Ext.getCmp("qrcodeDisplay").getEl().dom.src = C_ROOT + 'NG3Resource/QRCodeLogo/qrcode.png?temp=' + Math.random();
+                                            }
+                                        }
+                                    });                                   
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            var iconArea = Ext.create("Ext.panel.Panel", {
+                region: 'center',
+                height: 400,
+                width: 800,
+                border:0,
+                layout: 'border',
+                autoScroll: true,
+                items: [icons]
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [toolbar, form, iconArea]
+            });
+
+            //加载数据
+            Ext.Ajax.request({
+                params: { 'id': busid },
+                url: '@Url.Content("~/SUP/QRCodeSet/GetQrStyle")',
+                success: function (response) {
+                    if (response.responseText != "" && response.responseText != null) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        var formobj = form.getForm();
+                        formobj.setValues(resp[0]);
+                    }
+                }
+            });
+            //导入LOGO
+            var addIconBtn = Ext.create("Ext.button.Button", {
+                x: 375,
+                y: 230,
+                text: '上传',
+                height: 23,
+                width: 64,
+                itemId: 'addIconBtn',
+                handler: function () {
+                    addIconBtn.disable();//禁用按钮
+                    var myMask = new Ext.LoadMask(document.body, { msg: "正在上传图标,请稍候..." });
+                    myMask.show();//锁屏
+                    var name = Ext.getCmp('addIconUpload').getValue();
+                    name = name.substring(name.lastIndexOf("\\") + 1);
+                    if (!/^.*\.(jpg|png|ico)$/i.test(name)) {
+                        Ext.MessageBox.alert('提示', '请选择jpg,png,ico格式的图标文件!');
+                        myMask.hide();//停止锁屏
+                        addIconBtn.enable();//按钮设置为可用
+                        return;
+                    }
+                    var form = this.up('form').getForm();
+                    if (form.isValid()) {
+                        form.submit({
+                            url: "../QRCodeSet/AddIconUpload",
+                            method: 'post',
+                            params: { 'name': name },
+                            success: function (response) {
+                                myMask.hide();//停止锁屏
+                                addIconBtn.enable();
+                                Ext.MessageBox.alert('提示', '图标新增成功!');
+                                addIconWin.hide();
+                            },
+                            failure: function (response) {
+                                myMask.hide();//停止锁屏
+                                addIconBtn.enable();//按钮设置为可用
+                            }
+                        });
+                    }
+                }
+            });
+            var addIconPanel = Ext.create("Ext.form.Panel", {
+                layout: 'absolute',
+                height: 270,
+                border: false,
+                items: [
+                    {
+                        height: 30,
+                        xtype: 'filefield',
+                        name: 'addCustomIcon',
+                        id: 'addIconUpload',
+                        buttonText: '...',
+                        msgTarget: 'side',
+                        anchor: '100%',
+                        allowBlank: false,
+                        margin: '12 8 3 8',
+                        regex: /^.*\.(jpg|png|ico)$/i,
+                        regexText: '请选择jpg,png,ico格式的图标文件',
+                        width: 427
+                    },
+                    {
+                        xtype: 'label',
+                        margin: '5 0 5 10',
+                        y: 42,
+                        text: '支持jpg、png、ico格式的图标文件'
+                    },
+                    addIconBtn
+                ]
+            });
+            var addIconWin = Ext.create('Ext.window.Window', {
+                title: '上传LOGO',
+                height: 300,
+                width: 460,
+                modal: true,
+                closeAction: 'hide',
+                items: [addIconPanel]
+            });
+            //修改
+            toolbar.items.get('addIcon').on('click', function () {
+                addIconWin.show();
+            });
+
+            toolbar.items.get('save').on('click', function () {
+                var vf = form.isValid();
+                if (!vf) {
+                    return;
+                };              
+                var masterData = form.getFormData();
+                Ext.Ajax.request({
+                    params: {
+                        'masterData': masterData
+                    },
+                    url: '@Url.Content("~/SUP/QRCodeSet/SaveQrStyle")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+                                
+                            });
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+
+            });
+        });
+
+
+    </script>
+}

@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script src="@Url.Content("~/Scripts/jquery-2.1.1.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.md5.js")" type="text/javascript"></script>
+
+    <script>
+        function doUpload() {
+
+            var appKey = 'D31B7F91-3068-4A49-91EE-F3E13AE5C48C',
+                appSecret = '103CB639-840C-4E4F-8812-220ECE3C4E4D',
+                url = "http://10.0.45.51:7758",
+                reqTimeStamp = Date.parse(new Date());
+            var sign = $.md5((url + reqTimeStamp + appKey + appSecret).toLowerCase());
+            var items = [sign, url, reqTimeStamp, appKey];
+
+            var appinfo = {
+                'DbName': 'NG0001',
+                'OrgId': '521180820000002',
+                'OrgName': '',
+                'OCode': '',
+                'UserId': '521180820000001',
+                'UserKey': '0001',
+                'UserName': '',
+                'TokenKey': '',
+                'AppKey': appKey,
+                'AppSecret': appSecret,
+                'DbServerName': '',
+                'SessionKey': '',
+                'UName': ''
+            };
+
+            var form = new FormData(document.getElementById("uploadForm"));
+            $.ajax({
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Accept': "application/json; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                url: 'http://127.0.0.1:8028/api/GCW/SysOrganize/PostUploadFile',
+                type: 'post',
+                url: '@Url.Content("~/api/GCW/PSubject/GetPSubjectQueryList")',
+                data: form,
+                datatype: 'json',
+                success: function (returndata) {
+                    console.log(returndata);
+                },
+                error: function (returndata) {
+                    console.log(returndata);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>柠檬伙伴云</h1>
+    <form action="http://127.0.0.1:8028/api/Demo/PostUploadFile" method="post" enctype="multipart/form-data">
+
+        <input type="file" name="f1" /> <br /><br />
+        <input type="file" name="f2" /> <br /><br />
+
+        <input type="submit" value="上传图片" />
+
+    </form>
+</body>
+</html>

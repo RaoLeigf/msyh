@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Dac.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlBudgetDtlDac">
+            <summary>
+            ProjectDtlBudgetDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlFundApplDac">
+            <summary>
+            ProjectDtlFundAppl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlImplPlanDac">
+            <summary>
+            ProjectDtlImplPlan数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlPerformTargetDac">
+            <summary>
+            ProjectDtlPerformTarget数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlPurchaseDtlDac">
+            <summary>
+            ProjectDtlPurchaseDtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlPurDtl4SOFDac">
+            <summary>
+            ProjectDtlPurDtl4SOF数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectDtlTextContentDac">
+            <summary>
+            ProjectDtlTextContent数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Dac.Interface.IProjectMstDac">
+            <summary>
+            ProjectMst数据访问层接口
+            </summary>
+        </member>
+    </members>
+</doc>

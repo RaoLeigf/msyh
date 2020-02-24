@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GGK3.GK.Dac</name>
+    </assembly>
+    <members>
+        <member name="T:GGK3.GK.Dac.GKPaymentDtlDac">
+            <summary>
+            GKPaymentDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GGK3.GK.Dac.GKPaymentMstDac">
+            <summary>
+            GKPaymentMst数据访问处理类
+            </summary>
+        </member>
+    </members>
+</doc>

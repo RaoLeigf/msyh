@@ -1,0 +1,432 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Facade</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Facade.ProjectDtlBudgetDtlFacade">
+            <summary>
+            ProjectDtlBudgetDtl业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlBudgetDtlFacade.ProjectDtlBudgetDtlRule">
+            <summary>
+            ProjectDtlBudgetDtl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlBudgetDtlFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlBudgetDtlFacade.UpdateDtlFBudgetAmount(System.Int64[],System.Decimal[])">
+            <summary>
+            预算根据明细表主键回填预算金额
+            </summary>
+            <param name="phid"></param>
+            <param name="FAmount"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlBudgetDtlFacade.UpdateBudgetDtlList(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel})">
+            <summary>
+            生成预算时回填明细
+            </summary>
+            <param name="oldxm3BudgetDtl"></param>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectDtlFundApplFacade">
+            <summary>
+            ProjectDtlFundAppl业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlFundApplFacade.ProjectDtlFundApplRule">
+            <summary>
+            ProjectDtlFundAppl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlFundApplFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectDtlImplPlanFacade">
+            <summary>
+            ProjectDtlImplPlan业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlImplPlanFacade.ProjectDtlImplPlanRule">
+            <summary>
+            ProjectDtlImplPlan业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlImplPlanFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectDtlPerformTargetFacade">
+            <summary>
+            ProjectDtlPerformTarget业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPerformTargetFacade.ProjectDtlPerformTargetRule">
+            <summary>
+            ProjectDtlPerformTarget业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPerformTargetFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade">
+            <summary>
+            ProjectDtlPurchaseDtl业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade.ProjectDtlPurchaseDtlRule">
+            <summary>
+            ProjectDtlPurchaseDtl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade.ProjectDtlPurDtl4SOFRule">
+            <summary>
+            ProjectDtlPurDtl4SOF业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade.Delete``1(``0)">
+            <summary>
+            通过id，删除数据
+            </summary>
+            <param name="id">单主键id值</param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade.Delete``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            通过ids，删除数据
+            </summary>
+            <param name="ids">单主键id集合</param>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade">
+            <summary>
+            ProjectDtlPurDtl4SOF业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlPurDtl4SOFRule">
+            <summary>
+            ProjectDtlPurDtl4SOF业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlTextContentRule">
+            <summary>
+            ProjectDtlTextContent业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlPurchaseDtlRule">
+            <summary>
+            ProjectDtlPurchaseDtl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlPerformTargetRule">
+            <summary>
+            ProjectDtlPerformTarget业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlFundApplRule">
+            <summary>
+            ProjectDtlFundAppl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlBudgetDtlRule">
+            <summary>
+            ProjectDtlBudgetDtl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.ProjectDtlImplPlanRule">
+            <summary>
+            ProjectDtlImplPlan业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.Delete``1(``0)">
+            <summary>
+            通过id，删除数据
+            </summary>
+            <param name="id">单主键id值</param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade.Delete``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            通过ids，删除数据
+            </summary>
+            <param name="ids">单主键id集合</param>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectDtlTextContentFacade">
+            <summary>
+            ProjectDtlTextContent业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectDtlTextContentFacade.ProjectDtlTextContentRule">
+            <summary>
+            ProjectDtlTextContent业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectDtlTextContentFacade.FindByForeignKey``1(``0,System.String[])">
+            <summary>
+            通过外关联的单主键值，获取数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns>实体</returns>
+        </member>
+        <member name="T:GXM3.XM.Facade.ProjectMstFacade">
+            <summary>
+            ProjectMst业务组装处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectMstRule">
+            <summary>
+            ProjectMst业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlImplPlanRule">
+            <summary>
+            ProjectDtlImplPlan业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlTextContentRule">
+            <summary>
+            ProjectDtlTextContent业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlFundApplRule">
+            <summary>
+            ProjectDtlFundAppl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlBudgetDtlRule">
+            <summary>
+            ProjectDtlBudgetDtl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlPurchaseDtlRule">
+            <summary>
+            ProjectDtlPurchaseDtl业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlPurDtl4SOFRule">
+            <summary>
+            ProjectDtlPurDtl4SOF业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.ProjectMstFacade.ProjectDtlPerformTargetRule">
+            <summary>
+            ProjectDtlPerformTarget业务逻辑处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.LoadWithPage(System.Int32,System.Int32,System.Collections.Generic.Dictionary{System.String,System.Object},System.String[])">
+            <summary>
+            分页获取全部集合
+            </summary>
+            <param name="pageNumber">页码(从1开始)</param>
+            <param name="pageSize">每页大小(最大为200)</param>
+            <param name="dic">查询条件字典（建议使用Enterprise3.Common.Base.CreateCriteria进行创建）</param>
+            <param name="sorts">排序({属性名 desc,属性名,属性名 asc})</param>
+            <returns>集合</returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.LoadWithPage(System.Int32,System.Int32,System.String,System.Collections.Generic.Dictionary{System.String,System.Object},System.String[])">
+            <summary>
+            分页获取全部集合
+            </summary>
+            <param name="pageNumber">页码(从1开始)</param>
+            <param name="pageSize">每页大小(最大为200)</param>
+            <param name="nameSqlName">命名SQL名称</param>
+            <param name="dic">查询条件字典（建议使用Enterprise3.Common.Base.CreateCriteria进行创建）</param>
+            <param name="sorts">排序({属性名 desc,属性名,属性名 asc})</param>
+            <returns>集合</returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.Delete``1(``0)">
+            <summary>
+            通过id，删除数据
+            </summary>
+            <param name="id">单主键id值</param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.Delete``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            通过ids，删除数据
+            </summary>
+            <param name="ids">单主键id集合</param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.UpdateFProjStatus(System.Int64)">
+            <summary>
+            更改项目状态,项目状态更改成“单位备选”时,删除当前预算，并把对应项目的状态改为“单位备选”
+            </summary>
+            <param name="phid"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.SaveProjectMst(GXM3.XM.Model.Domain.ProjectMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="projectMstEntity"></param>
+            <param name="projectDtlImplPlanEntities"></param>
+            <param name="projectDtlTextContentEntities"></param>
+            <param name="projectDtlFundApplEntities"></param>
+            <param name="projectDtlBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.SaveProjectMst(GXM3.XM.Model.Domain.ProjectMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="projectMstEntity"></param>
+            <param name="projectDtlTextContentEntities"></param>
+            <param name="projectDtlPurchaseDtlEntities"></param>
+            <param name="projectDtlPurDtl4SOFEntities"></param>
+            <param name="projectDtlPerformTargetEntities"></param>
+            <param name="projectDtlFundApplEntities"></param>
+            <param name="projectDtlBudgetDtlEntities"></param>
+            <param name="projectDtlImplPlanEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.FlowStart(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            流程发起时调用（一般用于修改表单状态为送审中、或是维护表单已挂工作流）
+            </summary>
+            <param name="ec"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.CheckApproveValid(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            在审批任务执行前调用，在这里判断是否允许执行审批操作（现在流程中没有判断杜绝多个审批节点执行，所以单据状态为已审批也允许再次审批）
+            </summary>
+            <param name="ec"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.Approve(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+             审批组件任务办理时调用（现在流程中没有判断杜绝多个审批节点执行，所以如果单据已审批就修改审批人、审批时间）
+            </summary>
+            <param name="ec"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.CheckCancelApproveValid(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            审批节点回退前判断是否允许取消审批
+            </summary>
+            <param name="ec"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.CancelApprove(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            审批节点回退时调用进行单据取消审批操作
+            </summary>
+            <param name="ec"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.FlowAbort(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            流程被终止时调用
+            </summary>
+            <param name="ec"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.FlowEnd(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            流程结束时调用
+            </summary>
+            <param name="ec"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.EditUserTaskComplete(System.String,NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            新增、编辑\审核类组件任务执行时调用,方法参数中包含组件id
+            </summary>
+            <param name="compId"></param>
+            <param name="ec"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.GetBizToPdfEntity(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            获取单据转pdf所需的套打模块、及数据，用于APP端
+            </summary>
+            <param name="executionContext"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.GetBizAttachment(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext)">
+            <summary>
+            获取单据附用（用于App端）
+            </summary>
+            <param name="executionContext"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.CheckBizSaveByMobileApp(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            app办理时如果单据有修改则调用该方法判断是否允许保存修改
+            </summary>
+            <param name="executionContext"></param>
+            <param name="jsonData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.SaveBizDataByMobileApp(NG3.WorkFlow.Interfaces.WorkFlowExecutionContext,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            app端办理时如果修改了单据内容则调用该方法进行单据保存。
+            </summary>
+            <param name="executionContext"></param>
+            <param name="jsonData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.AddData(System.String[])">
+            <summary>
+            项目同步数据到老G6H
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.GetApproveList(Enterprise3.Common.Model.Results.PagedResult{GXM3.XM.Model.Domain.ProjectMstModel})">
+            <summary>
+            获取审批中的单据id
+            </summary>
+            <param name="pageResult"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.ProjectMstFacade.AddNextApproveName(Enterprise3.Common.Model.Results.PagedResult{GXM3.XM.Model.Domain.ProjectMstModel},System.String)">
+            <summary>
+            增加单据中下一审批节点名称
+            </summary>
+            <param name="pageResult"></param>
+            <param name="BizType"> 审批流业务类型</param>
+            <returns></returns>
+        </member>
+        <member name="T:GXM3.XM.Facade.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.Resources.Culture">
+            <summary>
+              使用此强类型资源类，为所有资源查找
+              重写当前线程的 CurrentUICulture 属性。
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Facade.Resources.InitializeObject">
+            <summary>
+              查找类似 初始化对象失败！ 的本地化字符串。
+            </summary>
+        </member>
+    </members>
+</doc>

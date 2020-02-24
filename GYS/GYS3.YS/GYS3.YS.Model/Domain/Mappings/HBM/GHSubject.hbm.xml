@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GHSubjectModel" table="ys3_Subject">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="FYear" column="f_year" type="System.String" length="4" not-null="false" />
+		<property name="FProjCode" column="f_ProjCode" type="System.String" length="255" not-null="false" />
+		<property name="FProjName" column="f_ProjName" type="System.String" length="100" not-null="false" />
+		<property name="FDeclarationUnit" column="f_DeclarationUnit" type="System.String" length="200" not-null="false" />
+		<property name="FDeclarationDept" column="f_DeclarationDept" type="System.String" length="200" not-null="false" />
+		<property name="FBudgetDept" column="f_BudgetDept" type="System.String" length="200" not-null="false" />
+		<property name="FProjAttr" column="f_ProjAttr" type="System.String" length="20" not-null="false" />
+		<property name="FDuration" column="f_Duration" type="System.String" length="20" not-null="false" />
+		<property name="FExpenseCategory" column="f_ExpenseCategory" type="System.String" length="20" not-null="false" />
+		<property name="FProjStatus" column="f_ProjStatus" type="System.Int32" not-null="false" />
+		<property name="FStartDate" column="f_StartDate" type="System.DateTime" not-null="false" />
+		<property name="FEndDate" column="f_EndDate" type="System.DateTime" not-null="false" />
+		<property name="FDateofDeclaration" column="f_DateofDeclaration" type="System.DateTime" not-null="false" />
+		<property name="FDeclarer" column="f_Declarer" type="System.String" length="20" not-null="false" />
+		<property name="FProjAmount" column="f_ProjAmount" type="System.Decimal" not-null="false" />
+		<property name="FBudgetAmount" column="f_BudgetAmount" type="System.Decimal" not-null="false" />
+		<property name="FifPerformanceAppraisal" column="f_ifPerformanceAppraisal" type="System.Int32" not-null="false" />
+		<property name="FifKeyEvaluation" column="f_ifKeyEvaluation" type="System.Int32" not-null="false" />
+		<property name="FMeetingTime" column="f_MeetingTime" type="System.DateTime" not-null="false" />
+		<property name="FMeetiingSummaryNo" column="f_MeetiingSummaryNo" type="System.String" length="100" not-null="false" />
+		<property name="FType" column="f_Type" type="System.String" length="2" not-null="false" />
+		<property name="FApproveStatus" column="f_ApproveStatus" type="System.String" length="2" not-null="false" />
+		<property name="FVerNo" column="f_VerNo" type="System.String" length="20" not-null="false" />
+		<property name="FLifeCycle" column="f_LifeCycle" type="System.Int32" not-null="false" />
+		<property name="FCarryOver" column="f_CarryOver" type="System.Int32" not-null="false" />
+		<property name="FBillNo" column="f_BillNo" type="System.String" length="50" not-null="false" />
+		<property name="FApprover" column="f_Approver" type="System.Int64" not-null="false" />
+		<property name="FApproveDate" column="f_ApproveDate" type="System.DateTime" not-null="false" />
+		<property name="FmidYearChange" column="f_midYearChange" type="System.String" length="2" not-null="false" />
+		<property name="FifPurchase" column="f_ifPurchase" type="System.Int32" not-null="false" />
+		<property name="FPerformType" column="f_PerformType" type="System.String" length="30" not-null="false" />
+		<property name="FPerformEvalType" column="f_PerformEvalType" type="System.String" length="30" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="FNextApprove" column="f_NextApprove" type="System.String" length="200" not-null="false" />
+	</class>
+</hibernate-mapping>

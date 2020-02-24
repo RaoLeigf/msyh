@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="esb_dataservice_main">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="dsc_code" />
+      <Field Name="dsc_name"  />
+      <Field Name="dsc_key"  />
+      <Field Name="pid"  />
+      <Field Name="dsc_index"  />
+      <Field Name="dsc_type"  />
+      <Field Name="dsc_isfolder"  />
+      <Field Name="dsc_suit"  />
+      <Field Name="dsc_module"  />
+      <Field Name="dsc_xmlname"  />
+      <Field Name="dsc_xmlcontent"  />
+      <Field Name="dsc_memo"  />
+    </Table>
+  </Tables>
+  
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="id" Oper="Equal" Target="Client" Value="id" />
+      <Exp Field="pid" Oper="Equal" Target="Client" Value="pid" />
+      <Exp Field="dsc_name" Oper="Like" Target="Client" Value="dsc_name"/>
+      <Exp Field="dsc_key" Oper="Like" Target="Client" Value="dsc_key" />
+      <Exp Field="dsc_isfolder" Oper="Equal" Target="None" Value="0" />
+    </Query>
+    <OrderBy format="{dsc_index}">
+      <Exp Field="dsc_index" value="asc"/>
+    </OrderBy>
+  </Read>
+
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <SelectDataCenter>
+    <Sql>
+      select id,dsc_name as ds_name,dsc_index as ds_index, pid, dsc_isfolder as ds_isfolder, id as dsc_id, 1 as ds_sys from esb_dataservice_main
+    </Sql>
+    <Where>
+    </Where>
+  </SelectDataCenter>
+  <GetName>
+    <Sql>
+      select dsc_name from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="id" Oper="Equal" Target="Client" value="id"></Exp>
+    </Where>
+  </GetName>
+
+</DataService>
+
+

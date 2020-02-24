@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GYS3.YS.Dac</name>
+    </assembly>
+    <members>
+        <member name="T:GYS3.YS.Dac.BuDeptReportDac">
+            <summary>
+            BudgetDtlBudgetDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlBudgetDtlDac">
+            <summary>
+            BudgetDtlBudgetDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlFundApplDac">
+            <summary>
+            BudgetDtlFundAppl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlImplPlanDac">
+            <summary>
+            BudgetDtlImplPlan数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlPerformTargetDac">
+            <summary>
+            BudgetDtlPerformTarget数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlPurchaseDtlDac">
+            <summary>
+            BudgetDtlPurchaseDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlPurDtl4SOFDac">
+            <summary>
+            BudgetDtlPurDtl4SOF数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetDtlTextContentDac">
+            <summary>
+            BudgetDtlTextContent数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetMstDac">
+            <summary>
+            BudgetMst数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.BudgetProcessCtrlDac">
+            <summary>
+            BudgetProcessCtrl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.ExpenseDtlDac">
+            <summary>
+            ExpenseDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.ExpenseMstDac">
+            <summary>
+            ExpenseMst数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.GHSubjectDac">
+            <summary>
+            GHSubject数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.SubjectMstBudgetDtlDac">
+            <summary>
+            SubjectMstBudgetDtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Dac.SubjectMstDac">
+            <summary>
+            SubjectMst数据访问处理类
+            </summary>
+        </member>
+    </members>
+</doc>

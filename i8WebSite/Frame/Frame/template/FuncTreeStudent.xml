@@ -1,0 +1,24 @@
+﻿<Data>
+  <items>
+      <item ID="0200000000000" str="沙盘操作表" para="~/PMS/Bills/Operatetable" />
+      <item ID="0201" str="项目策划">
+        <item ID="020101" str="技术负责人" para="~/PMS/TechnicalLeader"/>
+        <item ID="020102" str="采购负责人" para="~/PMS/PurchasingLeader" />
+        <item ID="020103" str="预算主管" para="~/PMS/BudgetDirector" />
+        <item ID="020104" str="财物主管" para="~/PMS/PropertyCompetent" />
+        <item ID="020105" str="项目经理" para="~/PMS/ProjectManager"/>
+      </item>
+      <item ID="0202" str="项目准备">
+        <item ID="020201" str="公司借款申请" para="~/PMS/Bills/CompanyLoan"/>
+        <item ID="020202" str="临设建设申请" para="~/PMS/Bills/Facility" />
+      </item>
+      <item ID="0203" str="项目施工">
+        <item ID="020301" str="月初工作">
+          <item ID="02030101" str="银行借款申请" para="~/PMS/Bills/BankLoan"/>
+          <item ID="02030102" str="资格认证费缴纳" para="~/PMS/Bills/OtherPay" />
+          <item ID="02030103" str="钢筋原材料采购" para="~/PMS/Bills/MaterialPay"/>
+        </item>
+        <item ID="020302" str="每旬工作" para="~/PMS/PurchasingLeader" />
+      </item>
+  </items>
+</Data>

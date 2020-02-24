@@ -1,0 +1,92 @@
+﻿Ext.define('Aform.controller.List', {
+    extend: 'Ext.app.Controller',
+
+    config: {
+        refs: {
+            List: 'viewlist'
+        },
+        control: {
+            'viewlist': {
+                disclose: 'showDetail'
+            },
+            'button[itemId=add]': {
+                tap: 'onAddButtonTap'
+            },
+            'button[itemId=delete]': {
+                tap: 'onDelButtonTap'
+            }
+        }
+    },
+
+    launch: function () {
+        this.getList().getStore().load()
+    },
+
+    //显示明细
+    showDetail: function (list, record) {
+
+        var viewedit = Ext.Viewport.getComponent('viewportEdit');
+
+        //不存在编辑窗口则新建
+        if (!viewedit) {
+            viewedit = Ext.create('Aform.view.Edit')
+            Ext.Viewport.add(viewedit);
+        }
+
+        viewedit.setValues(record.getData());
+        Ext.Viewport.setActiveItem(viewedit);
+    },
+
+	<# if(Toolbar.LNgButtons.Contains("add")||Toolbar.RNgButtons.Contains("add")) { #>
+    //新增
+    onAddButtonTap: function () {
+
+        var viewedit = Ext.Viewport.getComponent('viewportEdit');
+
+        if (viewedit) {
+            viewedit.reset();            
+        }
+        else {
+            viewedit = Ext.create('Aform.view.Edit')
+            Ext.Viewport.add(viewedit);
+        }
+
+        viewedit.otype = 'add';
+        Ext.Viewport.setActiveItem(viewedit);
+    },
+	<# } #>
+
+	<# if(Toolbar.LNgButtons.Contains("add")||Toolbar.RNgButtons.Contains("add")) { #>
+    //删除
+    onDelButtonTap: function () {
+
+        var viewlist = this.getList();
+        var storelist = viewlist.getStore();
+        var data = viewlist.getSelection();
+
+        if (data.length > 0) {
+            var id = data[0].get('phid');
+
+            Ext.Msg.confirm('提示', '是否删除此记录？', function (e) {
+                if (e == "yes") {
+                    Ext.Ajax.request({
+                        params: { 'id': id },
+                        url: C_ROOT + "SUP/<#= ClassName #>List/Delete",
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.status == "OK") {
+                                storelist.remove(data[0]); //前端删除
+                                Ext.Msg.alert('提示', '删除成功!');
+                            } else {
+                                Ext.Msg.alert('提示', '删除失败!');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+	<# } #>
+});
+
+

@@ -1,0 +1,177 @@
+﻿@{
+    ViewBag.Title = "AddinExpressionEdit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{  
+    <script type="text/javascript">
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo)? {} : Ext.decode(langInfo); //自定义
+
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+		//var busno = '@ViewBag.No';
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    'save', 'attachment', 'addrow', 'deleterow', '->', 'print', 'close'
+                ]
+            });
+
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 400,
+                autoScroll: true,
+                buskey: 'Phid', //对应的业务表主键属性
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 4,
+                fieldDefaults: {
+                    labelWidth: 87,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                fields: [
+					{
+						xtype: 'ngText',
+						fieldLabel: Lang.ExpText || '表达式文本',
+						name: 'ExpText',
+						itemId: 'ExpText',
+						readOnly: false,
+						mustInput: false,
+						colspan: 1 
+					},{
+						xtype: 'container',
+						hidden: true,
+						items: [
+							{
+								xtype: 'hiddenfield',
+								fieldLabel: 'Phid',
+								name: 'Phid',
+								itemId: 'Phid'
+							},{
+								xtype: 'hiddenfield',
+								fieldLabel: '主表phid',
+								name: 'MstPhid',
+								itemId: 'MstPhid'
+							}
+						]
+					}
+				]
+            });
+
+
+			//布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, {
+                    xtype: 'panel',
+                    region: 'center',
+                    autoScroll: true,
+                    overflowY: 'scroll',
+                    layout: 'border',
+                    bodyStyle: "padding-right:20px",
+                    items: [mstform]
+                }]
+            });
+
+			//当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'addinexpression' },
+                    url: '@Url.Content("~/[需替换成AreaName]/AddinExpression/GetAddinExpressionInfo")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mstform.getForm();
+                            mstformobj.setValues(resp.Data);
+
+							//代码转名称
+                            var codectl = [];
+                            BatchBindCombox(codectl);
+
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.Msg);
+                        }
+                    }
+                });
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+				//if (busno != undefined && busno != "") {
+                //    Ext.getCmp("No").userSetReadOnly(true);
+                //    Ext.getCmp("No").setValue(busno);
+                //}
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT) {
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+            }
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                var mstvf = mstform.isValid();
+
+                if (!mstvf) {
+                    return;
+                }
+
+                var mstformData = mstform.getFormData();
+
+                Ext.Ajax.request({
+                    params: {
+						'mstformData': mstformData
+                    },
+                    url: '@Url.Content("~/[需替换成AreaName]/AddinExpression/save")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                var frame = $GetWFrame();
+                                if (frame) {
+                                    var listref = frame.ListObserver.get('AddinExpressionList');
+                                    var data = mstform.getForm().getValues();
+									data.Phid = resp.KeyCodes[0];//赋主键值
+                                    listref.fireEvent('refreshlist', data);
+                                }
+
+                                $CloseTab();
+                            });
+
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+            });
+
+
+            //附件
+            ngToolbar.get('attachment').on('click', function () {
+                alert("attachment");
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                alert("print");
+            });
+
+
+        });
+        
+    </script>
+}

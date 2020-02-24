@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_ugroup">
+      <Field Name="g_code" IsKey="true"/>
+      <Field Name="g_name" />
+      <Field Name="memo"  />
+      <Field Name="priority"  />
+      <Field Name="usb"  />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] where 1=1 [query]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="g_code" paramName="g_code_like" Target="Client"  Oper="Like" value="g_code_like"/>
+      <Exp Field="g_name" paramName="g_name_like" Target="Client"  Oper="Like" value="g_name_like"/>
+      <Exp Field="g_code" Target="Client" Value="g_code" />
+      <Exp Field="g_name" Target="Client" value="g_name"/>
+      <Exp Field="memo" Target="Client" value="memo"/>
+    </Query>
+    <OrderBy format="{g_code}">
+      <Exp Field="g_code" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>      
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>        
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>        
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+
+</DataService>
+
+

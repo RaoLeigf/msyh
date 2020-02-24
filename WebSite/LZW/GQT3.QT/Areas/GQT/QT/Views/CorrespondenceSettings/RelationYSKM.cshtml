@@ -1,0 +1,298 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_YSKM.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript">
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'add',  'delete', 
+                    '->',  'close'
+                ]
+            });
+			
+			
+			var storeYSKM = Ext.create('Ext.ng.JsonStore', {
+				//pageSize: 14,
+				fields: [{
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+  
+    "name": "KMDM",
+    "type": "string",
+    "mapping": "KMDM"
+  },
+  {
+    "name": "KMMC",
+    "type": "string",
+    "mapping": "KMMC"
+  },
+  {
+    "name": "KMLB",
+    "type": "int",
+    "mapping": "KMLB"
+	
+
+				}],
+				url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsListDYGXdtl',
+				autoLoad:false
+			});
+			gridYSKM = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				store: storeYSKM,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+				header: '对应关系主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '科目代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMDM',
+					//hidden:true
+				}, {
+					header: '科目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMMC'
+				}, {
+					header: '科目属性',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'KMLB',
+					renderer:function(value, parm, record){
+						if(value=='0')
+						{
+							return "收入";
+						}else if(value=='1'){
+							return "支出";
+						}
+					}
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});
+			
+			
+
+			
+			
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+				}],
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+				//url: C_ROOT + 'DMC/Org/Organization/GetOrganizationList',
+				autoLoad:true
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						
+						var params={'Dwdm':record.get('PhId')};
+						Ext.apply(storeYSKM.proxy.extraParams,params);
+						storeYSKM.load(function(){
+							/*for(var i=0;i<storeDYGX.getCount();i++){
+								var YSKMDM=storeDYGX.getAt(i).get('Dydm');
+								//var YSKMindex=storeYSKM.find('KMDM',YSKMDM);
+								var YSKMindex=findStoreIndex(storeYSKM,'KMDM',YSKMDM);
+								if(YSKMindex>=0)
+								{
+									var YSKMMC=storeYSKM.getAt(YSKMindex).get('KMMC');
+									var YSKMLB=storeYSKM.getAt(YSKMindex).get('KMLB');
+									if(YSKMLB=='0'){
+										YSKMLB='收入';
+									};
+									if(YSKMLB=='1'){
+										YSKMLB='支出';
+									};
+									
+									storeDYGX.getAt(i).set('KMMC',YSKMMC);
+									storeDYGX.getAt(i).set('KMLB',YSKMLB);
+								}
+							};*/
+						})
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				},
+			});
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridOrg],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridYSKM],
+				
+				}]
+            });
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                var data = gridOrg.getSelectionModel().getSelection();
+				if(data.length > 0){
+					var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+					   
+					});
+					win.show();
+				}
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = gridYSKM.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    //recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/DeleteQtbase',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            storeYSKM.remove(record); //前端删除
+                                        });
+
+                                        Ext.MessageBox.alert('提示', '删除成功！');
+										
+										var data = gridOrg.getSelectionModel().getSelection();
+										var dataPhid=data[0].data.PhId;
+										var params={'Dwdm':dataPhid};
+										Ext.apply(storeYSKM.proxy.extraParams,params);
+										storeYSKM.load(function(){
+											
+										})
+                                    } else {
+                                        Ext.MessageBox.alert('提示', resp.Msg);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+		});
+		function findStoreIndex(store,name,value){
+			for(var i=0;i<store.getCount();i++){
+				if(store.getAt(i).get(name)==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+
+    </script>
+}
+
+

@@ -1,0 +1,169 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script type="text/javascript">
+	    //var pageName = '@ViewBag.Title';
+
+        Ext.onReady(function () {
+
+            //west
+            var tabPanel = Ext.create('Ext.tab.Panel', {
+                layout: 'border',
+                region: 'center',
+                deferredRender: false,
+                plain: true,
+                activeTab: 1,
+                defaults: { bodyStyle: 'padding:3px' },
+                tabPosition: 'left',
+                items: [
+                    {
+                        id: 'TabPage1',
+                        layout: 'border',
+                        title: '待办任务',
+                        items: [{
+                            xtype: 'container',
+                            name: 'charge',
+                            style: 'opacity：0.6;',
+                            tpl: [
+                                '<tpl for=".">',
+                                '<div style="height: 70px;float: left; margin: 0px 5px;">',
+                                '<p>{count}</p>',
+                                '<div>{title}</div>',
+                                '</div>',
+                                '</tpl>'
+                            ],
+                            data: [
+                                { id: '1', title: '待上报项目', count: 0 },
+                                { id: '2', title: '待审批项目', count: 0 },
+                                { id: '3', title: '待上报项目', count: 0 },
+                                { id: '4', title: '待审批项目', count: 0 }
+                            ]
+                        }]
+                    }, {
+                        id: 'TabPage2',
+                        layout: 'border',
+                        title: '通知公告',
+                        items: [noticeView]
+                    }
+                ]
+            });
+
+
+
+            Ext.define('NoticeModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'id', type: 'int' },
+                    { name: 'title', type: 'string' }
+                ]
+            });
+
+
+            var noticeStore = Ext.create('Ext.data.JsonStore', {
+                id: 'noticeStore',
+                model: 'NoticeModel',
+                autoLoad: true,
+                //data: [
+                //    { id: '1', title: 'Drawing & Charts' },
+                //    { id: '2', title: 'Advanced Data' },
+                //    { id: '3', title: 'Overhauled Theme' },
+                //    { id: '4', title: 'Performance Tuned' }
+                //]
+                proxy: {
+                    type: 'ajax',
+                    url: '../DefinedDesk/GetNotice',
+                    reader: {
+                        type: 'json',
+                        root: 'Record'
+                    }
+                }
+            });
+
+            
+
+            var imageTpl = new Ext.XTemplate(
+                '<tpl for=".">',
+                '<div style="margin-bottom: 10px;" class="thumb-wrap">',
+                '<span>{title}</span>',
+                '</div>',
+                '</tpl>'
+            );
+
+            var noticeView = Ext.create('Ext.view.View', {
+                id:'noticeView',
+                autoHeight:true,
+                store: noticeStore,
+                tpl: imageTpl,
+                itemSelector: 'div.thumb-wrap',
+                emptyText: 'No notice'
+                //renderTo: Ext.getBody()
+            });
+
+
+            var southPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                layout: 'border',
+                padding: '20 50 20 50',
+                items: [
+                    {
+                        xtype: 'container',
+                        style: 'opacity：0.6;text-align: center;',
+                        tpl: [
+                            '<div style="margin-left: 150px; margn: center;">',
+                            '<tpl for=".">',   
+                            '<div style="height: 70px;float: left; margin: 0px 5px;">',
+                            '<img src="resources/images/ghomeicon/csfw.png" style="height: 70px; width: 100%"/>',
+                            '</div>',                            
+                            '</tpl>',
+                            '</div>',
+                        ].join(''),
+                        data: [
+                            { id: '1', title: '待上报项目', count: 0 },
+                            { id: '2', title: '待审批项目', count: 0 },
+                            { id: '3', title: '待上报项目', count: 0 },
+                            { id: '4', title: '待审批项目', count: 0 }
+                        ]
+                    }]
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [{
+                    xtype: 'panel',
+                    region: 'south',
+                    layout: 'border',
+                    border: false,
+                    bodyStyle: { 'background-color': '#ddd' },
+                    height: '30%',
+                    items: [southPanel]
+                }, {
+                    xtype: 'panel',
+                    region: 'west',
+                    layout: 'border',
+                    bodyStyle: { 'background-color': '#aaa' },
+                    border: false,
+                    width: '50%',
+                    padding: 30,
+                    items: [tabPanel]
+                }, {
+                    xtype: 'panel',
+                    region: 'center',
+                    layout: 'border',
+                    bodyStyle: { 'background-color': '#ccc' },
+                    border: false,
+                    items: []
+
+                }]
+            });
+
+            
+        });
+    </script>
+}
+
+

@@ -1,0 +1,648 @@
+﻿@{
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
+        ViewBag.Title = "编报说明";
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src="@Url.Script("~/NG3Resource/js/WM/WMHelp.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/NG3Resource/js/WM/Archive/ArcDispatch/model.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/IndividualInfo/WM/Archive/ArcDispatch/ArcDispatch.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+
+        var store;
+        var NG3Refresh = function () {
+            if (store) {
+                store.load();
+            }
+        };
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var info = Ext.htmlDecode('@ViewBag.individualInfo');
+
+        if (Ext.isEmpty(info)) {
+            info = individualConfigInfo;//插件NewEmpInfoEdit中定义的UI信息默认值，每个插件都必须是这个值
+        }
+
+        var individualInfo = $DealIndividualInfo(info, Lang);//自定义信息与多语言合并
+
+        var fields = DispatchListFields;
+
+        var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'gridinfo');//合并model
+    </script>
+    <script type="text/javascript">
+
+        function OpenAttachment(busid) {
+
+            var attachguid = '';
+
+            var param = {
+                product: "", //传相应产品，i6、i6s、i6P、A3、GE，可为空
+                attachguid: attachguid, //会话guid,可传空生成方法cs代码:Guid.NewGuid().ToString()
+                attachTName: "c_pfc_attachment",
+                busTName: "hr_arc_dispatch", //传相应业务表
+                busid: busid //传相应产品业务单据phid
+                //bustypecode: "ArcDispatchList",//业务类型编码
+                //busurl: "WM/Archive/ArcDispatch/ArcDispatchEdit?otype=view&id=$phid$", //传相应业务单据url,文档那边需要根据此url打开原始单据，
+                //orgid: $appinfo.orgID//组织phid
+            };
+
+            var result = LoadAttach.InitBeforeOpen(param);
+            var obj = eval(result);
+
+            if (obj) {
+                if (obj.status == "success")//初始化成功
+                {
+                    attachguid = obj.msg;
+                }
+                else {
+                    Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.AttachInitFailed || "附件初始化失败！");
+                    return;
+                }
+            }
+            else {
+                Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.AttachInitFailed || "附件初始化失败！");
+                return;
+            }
+
+
+            var opt = {
+                product: "", //传相应产品，可为空
+                mode: "NG3", //固定传NG3
+                openbymianframe: "1", //通过主框架打开附件 0或空否  1 是固定传1
+                oper: "winfrom", //web、pb、winfrom、progress（进度条模式）,固定传 winfrom
+                asr_tbl: "c_pfc_attachment",
+                tbl: "hr_arc_dispatch", //传相应业务表
+                fill: $appinfo.logid, //传相应操作员id
+                fillname: $appinfo.username, //传相应操作员姓名
+                chkSign: "0", //默认传0
+                chkCheckIn: "0", //默认传0
+                btnAdd: "1", //新增按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                addserverstuts: "0", //导入按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnScan: "1", //扫描按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnDelete: "1", //删除按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnEdit: "1", //编辑按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnView: "1", //查看按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnDownload: "1", //下载按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnCancel: "1", //取消按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnOk: "1", //确定按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnWebAdd: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                btnWebOk: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                archivestuts: "2", //归档按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                status: 'view', //add 新增模式，view 查看模式， edit 编辑模式
+                showlist: "1", //显示文件列表 0 不显示 1显示
+                zip: "0", //附件压缩 0 不压缩 1 压缩
+                filenum: "", //附件上传数量限制 0或空不限制附件上传数量
+                filetype: "", //附件上传类型限制目前仅支持传入"image",如果传了"image"附件控件就只能上传图片
+                guid: attachguid //传第二步附件初始化获得的guid
+            };
+            LoadAttach.Init(opt); //打开附件
+        }
+
+        function AttachReturnValue(key, value) {
+            switch (key) {
+                case "guid": //附件控件返回会话guid，按需编写代码
+                    LoadAttach.GUID = value;
+                    if (LoadAttach.idGuid != null) {
+                        LoadAttach.idGuid.value = value;
+                    }
+                    break;
+                case "status": //附件控件返回状态，按需编写代码
+                    LoadAttach.STATUS = value;
+                    if (LoadAttach.idStatus != null) {
+                        LoadAttach.idStatus.value = value;
+                    }
+                    break;
+                case "closeNG3Container": //附件控件窗口关闭事件
+                    break;
+            }
+        }
+
+        //查看情况
+        function ViewQk(busid) {
+            var win = Ext.create('Ext.ng.ArcViewQKHelp', {
+                modal: true,
+                title: Lang.DptReadQk || '发文阅读情况',
+                arcId: busid,
+                archivestype: 'dispatch'
+            });
+            win.show();
+        }
+
+        //标题查看正文
+        function ViewContent(arcId) {
+            $OpenTab(Lang.DptView || '发文查看', C_ROOT + 'WM/Archive/MyArchive/ArcContentView?arctype=dispatch&code=' + arcId);
+        }
+
+    </script>
+
+    <script type="text/javascript">
+
+
+         var handPaperFirst = '';
+
+        Ext.onReady(function () {
+            //灵动菜单条
+            $CreateFloatMenu('ArcDispatchList');
+
+            var buttons = [{ id: 'add', text: '新增', iconCls: "icon-New", langKey: 'draft' },
+                'edit', 'delete', 'view','refresh',
+                { id: "location", text: "归档", iconCls: "icon-assign", langKey: 'archive' },
+                { id: "abolish", text: "废止", iconCls: "icon-Unverify", langKey: 'abolish' },
+                { id: "control", text: "受控", iconCls: "cog", langKey: 'control' },
+                'export',
+                '->', 'print', 'help', 'close'];
+
+
+
+            if (handPaperFirst == 'Y') {
+                buttons.splice(0, 1, {
+                    text: '拟稿',
+                    iconCls: "icon-save",
+                    langKey: 'draft',
+                    menu: {
+                        items:
+                            [
+                                { itemId: 'draftpaper', text: '稿纸优先', iconCls:'icon-save' },
+                                { itemId: 'add', text: '正文优先', iconCls: "icon-New" }
+                            ]
+                    }
+                });
+            }
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: 'ArcDispatchList', //权限名称
+                ngbuttons: buttons
+            });
+
+            ngToolbar.get('location').hide();
+            ngToolbar.get('abolish').hide();
+            ngToolbar.get('control').hide();
+            ngToolbar.get('export').hide();
+            ngToolbar.get('print').hide();
+            ngToolbar.get('help').hide();
+
+            //ngToolbar
+
+            Ext.define('DispatchListModel', {
+                extend: 'Ext.data.Model',
+                fields: modelFileds
+            });
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'DispatchListModel',//model定义在js中
+                pageSize: 25,
+                autoLoad: true,
+                url: '../ArcDispatch/GetArcDispatchList'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+            var initConfig = {
+                store: store,
+                bbar: [pagingbar]
+            };
+
+            var gridConfig = Ext.apply(initConfig, individualInfo.grid['gridinfo']);
+            //grid
+            var grid = Ext.create('Ext.ng.GridPanel', gridConfig);
+
+            //var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+            //    toolbar: ngToolbar,
+            //    pageid: "Web:ArcDispatchList",//对应内嵌查询业务点标识
+            //    grid: grid,
+            //    columnsPerRow: 4 //每行4列
+            //});
+
+            var isText = function (value) {
+                if (value == "1")
+                    return Lang.Yes || "是";
+                else
+                    return Lang.No || "否";
+            }
+
+            ////标题
+            //grid.getColumn('Cname').renderer = function (value, metaData, record) {
+            //    return '<a title="' + value + '" href="#" onclick="ViewContent(\'' + record.get("PhId") + '\')">' + value + '</a>';
+            //}
+            grid.getColumn('Cname').printRenderer = function (value) {
+                return value;
+            }
+            //已归档
+            grid.getColumn('PsoftDossierFlag').renderer = isText;
+            //已导出
+            grid.getColumn('ExportdocFlag').renderer = isText;
+            //分发日期
+            grid.getColumn('BookDt').renderer = Ext.util.Format.dateRenderer('Y-m-d');
+            //归档日期
+            grid.getColumn('PigeonholeDt').renderer = Ext.util.Format.dateRenderer('Y-m-d');
+            //附件（打印时）
+            grid.getColumn('Attachment').printRenderer = function (value) {
+                if (value == "")
+                    return '0';
+                else
+                    return value;
+            };
+            @*//附件
+            grid.getColumn('Attachment').renderer = function (value, metaData, record) {
+                if (value != "0" && value != "")
+                    //onclick="OpenAttachment(\'' + record.get("PhId") + '\')" ondblclick="event.stopPropagation();"
+                    return '<img style="width:18px;height:18px;cursor:pointer;"  border="0"   src="@Url.Content("~/NG3Resource/icons/attach.png")" /><font>' + value + '</font>';
+            };
+            //附件点击事件
+            grid.getColumn('Attachment').on('click', function () {
+                var record = arguments[5];
+                if (record.get('Attachment') != "0" && record.get('Attachment') != "") {
+                    OpenAttachment(record.get("PhId"));
+                }
+            });
+            //附件双击事件，阻止冒泡事件
+            grid.getColumn('Attachment').on('dblclick', function (event) {
+                return false;
+            });
+            //查看情况
+            grid.getColumn('ViewQk').renderer = function (value, metaData, record) {
+                return '<a title="查看" href="#" onclick="ViewQk(\'' + record.get("PhId") + '\')">查看</a>';
+            }
+            grid.getColumn('ViewQk').printRenderer = function (value) {
+                return "";
+            }*@
+
+            var achiveTypeTree = Ext.create('Ext.ng.TreePanel', {
+                id: "achiveTypeTree",
+                region: "west",
+                split: true,
+                rootVisible: true,
+                width: 220,
+                root: {
+                    text: Lang.AllType || "全部类型"
+                },
+                treeFields: [
+                    { name: 'PhId', type: 'string' },
+                    { name: 'text', type: 'string' },
+                    { name: 'Cno', type: 'string' },
+                    { name: 'Cname', type: 'string' },
+                    { name: 'Gphid', type: 'string' },
+                ],
+                url: '@Url.Content("~/WM/Archive/W3BaTreedatabase/GetArchiveTypeTreeNodes?ctype=DispatchArcType")',
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{ text: Lang.DispatchType || '发文类型' }]
+                }],
+                listeners: {
+                    'selectionchange': function (selModel, rcds, eOpts) {
+                        var ArchiveTypePhid = rcds[0].get("Gphid");
+                        Ext.apply(store.proxy.extraParams, { 'doctype': ArchiveTypePhid });
+                        store.currentPage = 1;
+                        store.load();
+                    }
+                }
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, {
+                    id: 'myPanel',
+                    xtype: 'panel',
+                    region: 'center',
+                    layout: 'border',
+                    border: false,
+                    items: [//achiveTypeTree,
+                        {
+                        id: 'cenpanel',
+                        xtype: 'panel',
+                        region: 'center',
+                        autoScroll: true,
+                        overflowY: 'scroll',
+                        layout: 'border',
+                        border: true,
+                        items: [grid]
+                        //items: [queryPanel, grid]
+                    }]
+                }]
+            });
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                var data = achiveTypeTree.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var archiveType = data[0].data.Gphid;
+                    $OpenTab('@ViewBag.Title-' + (Lang.Draft || '新增'), C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=add&paper=0&doctype=' + archiveType);
+                }
+                else {
+                    $OpenTab('@ViewBag.Title-' + (Lang.Draft || '新增'), C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=add&paper=0');
+                }
+            });
+
+            @*//稿纸优先
+            if (ngToolbar.get('draftpaper')) {
+                ngToolbar.get('draftpaper').on('click', function () {
+                    var data = achiveTypeTree.getSelectionModel().getSelection();
+
+                    if (data.length > 0) {
+                        var archiveType = data[0].data.Gphid;
+                        $OpenTab('@ViewBag.Title-' + (Lang.Draft || '拟稿'), C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=add&paper=1&doctype=' + archiveType);
+                    }
+                    else {
+                        $OpenTab('@ViewBag.Title-' + (Lang.Draft || '拟稿'), C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=add&paper=1');
+                    }
+                });
+            }*@
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                //    var cstatus = data[0].get('Cstatus');
+                //    var forceOut = data[0].get('ForceOut');
+                //    var fouthuMan = data[0].get('FouthuMan');
+                //    if (cstatus != '00000' && forceOut != '1') {
+                //        if (cstatus == '00013' || cstatus == '00014') { //受控、废止
+                //            Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.OnlyNotBeginOrBackCanEdit || '只有未开始的草稿、封回状态的公文才能修改！');
+                //        }
+                //        else {
+                //            Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.BillHasLoadFlow || '单据已挂载流程，无法进行修改操作！');
+                //        }
+                //        return;
+                //    }
+                //    if (forceOut == '1' && fouthuMan != $appinfo.userID) {
+                //        Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.OnlyNotBeginOrBackCanEdit || '只有未开始的草稿、封回状态的公文才能修改！');
+                //        return;
+                //    }
+                    var id = data[0].get('PhId');
+                    $OpenTab('@ViewBag.Title-' + (Lang.Edit || '修改'), C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=edit&id=' + id + '&opentype=listtoedit');
+                }
+            });
+
+            //删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+
+                    var flow_status_name = data[0].get('flow_status_name');
+
+                    if (flow_status_name === "运行中") {
+                        Ext.MessageBox.alert(Lang.Prompt || '提示', "该发文使用的流程正在执行中，所以无法删除！");
+                        return;
+                    }
+
+
+                    Ext.MessageBox.confirm(Lang.Prompt || '提示', Lang.IsDel || '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: '@Url.Content("~/WM/Archive/ArcDispatch/Delete")',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+                                        grid.getView().refresh(true);
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.SuccessDel || '删除成功！');
+                                    } else if (resp.Status === "error") {
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', resp.Msg);
+                                    } else {
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.FailedDel || '删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //归档
+            ngToolbar.get('location').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                var compId = 'WM3DOCDISPATCH_BackArc';
+
+                if (data.length > 0) {
+
+                    var hasConfig = data[0].get('PsoftDossierFlag');
+
+                    if (hasConfig == '1') {
+                        Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.ThisBillHasArchive || '该发文已归档！');
+                        return;
+                    }
+
+                    var cname = data[0].get('Cname');
+                    var bizphid = data[0].get('PhId');
+                    var wfParam = '';
+
+                    var win = Ext.create('Ext.ng.FileHelp', {
+                        listeners: {
+                            bntOk: function (obj) {//这里是帮助确定按钮触发的事件
+                                NG3Ajaxrequest({
+                                    params: {
+                                        'compId': compId, 'title': cname, 'mstformid': bizphid, 'Label': obj.Label, 'OriCopies': obj.OriCopies, 'PageCount': obj.PageCount,
+                                        'PhidFileType': obj.PhidFileType, 'Pphid': obj.Pphid, 'Remarks': obj.Remarks, 'PhidOrg': obj.PhidOrg, 'Type': obj.Type
+                                    },
+                                    url: '@Url.Content("~/WM/Archive/ArcDispatch/ListManualToDossier")',
+                                    success: function (response) {
+                                        var resp = Ext.JSON.decode(response.responseText);
+                                        if (resp.Status === "success") {
+                                            Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.SuccessArchive || "归档成功！", function () {
+                                                store.load();
+                                            });
+                                        }
+                                        else {
+                                            Ext.MessageBox.alert(Lang.Prompt || '提示', resp.Msg);
+                                        }
+                                    }
+                                }, Lang.Submit || '正在提交...');
+                            }
+                        }
+                    });
+                    win.show();
+                }
+                else {
+                    Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.PleaseSelectArchiveItem || '请选择归档项！');
+                }
+            });
+
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab('@ViewBag.Title-' + (Lang.view || '查看'), C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=view&id=' + id);
+                }
+            });
+
+            //刷新
+            ngToolbar.get('refresh').on('click', function () {
+                store.reload();
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                $PrintHelp("ArcDispatchList", 'OM_ArcDispatchList', null, [grid], [Lang.DispatchList || '发文管理列表']);
+            });
+
+            //帮助
+            ngToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('ArcDispatchList.cshtml', 'ArcDispatch');
+            });
+
+            //废止
+            ngToolbar.get('abolish').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+
+                    Ext.MessageBox.confirm(Lang.Prompt || '提示', Lang.IsAbolish || '是否废止此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: '@Url.Content("~/WM/Archive/ArcDispatch/Abolish")',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+                                        store.load();
+                                    }
+                                    else if (resp.Status === "error") {
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', resp.Msg);
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.FailedAbolish || '废止失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //受控
+            ngToolbar.get('control').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+
+                    Ext.MessageBox.confirm(Lang.Prompt || '提示', Lang.IsControl || '是否受控此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: '@Url.Content("~/WM/Archive/ArcDispatch/Control")',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+                                        store.load();
+                                    }
+                                    else if (resp.Status === "error") {
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', resp.Msg);
+                                    }
+                                    else {
+                                        Ext.MessageBox.alert(Lang.Prompt || '提示', Lang.FailedControl || '受控失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //导出
+            ngToolbar.get('export').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+
+                    var arcid = data[0].get('PhId');
+
+                    Ext.MessageBox.confirm(Lang.Prompt || '提示', '是否导出到文档库？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel")
+                            return;
+                        var win = Ext.create('Ext.ng.ArchiveToDocHelp', {
+                            arcid: arcid,
+                            formType: 'hr_arc_dispatch',
+                            listeners: {
+                                bntOk: function (data) {
+                                    var s = data;
+                                    NG3Ajaxrequest({
+                                        params: {
+                                            'busid': arcid,
+                                            'doclibId': data.pid,
+                                            'docno': data.cno,
+                                            'fromC': data.fromC
+                                        },
+                                        url: '@Url.Content("~/WM/Archive/ArcDispatch/ArchiveToDoc")',
+                                        success: function (response) {
+                                            var resp = Ext.JSON.decode(response.responseText);
+                                            if (resp.Status === "success") {
+                                                Ext.MessageBox.alert('提示', "导出成功", function () {
+                                                    store.load();
+                                                });
+                                            } else {
+                                                Ext.MessageBox.alert('提示', "导出失败:" + resp.Msg);
+                                            }
+                                        }
+                                    }, '正在导出...');
+                                }
+                            }
+                        });
+                        win.show();
+                    }
+                }
+            });
+
+
+            //刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: '@Url.Content("~/WM/Archive/ArcDispatch/GetArcDispatchList")',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+    </script>
+}
+
+

@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4104727B-9707-4512-9F63-52D41D1689C5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP.Common.Facade</RootNamespace>
+    <AssemblyName>SUP.Common.Facade</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Rights.AnalyticEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Enterprise3.Rights.AnalyticEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>\\ljy\Custom\BaseDlls\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\NG3.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>\\ljy\Custom\BaseDlls\NG3.Data.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Metadata.PBDesignerParse">
+      <HintPath>\\ljy\Custom\BaseDlls\NG3.Metadata.PBDesignerParse.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\SUP.Common.DataEntity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommonHelpFacade.cs" />
+    <Compile Include="CommonhelpSettingFacade.cs" />
+    <Compile Include="IndividualFormFacade.cs" />
+    <Compile Include="IndividualUIFacade.cs" />
+    <Compile Include="IndividualPropertyFacade.cs" />
+    <Compile Include="Interface\ICommonHelpFacade.cs" />
+    <Compile Include="Interface\IIndividualFormFacade.cs" />
+    <Compile Include="Interface\IIndividualUIFacade.cs" />
+    <Compile Include="Interface\IIndividualPropertyFacade.cs" />
+    <Compile Include="Interface\ILayoutLogFacade.cs" />
+    <Compile Include="Interface\IPersonFacade.cs" />
+    <Compile Include="Interface\IQueryPanelFacade.cs" />
+    <Compile Include="Interface\IUsefulControlFacade.cs" />
+    <Compile Include="Interface\IUserOnlineInforFacade.cs" />
+    <Compile Include="LayoutLogFacade.cs" />
+    <Compile Include="PersonFacade.cs" />
+    <Compile Include="PrintFacade.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryPanelFacade.cs" />
+    <Compile Include="RichHelpFacade.cs" />
+    <Compile Include="UsefulControlFacade.cs" />
+    <Compile Include="UserOnlineInforFacade.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Core\NG2.Data.Service\NG3.Data.Service.csproj">
+      <Project>{FF3E2D32-2030-4807-BDE8-4AC6EC6EA07E}</Project>
+      <Name>NG3.Data.Service</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Common.Base\SUP.Common.Base.csproj">
+      <Project>{DC8F3685-C798-48E3-B1A8-3BA1B2A033DD}</Project>
+      <Name>SUP.Common.Base</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Common.DataAccess\SUP.Common.DataAccess.csproj">
+      <Project>{962cc709-55ba-4d0a-ab69-b2272b60f454}</Project>
+      <Name>SUP.Common.DataAccess</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Common.Rule\SUP.Common.Rule.csproj">
+      <Project>{EF47CEA0-086D-4F45-9B3B-D3381704E055}</Project>
+      <Name>SUP.Common.Rule</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\bin</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

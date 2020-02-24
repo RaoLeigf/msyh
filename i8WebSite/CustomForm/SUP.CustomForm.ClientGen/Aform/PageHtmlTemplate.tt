@@ -1,0 +1,10 @@
+﻿<#@ template language="C#" #>
+@{
+    ViewBag.Title = "<#= ClassName #>";
+    Layout = "~/Views/Shared/_SenchaTouchLayout.cshtml"; 
+}
+
+@section Script
+{
+     <script type="text/javascript" src="~/AppJS/SUP/<#= ClassName #>/app.js" ></script>
+}

@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_menu">
+      <Field Name="code" IsKey="true"/>
+      <Field Name="id" />
+      <Field Name="pid"/>
+      <Field Name="name"/>
+      <Field Name="name_en"/>
+      <Field Name="name_jp"/>
+      <Field Name="url"/>
+      <Field Name="managername"/>
+      <Field Name="rightname"/>
+      <Field Name="functionname"/>
+      <Field Name="product"/>
+      <Field Name="suite"/>
+      <Field Name="industry"/>
+      <Field Name="apptype"/>
+      <Field Name="functionnode_flag"/>
+      <Field Name="seq"/>
+      <Field Name="moduleno"/>
+      <Field Name="rightid"/>
+      <Field Name="ebankflg"/>
+      <Field Name="norightcontrol"/>
+      <Field Name="menusign"/>
+      <Field Name="subflg"/>
+    </Table>    
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] 
+      [where] [orderby]
+    </Sql>
+    <Where format="({subflg1} or {subflg2})">
+      <Exp Field="subflg" ParamName="subflg1" Oper="Equal" Value="0" />
+      <Exp Field="subflg" ParamName="subflg2" Oper="IsNull" />
+    </Where>
+    <Query>      
+      <Exp Field="functionnode_flag" Target="Client" Value="functionnode_flag" />
+      <Exp Field="code" Target="Client" Value="code" />
+      <Exp Field="moduleno" Target="Client" value="moduleno"/>
+      <Exp Field="rightid" Target="Client"  value="rightid"/>
+      <Exp Field="functionname" Target="Client"  value="functionname"/>
+      <Exp Field="managername" Target="Client"  value="managername"/>
+      <Exp Field="rightname" Target="Client"  value="rightname"/>      
+      <Exp Field="suite" Target="Client"  value="suite"/>
+      <Exp Field="product" Target="Client"  value="product"/>
+      <Exp Field="apptype" Target="Client"  value="apptype"/>
+      <Exp Field="name" paramName="name_like" Target="Client"  Oper="Like" value="name_like"/>
+    </Query>
+    <OrderBy format="{moduleno},{rightid}">
+      <Exp Field="moduleno" value="asc"/>
+      <Exp Field="rightid" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="code"  Target="Client" Value="code" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="code" Target="Client" Value="code"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="code" Target="Client" Value="code"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+
+</DataService>
+
+

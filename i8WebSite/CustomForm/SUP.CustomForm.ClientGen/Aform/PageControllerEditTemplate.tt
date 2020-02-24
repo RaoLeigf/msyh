@@ -1,0 +1,63 @@
+﻿Ext.define('Aform.controller.Edit', {
+    extend: 'Ext.app.Controller',
+
+    config: {
+        refs: {
+            Edit: 'viewedit'
+        },
+        control: {
+            'button[itemId=back]': {
+                tap: 'onBackButtonTap'
+            },
+            'button[itemId=save]': {
+                tap: 'onSaveButtonTap'
+            }
+        }
+    },
+
+    //返回
+    onBackButtonTap: function () {
+        var viewlist = Ext.Viewport.getComponent('viewportList');
+        Ext.Viewport.setActiveItem(viewlist);
+    },
+
+    //保存
+    onSaveButtonTap: function () {
+        var mstform = this.getEdit();
+        var formData = mstform.getFormData();
+
+        Ext.Ajax.request({
+            params: {
+                'formData': formData
+            },
+            url: C_ROOT + "SUP/<#= ClassName #>Edit/Save",
+            success: function (response) {
+                var resp = Ext.JSON.decode(response.responseText);
+                if (resp.Status === "OK") {
+
+                    Ext.Msg.alert('提示', '保存成功!', function (e) {
+                        //回填列表
+                        var viewlist = Ext.Viewport.getComponent('viewportList');
+                        var storelist = viewlist.getStore();
+                        var formvalues = mstform.getValues();
+
+                        var index = storelist.find("phid", formvalues.phid);
+                        if (index >= 0) {
+                            Ext.apply(storelist.data.items[index].data, formvalues);
+                        }
+                        else {
+                            storelist.insert(storelist.getCount(), formvalues);
+                        };
+
+                        viewlist.refresh();  //从store重新加载数据到窗口，不查数据库
+                        Ext.Viewport.setActiveItem(viewlist);
+                    });
+
+                } else {
+                    Ext.MessageBox.alert('提示', '保存失败:' + resp.status);
+                }
+            }
+        });
+    }
+});
+

@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{229F2520-C7CA-4086-9DA9-CCCC9ABE0F75}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NG3.Addin.Model</RootNamespace>
+    <AssemblyName>NG3.Addin.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\NG3.Addin.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dlls\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\BusinessModel\InterceptedServiceBizModel.cs" />
+    <Compile Include="Domain\BusinessModel\ExtendFuncBizModel.cs" />
+    <Compile Include="Domain\BusinessModel\ExtendFuncUrlBizModel.cs" />
+    <Compile Include="Domain\BusinessModel\MethodAroundBizModel.cs" />
+    <Compile Include="Domain\BusinessModel\ServiceUIParamBizModel.cs" />
+    <Compile Include="Domain\BusinessModel\SupportFunctionBizModel.cs" />
+    <Compile Include="Domain\BusinessModel\SupportVariableBizModel.cs" />
+    <Compile Include="Domain\GenerateCodes\AddinAssemblyModel.cs" />
+    <Compile Include="Domain\GenerateCodes\AddinExpressionModel.cs" />
+    <Compile Include="Domain\GenerateCodes\AddinExpressionVarModel.cs" />
+    <Compile Include="Domain\GenerateCodes\AddinOperatorModel.cs" />
+    <Compile Include="Domain\GenerateCodes\AddinServiceModel.cs" />
+    <Compile Include="Domain\GenerateCodes\AddinSqlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ExtendFunctionMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\MethodAroundMstModel.cs" />
+    <Compile Include="Enums\EnumAddinType.cs" />
+    <Compile Include="Enums\EnumCatalog.cs" />
+    <Compile Include="Enums\EnumInterceptorType.cs" />
+    <Compile Include="Enums\EnumSqlOpType.cs" />
+    <Compile Include="Enums\EnumUIDataSourceType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\AddinAssembly.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\AddinExpression.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\AddinExpressionVar.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\AddinSql.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ExtendFunctionMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\MethodAroundMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\AddinAssembly.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\AddinExpression.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\AddinExpressionVar.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\AddinSql.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ExtendFunctionMst.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\MethodAroundMst.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\AddinOperator.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\AddinOperator.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\AddinService.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\AddinService.nhv.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\bin
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

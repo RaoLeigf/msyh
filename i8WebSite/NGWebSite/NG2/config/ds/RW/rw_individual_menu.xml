@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_individual_menu">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="pid" />
+      <Field Name="nodeindex"  />
+      <Field Name="name"  />
+      <Field Name="isreport" IsKey="true"/>
+      <Field Name="userid"  IsKey="true"/>
+      <Field Name="rep_id"/>      
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{pid}">
+      <Exp Field="pid" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+</DataService>
+
+

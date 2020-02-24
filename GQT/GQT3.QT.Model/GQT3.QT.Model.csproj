@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{47EE9856-F415-4171-8609-B0531DB86167}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GQT3.QT.Model</RootNamespace>
+    <AssemblyName>GQT3.QT.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GQT3.QT.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\GenerateCodes\BankAccountModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetAccountsModel.cs" />
+    <Compile Include="Domain\GenerateCodes\CorrespondenceSettings2Model.cs" />
+    <Compile Include="Domain\GenerateCodes\CorrespondenceSettingsModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ExpenseCategoryModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GHProjDtlShareModel.cs" />
+    <Compile Include="Domain\GenerateCodes\OrganizeModel.cs" />
+    <Compile Include="Domain\GenerateCodes\OrgRelatitem2Model.cs" />
+    <Compile Include="Domain\GenerateCodes\PaymentMethodModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformEvalTargetClassModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformEvalTargetModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformEvalTargetTypeModel.cs" />
+    <Compile Include="Domain\GenerateCodes\PerformEvalTypeModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProcurementCatalogModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProcurementProceduresModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProcurementTypeModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtAccountModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtAttachmentModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtBaseProjectModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTControlSetModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtCoverUpDataModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtCoverUpForOrgModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtDtlStageModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTEditMemoModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTIfApproveModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTMemoModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTModifyModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTIndividualInfoTempleModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTIndividualInfoModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtNaviGationdtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtNaviGationModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtOrgDygxModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProductModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProductUserDygxModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProductUserModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlBudgetDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlFundApplModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlImplPlanModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlPerformTargetModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlPurchaseDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlPurDtl4SOFModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectDtlTextContentModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTProjectMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QTSysSetModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtTableCustomizeModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtVenueModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtXmDistributeModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtYJKModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtZcgnflModel.cs" />
+    <Compile Include="Domain\GenerateCodes\VProjectThresholdModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectThresholdModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjLibProjModel.cs" />
+    <Compile Include="Domain\GenerateCodes\QtSysCodeSeqModel.cs" />
+    <Compile Include="Domain\GenerateCodes\RWReportModel.cs" />
+    <Compile Include="Domain\GenerateCodes\SourceOfFundsModel.cs" />
+    <Compile Include="Domain\GenerateCodes\User2Model.cs" />
+    <Compile Include="Domain\GenerateCodes\UserOrganize2Model.cs" />
+    <Compile Include="Domain\GenerateCodes\VCorrespondenceSetting2Model.cs" />
+    <Compile Include="Enums\EnumKMLB.cs" />
+    <Compile Include="Enums\EnumOrgInnerType.cs" />
+    <Compile Include="Enums\EnumUserStatus.cs" />
+    <Compile Include="Extra\DeftDataModel.cs" />
+    <Compile Include="Extra\OrganizeModel.cs" />
+    <Compile Include="Extra\QtModulerightsModel.cs" />
+    <Compile Include="Extra\QtModulesModel.cs" />
+    <Compile Include="Extra\QtOrgModel.cs" />
+    <Compile Include="Extra\QTProjectMstHZModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetAccounts.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\CorrespondenceSettings.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ExpenseCategory.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\SourceOfFunds.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetAccounts.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\CorrespondenceSettings.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ExpenseCategory.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\SourceOfFunds.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\CorrespondenceSettings2.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\CorrespondenceSettings2.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\PaymentMethod.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PaymentMethod.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtSysCodeSeq.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QtSysCodeSeq.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjLibProj.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjLibProj.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\NHV\GHProjDtlShare.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\GHProjDtlShare.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\Organize.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\User2.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\Organize.nhv.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Mappings\NHV\User2.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\VCorrespondenceSetting2.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\UserOrganize2.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\UserOrganize2.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\OrgRelatitem2.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Mappings\HBM\RwReport.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProcurementType.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProcurementProcedures.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformEvalTargetType.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformEvalTarget.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformEvalTargetClass.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProcurementCatalog.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\PerformEvalType.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectThreshold.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtBaseProject.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtOrgDygx.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtZcgnfl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProduct.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProductUser.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProductUserDygx.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTControlSet.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtYJK.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTMemo.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTModify.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTIndividualInfo.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\BankAccount.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTSysSet.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTEditMemo.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtAttachment.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTIfApprove.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtDtlStage.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlBudgetDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlFundAppl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlImplPlan.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlPerformTarget.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlPurchaseDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlPurDtl4SOF.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectDtlTextContent.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QTProjectMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtAccount.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtCoverUpData.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtCoverUpForOrg.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtNaviGation.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtTableCustomize.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtVenue.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\QtXmDistribute.hbm.xml" />
+    <Content Include="Domain\Mappings\NHV\OrgRelatitem2.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\RWReport.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProcurementType.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProcurementProcedures.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformEvalTargetType.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformEvalTarget.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformEvalTargetClass.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProcurementCatalog.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\PerformEvalType.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectThreshold.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QtBaseProject.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QtOrgDygx.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QtZcgnfl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QTProduct.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QTProductUser.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QTProductUserDygx.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QTControlSet.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\QtYJK.nhv.xml" />
+    <Content Include="Domain\Mappings\NHV\VCorrespondenceSetting2.nhv.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

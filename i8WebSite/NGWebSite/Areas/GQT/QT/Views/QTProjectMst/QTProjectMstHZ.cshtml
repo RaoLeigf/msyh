@@ -1,0 +1,293 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QTProjectMstHZ.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+        var store;//Grid数据源
+        Ext.onReady(function () {
+			var fields =[
+				{
+					"name": "FDeclarationDept",
+					"type": "string",
+					"mapping": "FDeclarationDept"
+				},
+				{
+					"name": "FDeclarationDept_EXName",
+					"type": "string",
+					"mapping": "FDeclarationDept_EXName"
+				},
+				{
+					"name": "FBudgetDept",
+					"type": "string",
+					"mapping": "FBudgetDept"
+
+				},
+				{
+					"name": "FBudgetDept_EXName",
+					"type": "string",
+					"mapping": "FBudgetDept_EXName"
+
+				},
+				{
+					"name": "FProjName",
+					"type": "string",
+					"mapping": "FProjName"
+
+				},
+				{
+					"name": "FExpenseCategory_EXName",
+					"type": "string",
+					"mapping": "FExpenseCategory_EXName"
+
+				},
+				{
+					"name": "FBudgetAccounts",
+					"type": "string",
+					"mapping": "FBudgetAccounts"
+
+				},
+				{
+					"name": "FBudgetAccounts_EXName",
+					"type": "string",
+					"mapping": "FBudgetAccounts_EXName"
+
+				},
+				{
+					"name": "FBudgetAccounts2",
+					"type": "string",
+					"mapping": "FBudgetAccounts2"
+
+				},
+				{
+					"name": "FBudgetAccounts2_EXName",
+					"type": "string",
+					"mapping": "FBudgetAccounts2_EXName"
+
+				},
+				{
+					"name": "FAccount",
+					"type": "string",
+					"mapping": "FAccount"
+
+				},
+				{
+					"name": "FAccount_EXName",
+					"type": "string",
+					"mapping": "FAccount_EXName"
+
+				},
+				{
+					"name": "FAmountTop1",
+					"type": "float",
+					"mapping": "FAmountTop1"
+
+				},
+				{
+					"name": "FAdjustAmount",
+					"type": "float",
+					"mapping": "FAdjustAmount"
+
+                },
+                {
+                    "name": "FAdjustAmountS2S1",
+                    "type": "float",
+                    "mapping": "FAdjustAmountS2S1"
+
+                },
+                {
+                    "name": "FAdjustAmountX2S1",
+                    "type": "float",
+                    "mapping": "FAdjustAmountX2S1"
+
+                },
+				{
+					"name": "FAmountBottom1",
+					"type": "float",
+					"mapping": "FAmountBottom1"
+
+				},
+				{
+					"name": "FAdjustAmount2",
+					"type": "float",
+					"mapping": "FAdjustAmount2"
+
+                },
+                {
+                    "name": "FAdjustAmountX2X1",
+                    "type": "float",
+                    "mapping": "FAdjustAmountX2X1"
+
+                },
+				{
+					"name": "FAmountTop2",
+					"type": "float",
+					"mapping": "FAmountTop2"
+
+				},
+				{
+					"name": "FAdjustAmount3",
+					"type": "float",
+					"mapping": "FAdjustAmount3"
+
+				},
+				{
+					"name": "FAmountBottom2",
+					"type": "float",
+					"mapping": "FAmountBottom2"
+
+				}
+			];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'grid');
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GQT/QT/QTProjectMst/GetQTProjectMstHZ'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: 'c260633e-503b-4660-b42a-7c86e31c46f9',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				/*layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},*/
+                bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['grid']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+			 var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                //toolbar: ngToolbar,
+                hidePanel:true,
+                pageid: "Web:QTProjectMstHZ",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 4 //每行5列
+            });
+
+			//布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [queryPanel,grid]
+            });
+
+			//按当前操作员过滤申报单位
+			queryPanel.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID });
+			
+			//按当前申报单位过滤预算部门、支出类别
+            queryPanel.queryById("FDeclarationUnit").on("helpselected", function (obj) {
+                var unitCode = obj.code;
+                var filter;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                } else {
+                    filter = "(Z_QTDYGX2.DEF_STR1='" + $appinfo.uCode + "' )";
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                    queryPanel.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                }
+
+			});
+			
+			queryPanel.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+                var unitCode = queryPanel.queryById("FDeclarationUnit").getValue();
+                var filter;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                }
+                else {
+                    Ext.MessageBox.alert('请先选择申报单位');
+                    return false;
+                }
+
+                //预算单位
+                if (filter) {
+                    queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                }
+
+			});
+			
+			queryPanel.queryById("FDeclarationDept").on("beforetriggerclick", function (str) {
+                var unitCode = queryPanel.queryById("FDeclarationUnit").getValue();
+                var filter;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                }
+                else {
+                    Ext.MessageBox.alert('提示', '请先选择申报单位!');
+                    return false;
+                }
+
+                //申报部门
+                if (filter) {
+                    queryPanel.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                }
+
+            });
+
+			//刷新列表中想修改或删除的行数据
+            function recoderefresh(data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: C_ROOT + 'GQT/QT/QTProjectMst/GetQTProjectMstHZ',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+
+    </script>
+}
+
+

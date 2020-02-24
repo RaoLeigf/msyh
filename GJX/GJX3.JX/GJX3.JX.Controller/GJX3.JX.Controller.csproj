@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2E882362-D884-4E2E-BE20-473F2ABCCEC2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GJX3.JX.Controller</RootNamespace>
+    <AssemblyName>GJX3.JX.Controller</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GJX3.JX.Controller.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Controller">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Controller.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GQT3.QT.Model">
+      <HintPath>..\..\..\BusinessDlls\bin\GQT3.QT.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="GQT3.QT.Service.Interface">
+      <HintPath>..\..\..\BusinessDlls\Rules\GQT3.QT.Service.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="netpay">
+      <HintPath>..\..\..\BusinessDlls\netpay.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\DMP_NJ\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Web.Controller">
+      <HintPath>..\..\..\BusinessDlls\NG3.Web.Controller.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Web.Mvc">
+      <HintPath>..\..\..\BusinessDlls\NG3.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PerformanceMstController.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\GYS3.YS.Model\GYS3.YS.Model.csproj">
+      <Project>{dd639bb1-92fc-4da9-a0a0-c5f1ac91b7f5}</Project>
+      <Name>GYS3.YS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\GYS3.YS.Service.Interface\GYS3.YS.Service.Interface.csproj">
+      <Project>{3a283fb2-32b7-4114-b5d9-9db4b265583e}</Project>
+      <Name>GYS3.YS.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GJX3.JX.Model\GJX3.JX.Model.csproj">
+      <Project>{b39f5a26-7c4d-4baf-ab96-4cf43b4be734}</Project>
+      <Name>GJX3.JX.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GJX3.JX.Service.Interface\GJX3.JX.Service.Interface.csproj">
+      <Project>{abf5a1bf-fd77-4332-ad35-1838c0b3ca53}</Project>
+      <Name>GJX3.JX.Service.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\BusinessDlls\Enterprise3.NHORM.Base.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

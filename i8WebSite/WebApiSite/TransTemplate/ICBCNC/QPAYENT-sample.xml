@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding = "GBK"?>
+<CMS>
+  <eb>
+    <pub>
+      <TransCode>QPAYENT</TransCode>
+      <CIS>集团CIS号</CIS>
+      <BankCode>归属银行编号</BankCode>
+      <ID>证书ID</ID>
+      <TranDate>交易日期</TranDate>
+      <TranTime>交易时间</TranTime>
+      <fSeqno>指令包序列号</fSeqno>
+    </pub>
+    <in>
+      <QryfSeqno>待查指令包序列号</QryfSeqno>
+      <QrySerialNo>待查平台交易序列号</QrySerialNo>
+      <ReqReserved1>请求备用字段1</ReqReserved1>
+      <ReqReserved2>请求备用字段2</ReqReserved2>
+      <rd>
+        <iSeqno>指令包顺序号</iSeqno>
+        <QryiSeqno>待查指令包顺序号</QryiSeqno>
+        <QryOrderNo>待查平台交易顺序号</QryOrderNo>
+        <ReqReserved3>请求备用字段3</ReqReserved3>
+        <ReqReserved4>请求备用字段4</ReqReserved4>
+      </rd>
+    </in>
+  </eb>
+</CMS>
+<!--支付指令查询-->

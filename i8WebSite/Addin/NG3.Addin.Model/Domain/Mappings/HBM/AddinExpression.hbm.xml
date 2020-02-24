@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="AddinExpressionModel" table="addin_expression">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="MstPhid" column="mstphid" type="System.Int64" not-null="false" />
+		<property name="ExpText" column="exptext" type="System.String" length="1000" not-null="false" />
+    <property name="Msg" column="msg" type="System.String" length="500" not-null="false" />
+    <property name="IsContinue" column="iscontinue" type="System.Int32"  not-null="false" />
+  </class>
+</hibernate-mapping>

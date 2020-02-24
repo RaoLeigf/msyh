@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_data_catalog">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="pid" />
+      <Field Name="catalog_code"  />
+      <Field Name="catalog_index"  />
+      <Field Name="catalog_name"  />
+      <Field Name="seq"  />
+      <Field Name="isloaded" format="0" asname="isloaded" />
+      <Field Name="isrep" format="0" asname="isrep" />
+      <Field Name="catalog_src"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{catalog_index}">
+      <Exp Field="catalog_index" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <SelectMaxRWIndex>
+    <Sql>
+      select max(catalog_index) from rw_data_catalog [where]
+    </Sql>
+    <Where>
+      <Exp Field="catalog_index" Target="Client" Oper="LikeRight" Value="catalog_index" />
+    </Where>
+  </SelectMaxRWIndex>
+
+  <SelectMaxID>
+    <Sql>
+      select max( cast(id as int) ) from rw_data_catalog
+    </Sql>
+  </SelectMaxID>
+
+  <DeleteCat>
+    <Sql>
+      delete from rw_data_catalog [where]
+    </Sql>
+    <Where>
+      <Exp Field="id" Target ="client" Value="id"/>
+    </Where>
+  </DeleteCat>
+
+  <RecordByRef>
+    <Sql>
+      select 1 from rw_report_main [where]
+    </Sql>
+    <Where >
+      <Exp Field="catalog_id" Target="Client" Value="id"/>
+    </Where>
+  </RecordByRef>
+  
+</DataService>
+
+

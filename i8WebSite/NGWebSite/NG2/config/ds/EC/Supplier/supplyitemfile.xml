@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="supplyitemfile">
+      <Field Name="itemno" IsKey="true" />
+      <Field Name="compno" IsKey="true" />
+      <Field Name="ocode"  IsKey="true"/>
+      <Field Name="remarks"  />
+      <Field Name="supplyitemno" />
+      <Field Name="supplybarcode" />
+      <Field Name="supplyitemname" />
+      <Field Name="exchangeperiod" />
+      <Field Name="exchangerate" />
+      <Field Name="price" />
+      <Field Name="paystate" />
+      <Field Name="deliverycyc" />
+      <Field Name="msunit" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="ocode"  Target="AppInfo" Value="Ocode"/>
+      <Exp Field="compno"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+
+    </Sql>
+    <Where>
+
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Record>
+  <Create>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

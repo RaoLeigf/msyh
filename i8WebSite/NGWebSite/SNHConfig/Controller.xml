@@ -1,0 +1,1059 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net" default-lazy-init="true" >
+
+  <!--Affairs-->
+  <object type="HR3.Affairs.Controller.HrAffairsContInjuryController, HR3.Affairs.Controller" singleton="false" />
+  <!--Affairs-->
+  <!--EmpList-->
+  <object type="HR3.Emp.Controller.basedata.HrBaseEnumController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.empstatus.HrEpmStatusPropertyController, HR3.Emp.Controller" singleton="false"
+/>
+  <object type="HR3.Emp.Controller.emprecord.HrEpmArctypeController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrEpmArcinfoController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrFieldsController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrEpmRecordController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.ogmposition.FgOgmStationController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrEpmArchivalController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.HrEpmStationController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrEpmPrjinfoController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrEpmDevposdController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.emprecord.HrEpmChgConsController, HR3.Emp.Controller" singleton="false" />
+  <!--EmpList-->
+  <!--DMC.Common-->
+
+  <object type="DMC3.Common.Controller.Language.NG3BusiTipController, DMC3.Common.Controller" singleton="false" />
+  <object type="DMC3.Common.Controller.Language.NG3LangController, DMC3.Common.Controller" singleton="false" />
+  <object type="DMC3.Common.Controller.Language.NG3UILableController, DMC3.Common.Controller" singleton="false" />
+  <object type="DMC3.Common.Controller.Language.NG3UseLangController, DMC3.Common.Controller" singleton="false" />
+
+  <!--DMC.Common-->
+  <!--Pam-->
+  <object type="HR3.Pam.Controller.PerformmainProjectController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformmainDeptController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformkindController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformcycleController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformmainruleController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformitemController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformModeMainController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformmainController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformscoresmoreController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformscoresController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformcommuController, HR3.Pam.Controller" singleton="false" />
+  <object type="HR3.Pam.Controller.PerformcomplainController, HR3.Pam.Controller" singleton="false" />
+  <!--Pam-->
+  <!--Emp-->
+  <object type="HR3.Emp.Controller.HrEpmMainController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.MyWorkMateController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.HrEmpBatchEditController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.HrEmpChginfoController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.HrEpmLinkController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.EpmContController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmEduController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmCorrelController, HR3.Emp.Controller" singleton="false" />
+
+  <object type="HR3.Emp.Controller.other.HrEpmWorkController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmAgreementController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmMedicalexaminfoController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmHukouController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmTrainController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmAchiController, HR3.Emp.Controller" singleton="false" />
+  <object type="HR3.Emp.Controller.other.HrEpmAmerceController, HR3.Emp.Controller" singleton="false" />
+  <!--Emp-->
+  <!--underling-->
+  <object type="HR3.Emp.Controller.FgUnderLingController, HR3.Emp.Controller" singleton="false" />
+  <!--underling-->
+  <!--user-->
+  <object type="HR3.Emp.Controller.UserController, HR3.Emp.Controller" singleton="false" />
+  <!--user-->
+  <!--FuncRight-->
+  <object type="DMC3.Rights.Controller.Func.LimitRoleController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Func.LimitFunRightsController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Func.RightsLogController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Func.RoleRightsController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Func.UserRightsController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Func.RightsController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.UserController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.RoleController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.RoleMutexController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.UserOrgController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.RoleOrgController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.UserRoleOrgController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.MenuController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.UserOrRoleClassController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.MenuCustomMainController, DMC3.Rights.Controller" singleton="false" />
+  <!--FuncRight-->
+
+  <!--InfoRights-->
+  <object type="DMC3.Rights.Controller.Info.LimitObjController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Info.LimitElemtController, DMC3.Rights.Controller" singleton="false" />
+  <object type="DMC3.Rights.Controller.Info.CommonAllotController, DMC3.Rights.Controller" singleton="false" />
+  <!--InfoRights-->
+
+  <!--Org-->
+  <object type="DMC3.Org.Controller.OrganizationController, DMC3.Org.Controller" singleton="false" />
+  <object type="DMC3.Org.Controller.OrgRelatController, DMC3.Org.Controller" singleton="false" />
+  <!--Org-->
+
+  <!--Enterprise-->
+  <object type="DMC3.Enterprise.Controller.EnterpriseController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.ComplistRelController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.SupplyFileController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.CustomFileController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.AddressController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.LinkManMainController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.CardInfoController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.QualificationController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.SupplyfileCategoryController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.SupplyItemFileController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.UnitAccountController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.UnitCheckConfigController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.GroupUnitInfoSetController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.CustomBusiInfoController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.CustomSettleInfoController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.SupplyBusiInfoController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.SupplySettleInfoController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.SupplyConfigController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.CustomConfigController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.EntShareOrgController, DMC3.Enterprise.Controller" singleton="false" />
+  <object type="DMC3.Enterprise.Controller.CustOrSuppBusOrgController, DMC3.Enterprise.Controller" singleton="false" />
+  <!--<object type="DMC3.Enterprise.Controller.EntHelpForPBController, DMC3.Enterprise.Controller" singleton="false" />-->
+  <!--OrgEnterprise-->
+
+  <!--calendar-->
+  <object type="DMC3.Calendar.Controller.GlobalCalendarController, DMC3.Calendar.Controller" singleton="false" />
+  <object type="DMC3.Calendar.Controller.ProjectCalendarController, DMC3.Calendar.Controller" singleton="false" />
+  <object type="DMC3.Calendar.Controller.ProjcalExpdateController, DMC3.Calendar.Controller" singleton="false" />
+  <object type="DMC3.Calendar.Controller.ProjcalWeekdayController, DMC3.Calendar.Controller" singleton="false" />
+  <object type="DMC3.Calendar.Controller.ProjcalWeekdayMstController, DMC3.Calendar.Controller" singleton="false" />
+  <object type="DMC3.Calendar.Controller.ProjcalExpdateMstController, DMC3.Calendar.Controller" singleton="false" />
+  <object type="DMC3.Calendar.Controller.ProjcalHolController, DMC3.Calendar.Controller" singleton="false" />
+
+  <!--calendar-->
+
+  <!--BasicData-->
+  <object type="DMC3.BasicData.Controller.Region.RegionController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.Region.NationController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.Region.ProductAreaController, DMC3.BasicData.Controller" singleton="false" />
+  
+  <object type="DMC3.BasicData.Controller.SimpleTypeController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.SimpleDataController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.SuppClassController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.CustClassController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.WorkCycleController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.WorkCycleTypeController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.WbsTypeController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.TradeTypeController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.StatsController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.MsUnitController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.ShipTypeController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.CarryTypeController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.SaleTypeController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.OrderTypeController, DMC3.BasicData.Controller" singleton="false" />
+
+  <object type="DMC3.BasicData.Controller.FgFcurController, DMC3.BasicData.Controller" singleton="false" />
+  <object type="DMC3.BasicData.Controller.BackReasonController, DMC3.BasicData.Controller" singleton="false" />
+  <!--BasicData-->
+
+  <!--BusIntegration-->
+  <object type="DMC3.BusIntegration.Controller.BusIntegrationTreeController, DMC3.BusIntegration.Controller" singleton="false" />
+  <object type="DMC3.BusIntegration.Controller.OrgTreeRememberController, DMC3.BusIntegration.Controller" singleton="false" />
+  <object type="DMC3.BusIntegration.Controller.BillInvoRelController, DMC3.BusIntegration.Controller" singleton="false" />
+  <!--BusIntegration-->
+
+  <!--WM-->
+  <object type="WM3.Affairs.Controller.PlanTemplateController, WM3.Affairs.Controller" singleton="false" />
+  <!--WM-->
+  <object type="WM3.Doc.Controller.DocumentController, WM3.Doc.Controller" singleton="false" >
+
+  </object>
+  <object type="WM3.Doc.Controller.DocOperationController, WM3.Doc.Controller" singleton="false" >
+
+  </object>
+  <object type="WM3.KM.Controller.WiKiSearchController, WM3.KM.Controller" singleton="false" >
+
+  </object>
+  <object type="WM3.Doc.Controller.DocumentSearchController, WM3.Doc.Controller" singleton="false" >
+
+  </object>
+
+  <object type="WM3.Doc.Controller.DocLibController, WM3.Doc.Controller" singleton="false" >
+  </object>
+
+  <object type="WM3.Doc.Controller.DocMediumController, WM3.Doc.Controller" singleton="false" >
+
+  </object>
+  <object type="WM3.Doc.Controller.DocTagsController, WM3.Doc.Controller" singleton="false" >
+
+  </object>
+
+  <object type="WM3.Doc.Controller.ProjectDocumentController, WM3.Doc.Controller" singleton="false" >
+  </object>
+  <object type="WM3.Doc.Controller.DocModelTypeController, WM3.Doc.Controller" singleton="false" />
+
+  <object type="WM3.Doc.Controller.TagsController, WM3.Doc.Controller" singleton="false" />
+
+  <object type="WM3.Doc.Controller.TagsKindController, WM3.Doc.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowlgExpertsController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.ExpertsCategoryController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.WikiAuthorController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.WikiMainController, WM3.KM.Controller" singleton="false" >
+
+  </object>
+
+  <object type="WM3.KM.Controller.WikiOperationsController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.WikiEvalDetailController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.WikiQuoteController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.WikiModifyController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowlgCategoryController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowlgTagController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.IntegeralActivitiesController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.IntegeralExchRecordController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowlgQuestController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowlgnswersController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.WiKiCategoryController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.IntegeralRulesController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.EvalMainController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowlgAnswOperaController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.OperationRecordController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.KnowProjectController, WM3.KM.Controller" singleton="false" />
+  <object type="WM3.KM.Controller.KnowlgRemindEmpController, WM3.KM.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.ArcDispatchController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcDispatchObjController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcDispatchActObjController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.ArcReceiptController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcReceiptObjController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcReceiptActorObjController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.ArcDistransferController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcDistransferObjController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcFeedBackController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.KingGridTagController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.MyArchiveController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArchivesBatchExportController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.W3BaTreedatabaseController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.DispatcharcShareController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.ArcArchiveObjController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcArchiveSendController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.WmIoSignatureController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.SignatureShareController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.KingGridObjectController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.SendObjUsualMainController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.SendObjUsualObjController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.SendObjUsualActorObjController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.Archive.Controller.ArcDispatchHisController, WM3.Archive.Controller" singleton="false" />
+  <object type="WM3.Archive.Controller.ArcReceiptHisController, WM3.Archive.Controller" singleton="false" />
+  
+  <object type="WM3.Archive.Controller.ArcCommonController, WM3.Archive.Controller" singleton="false" />
+
+  <object type="WM3.KM.Controller.AttAuthorController, WM3.KM.Controller" singleton="false" />
+  <object type="WM3.Affairs.Controller.WorklogController, WM3.Affairs.Controller" singleton="false"/>
+  <object type="WM3.Affairs.Controller.CalendarController, WM3.Affairs.Controller" singleton="false" />
+  <object type="WM3.Affairs.Controller.PlanSummaryController, WM3.Affairs.Controller" singleton="false" />
+  <object type="WM3.Affairs.Controller.PbcTaskController, WM3.Affairs.Controller" singleton="false" />
+  <object type="WM3.Affairs.Controller.TaskExecutorController, WM3.Affairs.Controller" singleton="false" />
+  <object type="WM3.Affairs.Controller.TaskSupervisorController, WM3.Affairs.Controller" singleton="false" />
+  <object type="WM3.Affairs.Controller.TaskExecutorHistoryController, WM3.Affairs.Controller" singleton="false" />
+  
+  <object type="WM3.Common.Controller.HrArcTemplateController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.HrArcDefaultTemplateController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.WmAutoToArctiveSettingController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.WmAutoDossierSettingController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.WmIofficeBookMarksController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.GradeSetController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.LogTypeController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.ManageSettingController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.CsysQuickStartController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.CommonWordController, WM3.Common.Controller" singleton="false" />
+  <object type="WM3.Common.Controller.FgMsgLinkmanGroupController, WM3.Common.Controller" singleton="false" />
+  
+  <object type="WM3.Inform.Controller.InformModelController, WM3.Inform.Controller" singleton="false" />
+  <object type="WM3.Inform.Controller.InformModelObjController, WM3.Inform.Controller" singleton="false" />
+
+  <object type="WM3.Office.Controller.OfficeMainController, WM3.Office.Controller" singleton="false" >
+  </object>
+  <object type="WM3.Office.Controller.OfficeItemtypeController, WM3.Office.Controller" singleton="false" >
+    <property name="DirectoryService" ref="WM3.Office.Service.Directory" />
+  </object>
+  <object type="WM3.Office.Controller.OfficeDetailController, WM3.Office.Controller" singleton="false" />
+  <object type="WM3.Office.Controller.OfficeItemdataController, WM3.Office.Controller" singleton="false" >
+    <property name="OfficeItemtypeService" ref="WM3.Office.Service.OfficeItemtype" />
+  </object>
+  <object type="WM3.Office.Controller.DirectoryController, WM3.Office.Controller" singleton="false" />
+  <!--WM-->
+
+  <!--pms3.basicdata-->
+
+  <object type="PMS3.BasicData.Controller.WBSController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.CbsController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.WbsHelpController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.WbsTaskController, PMS3.BasicData.Controller" singleton="false" />
+  <object type="PMS3.BasicData.Controller.Res.BsDataTradeController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.ItemDataController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.ItemPropertyController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.ItemPropertyGroupMController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.ItemDetailController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.ResBsController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.ResMasterController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.Res.UserDefaultItemsController, PMS3.BasicData.Controller" singleton="false"  />
+  <object type="PMS3.BasicData.Controller.ProductController, PMS3.BasicData.Controller" singleton="false" />
+  <object type="PMS3.BasicData.Controller.Res.ResCbsController, PMS3.BasicData.Controller" singleton="false" />
+  
+
+  <!--pms3.basicdata-->
+
+  <!--pms3.schedule-->
+  <object type="SPM.GYBZ.Controller.SpmNetPlanController, SPM.GYBZ.Controller" singleton="false" />
+  <object type="SPM.GYBZ.Controller.JdBaseLineListController, SPM.GYBZ.Controller" singleton="false" />
+  <object type="SPM.GYBZ.Controller.JdBaseLineListDetailController, SPM.GYBZ.Controller" singleton="false" />
+  <object type="SPM.GYBZ.Controller.Spm3ColSetController, SPM.GYBZ.Controller" singleton="false" />
+  <!--pms3.schedule-->
+
+  <!--pms3.ProjectTable-->
+  <object type="PMS3.PC.Controller.ProjectTableController, PMS3.PC.Controller" singleton="false" />
+  <object type="PMS3.PC.Controller.PcMapController, PMS3.PC.Controller" singleton="false" />
+  <object type="PMS3.PC.Controller.DeliverNameController, PMS3.PC.Controller" singleton="false" />
+  <object type="PMS3.PC.Controller.PcLalMapController, PMS3.PC.Controller" singleton="false" />
+  <!--pms3.ProjectTable-->
+
+  <!--pms3.pcm-->
+  <object type="PMS3.PCM.Controller.CntFbfwBaseController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntPtypebaseController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntProjTypeController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntListmodelController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntDescbaseController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.Common.Controller.AsrInfoController, PMS3.Common.Controller" singleton="false" />
+  <object type="PMS3.Common.Controller.CommonController, PMS3.Common.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntPayMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntTypeController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntItemMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntProjBalController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntFinalMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntAdjustiveMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntStopController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntGuaranteeController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntClaimController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntEvaluateController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntFunTreeController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntCheckupController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntChangeMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntInvtypeController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.PCM.Controller.CntPrePayMController, PMS3.PCM.Controller" singleton="false" />
+  <object type="PMS3.Common.Controller.ContentLevelController, PMS3.Common.Controller" singleton="false" />
+  <object type="PMS3.Common.Controller.RememberController, PMS3.Common.Controller" singleton="false" />
+  <!--pms3.pcm-->
+  <!--pms3.pco-->
+  <object type="PMS3.PCO.Controller.AYS.AysCostMController, PMS3.PCO.Controller" singleton="false" />
+  <object type="PMS3.PCO.Controller.AYS.AysItemMController, PMS3.PCO.Controller" singleton="false" />
+  <object type="PMS3.PCO.Controller.AYS.AysCostOtherMController, PMS3.PCO.Controller" singleton="false" />
+  
+  <!--PMS3.PCO.ERM-->
+  <object type="PMS3.PCO.Controller.ERM.QuotaMController, PMS3.PCO.Controller" singleton="false" />
+  <object type="PMS3.PCO.Controller.ERM.ErmFeatureMController, PMS3.PCO.Controller" singleton="false" />
+  <object type="PMS3.PCO.Controller.ERM.QuotaTypeController, PMS3.PCO.Controller" singleton="false" />
+
+  <!--PMS3.PCO.ERM-->
+  <!--pms3.pco-->
+
+  <!--pms3.pmm-->
+  <object type="PMS3.PMM.Controller.KC.KcPotalReportsController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcBillController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcBillBodyController, PMS3.PMM.Controller" singleton="false" />
+
+  <object type="PMS3.PMM.Controller.KC.KcAccountingController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcBaseSettingController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcBillController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcReportController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcCommonController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcZcbfMController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcZcRepairMController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.VKcZcwxItemController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.KC.KcZctxMController, PMS3.PMM.Controller" singleton="false" />
+  <!--配料单-->
+  <object type="PMS3.PMM.Controller.KC.KcItemgroupMController, PMS3.PMM.Controller" singleton="false" />
+  <!--限额领料单-->
+  <object type="PMS3.PMM.Controller.KC.KcQuotaMController, PMS3.PMM.Controller" singleton="false" />
+  <!--仓库-->
+  <object type="PMS3.PMM.Controller.KC.KcBaseSettingController, PMS3.PMM.Controller" singleton="false" />
+
+  <object type="PMS3.PMM.Controller.CG.CgModeController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.PoUrgeMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.CgJiesuanMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.CgPayMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.CombineAllotMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.MatPChgMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.MatPMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.PurOrderMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.ReqPMController, PMS3.PMM.Controller" singleton="false"  />
+  <object type="PMS3.PMM.Controller.CG.CgXunjMController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.CG.CgPaymentMController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.VendorGoodsController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.VendorGoodsHisController, PMS3.PMM.Controller" singleton="false" />
+  
+  <!--价格曲线-->
+  <object type="PMS3.PMM.Controller.PriceCurveController, PMS3.PMM.Controller" singleton="false" />
+  <!--过磅-->
+  <object type="PMS3.PMM.Controller.MW.VehicleController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.MW.VehicleTypeController, PMS3.PMM.Controller" singleton="false" />
+  <object type="PMS3.PMM.Controller.MW.WeightInfoController, PMS3.PMM.Controller" singleton="false" />
+  
+  <!--pms3.pmm-->
+
+  <!--pms3.pms-->
+  <object type="PMS3.PMS.Controller.AQ.AQPortalReportsController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.CZ.CZPortalReportsController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.ProjectPortalReportsController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.ZJ.ZJPortalReportsController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.JD.JdPlanMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.JD.JdCaseInfoController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.JD.JdTotalPlanController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.JD.JdPlanTController, PMS3.PMS.Controller" singleton="false" />  
+  <object type="PMS3.PMS.Controller.AQ.WxmLecsetController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.WxmDsetController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqWatchController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqDanManController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqTrainMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqPeccancyMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqBuildlogMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqCorrMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqChkMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqChkPlanMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.AqWatchTaskController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.WxmEvahisController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.Bs.BsDataController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.Init.InitController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.BoqBillController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.BoqLevelController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.LbOrgController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.CZ.CzPlanMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.CZ.CzActMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.BoqImportSchemeMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.BimCompController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.ZY.ProjResMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.ZY.HisProjResMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.DatamapResController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.PanelRegisterController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.PanelOptionController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.BimCompRelController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.AQ.ConstrPlanTragController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgBuildbudgetMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgBuildmissonMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgPaymentMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgSalaryMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCraftSetupController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgEquipmentMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgSafeTrainController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgTechConfimController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgBadrecordController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgApplyMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCraftInfoController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgBlackMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCheckinputMController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCheckouterController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgLaborTeamController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgEnterExitController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgEnterExitHisController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.PC.PcSetupController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCheckRuleController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCheckouterHkController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCheckSummaryController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgEduTypeController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgEventTypeController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgCraftEvaluateController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgSafeHatController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgSafeHatInitController, PMS3.PMS.Controller" singleton="false" />
+  <object type="PMS3.PMS.Controller.YG.YgSafeHatUsehisController, PMS3.PMS.Controller" singleton="false" />
+  <!--pms3.pms-->
+
+  <!--pms3.dcs-->
+  <object type="PMS3.DCS.Controller.DcsPortalController, PMS3.DCS.Controller" singleton="false" />
+  <object type="PMS3.DCS.Controller.ProjectEmpPortalController, PMS3.DCS.Controller" singleton="false" />
+  <object type="PMS3.DCS.Controller.LRS.DcsLrsPcPlatMappingController, PMS3.DCS.Controller" singleton="false" />
+  <object type="PMS3.DCS.Controller.LRS.DcsLrsBasicMappingController, PMS3.DCS.Controller" singleton="false" />
+  <object type="PMS3.DCS.Controller.LRS.DcsLrsDataSynchController, PMS3.DCS.Controller" singleton="false" />
+  <!--pms3.dcs-->
+
+  <!--pms3.portal-->
+  <object type="PMS3.Portal.Controller.PmsSchemeInfoController, PMS3.Portal.Controller" singleton="false" />
+  <object type="PMS3.Portal.Controller.PmsSchemeLayoutController, PMS3.Portal.Controller" singleton="false" />
+  <object type="PMS3.Portal.Controller.PmsPanelInfoController, PMS3.Portal.Controller" singleton="false" />
+  <object singleton="false" type="PMS3.Portal.Controller.PmsProjectTableController, PMS3.Portal.Controller"/>
+  <object singleton="false" type="PMS3.Portal.Controller.PmsProvinceController, PMS3.Portal.Controller"/>
+  <object singleton="false" type="PMS3.Portal.Controller.PmsOrganizationController, PMS3.Portal.Controller"/>
+  <object singleton="false" type="PMS3.Portal.Controller.PmsSchemeUserController, PMS3.Portal.Controller"/>
+  <object type="PMS3.Portal.Controller.PmsSchemeAttentionController, PMS3.Portal.Controller" singleton="false" />
+  <object type="PMS3.Portal.Controller.PortalPlatformSetMController, PMS3.Portal.Controller" singleton="false" />
+  <!--pms3.portal-->
+
+  <!--wm3.file-->
+  <object type="WM3.File.Controller.FileTypeController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileBaseController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileLibMainController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileSearchController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileBorrowMstController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.BorrowStoreController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileLableController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileBurnApplyMainController, WM3.File.Controller" singleton="false" />
+  <object type="WM3.File.Controller.FileBurningMainController, WM3.File.Controller" singleton="false" />
+  <!--wm3.file-->
+  <!--wm3.certificate-->
+  <object type="WM3.Certificate.Controller.EmpCertTypeController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EmpCertNameController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EntCertTypeController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EntCertNameController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertBaseDataController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertMajorController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EmployeeCertController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EnterpriseCertController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertBorrowMstController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertAptitudeSerialController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertAptitudeNameController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EmpCertRecordMstController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EmpCertRecordDtlController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EntCertRecordMstController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.EntCertRecordDtlController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.ManageempCertRecordController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertRecordInformationController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertRecordChangehisController, WM3.Certificate.Controller" singleton="false" />
+  <object type="WM3.Certificate.Controller.CertRegarChitectController, WM3.Certificate.Controller" singleton="false" />
+  <!--wm3.certificate-->
+  <!--wm3.signet-->
+  <object type="WM3.Signet.Controller.EsKindController, WM3.Signet.Controller" singleton="false" />
+  <object type="WM3.Signet.Controller.EsTypeController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.EsEngraveController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.EsMachineController, WM3.Signet.Controller" singleton="false" />
+  <object type="WM3.Signet.Controller.ESAppmstController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.EsAppdtlController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.EsMacbindController, WM3.Signet.Controller" singleton="false" />
+  <object type="WM3.Signet.Controller.EsAppabnormalMainController, WM3.Signet.Controller" singleton="false" />
+  <object type="WM3.Signet.Controller.EsAppabnormalCrevController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.EsOphisController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.EsMacbindChangeController, WM3.Signet.Controller" singleton="false" />
+
+  <object type="WM3.Signet.Controller.MachineConfigController, WM3.Signet.Controller" singleton="false" />
+
+
+
+
+  <!--wm3.signet-->
+  <!--addin -->
+  <object type="NG3.Addin.Controller.ExtendFunctionMstController, NG3.Addin.Controller" singleton="false" />
+  <object type="NG3.Addin.Controller.MethodAroundMstController, NG3.Addin.Controller" singleton="false" />
+  <object type="NG3.Addin.Controller.ExtendFuncController, NG3.Addin.Controller" singleton="false" />
+  <object type="NG3.Addin.Controller.BasicSettingController, NG3.Addin.Controller" singleton="false" />
+  <!--addin -->
+
+
+
+  <!--ITM3-->
+  <object type="ITM3.BasicData.Controller.InvoItemSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.RoomNumberController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.StructTypeController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.ImposeProjController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.OutBillSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.CustomsItemsController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.OptionsRegController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.ConsigneeController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.ExpressBaseController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.InvoTypeRateSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.OptionsValController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxOrgController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.RateSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.RatepayInfoController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.InvTypeRelaController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxInitController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.UnbilledSaleTypeController, ITM3.BasicData.Controller" singleton="false"/>
+  <object type="ITM3.BasicData.Controller.StampsController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.AdjustProjController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxRatioController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxDefController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.PassSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.UvTaxInitController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.ItemController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.InvoUseController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxClassCodeController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.InvTaxRateSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.InvPassSetController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxRateController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.ProductNameController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.TaxPeriodController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.EnvTaxProjController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.LandLevelTaxController, ITM3.BasicData.Controller" singleton="false" />
+  <object type="ITM3.BasicData.Controller.ReliefItemController, ITM3.BasicData.Controller" singleton="false" />
+
+  <object type="ITM3.Common.Controller.ITMTreeController, ITM3.Common.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoSjController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.GFIOverBudgetAlert, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.GFIInvoceOverAlert, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoBillController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoSplitController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvItemController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoBillUndeductController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.SnchronismextViewController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoExpressController, ITM3.INV.Controller" singleton="false" >
+    <property name="InvoBillService" ref="ITM3.INV.Service.InvoBill"/>
+  </object>
+  <object type="ITM3.INV.Controller.HxBillController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.HxBillxxController, ITM3.INV.Controller" singleton="false" >
+    <property name="InvoBillService" ref="ITM3.INV.Service.InvoBill"/>
+  </object>
+  <object type="ITM3.INV.Controller.BalanceMstController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.BalanceDetController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.SjInterfaceMController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.SjInterfaceDController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoOutBillPayMController, ITM3.INV.Controller" singleton="false"/>
+  <object type="ITM3.INV.Controller.Itm3InvoBillUnsynController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InputDeductionController, ITM3.INV.Controller" singleton="false" >
+    <property name="InvoCollectDataService" ref="ITM3.INV.Service.InvoCollectData"/>
+  </object>
+  <object type="ITM3.INV.Controller.InvoCalcJController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoCalcXController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.Itm3InvobillUndeductitemController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoBillBaoYeController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.ProjectCntController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoCheckController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.DeductionChkReportController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.InvoLogController, ITM3.INV.Controller" singleton="false" />
+  <object type="ITM3.INV.Controller.RedBlueController, ITM3.INV.Controller" singleton="false" />
+
+  <object type="ITM3.TAX.Controller.EarlyWarningController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.StampsMgrMController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.EarlyWarningController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.InvnoItemMController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.InvnoWarningController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.ExpressWarningController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.ImmovablesWarningController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.PreAttachWarningController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.OutCertApplyController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.OutCertController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxAsSaleController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxPreBillController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxInvoController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxPrePayMController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxEasyBillController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxEasyInvoController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxFrController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxFrGatherTraceController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxFrQuotaCalcController, ITM3.TAX.Controller" singleton="false" />
+  <object type="ITM3.TAX.Controller.TaxForecastListController, ITM3.TAX.Controller" singleton="false" />
+
+  <object type="ITM3.ITAX.Controller.InvoBillTaxController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.TaxFpMstController, ITM3.ITAX.Controller" singleton="false" >
+    <property name="ProjectTableService" ref="PMS3.PC.Service.ProjectTable"/>
+  </object>
+  <object type="ITM3.ITAX.Controller.Itm3TaxReportInitController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.TaxPayMentMController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.TaxForcastController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.UvTaxForcastFpController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.OverAllPlanController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.CatalogReprotController, ITM3.ITAX.Controller" singleton="false" />
+  <object type="ITM3.ITAX.Controller.TaxInitCalcProjController, ITM3.ITAX.Controller" singleton="false" />
+
+
+  <object type="ITM3.STAX.Controller.DustGeneReduCoeffController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.EnvTaxPaymentController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.ProjUnderConController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.EnvInternalClearingController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.EnvStatisListController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.EnvTaxReturnsController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.LandInfoController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.StampsRegCntController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.LandTaxPaymentController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.LandTaxFrController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.StampsInClearingController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.StampsPurchaseController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.StampsAllotController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.StampsStatisListController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.StampsTaxReturnsController, ITM3.STAX.Controller" singleton="false" />
+  <!--ITM3-->
+  <!--GFI3.BasicData-->
+  <object type="GFI3.BasicData.Controller.GfiWlAccoController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.GfiWxSynController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.CrediTrankController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.FinTypeController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.BaPsnFeetypeController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.TaxTypeController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.BaPsnAccoController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.BaPsnBilltpaccoController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.BaPsnCreditController, GFI3.BasicData.Controller" singleton="false" />
+  <object type="GFI3.BasicData.Controller.PayWayController, GFI3.BasicData.Controller" singleton="false" />
+  <!--GC-->
+  <object type="GFI3.GC.Controller.Gfi3BusRegisterController, GFI3.GC.Controller" singleton="false" />
+  <object type="GFI3.GC.Controller.Gfi3BusBdSupSetController, GFI3.GC.Controller" singleton="false" />
+  <!--GC-->
+  <!--GFI3.BasicData-->
+  <!--ng3.log-->
+  <object type="SUP3.Log.Controller.LogCfgController, SUP3.Log.Controller" singleton="false" />
+  <object type="SUP3.Log.Controller.LogLogsController, SUP3.Log.Controller" singleton="false" />
+  <object type="SUP3.Log.Controller.LogPerfController, SUP3.Log.Controller" singleton="false" />
+  <object type="SUP3.Log.Controller.LogSqlController, SUP3.Log.Controller" singleton="false" />
+  <object type="SUP3.Log.Controller.LogSortingMethodController, SUP3.Log.Controller" singleton="false" />
+  <object type="SUP3.Log.Controller.LogSortingSlowPerfController, SUP3.Log.Controller" singleton="false" />
+  <object type="SUP3.Log.Controller.LogSortingSlowSqlController, SUP3.Log.Controller" singleton="false" />
+  <!--ng3.log-->
+  <!--ECC-->
+  <object type="ECC3.LR.Controller.EccFeeBdOrgController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccPaywayController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccTravelExpensesController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccApplicationMstController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccPaybackController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccFeeTypeController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccLoanTypeController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccLoanController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccReimbursementController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccEmpCreditsController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccEmpLevelController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.TravelAreaSetController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccTravelLevelController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccTravelStandardController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccCommonController, ECC3.LR.Controller" singleton="false" />
+  <object type="ECC3.LR.Controller.EccAutoReimburseController, ECC3.LR.Controller" singleton="false" />
+  <!--ECC-->
+
+
+  <!--FC3-->
+  <!--BasicData-->
+  <object type="FC3.BasicData.Controller.FundModuleController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.FC3RateSetController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.OuterAccController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.BankMatchController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.BankSysController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.BudgetTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.BudgetTypeProjController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.PlanTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.BusTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.PayTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.ChangeTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.PayRankLevelController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.PayRankController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.RecTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.ProjPayTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.BudgetFundTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.AccFundTypeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.InnerAccController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.InnerAccProjController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.InnerAccTypeController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.InnerAccTypeTzController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.InnerBankInitController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.CommonController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.FundCalcController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.UvIAccTypeDetController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.UvIAccDetController, FC3.BasicData.Controller" singleton="false"/>
+  <object type="FC3.BasicData.Controller.UvIAccBalController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvIAccTaxesBalController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvIAccTaxesDetController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvBudgetDetController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvBudgetMonComparePcController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvBudgetMonPlanPcController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvIBankBalController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.Fc3DataInfoController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.FundManageModeController, FC3.BasicData.Controller" singleton="false" />
+  <object type="FC3.BasicData.Controller.UvIBankDetController, FC3.BasicData.Controller" singleton="false" />
+  <!--BasicData-->
+  
+  <!--SC-->
+  <object type="FC3.SC.Controller.IBankOverdraftTzController, FC3.SC.Controller" singleton="false" />
+  <object type="FC3.SC.Controller.PayBillController, FC3.SC.Controller" singleton="false" />
+  <object type="FC3.SC.Controller.PayBillScController, FC3.SC.Controller" singleton="false" />
+  <object type="FC3.SC.Controller.IBankInterestController, FC3.SC.Controller" singleton="false" />
+  <object type="FC3.SC.Controller.InnerTransController, FC3.SC.Controller" singleton="false" />
+  <!--SC-->
+  
+  <!--PFM-->
+  <object type="FC3.PFM.Controller.BorrowBillController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.FundPlanPcController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.FundPlanPcYearController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.PlanChgPcController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.PlanChgPcYearController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.MonPlanPcController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.OtherRecPcController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.OtherPayPcController, FC3.PFM.Controller" singleton="false"/>
+  <object type="FC3.PFM.Controller.FundAllotController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.RepayBillController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.SettleBillController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.PayPlanPcController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.AccInterestController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.InterestNoticeController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.IAccOverdraftTzController, FC3.PFM.Controller" singleton="false" />
+  <object type="FC3.PFM.Controller.IAccPcInterestController, FC3.PFM.Controller" singleton="false" />
+  <!--PFM-->
+  
+  <!--BEI-->
+  <object type="FC3.BEI.Controller.EbankBalanceController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankCompInfoController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankPayBillController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankSalaryController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankSalaryDController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankSignController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankTransDetController, FC3.BEI.Controller" singleton="false" />
+  <object type="FC3.BEI.Controller.EbankVerController, FC3.BEI.Controller" singleton="false" />
+  <!--BEI-->
+
+  <!--EFM-->
+  <object type="FC3.EFM.Controller.MonPlanEntController, FC3.EFM.Controller" singleton="false" />
+  <object type="FC3.EFM.Controller.FundPlanEntController, FC3.EFM.Controller" singleton="false" />
+  <object type="FC3.EFM.Controller.PlanChgEntController, FC3.EFM.Controller" singleton="false" />
+  <!--EFM-->
+
+  <!--ICM-->
+  <!--ICM-->
+
+  <!--FBM-->
+  <!--FBM-->
+
+  <!--Common-->
+  <!--Common-->
+  <!--FC3-->
+
+
+  <!--EAM3-->
+  <!--BasicData-->
+  <object singleton="false" type="EAM3.BasicData.Controller.DeviceUpkeepController, EAM3.BasicData.Controller"/>
+  <object singleton="false" type="EAM3.BasicData.Controller.DeviceTypeController, EAM3.BasicData.Controller"/>
+  <object singleton="false" type="EAM3.BasicData.Controller.DeviceClassController, EAM3.BasicData.Controller"/>
+  <object singleton="false" type="EAM3.BasicData.Controller.AssetTypeController, EAM3.BasicData.Controller"/>
+  <object singleton="false" type="EAM3.BasicData.Controller.AssetSourceController, EAM3.BasicData.Controller"/>
+  <object singleton="false" type="EAM3.BasicData.Controller.AssetPropController, EAM3.BasicData.Controller"/>
+  <object singleton="false" type="EAM3.BasicData.Controller.AssetFeatureController, EAM3.BasicData.Controller"/>
+  <object type="EAM3.BasicData.Controller.DeviceNetRegController, EAM3.BasicData.Controller" singleton="false" />
+  <object type="EAM3.Basicdata.Controller.MachineWorkerController, EAM3.Basicdata.Controller" singleton="false" />
+  <object type="EAM3.BasicData.Controller.TimerTaskController, EAM3.BasicData.Controller" singleton="false" />
+  <!--BasicData-->
+
+  <!--Common-->
+  <object type="EAM3.Common.Controller.MachineCommanderController, EAM3.Common.Controller" singleton="false" />
+  <!--Common-->
+  
+  <!--AEM-->
+  <object type="EAM3.AEM.Controller.DeviceController, EAM3.AEM.Controller" singleton="false" />
+  <object type="EAM3.AEM.Controller.DeviceMachineInfoController, EAM3.AEM.Controller" singleton="false" />
+  <object type="EAM3.AEM.Controller.DeviceWarnInfoController, EAM3.AEM.Controller" singleton="false" /> 
+  <object type="EAM3.AEM.Controller.DevicePatrolController, EAM3.AEM.Controller" singleton="false" /> 
+  <object type="EAM3.AEM.Controller.PatrolCorrectController, EAM3.AEM.Controller" singleton="false" />
+  <object type="EAM3.AEM.Controller.DeviceChgController, EAM3.AEM.Controller" singleton="false" />
+  <!--AEM-->
+
+  <!--AAM-->
+  <!--AAM-->
+
+  <!--APM-->
+  <!--APM-->
+
+  <!--AHM-->
+  <object type="EAM3.AHM.Controller.DeviceInOutController, EAM3.AHM.Controller" singleton="false" />
+  <object type="EAM3.AHM.Controller.RentInWorkController, EAM3.AHM.Controller" singleton="false" />
+  <object type="EAM3.AHM.Controller.DeviceWorkTimeController, EAM3.AHM.Controller" singleton="false" />
+    <object type="EAM3.AHM.Controller.SynchWorkDateController, EAM3.AHM.Controller" singleton="false" />
+  <!--AHM-->
+
+  <!--ARM-->
+  <!--ARM-->
+
+  <!--MIM-->
+  <!--MIM-->
+  <!--EAM3-->
+  
+
+  <!--HURRYCALL-->
+  <object type="WM3.HurryCall.Controller.HurryCallController, WM3.HurryCall.Controller" singleton="false" />
+  <object type="WM3.HurryCall.Controller.HurryCallReplyController, WM3.HurryCall.Controller" singleton="false" />
+  <object type="WM3.HurryCall.Controller.HurryCallTemplateController, WM3.HurryCall.Controller" singleton="false" />
+  <!--HURRYCALL-->
+
+  <!--CBM3.BasicData-->
+  <object type="CBM3.BasicData.Controller.PeriodTypeController, CBM3.BasicData.Controller" singleton="false" />
+
+  <object type="CBM3.BasicData.Controller.PeriodController, CBM3.BasicData.Controller" singleton="false" />
+
+  <object type="CBM3.BasicData.Controller.BudgetItemController, CBM3.BasicData.Controller" singleton="false" />
+
+  <object type="CBM3.BasicData.Controller.BudgetAssistController, CBM3.BasicData.Controller" singleton="false" />
+
+  <object type="CBM3.BasicData.Controller.BudgetTypeController, CBM3.BasicData.Controller" singleton="false" />
+
+  <object type="CBM3.BasicData.Controller.BudgetItemSchemeController, CBM3.BasicData.Controller" singleton="false" />
+
+
+  <object type="CBM3.BasicData.Controller.BudgetElementsController, CBM3.BasicData.Controller" singleton="false" />
+  
+  <!--CBM3.BasicData-->
+  <!--CBM3.Common-->
+  <object type="CBM3.Common.Controller.CbBudgetMstController, CBM3.Common.Controller" singleton="false" />
+  <!--CBM3.Common-->
+  <!--CBM3.ECC-->
+  <object type="CBM3.ECC.Controller.BudgetSendDownController, CBM3.ECC.Controller" singleton="false" />
+  <object type="CBM3.ECC.Controller.DeptBudgetAdjustController, CBM3.ECC.Controller" singleton="false" />
+  <object type="CBM3.ECC.Controller.DbActualMstController, CBM3.ECC.Controller" singleton="false" />
+  <!--CBM3.ECC-->
+
+
+  <!--WM3.Meet-->
+  <object type="WM3.Meet.Controller.MeetModelController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetSummaryModelController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetRoomController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetRoomLendController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetTypeController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetingAttendeesController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetSummaryController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetingController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetIssueController, WM3.Meet.Controller" singleton="false" />
+  <object type="WM3.Meet.Controller.MeetSummaryRecvController, WM3.Meet.Controller" singleton="false" />
+  <!--WM3.Meet-->
+
+  <!--SC3.BasicData-->
+  <object type="SC3.BasicData.Controller.FlowLabelController, SC3.BasicData.Controller" singleton="false" />
+  <object type="SC3.BasicData.Controller.PriorityLevelController, SC3.BasicData.Controller" singleton="false" />
+  <object type="SC3.BasicData.Controller.RejectReasonController, SC3.BasicData.Controller" singleton="false" />
+  <object type="SC3.BasicData.Controller.BillTypeController, SC3.BasicData.Controller" singleton="false" />
+  <object type="SC3.BasicData.Controller.TaskHandleRangeController, SC3.BasicData.Controller" singleton="false" />
+  <object type="SC3.BasicData.Controller.AutoFpController, SC3.BasicData.Controller" singleton="false" />
+  <!--SC3.BasicData-->
+
+  <object type="SC3.Common.Controller.CommonReportController, SC3.Common.Controller" singleton="false" />
+
+  <!--SC3.ES-->
+  <object type="SC3.ES.Controller.EcTaskManageController, SC3.ES.Controller" singleton="false" />
+  <object type="SC3.ES.Controller.TaskPlatformController, SC3.ES.Controller" singleton="false" />
+  <!--SC3.ES-->
+  <object type="ITM3.RTAX.Controller.RTaxPreBillController, ITM3.RTAX.Controller" singleton="false" />
+  <object type="ITM3.RTAX.Controller.RVatTaxInvoController, ITM3.RTAX.Controller" singleton="false" />
+  <object type="ITM3.RTAX.Controller.RVatTaxPreBillController, ITM3.RTAX.Controller" singleton="false" />
+
+  <!--EPM3.DMC-->
+  <object type="EPM3.DMC.Controller.EpmBasicController, EPM3.DMC.Controller" singleton="false" />
+  <object type="EPM3.DMC.Controller.EpmDimController, EPM3.DMC.Controller" singleton="false" />
+  <object type="EPM3.DMC.Controller.EpmFuParamController, EPM3.DMC.Controller" singleton="false" />
+  <object type="EPM3.DMC.Controller.EpmBiController, EPM3.DMC.Controller" singleton="false" />
+  <!--EPM3.DMC-->
+  <!--EPM3.MC-->
+  <object type="EPM3.MC.Controller.EpmStatichtmlController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmViewSetController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmMetopeOptionsController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmMetopeCatalogController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmMetopeController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmViewCatalogController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmViewController, EPM3.MC.Controller" singleton="false" />
+  <object type="EPM3.MC.Controller.EpmViewQueryController, EPM3.MC.Controller" singleton="false" />
+  <!--EPM3.MC-->
+  <!--EPM3.IC-->
+  <object type="EPM3.IC.Controller.Epm3NormCatalogController, EPM3.IC.Controller" singleton="false" />
+  <object type="EPM3.IC.Controller.Epm3NormController, EPM3.IC.Controller" singleton="false" />
+  <object type="EPM3.IC.Controller.EpmNormFunController, EPM3.IC.Controller" singleton="false" />
+  <!--EPM3.IC-->
+  <!--EPM3.PR-->
+  <object type="EPM3.PR.Controller.Epm3PerReportHtmlController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3ViewPerReportController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3PerSendController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.EPM3PerReportExtController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3PerSendTempController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3PerReportTempCatalogController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3PerReportTempController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3PerReportSubController, EPM3.PR.Controller" singleton="false" />
+  <object type="EPM3.PR.Controller.Epm3PerReaderController, EPM3.PR.Controller" singleton="false" />
+  <!--EPM3.PR-->
+  <!--EPM3.DW-->
+  <object type="EPM3.DW.Controller.EpmDataWinController, EPM3.DW.Controller" singleton="false" />
+  <object type="EPM3.DW.Controller.EpmDataWinPlanController, EPM3.DW.Controller" singleton="false" />
+  <!--EPM3.DW-->
+  <!--STAX-House-->
+  <object type="ITM3.STAX.Controller.EstateAccountController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.LandHouseLeaseConController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.TaxBillController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.TaxPayBillController, ITM3.STAX.Controller" singleton="false" />
+  <object type="ITM3.STAX.Controller.EstateTaxDeclarationController, ITM3.STAX.Controller" singleton="false" />
+  <!--STAX-House-->
+
+  <!--GXM3.XM-->
+  <object type="GXM3.XM.Controller.ProjectMstController, GXM3.XM.Controller" singleton="false" />
+  <object type="GXM3.XM.Controller.DefinedDeskController, GXM3.XM.Controller" singleton="false" />
+  <!--GXM3.QT-->
+  <object type="GQT3.QT.Controller.BudgetAccountsController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.ExpenseCategoryController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.CorrespondenceSettingsController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.VCorrespondenceSetting2Controller, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.SourceOfFundsController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.CorrespondenceSettings2Controller, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.PaymentMethodController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtSysCodeSeqController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.ProjLibProjController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.GHProjDtlShareController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.UserOrgController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.ProcurementTypeController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.ProcurementProceduresController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.PerformEvalTargetTypeController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.PerformEvalTargetController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.PerformEvalTargetClassController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.ProcurementCatalogController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.PerformEvalTypeController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.ProjectThresholdController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtBaseProjectController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtZcgnflController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtOrgDygxController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTProductController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTProductUserController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTProductUserDygxController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTControlSetController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtYJKController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTMemoController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTModifyController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTIndividualInfoController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.BankAccountController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTSysSetController, GQT3.QT.Controller" singleton="false" />
+
+  <object type="GQT3.QT.Controller.QTEditMemoController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtAttachmentController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtDtlStageController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QTProjectMstController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtAccountController, GQT3.QT.Controller" singleton="false" />
+  <object type="GQT3.QT.Controller.QtVenueController, GQT3.QT.Controller" singleton="false" />
+  
+  <!--GYS3.YS-->
+  <object type="GYS3.YS.Controller.BudgetMstController, GYS3.YS.Controller" singleton="false" />
+  <object type="GYS3.YS.Controller.BudgetProcessCtrlController, GYS3.YS.Controller" singleton="false" />
+  <object type="GYS3.YS.Controller.BuDeptReportController, GYS3.YS.Controller" singleton="false" />
+  <object type="GYS3.YS.Controller.GHSubjectController, GYS3.YS.Controller" singleton="false" />
+  <object type="GYS3.YS.Controller.ExpenseMstController, GYS3.YS.Controller" singleton="false" />
+  <!--GJX3.JX-->
+  <object type="GJX3.JX.Controller.PerformanceMstController, GJX3.JX.Controller" singleton="false" />
+
+  
+</objects>

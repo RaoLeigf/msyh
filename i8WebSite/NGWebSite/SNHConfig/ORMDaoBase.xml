@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects default-lazy-init="true" xmlns="http://www.springframework.net"
+         xmlns:db="http://www.springframework.net/database">
+  <!-- 配置占位符 -->
+  <object type="Spring.Objects.Factory.Config.PropertyPlaceholderConfigurer, Spring.Core" >
+    <property name="ConfigSections" value="databaseSettings,mappingAssembliesSettings"/>
+  </object>
+
+  <!--数据库提供者
+	<db:provider id="DbProviderKit" provider="${provider}"
+				 connectionString="${connectionStringkit}" />
+
+	<db:provider id="DbProviderLocal" provider="${provider}"
+				 connectionString="${connectionString}" />
+
+	<object id="DbProviderDictionary" type="Spring.Collections.SynchronizedHashtable, Spring.Core">
+		<property name="['DbProvider1']" ref="DbProviderLocal"/>
+		<property name="['DbProvider2']" ref="DbProviderKit"/>
+	</object>-->
+
+  <object id="DbProvider" type="Spring.Data.Common.MultiDelegatingDbProvider, Spring.Data">
+    <property name="TargetDbProviders" ref="DbProviderDictionary"/>
+    <property name="DefaultDbProvider" ref="DefaultDbProvider"/>
+  </object>
+  
+  <object id="NHibernateInterceptor" type="Enterprise3.NHORM.Base.AspectsHandling.NHibernateInterceptor, Enterprise3.NHORM.Base" />
+  
+  <!--SessionFactory对象-->
+  <object id="NHibernateSessionFactory" type="Spring.Data.NHibernate.LocalSessionFactoryObject, Spring.Data.NHibernate4" >
+    <property name="DbProvider" ref="DbProvider"/>
+    <property name="MappingAssemblies" value="${hibernate.mappingassemblies}" />
+    <property name="HibernateProperties">
+      <dictionary>
+        <entry key="hibernate.current_session_context_class"
+               value="Spring.Data.NHibernate.SpringSessionContext, Spring.Data.NHibernate4"/>
+
+        <entry key="hibernate.connection.provider"
+               value="NHibernate.Connection.DriverConnectionProvider"/>
+        <!--数据库方言-->
+        <entry key="dialect" value="${dialect}"/>
+
+        <!--数据库驱动-->
+        <entry key="connection.driver_class" value="${driver_class}"/>
+
+        <entry key="use_outer_join" value="true"/>
+        <entry key="show_sql" value="true"/>
+        <!--自动建表(反向映射)-->
+        <entry key="hbm2ddl.auto" value="${hbm2ddl.auto}"/>
+        <!--超时时间-->
+        <entry key="command_timeout" value="120"/>
+        <!--连接池的连接数-->
+        <entry key="maxPoolSize" value="512" />
+        <!-- 启用二级缓存 -->
+        <entry key="cache.use_second_level_cache" value ="false" />
+        <!-- 启动查询缓存 -->
+        <entry key="cache.use_query_cache" value ="false" />
+        <entry key="query.substitutions" value="true 1, false 0, yes 'Y', no 'N'"/>
+        <entry key="proxyfactory.factory_class"
+               value="Spring.Data.NHibernate.Bytecode.ProxyFactoryFactory, Spring.Data.NHibernate4"/>
+
+        <!-- 批量更新 -->
+        <entry key ="adonet.batch_size" value ="1000" />
+      
+        <!--<entry key="connection.provider" value="Enterprise3.NHORM.Lob.ExternalBlobDriverConnectionProvider, Enterprise3.NHORM.Lob" />
+        <entry key="connection.lob.external.provider" value="Enterprise3.NHORM.Lob.Providers.ByteArray.ByteArrayConnectionProvider, Enterprise3.NHORM.Lob" />-->
+      </dictionary>
+    </property>
+    <!--<property name="adonet.batch_size" value="2" />-->
+    <property name="ExposeTransactionAwareSessionFactory" value="true" />
+    <property name="EntityInterceptor" ref="NHibernateInterceptor" />
+  </object>
+
+  <!--HibernateTemplate模板-->
+  <object id="HibernateTemplate" type="Spring.Data.NHibernate.Generic.HibernateTemplate" >
+    <property name="SessionFactory" ref="NHibernateSessionFactory" />
+    <property name="TemplateFlushMode" value="Auto" />
+    <property name="CacheQueries" value="true" />
+  </object>
+
+  <!--ADO.NET Config-->
+  <object id="AdoTemplate" type="Spring.Data.Core.AdoTemplate, Spring.Data" >
+    <property name="DbProvider" ref="DbProvider"/>
+    <property name="DataReaderWrapperType" value="Spring.Data.Support.NullMappingDataReader, Spring.Data"/>
+  </object>
+
+  <object id="NHValidator" type="Enterprise3.NHORM.Base.Validator.NHValidatorObject,Enterprise3.NHORM.Base" >
+    <property name="ApplyToDDL" value="true"></property>
+    <property name="AutoRegisterListeners" value="true"></property>
+    <property name="DefaultMode" value="UseExternal"></property>
+    <property name="MappingAssemblies" value="${hibernate.mappingassemblies}" />
+  </object>
+</objects>

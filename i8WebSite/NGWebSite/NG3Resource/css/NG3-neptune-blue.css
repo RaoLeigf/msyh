@@ -1,0 +1,456 @@
+* {
+    font-family:'宋体',tahoma,Verdana, "微软雅黑",Arial,SimSon,sans-serief !important;
+    font-size: 12px !important;
+}
+ 
+
+
+        /*tabpanel突出显示*/
+.x-tab-default .x-tab-inner {
+    font-weight: normal;
+}
+
+.x-tab-default-active .x-tab-inner {
+    font-weight: normal;
+}
+
+.x-tab-default-top-active, .x-tab-default-left-active, .x-tab-default-right-active {
+    /*background-color: white;
+            background-image: none;*/
+}
+        
+        /*控件验证提示颜色*/
+input.x-form-invalid-field, textarea.x-form-invalid-field {
+    background-color: transparent;
+    /* background-image: url(images/grid/invalid_line.gif); */
+    background-image: none;
+    background-repeat: repeat-x;
+    background-position: bottom;
+    border-color: #B0CC00;
+} 
+         /*控件验证提示图标*/
+.x-form-invalid-icon {
+    width: 16px;
+    height: 16px;
+    margin: 0 1px;
+    /* background-image: url(images/form/exclamation.gif);*/
+    background-image: none;
+    background-repeat: no-repeat;
+}
+
+ /* textline */
+.ngx-form-text {
+/*.ng-x-form-text {*/
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    border-bottom-width:thin;
+    color: black;
+    padding: 1px 3px 1px 3px;
+    /*background: white repeat-x 0 0;*/
+    background: repeat-x 0 0;
+    /*border-width: 1px;*/
+    border-style: solid;
+    border-color: #b5b8c8;
+    /*background-image: url(images/form/text-bg.gif);*/
+    height: 22px;
+    line-height: 17px;
+}
+
+
+/* textline获得焦点 */
+/*
+.x-form-text-focus {
+    color: black;
+    padding: 1px 3px 1px 3px;
+    background: white repeat-x 0 0;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #b5b8c8;
+    background-image: url(images/form/text-bg.gif);
+    height: 22px;
+    line-height: 17px;
+    box-shadow:0 0 10px #9ecded;
+}*/
+
+/*ngtextarea*/		
+.ng-textarea {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    color: black;
+    padding: 1px 3px 1px 3px;
+    /*background: white repeat-x 0 0;*/
+    background: repeat-x 0 0;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #b5b8c8;
+    /*background-image: url(images/form/text-bg.gif);*/
+    height: 22px;
+    line-height: 17px;
+}
+
+/*ngtextarea focus*/
+.ng-textarea-focus {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    color: black;
+    padding: 1px 3px 1px 3px;
+    background: white repeat-x 0 0;
+    /*background: repeat-x 0 0;*/
+    border-width: 1px;
+    border-style: solid;
+    border-color: #b5b8c8;
+    background-image: url(images/form/text-bg.gif);
+    height: auto;
+    line-height: 17px;
+    box-shadow:0 0 10px #9ecded;
+}		
+
+.mustInput {
+    color:OrangeRed;
+}
+
+
+
+
+/*滚动条样式*/
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-button:vertical{display:inl}
+::-webkit-scrollbar-track:vertical{background-color:black}
+::-webkit-scrollbar-track-piece{background:#f4f4f4}
+::-webkit-scrollbar-thumb:vertical{	background-color:#d3d3d3;border-radius:5px;}
+::-webkit-scrollbar-thumb:vertical:hover{background-color:#a9a9a9}
+::-webkit-scrollbar-corner:vertical{background-color:#535353}
+::-webkit-scrollbar-resizer:vertical{background-color:#ff6e00}
+
+::-webkit-scrollbar-button:horizontal{display:none}
+::-webkit-scrollbar-track:horizontal{background-color:black}
+::-webkit-scrollbar-track-piece{background:#f4f4f4}
+::-webkit-scrollbar-thumb:horizontal{background-color:#d3d3d3;border-radius:5px}
+::-webkit-scrollbar-thumb:horizontal:hover{background-color:#a9a9a9}
+::-webkit-scrollbar-corner:horizontal{background-color:#535353}
+::-webkit-scrollbar-resizer:horizontal{background-color:#ff6e00}
+
+
+/* neptune */
+
+/*横线效果*/
+/*.x-form-trigger-wrap {
+    border: 1px solid;
+    border-color: #F6F6F6 #F6F6F6 #F6F6F6;
+}*/
+
+/*按钮扁平化*/
+.x-btn-default-small {  
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;	
+    background-image: -webkit-linear-gradient(top,#FFFFFF,#FFFFFF 50%,#FFFFFF 51%,#FFFFFF);
+    background-color: white; 
+    border-color:#C0C0C0;	
+}
+
+/*按钮光标放上颜色*/
+.x-btn-default-small-over {  
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;
+    background-image: -webkit-linear-gradient(top,#c1ddf1,#c1ddf1 50%,#c1ddf1 51%,#c1ddf1);
+    background-color: #3892d3;
+    border-color:#4b9cd7;	
+}
+
+/*按钮字体颜色*/
+.x-btn-default-small .x-btn-inner {
+    font-size: 12px;
+    font-weight: normal;    
+    color: #333f49;
+    padding: 0 5px;
+}
+
+
+
+.x-panel-default {
+    /*border-color: #157fcc;*/
+    /* padding: 3px;*/ /*边框间距控制，可是grid列选择的menu有点问题*/
+}
+
+/*panel frame的边框颜色*/
+.x-panel-default-framed {
+    border-color:#C0C0C0;/*#f6f6f6*/;
+    padding: 0;
+    border-width: thin;
+	margin: 3px;
+}
+/*panel framed框的背景颜色*/
+.x-panel-body-default-framed {
+    background: #dfe9f6;
+    border-color: #DFE9F6;/*#99bce8;*/
+    color: black;
+    font-size: 13px;
+    font-size: normal;
+    border-width: 1px;
+    border-style: solid;
+}
+/*panel的背景颜色*/
+.x-panel-body-default {
+    background: #ffffff;
+    border-color: #d5d5d5;/*#99bce8;*/
+    color: #333f49;
+    font-size: 13px;
+    border-width: 1px;
+    border-style: solid;
+	border-radius: 3px;
+}
+
+/*容器边框颜色*/
+.x-border-layout-ct {
+    background-color: #DFE9F6;/*#FFFFFF*/; 
+}
+
+/*window头部*/
+.x-window-header-default {
+    font-size: 13px;
+    border-color: #4b9cd7;
+    zoom: 1;
+    background-color: #CEDFEA;
+	border-width: 0px!important;
+}
+
+.x-window-header-text-container-default {
+    color: #3C3C3C;   
+}
+
+.x-window-default {
+    border-color: #ced9e7;    
+}
+
+.x-window-body-default {
+    border-color: #B5B8C8;
+    border-width: 1px;
+    border-style: solid;
+    background: #F6F6F6;
+    color: black;
+}
+
+.x-message-box .x-window-body {
+    background-color: #F6F6F6;
+    border-width: 0;
+}
+
+/*tab 边框*/
+.x-tab-default {
+    border-color: #B8D7F5;
+    margin: 0 1px 0 0;
+    cursor: pointer;
+	/*height:28px;*/
+}
+
+/*tab 颜色*/
+/*
+.x-tab-default-top {  
+    background-color: #c1ddf1;
+}*/
+
+/*tab下的横条*/
+.x-tab-bar-strip-default {
+    border-style: solid;
+    border-color: #A7C6DC;
+    background-color: #F6F6F6;
+}
+
+
+/*tabbar的颜色*/
+.x-tab-bar-default {
+    background-color: #f6f6f6;
+}
+
+/*tabbar高度;这里不管用， 请在tabpanel设置tabBar的width属性*/
+/*.x-tab-bar-body-default-horizontal {
+    height: 30px;
+}*/
+
+
+/*panel背景色*/
+.x-panel-header-default {
+    background-image: none;
+    background-color: #f6f6f6;
+}
+
+/*panel边框*/
+.x-panel-header-default {
+    font-size: 13px;
+    border: 1px solid #f6f6f6;
+}
+
+.x-panel-header-default-framed-collapsed-left {   
+    background-color: #F6F6F6;
+}
+.x-panel-header-default-framed-collapsed-top {   
+    background-color: #F6F6F6;
+}
+
+.x-panel-header-default-framed-top { 
+    background-color: #F6F6F6;
+}
+.x-panel-header-default-framed {  
+    border: 5px solid #F6F6F6;
+}
+.x-panel-header-text-container-default-framed {
+    color: #666;   
+    font-weight: bold;  
+}
+
+/*panel 标题的字体颜色 */
+.x-panel-header-text-container-default {
+    color: #666;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: arial,helvetica,verdana,sans-serif;
+    line-height: 15px;
+    padding: 1px 0 0;
+    text-transform: none;
+}
+
+/*footbar背景色*/
+.x-toolbar-footer {
+    background: #dfe9f6;
+    border: 0;
+    margin: 0;
+    padding: 6px 0 6px 6px;
+}
+
+/*grid 列标题字体*/
+.x-column-header {   
+    color: #333f49;
+    font: normal 12px '宋体';
+    background-color: #f5f5f5;
+}
+
+
+
+/*--toolbar----*/
+.x-toolbar {   
+    padding: 2px 0px 3px 10px;
+}
+
+.x-toolbar-default {
+    border-color: silver;   
+    background-image: none;
+    background-color: #DFE9F6;
+}
+
+/*toobar按钮背景*/
+.x-btn-default-toolbar-small {
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;
+    background-image: none;
+    background-color: #DFE9F6;  
+	border-color: #DFE9F6;
+}
+
+/*toobar按钮边框*/
+.x-btn-default-toolbar-small-over {
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;
+    background-image: -webkit-linear-gradient(top,#c1ddf1,#c1ddf1 50%,#c1ddf1 51%,#c1ddf1);
+    background-color: #c1ddf1;
+    border-color:#4b9cd7;	
+}
+
+/*toobar按钮字体大小*/
+.x-btn-default-toolbar-small .x-btn-inner {
+    font-size: 12px;
+    font-weight: normal;
+    font-family: helvetica,arial,verdana,sans-serif;
+    color: #333f49;    
+}
+
+
+/*----tab特效----*/
+
+/*tab的颜色*/
+    .x-tab-default-top, .x-tab-default-left, .x-tab-default-right {
+    border-radius: 6px 6px 0px 0px;
+    border-bottom: 1px solid #d0d0d0;
+    background-image: none;
+    background-color: #e8f2ff;/* #eaeaea */  
+	background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,rgba(192, 219, 245, 0.87)),color-stop(100%,#f4f4f4));/*颜色淡一点*/
+	background-image: -moz-linear-gradient(top,#dcdcdc,#eaeaea);
+    background-image: -o-linear-gradient(top,#dcdcdc,#eaeaea);
+    background-image: linear-gradient(top,#dcdcdc,#eaeaea);
+    -webkit-box-shadow: white 0 1px 0 0 inset,white -1px 0 0 0 inset,white 1px 0 0 0 inset;
+    -moz-box-shadow: white 0 1px 0 0 inset,white -1px 0 0 0 inset,white 1px 0 0 0 inset
+}
+
+.x-tab-default .x-tab-inner {
+    font-size: 11px;    
+    font-family: tahoma,arial,verdana,sans-serif;
+    color: #333f49;
+    line-height: 13px;
+}
+
+/*激活之后背景*/
+ .x-tab-default-top-active, .x-tab-default-left-active, .x-tab-default-right-active {
+    background-color: white;
+    background-image: none;
+}
+    
+
+/*光标放到tab上*/
+.x-tab-default-top-over,
+.x-tab-default-left-over,
+.x-tab-default-right-over {
+  background-image: none;
+  background-color: whitesmoke; /*#e8f2ff;*/ 
+}
+
+/*tab的边上的颜色*/
+.x-tab-bar-default-left {   
+    background-color: #923232;    
+    background-image: -webkit-linear-gradient(left,#E9F2F9,#E9F2F9);    
+}
+
+/*tabbar的颜色*/
+.x-tab-bar-body {
+    z-index: 2;
+    position: relative;
+    background-color: #DFE9F6;
+}
+
+/*tabbar的滚动按钮*/
+/*.x-tab-bar-default .x-tabbar-scroll-top, .x-tab-bar-default .x-tabbar-scroll-bottom {
+    width: 22px;
+    height: 20px;
+}*/
+
+.x-mask {
+    filter: alpha(opacity=70);
+    opacity: .6;
+    background: #ededed;
+}
+
+/*标签字体*/
+.x-form-item-label {
+    color:#333f49;
+    font: normal 13px/22px helvetica,arial,verdana,sans-serif;
+}
+
+/*输入框的字体*/
+.x-form-text {
+    color:#333f49; 
+	border-radius: 3px;
+}
+
+.x-form-trigger-wrap {   
+    border-radius: 3px;
+}
+

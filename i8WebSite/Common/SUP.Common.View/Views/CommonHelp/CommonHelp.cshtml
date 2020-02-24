@@ -1,0 +1,569 @@
+﻿@{
+    ViewBag.Title = "CommonHelp";
+      Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src="@Url.Content("~/NG3/js/RWcommon.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/NG3/js/RWextux.js")" type="text/javascript"></script>
+<script>
+    var helpObj = {};
+
+    helpObj.title = '@ViewBag.HelpTitle';
+    helpObj.icon = '@ViewBag.Icon';
+    helpObj.codeField = '@ViewBag.CodeField';
+    helpObj.nameField = '@ViewBag.NameField';
+    helpObj.selectMode = @ViewBag.SelectMode;  
+    helpObj.t1 = Ext.htmlDecode('@ViewBag.T1');
+    helpObj.t2 = Ext.htmlDecode('@ViewBag.T2');     
+   
+
+   Ext.onReady(function () {   
+      var SUPObject1 = Ext.getDom('SUPObject1');
+      //SUPObject1.Template = t1;
+      SUPObject1.ObjConfig = { id: 'SUPObject1_AF', type: 'BCV1.TreeList', param: 'Border=0;', ver: SupCanVersion };
+
+      var SUPObject2 = Ext.getDom('SUPObject2');
+      //SUPObject2.Template = t2;
+      SUPObject2.ObjConfig = { id: 'SUPObject2_AF', type: 'BCV1.TreeList', param: 'Border=0;', ver: SupCanVersion };
+
+       var SUPObject3 = Ext.getDom('SUPObject3');
+      //SUPObject2.Template = t2;
+      SUPObject3.ObjConfig = { id: 'SUPObject3_AF', type: 'BCV1.FreeForm', param: 'Border=0;', ver: SupCanVersion };
+    
+        var AF, AF2,wcmp, checkColId = '',  pb, showText, okBtn, cancelBtn, showBtn, delBtn, clearBtn, helpid = Ext.getUrlParam('helpid');
+       
+        var outFilter = Ext.getUrlParam('outFilter');
+        
+        var isMulti =(Ext.getUrlParam('selectMode') === '1') ? true : false;
+        if (Ext.getUrlParam('isMulti')&&Ext.getUrlParam('isMulti') - 0 >-1) {
+            isMulti = Ext.getUrlParam('isMulti') - 0>0;
+        }
+
+
+
+        var codeArr = helpObj.codeField.split(',');
+        var nameArr = helpObj.nameField.split(',');
+
+        var btBar = "";
+        if (isMulti) {
+            btBar = { border: false, frame: false, region: 'center', id: 'bottombar', text: 'bottombar', xtype: 'panel', height: 60, layout: 'fit',
+                bodyBorder: false,
+                bodyCfg: { cls: 'x-window-bc' },
+                layout: 'hbox',
+                layoutConfig: {
+                    padding: '5',
+                    align: 'center'
+                },
+                defaults: { margins: '5 5 0 0' },
+                items: [
+                            { id: 'showText', html: '显示选择项[已选   项]', xtype: 'label', style: style = "font-size:12px;font-family:宋体;", margins: '10 10 5 10', hidden: false },
+                            {
+                                id: 'showBtn', xtype: 'button',
+                                text: '显示已选',
+                                autoWidth: false,
+                                width: 75, hidden: false
+                            },
+                            {
+                                id: 'delBtn', xtype: 'button',
+                                text: '删除',
+                                autoWidth: false,
+                                width: 75, hidden: false
+                            }, {
+                                id: 'clearBtn', xtype: 'button',
+                                text: '清除已选',
+                                autoWidth: false,
+                                width: 75, hidden: false
+                            }, {
+                                xtype: 'tbspacer',
+                                flex: 1
+                            }, {
+                                id: 'okBtn', xtype: 'button',
+                                text: '确定',
+                                autoWidth: false,
+                                width: 75
+                            }, {
+                                id: 'cancelBtn', xtype: 'button',
+                                text: '取消',
+                                autoWidth: false,
+                                width: 75
+                            }
+                    ]
+            };
+        }
+        else {
+            btBar = { border: false, frame: false, region: 'center', id: 'bottombar', text: 'bottombar', xtype: 'panel', height: 60, layout: 'fit',
+                bodyBorder: false,
+                bodyCfg: { cls: 'x-window-bc' },
+                layout: 'hbox',
+                layoutConfig: {
+                    padding: '5',
+                    align: 'center'
+                },
+                defaults: { margins: '5 5 0 0' },
+                items: [
+                        {
+                            xtype: 'tbspacer',
+                            flex: 1
+                        }, {
+                            id: 'okBtn', xtype: 'button',
+                            text: '确定',
+                            autoWidth: false,
+                            width: 75
+                        }, {
+                            id: 'cancelBtn', xtype: 'button',
+                            text: '取消',
+                            autoWidth: false,
+                            width: 75
+                        }
+                ]
+            };
+        }
+
+        var vpitems = [
+                    { border: false, frame: false, region: 'north', id: 'north', xtype: 'panel', height: 33, border: false, autoHeight: false, layout: 'fit' },
+                    { border: false, frame: false, region: 'center', id: 'center', xtype: 'panel', layout: 'fit' },
+                    { border: false, region: 'south', id: 'southPanel', xtype: 'panel', height: 60, bodyBorder: false,
+                        items:
+                        [
+                            { border: false, frame: false, region: 'north', height: 26, layout: 'fit', html: '<div id="bbar"/>' }, //                                    
+                            btBar
+                        ]
+                    }
+        ];
+        var treelist_dropListCols, treelist_dropListIds, treelist_dropListDatas;
+        var query_dropListCols, query_dropListIds, query_dropListDatas;    
+
+       
+        if (isMulti) {
+            vpitems.push({ border: false, region: 'east', id: 'right', split: true, autoScroll: true, width: 0, xtype: 'panel' });
+        }
+
+        var vp = new Ext.Viewport({
+            layout: 'border',           
+            renderTo: Ext.getBody(),
+            border: false,
+            items: vpitems
+        });
+
+        var bottombar = Ext.getCmp('southPanel').items.get('bottombar');
+
+        Ext.getCmp('north').body.dom.appendChild(SUPObject3);
+        var AFQuery = $AF.create(SUPObject3);
+
+        Ext.getCmp('center').body.dom.appendChild(SUPObject1);
+        AF = $AF.create(SUPObject1);
+
+        if (isMulti) {
+            Ext.getCmp('right').body.dom.appendChild(SUPObject2);
+            AF2 = $AF.create(SUPObject2);
+        }  
+
+        w.init = function (_wcmp) {
+            wcmp = _wcmp;
+
+            wcmp.setTitle(helpObj.title, helpObj.icon);
+
+            var pclose = wcmp.close;
+            wcmp.close = function () {
+                Cancelcallback();
+                pclose.call(wcmp);
+            }
+
+            if (isMulti)
+            { showText = bottombar.items.get('showText'); }
+
+            okBtn = bottombar.items.get('okBtn');
+            okBtn.on('click', okHandler);
+            cancelBtn = bottombar.items.get('cancelBtn');
+            cancelBtn.on('click', function () { wcmp.close(); });
+
+
+            wcmp.doLayout();
+
+            //设置treelist下拉数据
+            treelist_dropListCols = _wcmp.$params.treelist_droplistcols;
+            treelist_dropListIds = _wcmp.$params.treelist_droplistids;
+            treelist_dropListDatas = wcmp.$params.treelist_droplistdatas;
+            TreelistSetDropListData(treelist_dropListCols, treelist_dropListIds, treelist_dropListDatas);
+
+            //设置query下拉数据
+            query_dropListCols = _wcmp.$params.query_droplistcols;
+            query_dropListIds = _wcmp.$params.query_droplistids;
+            query_dropListDatas = wcmp.$params.query_droplistdatas;
+            QuerySetDropListData(query_dropListCols, query_dropListIds, query_dropListDatas);
+
+            //取得keyword,并设置到名称列
+            keyword = _wcmp.$params.keyword;
+            SetKeyWord(keyword);
+        }
+
+        w.dealAction = function () {
+            if (isMulti) {
+                AF2.DeleteRows(0, -1);
+                updateShowBtn();
+            }
+
+            loadData();
+        }
+
+        function SetKeyWord(keyword) {
+            if (AFQuery) {
+                var inputs = AFQuery.GetObjectIds('input'); //取得第一个查询条件的控件ID
+                if (inputs) {
+                    var inputArray = inputs.split(',');
+                    var input0 = inputArray[0];
+                    if (input0) {
+                        AFQuery.SetValue(input0, keyword);
+                        //                        btnquery.OnClicked();
+                    }
+                }
+            }
+        }
+
+        function loadData(params) {
+            params = Ext.apply({ helpid: helpid, custom: AF.getCustom() }, params || {});
+            Ext.apply(pb.load.params, params);
+            pb.changePage(1);
+        }
+
+        function callback(lineid, AF) {
+            var code = getCode(lineid, AF);
+            var name = getName(lineid, AF);
+
+            //wcmp.hide();
+
+            if (Ext.isFunction(wcmp.$params.callback)) {
+                var callbackAF = isMulti ? AF2 : AF;
+                wcmp.$params.callback.call(callbackAF, code, name, callbackAF);
+            }
+            else if (wcmp.$params.ctrl) {
+                wcmp.$params.ctrl.value(code);
+                wcmp.$params.ctrl.text(name);
+            }
+            wcmp.close();
+        }
+
+        function Cancelcallback() {
+            if (Ext.isFunction(wcmp.$params.cancelcallback)) {
+                var callbackAF = isMulti ? AF2 : AF;
+                wcmp.$params.cancelcallback.call(callbackAF);
+            }
+            //wcmp.close();
+        }
+
+        function getCode(lineid, AF) {
+            var s = '', lineArr = Ext.isArray(lineid) ? lineid : lineid.split(',');
+            for (var i = 0; i < lineArr.length; i++) {
+                for (var j = 0; j < codeArr.length; j++) {
+                    s += AF.GetCellData(lineArr[i], codeArr[j]);
+                    if (j < codeArr.length - 1)
+                        s += ',';
+                }
+                if (i < lineArr.length - 1)
+                    s += '\\|';
+            }
+            return s;
+        }
+
+        function getName(lineid, AF) {
+            var s = '', lineArr = Ext.isArray(lineid) ? lineid : lineid.split(',');
+            for (var i = 0; i < lineArr.length; i++) {
+                for (var j = 0; j < nameArr.length; j++) {
+                    s += AF.GetCellText(lineArr[i], nameArr[j]);
+                    if (j < nameArr.length - 1)
+                        s += ',';
+                }
+                if (i < lineArr.length - 1)
+                    s += '\\|';
+            }
+            return s;
+        }
+
+        function okHandler() {
+            var obj = AF, lineid = AF.getCurrentRow();
+            if (isMulti) {
+                obj = AF2;
+                lineid = AF2.FindAll(1);
+            }
+            if (lineid != '') {
+                callback(lineid, obj);
+            }
+            else {
+                AF.MessageBoxFloat('请选择一条记录!');
+            }
+        }
+
+
+        function updateShowBtn() {
+            if (showText) {
+                showText.el.dom.innerHTML = '显示选择项[已选' + AF2.getRows() + '项]';
+            }
+        }
+
+        function getLineByKey(o, key) {
+            for (var j = 0; j < o.GetRows(); j++) {
+                if (key == o.GetRowKey(j)) {
+                    return j;
+                }
+            }
+            return -1;
+        }
+
+        //填充treelist下拉列表数据
+        function TreelistSetDropListData(droplistcols, droplistids, droplistdatas) {
+            var h;
+            if (droplistcols && droplistids && droplistdatas) {
+                if ((Object.prototype.toString.call(droplistcols) === '[object Array]') && (Object.prototype.toString.call(droplistids) === '[object Array]') && (Object.prototype.toString.call(droplistsdatas) === '[object Array]')) {
+                    for (var i = 0; i < droplistsids.length; i++) {
+                        /*
+                        AF.Load(droplistsids[i],droplistdatas[i] );
+                        if (AF2) {
+                        AF2.Load(droplistsids[i],droplistdatas[i]);
+                        }
+                        */
+                        h = AF.GetHandle(droplistcols[i]);
+                        AF.DropList_DeleteAll(h);
+                        AF.SetDroplistProp(droplistids[i], "dataURL", droplistdatas[i]);
+                        if (AF2) {
+                            h = AF2.GetHandle(droplistcols[i]);
+                            AF2.DropList_DeleteAll(h);
+                            AF2.SetDroplistProp(droplistids[i], "dataURL", droplistdatas[i]);
+                        }
+                    }
+                }
+                else {
+                    h = AF.GetHandle(droplistcols);
+                    AF.DropList_DeleteAll(h);
+                    AF.SetDroplistProp(droplistids, "dataURL", droplistdatas);
+                    if (AF2) {
+                        h = AF2.GetHandle(droplistcols);
+                        AF2.DropList_DeleteAll(h);
+                        AF2.SetDroplistProp(droplistids, "dataURL", droplistdatas);
+                    }
+                }
+            }
+        }
+
+        //填充query下拉列表数据
+        function QuerySetDropListData(droplistcols, droplistids, droplistdatas) {
+            var h;
+            if (droplistcols && droplistids && droplistdatas) {
+                if ((Object.prototype.toString.call(droplistcols) === '[object Array]') && (Object.prototype.toString.call(droplistids) === '[object Array]') && (Object.prototype.toString.call(droplistsdatas) === '[object Array]')) {
+                    for (var i = 0; i < droplistsids.length; i++) {
+                        //h = AF.GetHandle('topBar');
+                        //AF.func(h + "SetDroplistProp", droplistids[i] + "\r\n" + "dataURL" + "\r\n" + droplistdatas[i]);
+                        AFQuery.SetDropListProp(droplistids[i], "dataURL", droplistdatas[i]);
+                    }
+                }
+                else {
+                    //h = AF.GetHandle('topBar');
+                    //AF.func(h + "SetDroplistProp", droplistids + "\r\n" + "dataURL" + "\r\n" + droplistdatas);
+                    AFQuery.SetDropListProp(droplistids, "dataURL", droplistdatas);
+                }
+            }
+        }
+
+        AllReady = function () {
+           
+            if (helpObj.t1 != '') {                
+                AFQuery.Build(helpObj.t1);             
+            }
+        
+            AF.Build(helpObj.t2);
+
+            pb = new Ext.ux.SupcanPager({
+                renderTo: 'bbar',
+                AF: AF,
+                region: 'south',
+                height: 26,
+                sliderWidth: 150,
+                load: {
+                    url: 'CommonHelp/getList',
+                    params:{helpid:helpid,outqueryfilter:outFilter},
+                    success: function (res) {
+                        if (res.valid) {
+                            AF.load(res.text);
+                        }
+                    }
+                },
+                autoLoad: false,
+                displayInfo: true
+            });
+
+          
+
+            if (isMulti) {
+                //AF.setProp('multiRowSelectAble', true);
+                AF2.Build(helpObj.t2);
+                AF2.SetProp('SeparateBarStyle', false);
+                AF2.setProp('multiRowSelectAble', true);
+
+                //updateShowBtn();
+                for (var i = 0; i < AF.getCols(); i++) {
+                    if (AF.GetColProp(i, 'ishide') == '0') {
+                        if (AF.GetColProp(i, 'isCheckboxOnly') == '0') {
+                            //自动插入一个多选列
+                            AF.InsertCol(i, { name: 'checked', isCheckboxOnly: true });
+                        }
+                        checkColId = AF.GetColName(i);
+                        break;
+                    }
+                }
+
+                pb.load.callback = function () {
+                    for (var i = 0; i < AF.GetRows(); i++) {
+                        var key = AF.GetRowKey(i);
+                        for (var j = 0; j < AF2.GetRows(); j++) {
+                            if (key == AF2.GetRowKey(j)) {
+                                AF.SetCellData(i, checkColId, '1');
+                            }
+                        }
+                    }
+                }
+
+                AF.OnClicked = function (rowid, colid) {
+                    if (checkColId != '') {
+                        var count = AF.getRows();
+                        for (var i = 0; i < count; i++) {
+                            var key = AF.GetRowKey(i);
+                            if (AF.GetCellData(i, checkColId) == 1) {
+                                var json = AF.toJson(AF.Export('asData', 'row=' + i) + "\r\n recordset");
+                                if (getLineByKey(AF2, key) == -1) {
+                                    AF2.InsertRows(0);
+                                    AF2.SetRowCellData(0, json);
+                                }
+                            }
+                            else {
+                                for (var j = 0; j < AF2.GetRows(); j++) {
+                                    if (key == AF2.GetRowKey(j)) {
+                                        AF2.DeleteRows(j, 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    updateShowBtn();
+                }
+
+            }
+            else {
+                AF.setProp('multiRowSelectAble', false);
+
+                AF.OnDblClicked = function (lineid) {
+                    callback(lineid, AF);
+                }
+            }
+
+            AF.OnInvalidMouseWheel = function (param) {
+                var page = pb.getPageData();
+
+                if (param == "up") {
+                    //向前翻
+                    if (page.activePage == 1) {
+                        return;
+                    }
+                    else {
+                        pb.changePage(page.activePage - 1);
+                    }
+                }
+
+                if (param == "down") {
+                    //向后翻
+                    if (page.activePage == page.pages) {
+                        return;
+                    }
+                    else {
+                        pb.changePage(page.activePage + 1);
+                    }
+                }
+            }
+
+            //查询面板搜索按钮点击事件
+            var btnquery = AFQuery.get('btnquery');
+            btnquery.OnClicked = function () {
+                loadData({ query: AFQuery.getQuery() });
+            }
+
+            //查询面板清空按钮点击事件
+            var btnreset = AFQuery.get('btnreset');
+            btnreset.OnClicked = function () {
+                AFQuery.Recover();
+            }
+          
+            showBtn = bottombar.items.get('showBtn');
+            if (showBtn) {
+                showBtn.on('click', function () {                   
+                    if (!this.pressed) {
+                        Ext.getCmp('right').setWidth(vp.getWidth() / 2);
+                        this.pressed = true;
+                        this.setText('隐藏已选');
+                    }
+                    else {
+                        Ext.getCmp('right').setWidth(0);
+                        this.pressed = false;
+                        this.setText('显示已选');
+                    }
+                    //showBtn.setButtonClass();
+                    vp.doLayout();
+                }
+                );
+            }
+
+            delBtn = bottombar.items.get('delBtn');
+            if (delBtn) {
+                delBtn.on('click', function () {
+                    if (!showBtn.pressed) {
+                        showBtn.pressed = true;
+                        showBtn.setText('隐藏已选');
+                        //showBtn.setButtonClass();
+                        Ext.getCmp('right').setWidth(vp.getWidth() / 2);
+                        vp.doLayout();
+                    }
+                    else {
+                        var lineid = AF2.GetCurrentRow();
+                        if (lineid.length > 0) {
+                            var rs = lineid.split(',');
+                            for (var i = 0; i < rs.length; i++) {
+                                AF.SetCellData(getLineByKey(AF, AF2.GetRowKey(rs[i])), checkColId, 0);
+                            }
+                            AF2.DeleteCurrentRow();
+                            updateShowBtn();
+                        }
+                    }
+                });
+            }
+
+            clearBtn = bottombar.items.get('clearBtn');
+            if (clearBtn) {
+                clearBtn.on('click', function () {
+                    Ext.Msg.confirm('清空?', '确定要清空所有选择的项吗?', function (btn) {
+                        if (btn == 'yes') {
+                            for (var i = 0; i < AF.getRows(); i++) {
+                                AF.SetCellData(i, checkColId, 0);
+                            }
+                            AF2.DeleteRows(0, -1);
+                            updateShowBtn();
+                        }
+                    });
+                });
+            }
+            w.isReady = true;
+        }
+})
+
+</script>
+
+}
+
+<div id="SUPObject1" style="width:100%;height:100%;">
+</div>
+
+<div id="SUPObject2" style="width:100%;height:100%;">
+</div>
+
+<div id="SUPObject3" style="width:100%;height:100%;">
+</div>
+
+

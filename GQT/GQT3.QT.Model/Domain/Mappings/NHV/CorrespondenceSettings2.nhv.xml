@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="CorrespondenceSettings2Model">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Dwdm" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="Dydm" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="Dylx" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="DefStr1" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DefStr2" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DefStr3" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DefStr4" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DefStr5" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DefStr6" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="DefNum1" >
+			<length min="0" max="18" message ="长度不超过18！"/>
+		</property>
+		<property name="DefNum2" >
+			<length min="0" max="18" message ="长度不超过18！"/>
+		</property>
+	</class>
+</nhv-mapping>

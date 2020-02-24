@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GGK3.GK.Rule</name>
+    </assembly>
+    <members>
+        <member name="T:GGK3.GK.Rule.GKPaymentDtlRule">
+            <summary>
+            GKPaymentDtl业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GGK3.GK.Rule.GKPaymentDtlRule.GKPaymentDtlDac">
+            <summary>
+            GKPaymentDtl数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GGK3.GK.Rule.GKPaymentDtlRule.DataCheck(System.Collections.Generic.IList{GGK3.GK.Model.Domain.GKPaymentDtlModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GGK3.GK.Rule.GKPaymentDtlRule.DataHandling``1(System.Collections.Generic.IList{GGK3.GK.Model.Domain.GKPaymentDtlModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GGK3.GK.Rule.GKPaymentMstRule">
+            <summary>
+            GKPaymentMst业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GGK3.GK.Rule.GKPaymentMstRule.GKPaymentMstDac">
+            <summary>
+            GKPaymentMst数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GGK3.GK.Rule.GKPaymentMstRule.DataCheck(System.Collections.Generic.IList{GGK3.GK.Model.Domain.GKPaymentMstModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GGK3.GK.Rule.GKPaymentMstRule.DataHandling``1(System.Collections.Generic.IList{GGK3.GK.Model.Domain.GKPaymentMstModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+    </members>
+</doc>

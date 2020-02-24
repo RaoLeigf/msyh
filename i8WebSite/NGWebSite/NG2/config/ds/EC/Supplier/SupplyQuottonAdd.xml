@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_askpricedtl">
+      <Field Name="askpriceid" AsName ="relid" isKey="true"/>
+      <Field Name="lineid" AsName ="relmxid" isKey="true"/>
+      <Field Name="itemno"  />
+      <Field Name="ranks"/>
+      <Field Name="msunit" />
+      <Field Name="qty" />
+      <Field Name="price"/>
+      <Field Name="deliverycyc"/>
+      <Field Name="qty" AsName="askqty"/>
+      <Field Name="price" AsName="askprice"/>
+      <Field Name="deliverycyc" AsName="askdeliverycyc"/>
+      <Field Name="remarks" AsName="askremarks"/>
+    </Table>
+    <Table Name="wsp_supply_quotton">
+      <Field Name="quotid" />
+      <Field Name="lineid" />
+      <Field Name="quotno" />
+      <Field Name="remarks" />
+    </Table>
+    <Table Name="ec_askpricemst">
+      <Field Name="recorddate" />
+      <Field Name="askpriceno" />
+      <Field Name="askpriceno" AsName="relno"/>
+      <Field Name="ocode" />
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"/>
+      <Field Name="descript1"/>
+      <Field Name="descript"/>
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname"/>
+    </Table>
+    <Table Name="ec_askpricerel">
+      <Field Name="supcomp" AsName ="privcomp" />
+    </Table>
+    <Table Name="ec_askpricedtlrel">
+      <Field Name="uicaccflg"/>
+      <Field Name="supcomp" AsName="relsupcomp"/>
+    </Table>
+    <Table Name="enterprise">
+      <Field Name="compname" />
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select distinct [fields] from [table]
+      inner join ec_askpricemst on ec_askpricemst.askpriceid = [table].askpriceid
+      inner join ec_askpricerel on ec_askpricerel.askpriceid = [table].askpriceid
+      left join wsp_supply_quotton on wsp_supply_quotton.relid = [table].askpriceid
+       and wsp_supply_quotton.relmxid = [table].lineid
+       and wsp_supply_quotton.privcomp = ec_askpricerel.supcomp
+      left join itemdata on itemdata.itemno=[table].itemno
+      left join msunit on msunit.msunit = [table].msunit
+      left outer join ec_askpricedtlrel on ec_askpricedtlrel.askpriceid = [table].askpriceid
+       and ec_askpricedtlrel.lineid = [table].lineid
+       and ec_askpricedtlrel.supcomp = ec_askpricerel.supcomp
+      left outer join enterprise on enterprise.compno = ec_askpricerel.supcomp
+      left outer join ranks on ranks.ranks = [table].ranks
+      [where] [orderby]
+    </Sql>
+    <Where format="({uicaccflg1} or {uicaccflg2}) ">
+      
+      <!--<exp Field="relid" Target="Client" Value="askkeyid" DataType="Array" subkey="0"/>
+      <exp Field="relmxid" Target="Client" Value="askkeyid" DataType="Array" index="1"/>-->
+      
+      <!--<exp Field="relid" Target="Client" Value="askpriceid" DataType="Array"/>
+      <exp Field="relmxid" Target="Client" Value="lineid" />-->
+      <Exp Field="uicaccflg" ParamName="uicaccflg1" Value="0" />
+      <Exp Field="uicaccflg" ParamName="uicaccflg2" Oper="IsNullOrEqual" Value="" />
+      <Exp Field="privcomp" Target="AppInfo" Value="LoginID" ></Exp>
+      <Exp Field="ec_askpricedtlrel.supcomp" ParamName="supcomp1" Oper="IsNullOrEqual" Value="" ></Exp>
+    </Where>
+    <Query>
+      <Exp Field="askpriceid" Target="Client" Value="askpriceid" Type="Array">
+        <Exp Field="ec_askpricedtl.askpriceid" ParamName ="relid" TypeKey="0"/>
+        <Exp Field="ec_askpricedtl.lineid" ParamName ="relmxid" TypeKey="1" />
+      </Exp>
+    </Query>
+    <OrderBy format="{recorddate}">
+      <Exp Field="recorddate" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+
+    </Values>
+  </Record>
+  <Create>
+    
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+    <Values>
+
+    </Values>
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

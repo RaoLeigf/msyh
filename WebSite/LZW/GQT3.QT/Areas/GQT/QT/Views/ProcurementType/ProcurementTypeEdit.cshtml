@@ -1,0 +1,209 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{  
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/ProcurementTypeEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+		//var busno = '@ViewBag.No';
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    'save',  '->',  'close'
+                ]
+            });
+
+			//定义mainPanel_form
+			var mainPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var mainPanel_formConfig = mainPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(mainPanel_formConfig, individualInfo.form['mainPanel']);
+			}
+			var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm', mainPanel_formConfig);
+
+			Ext.create('Ext.container.Viewport', {
+				id: "viewPort",
+				layout: 'border',
+				items:
+				[
+					toolbar,
+					{
+						xtype: 'panel',
+						layout: 'border',
+						region: 'center',
+						autoScroll: true,
+						bodyStyle: 'padding-right:20px',
+						//style: 'overflow-y:scroll,padding-right:20px',
+						items: [ngToolbar, mainPanel_form]
+					}
+				]
+			});
+
+
+
+			//当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'procurementtype' },
+                    url: C_ROOT + 'GQT/QT/ProcurementType/GetProcurementTypeInfo',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mainPanel_form.getForm();
+                            mstformobj.setValues(resp.Data);
+
+							//mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstformobj.fireEvent('dataready', resp.Data);
+
+							//代码转名称
+                            var codectl = [];
+                            BatchBindCombox(codectl);
+
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                });
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+				//if (busno != undefined && busno != "") {
+                //    Ext.getCmp("No").userSetReadOnly(true);
+                //    Ext.getCmp("No").setValue(busno);
+                //}
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT) {
+				Ext.getCmp("mainPanel").getForm().findField("FCode").userSetReadOnly(true);
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+				
+            }
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+				var mainPanel_formvf = mainPanel_form.isValid();
+				if (!mainPanel_formvf)
+				{
+					return;
+				}
+
+				var flg;
+				//调用二次开发脚本的校验方法
+				if (typeof beforeSaveEdit === "function") {
+					flg = beforeSaveEdit();
+					if(!flg) return; 
+				} 
+
+				var mydata = {};
+				var procurementtypeformData = mainPanel_form.getFormData();
+				//myData = Ext.apply(mydata, { 'procurementtypeformData': procurementtypeformData});
+				myData = { 'procurementtypeformData': procurementtypeformData};
+				
+				//前端数据验证
+                var jsonData = JSON.parse(procurementtypeformData);
+                if (otype == $Otype.ADD) {
+                    if (jsonData.form.newRow.FCode == "") {
+                        Ext.MessageBox.alert('保存失败', "代码不能为空！");
+                        return;
+                    }
+                    if (jsonData.form.newRow.FName == "") {
+                        Ext.MessageBox.alert('保存失败', "名称不能为空！");
+                        return;
+                    }
+                    myData = Ext.apply(mydata, { 'otype': 'add' });
+                }
+                if (otype == $Otype.EDIT) {
+                    if (jsonData.form.modifiedRow.FCode == "") {
+                        Ext.MessageBox.alert('保存失败', "代码不能为空！");
+                        return;
+                    }
+                    if (jsonData.form.modifiedRow.FName == "") {
+                        Ext.MessageBox.alert('保存失败', "名称不能为空！");
+                        return;
+                    }
+                    myData = Ext.apply(mydata, { 'otype': 'edit' });
+                }
+				var extendData;
+				//调用二开代码获取二开需要保存的数据
+				if (typeof getExtendData === "function") {
+					extendData = getExtendData();
+					myData = Ext.apply(mydata, extendData);//合并
+				}
+
+                Ext.Ajax.request({
+                    params: {"procurementtypeformData":procurementtypeformData,'otype': otype},
+                    url: C_ROOT + 'GQT/QT/ProcurementType/save',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                if (window.external.RefreshWebListPage != undefined) {
+									window.external.RefreshWebListPage();
+								} else {
+									$NG3Refresh();
+								}
+
+                                $CloseTab();
+                            });
+                        } else {
+                            //NGMsg.Error(resp.Msg);
+							Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+            });
+
+            //附件
+            ngToolbar.get('attachment').on('click', function () {
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+            });
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+
+        });
+        
+    </script>
+}

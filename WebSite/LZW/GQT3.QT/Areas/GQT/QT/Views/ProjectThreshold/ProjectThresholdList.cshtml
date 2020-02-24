@@ -1,0 +1,240 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_PTE.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/ProjectThresholdEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save','edit',
+                    '->',  'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "Orgcode",
+    "type": "string",
+    "mapping": "Orgcode"
+  },
+  {
+    "name": "FOname",
+    "type": "string",
+    "mapping": "Orgname"
+    },
+    {
+        "name": "ProjTypeId",
+        "type": "string",
+        "mapping": "ProjTypeId"
+    },
+    {
+        "name": "ProjTypeName",
+        "type": "string",
+        "mapping": "ProjTypeName"
+    },
+  {
+    "name": "FThreshold",
+    "type": "string",
+    "mapping": "FThreshold"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'list2');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GQT/QT/ProjectThreshold/GetProjectThresholdListByUserPower'
+            });
+
+            store.load();
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '5b713ec4-ba23-480c-811b-cf97a9b7011f',
+				buskey: 'PhId', //对应的业务表主键属性
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				bbar: [pagingbar]
+            };
+
+            //双击弹出阈值设置框事件
+            function gridDblClick(grid, index, e) {
+                var rowData = index.data;
+                Ext.MessageBox.prompt('为"' + rowData.FOname + '"设置新阈值', '请输入新阈值', function (btn, text) {
+                    if (btn == "ok") {
+                        if (isNaN(text)) {
+                            Ext.MessageBox.alert('严重错误', '不合法的数字格式', gridDblClick(grid,index,e));
+                        } else {
+                            if (text.trim() != null && text.trim() != "") {
+                                rowData.FThreshold = parseFloat(text).toFixed(2);
+                            } else {
+                                Ext.MessageBox.alert('严重错误', '阈值不能为空', gridDblClick(grid, index, e));
+                            }
+                            Gridrefresh();
+                        }
+                    }
+                });
+            }
+
+            function Gridrefresh() {
+                grid.getView().refresh(true);
+            }
+            var gridConfig = Ext.apply(initConfig, individualInfo.grid['list2']);
+            //定义grid不能加var,否则后面弹出框将取不到这个变量
+
+            grid = Ext.create('Ext.ng.GridPanel', gridConfig);
+            gridOrg = grid;
+            grid.addListener("itemdblclick", gridDblClick);
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, grid]
+            });
+
+            ngToolbar.get('edit').on('click', function () {
+                var data = gridOrg.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var win = Ext.create('Ext.ng.WFDynamicNodeUserWin', {
+                    });
+                    win.show();
+                } else {
+                    alert("请选择一行数据");
+                }
+            });
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                var ws_store = grid.getStore();
+                /**数据格式
+                 * '|':元素分割符
+                 * ':':属性分割符
+                 * ...|PhId:Orgcode:FThreshold|...
+                 * */
+                var data = "";
+                for (var i = 0; i < ws_store.getCount(); i++) {
+                    var FThreshold = ws_store.data.items[i].data.FThreshold;
+                    var ProjTypeId = ws_store.data.items[i].data.ProjTypeId;
+                    var ProjTypeName = ws_store.data.items[i].data.ProjTypeName;
+                    if (FThreshold == "未设置") {
+                        FThreshold = '-1';
+                    }
+                    data += ws_store.data.items[i].data.PhId + ":" + ws_store.data.items[i].data.Orgcode + ":" + FThreshold + ":" + ProjTypeId + ":" + ProjTypeName+"|";
+                }
+
+                Ext.Ajax.request({
+                    params: { 'data': data},
+                    url: C_ROOT + 'GQT/QT/ProjectThreshold/SaveOrUpdate',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.result == 'success') {
+
+                            Ext.MessageBox.alert('提示', '保存成功');
+                            store.load();
+                            //NGMsg.Info('保存成功');
+                        } else {
+                            //NGMsg.Info('保存失败');
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                });
+
+            });
+
+
+
+
+
+
+
+
+
+            //打印
+            /*ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });*/
+
+			//刷新列表中想修改或删除的行数据
+            function recoderefresh(data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/ProjectThreshold/GetProjectThresholdList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

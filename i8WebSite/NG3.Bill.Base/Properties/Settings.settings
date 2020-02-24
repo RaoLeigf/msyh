@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NG3.Bill.Base.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="NG3_Bill_Base_WebReference_UploadFileService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1:81/I8FileSrv/UploadFileService.asmx</Value>
+    </Setting>
+    <Setting Name="NG3_Bill_Base_WebReference1_NG3UploadFileSvc" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://127.0.0.1:81/i8filesrv/NG3UploadFileSvc.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

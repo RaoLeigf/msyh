@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E8A12A4E-5436-43FF-94CD-09E094CA7A6F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP.Frame.Facade</RootNamespace>
+    <AssemblyName>SUP.Frame.Facade</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.NHORM.Rule">
+      <HintPath>\\ljy\SUP\Lib\Enterprise3.NHORM.Rule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3">
+      <HintPath>\\ljy\Custom\BaseDlls\NG3.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NG3.Data.Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\NG3.Data.Service.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SUP.Common.Base">
+      <HintPath>\\ljy\Custom\BaseDlls\SUP.Common.Base.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppAutoAuthorizeFacade.cs" />
+    <Compile Include="ApplyCheckFacade.cs" />
+    <Compile Include="BillCodeRuleFacade.cs" />
+    <Compile Include="ChangePwdFacade.cs" />
+    <Compile Include="CustomFloatMenuFacade.cs" />
+    <Compile Include="EnFuncTreeFacade.cs" />
+    <Compile Include="ExcelImportFacade.cs" />
+    <Compile Include="FuncIconManagerFacade.cs" />
+    <Compile Include="HrRightApplyFacade.cs" />
+    <Compile Include="IndividualNavigationFacade.cs" />
+    <Compile Include="IndividualSettingFacade.cs" />
+    <Compile Include="Interface\IAppAutoAuthorizeFacade.cs" />
+    <Compile Include="Interface\IApplyCheckFacade.cs" />
+    <Compile Include="Interface\IBillCodeRuleFacade.cs" />
+    <Compile Include="Interface\IEnFuncTreeFacade.cs" />
+    <Compile Include="Interface\IExcelImportFacade.cs" />
+    <Compile Include="Interface\IIndividualNavigationFacade.cs" />
+    <Compile Include="Interface\IIndividualSettingFacade.cs" />
+    <Compile Include="Interface\ILoginFacade.cs" />
+    <Compile Include="Interface\IMainTreeFacade.cs" />
+    <Compile Include="Interface\IMenuConfigFacade.cs" />
+    <Compile Include="Interface\IMyCommonFuncFacade.cs" />
+    <Compile Include="Interface\IMyFuncTreeFacade.cs" />
+    <Compile Include="Interface\INavigationCenterFacade.cs" />
+    <Compile Include="Interface\IOptionSettingFacade.cs" />
+    <Compile Include="Interface\IQRCodeSetFacade.cs" />
+    <Compile Include="Interface\IReportListFacade.cs" />
+    <Compile Include="Interface\ISchemeAllocationFacade.cs" />
+    <Compile Include="Interface\IShortcutMenuFacade.cs" />
+    <Compile Include="Interface\IUserFacade.cs" />
+    <Compile Include="LoginFacade.cs" />
+    <Compile Include="LoginPicManagerFacade.cs" />
+    <Compile Include="MainFrameFacade.cs" />
+    <Compile Include="MainTreeFacade.cs" />
+    <Compile Include="MenuConfigFacade.cs" />
+    <Compile Include="MyCommonFuncFacade.cs" />
+    <Compile Include="MyDesktopSetFacade.cs" />
+    <Compile Include="MyFuncTreeFacade.cs" />
+    <Compile Include="NavigationCenterFacade.cs" />
+    <Compile Include="OptionSettingFacade.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QRCodeSetFacade.cs" />
+    <Compile Include="ReportListFacade.cs" />
+    <Compile Include="SchemeAllocationFacade.cs" />
+    <Compile Include="ShortcutMenuFacade.cs" />
+    <Compile Include="SysMaintainCallFacade.cs" />
+    <Compile Include="UserFacade.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SUP.Frame.DataAccess\SUP.Frame.DataAccess.csproj">
+      <Project>{3A8A2EE7-1335-4695-ACC4-EFD541D66D2D}</Project>
+      <Name>SUP.Frame.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Frame.DataEntity\SUP.Frame.DataEntity.csproj">
+      <Project>{5C8117DB-2C51-46CE-B712-5B7871AA84C1}</Project>
+      <Name>SUP.Frame.DataEntity</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SUP.Frame.Rule\SUP.Frame.Rule.csproj">
+      <Project>{359EB51F-3C88-4CB8-8C29-62102D8E5D81}</Project>
+      <Name>SUP.Frame.Rule</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\Bin</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

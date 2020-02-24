@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="enterprise">
+      <Field Name="compno" IsKey="true" />
+      <Field Name="compname" />
+      <Field Name="simpname"  />
+      <Field Name="helpcode"/>
+      <Field Name="nationno"/>
+      <Field Name="provinceno"/>
+      <Field Name="cityno"/>
+      <Field Name="regionno"/>
+      <Field Name="tradetype"/>
+      <Field Name="unitcode"/>
+      <Field Name="address1"/>
+      <Field Name="address2"/>
+      <Field Name="address3"/>
+      <Field Name="postcode" />
+      <Field Name="telephone1" />
+      <Field Name="ext1" />
+      <Field Name="telephone2" />
+      <Field Name="ext2" />
+      <Field Name="faxno1" />
+      <Field Name="faxno2" />
+      <Field Name="bb_call1" />
+      <Field Name="bb_call2" />
+      <Field Name="portable1" />
+      <Field Name="portable2" />
+      <Field Name="attention1" />
+      <Field Name="attention2" />
+      <Field Name="http" />
+      <Field Name="email" />
+      <Field Name="istemp" />
+      <Field Name="addeddt" />
+      <Field Name="taxno" />
+      <Field Name="psn" />
+      <Field Name="bankno" />
+      <Field Name="accountno" />
+      <Field Name="parentcomp" />
+      <Field Name="remarks" />
+      <Field Name="in_acct" />
+      <Field Name="regno" />
+      <Field Name="password" />
+      <Field Name="isb2b" />
+      <Field Name="isupdate" />
+      <Field Name="dwcode" />
+      <Field Name="def_int1" />
+      <Field Name="isparent" />
+      <Field Name="isselfcomp" />
+      <Field Name="investper" />
+      <Field Name="badfinper" />
+      <Field Name="profitper" />
+      <Field Name="compclass" />
+      <Field Name="reg_dt_b" />
+      <Field Name="reg_dt_e" />
+      <Field Name="permit_dt_b" />
+      <Field Name="permit_dt_e" />
+      <Field Name="fsaleflg" />
+      <Field Name="fsaledt" />
+    </Table>
+    <Table Name="nation">
+      <Field Name="nat_name" AsName="nationname"></Field>
+    </Table>
+    <Table Name="province">
+      <Field Name="prvcname"></Field>
+    </Table>
+    <Table Name="city">
+      <Field Name="cityname"></Field>
+    </Table>
+    <Table Name="region">
+      <Field Name="regionname"></Field>
+    </Table>
+    <Table Name="bank">
+      <Field Name="bankname"></Field>
+    </Table>
+    <Table Name="tradetype">
+      <Field Name="tradename"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where] 
+    </Sql>
+    <Where>
+      <Exp Field="compno"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+   
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table]
+      left join nation on [table].nationno = nation.nationno
+      left join province on [table].provinceno = province.provinceno and [table].nationno = province.nationno
+      left join city on [table].cityno = city.cityno and [table].provinceno = city.provinceno and [table].nationno = city.nationno
+      left join region on [table].regionno = region.region
+      left join bank on [table].bankno = bank.bank
+      left join tradetype on [table].tradetype = tradetype.tradetype 
+      [where]
+    </Sql>
+    <Where>
+      <Exp Field="compno"  Target="AppInfo" Value="LoginID"/>
+    </Where>
+
+    <OrderBy>
+
+    </OrderBy>
+  </Record>
+  <Create>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

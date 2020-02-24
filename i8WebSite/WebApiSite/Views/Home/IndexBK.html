@@ -1,0 +1,255 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = null;
+}
+
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+            a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+            is an ideal platform for building RESTful applications on the .NET Framework.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <button id="test">测试接口</button>
+        <button id="test2">测试接口2</button>
+    </div>
+    <form enctype="multipart/form-data">
+        <input id="upload_file" name="file" type="file" />
+        <input id="upload_file2" name="file2" type="file" />
+        <input id="upload_file3" name="file3" type="file" />
+        <button id="aa" type="button" onclick="upFile()">提交</button>
+    </form>
+</div>
+<script src="@Url.Content(" ~/Scripts/jquery-2.1.1.min.js")" type="text/javascript"></script>
+<script src="@Url.Content(" ~/Scripts/jquery.base64.js")" type="text/javascript"></script>
+<script src="@Url.Content(" ~/Scripts/jquery.md5.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+    var appKey = 'D31B7F91-3068-4A49-91EE-F3E13AE5C48C',
+        appSecret = '103CB639-840C-4E4F-8812-220ECE3C4E4D',
+        url = "http://127.0.0.1:8020",
+        reqTimeStamp = Date.parse(new Date());
+    var sign = $.md5((url + reqTimeStamp + appKey + appSecret).toLowerCase());
+    var items = [sign, url, reqTimeStamp, appKey];
+    var configData = [];
+
+    var appinfo = {
+        'DbName': 'NG0001',
+        'OrgId': '547181121000001',
+        'OrgName': '',
+        'OCode': '',
+        'UserId': '521180820000001',
+        'UserKey': '9999',
+        'UserName': '',
+        'TokenKey': '',
+        'AppKey': appKey,
+        'AppSecret': appSecret,
+        'DbServerName': '',
+        'SessionKey': '',
+        'UName': ''
+    };
+
+    $(function () {
+        $("#test").bind('click', function () {
+            var info = {
+                'FName': 'dd'
+            }
+            var info2 = {
+
+            }
+
+            var data = {
+                infoData: {
+                    PaymentMst:info,
+                    PaymentXmDtl: info2
+                },
+                //PageIndex: 1,
+                //PageSize: 20,
+                //fPhId:'100'
+            };
+
+            $.ajax({
+                headers: {
+                    'Accept': "multipart/form-data; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                type: 'get',
+                url: '@Url.Content("~/api/GBK/PaymentMstApi/GetPaymentMst")',
+                data: data,
+                datatype: 'json',
+                success: function (data, textstatus) {
+                    console.log(JSON.parse(data));
+                },
+                error: function (xmlhttprequest, textstatus, errorThrown) {
+
+                }
+            });
+        });
+
+        $("#test2").bind('click', function () {
+
+            var info = {
+                'Author': 'xiaowang',
+                'Phone': '13587381870',
+                'Description': '很严峻',
+                'IsFinish': '0',
+            };
+            var data = {
+                uid: '631181115000001',
+                orgid: '547181121000001',
+                infoData: configData
+            };
+
+            $.ajax({
+                headers: {
+                    'Accept': "multipart/form-data; charset=utf-8",
+                    'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                    'Sign': items
+                },
+                type: 'post',
+                url: '@Url.Content("~/api/GCW/SysConfig/PostUpdate")',
+                data: data,
+                datatype: 'json',
+                success: function (data, textstatus) {
+                    alert(data);
+                },
+                error: function (xmlhttprequest, textstatus, errorThrown) {
+
+                }
+            });
+        });
+
+        //$("#test").bind('click', function () {
+
+        //});
+
+    })
+
+    function upFile() {
+
+        var form = new FormData();
+        form.append("file", $("#upload_file")[0].files[0]);
+        //form.append("file", $("#upload_file2")[0].files[0]);
+        //form.append("file", $("#upload_file3")[0].files[0]);
+        //新增新闻
+        /*
+        form.append("PhIdType", "199181225000001");             //信息类别
+        form.append("Title", "测试数据");                       //标题
+        form.append("Content", "这是一条测试新增的数据");       //内容
+        form.append("Name", "网络");                            //来源
+        form.append("LevelType","1");                           //制度级别
+        */
+
+        //修改新闻
+        /*
+        form.append("PhId", "553181226000001");
+        form.append("PhIdType", "199181225000001");
+        form.append("Title", "测试数据2");
+        form.append("Content", "这是一条测试修改的数据2");
+        form.append("Hitrate", "0");
+        form.append("Publish", "0");
+        form.append("Ontop", "0");
+        form.append("Name", "网络");
+        form.append("Picpath", "/UpLoadFiles/SysNews/2018-12-26/cd8e680ddb9140c4afeeb29289bd19f6.jpg");
+        form.append("AttachmentName", "img.jpg");
+        form.append("AttachmentSize", "6.00");
+        form.append("LevelType", "1");
+        form.append("Creator", "521180820000001");
+        form.append("Editor", "521180820000001");
+        form.append("CurOrgId", "521180820000002");
+        form.append("NgInsertDt", "2018-12-26 20:00:24.000");
+        form.append("NgUpdateDt", "2018-12-26 20:00:24.000");
+        form.append("NgRecordVer", "2");
+        */
+
+        //新增图片新闻
+        //form.append("Title", "测试数据");
+
+        //修改图片新闻
+        /*form.append("PhId", "559181226000001");
+        form.append("Title", "测试修改4");
+        form.append("Picpath", "/UpLoadFiles/SysPicture/2018-12-27/3a61a8c1d9f34cecb11fe6255e55445e.png");
+        form.append("AttachmentName", "logo.png");
+        form.append("AttachmentSize","3.82");
+        form.append("Publish", "0");
+        form.append("Ontop", "0");
+        form.append("SortCode", "0");*/
+        //form.append("Creator", "521180820000001");
+        //form.append("Editor", "521180820000001");
+        //form.append("CurOrgId", "521180820000002");
+        //form.append("NgInsertDt", "2018-12-26 22:09:22.000");
+        //form.append("NgUpdateDt", "2018-12-26 22:38:28.000");
+        //form.append("NgRecordVer", "6");
+
+        //console.log(form)
+
+        @*$.ajax({
+            headers: {
+                'Accept': "multipart/form-data; charset=utf-8",
+                'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                'Sign': items
+            },
+            url: '@Url.Content("~/api/GCW/SysNews/PostUpdateSysNews")',
+            type: 'post',
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function (data, textstatus) {
+                console.log(data);
+                alert("上传成功");
+            },
+            error: function (xmlhttprequest, textstatus, errorThrown) {
+                alert("服务器未正常响应，请重试");
+            }
+        });*@
+
+        //var FileResultDTO = new {
+        //    ID = 1111, FileName=$("#upload_file")[0].files[0].FileName,
+        //    ServerFileName= ""
+        //};
+
+        $.ajax({
+            headers: {
+                'Accept': "multipart/form-data; charset=utf-8",
+                'AppInfo': $.base64.encode(JSON.stringify(appinfo)),
+                'Sign': items
+            },
+            url: '@Url.Content("~/api/GCW/SysOrganize/PostInportTxt")',
+            type: 'post',
+            data: '',
+            processData: false,
+            contentType: false,
+            success: function (data, textstatus) {
+                console.log(data);
+                alert("上传成功");
+            },
+            error: function (xmlhttprequest, textstatus, errorThrown) {
+                alert("服务器未正常响应，请重试");
+            }
+        });
+    }
+</script>

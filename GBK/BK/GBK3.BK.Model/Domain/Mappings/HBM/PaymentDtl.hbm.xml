@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GBK3.BK.Model.Domain" assembly="GBK3.BK.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="PaymentDtlModel" table="bk3_payment_dtl">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="PayXmPhid" column="pay_xm_phid" type="System.Int64" not-null="false" />
+		<property name="XmMstPhid" column="xm_mst_phid" type="System.Int64" not-null="false" />
+		<property name="BudgetdtlPhid" column="budgetdtl_phid" type="System.Int64" not-null="false" />
+    <property name="BudgetdtlName" column="budgetdtl_name" type="System.String" length="100" not-null="false" />
+		<property name="FDepartmentcode" column="f_departmentcode" type="System.String" length="50" not-null="false" />
+		<property name="FDepartmentname" column="f_departmentname" type="System.String" length="100" not-null="false" />
+		<property name="FAmount" column="f_amount" type="System.Decimal" not-null="false" />
+		<property name="FPayment" column="f_payment" type="System.Int32" not-null="false" />
+		<property name="FPaymentdate" column="f_paymentdate" type="System.DateTime" not-null="false" />
+		<property name="FRemarks" column="f_remarks" type="System.String" length="400" not-null="false" />
+    <property name="FDelete" column="f_delete" type="System.Byte" not-null="false" />
+		<property name="QtKmdm" column="qt_kmdm" type="System.String" length="50" not-null="false" />
+    <property name="QtKmmc" column="qt_kmmc" type="System.String" length="100" not-null="false" />
+		<property name="FTransfertype" column="f_transfertype" type="System.Int32" not-null="false" />
+		<property name="FBanktype" column="f_banktype" type="System.String" length="50" not-null="false" />
+		<property name="FBankname" column="f_bankname" type="System.String" length="100" not-null="false" />
+		<property name="FAccount" column="f_account" type="System.String" length="50" not-null="false" />
+		<property name="FBankcode" column="f_bankcode" type="System.String" length="50" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

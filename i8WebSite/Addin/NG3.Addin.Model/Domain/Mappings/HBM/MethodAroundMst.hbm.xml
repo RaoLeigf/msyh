@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="MethodAroundMstModel" table="addin_method_m">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+    <property name="TargetServiceId" column="targetserviceid" type="System.Int64" not-null="false" />
+		<!--<property name="TargetClassName" column="targetclassname" type="System.String" length="100" not-null="false" />
+		<property name="TargetAssemblyName" column="targetassemblyname" type="System.String" length="100" not-null="false" />
+		<property name="TargetMethodName" column="targetmethodname" type="System.String" length="100" not-null="false" />-->
+		<property name="InterceptorType" column="interceptortype" type="NG3.Addin.Model.Enums.EnumInterceptorType, NG3.Addin.Model"  not-null="false" />
+		<property name="AddinType" column="addinType" type="NG3.Addin.Model.Enums.EnumAddinType, NG3.Addin.Model"  not-null="false" />
+    <property name="DeployFlag" column="deployflag" type="System.Int32"  not-null="false" />
+    <property name="MatchClause" column="matchclause" type="System.String"  not-null="false" />
+    
+	</class>
+</hibernate-mapping>

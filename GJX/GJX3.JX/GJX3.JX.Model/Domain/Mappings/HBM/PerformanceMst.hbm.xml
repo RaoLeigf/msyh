@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GJX3.JX.Model.Domain" assembly="GJX3.JX.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="PerformanceMstModel" table="jx3_PerformanceMst">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="YSMstPhId" column="ys_mst_phid" type="System.Int64" not-null="false" />
+		<property name="FProjCode" column="f_ProjCode" type="System.String" length="255" not-null="false" />
+		<property name="FProjName" column="f_ProjName" type="System.String" length="255" not-null="false" />
+		<property name="FExploitingEntity" column="f_ExploitingEntity" type="System.String" length="200" not-null="false" />
+		<property name="FProjectLeader" column="f_ProjectLeader" type="System.String" length="100" not-null="false" />
+		<property name="FPhoneNumber" column="f_PhoneNumber" type="System.String" length="50" not-null="false" />
+		<property name="FContactAddress" column="f_ContactAddress" type="System.String" length="200" not-null="false" />
+		<property name="FDeclarationUnit" column="f_DeclarationUnit" type="System.String" length="200" not-null="false" />
+		<property name="FDeclarationDept" column="f_DeclarationDept" type="System.String" length="200" not-null="false" />
+		<property name="FBudgetDept" column="f_BudgetDept" type="System.String" length="200" not-null="false" />
+		<property name="FProjAttr" column="f_ProjAttr" type="System.String" length="20" not-null="false" />
+		<property name="FDuration" column="f_Duration" type="System.String" length="20" not-null="false" />
+		<property name="FStartDate" column="f_StartDate" type="System.DateTime" not-null="false" />
+		<property name="FEndDate" column="f_EndDate" type="System.DateTime" not-null="false" />
+		<property name="FProjAmount" column="f_ProjAmount" type="System.Decimal" not-null="false" />
+		<property name="FIfPerformanceAppraisal" column="f_ifPerformanceAppraisal" type="System.Int32" not-null="false" />
+		<property name="FIfKeyEvaluation" column="f_ifKeyEvaluation" type="System.Int32" not-null="false" />
+		<property name="FMeetingTime" column="f_MeetingTime" type="System.DateTime" not-null="false" />
+		<property name="FMeetiingSummaryNo" column="f_MeetiingSummaryNo" type="System.String" length="100" not-null="false" />
+		<property name="FAuditStatus" column="f_AuditStatus" type="System.String" length="2" not-null="false" />
+		<property name="FAuditor" column="f_Auditor" type="System.Int64" not-null="false" />
+		<property name="FAuditDate" column="f_AuditDate" type="System.DateTime" not-null="false" />
+		<property name="FEvaluationDate" column="f_EvaluationDate" type="System.DateTime" not-null="false" />
+		<property name="FEvaluationScore" column="f_EvaluationScore" type="System.Decimal" not-null="false" />
+		<property name="FEvaluationResult" column="f_EvaluationResult" type="System.String" length="10" not-null="false" />
+		<property name="FInformant" column="f_informant" type="System.Int64" not-null="false" />
+		<property name="FInformantName" column="f_informantName" type="System.String" length="100" not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+    <property name="FExpenseCategory" column="f_ExpenseCategory" type="System.String" length="20" not-null="false" />
+    <property name="FPostCode" column="f_PostCode" type="System.String" length="20" not-null="false" />
+    <property name="FType" column="f_Type" type="System.String" length="2" not-null="false" />
+    <property name="FEvaluationDept" column="f_EvaluationDept" type="System.String" length="200" not-null="false" />
+    <property name="FCheckEvaluationScore" column="f_CheckEvaluationScore" type="System.Decimal" not-null="false" />
+    <property name="FCheckEvaluationResult" column="f_CheckEvaluationResult" type="System.String" length="10" not-null="false" />
+    <property name="FThirdCheckEvaluationScore" column="f_ThirdCheckEvaluationScore" type="System.Decimal" not-null="false" />
+    <property name="FThirdCheckEvaluationResult" column="f_ThirdCheckEvaluationResult" type="System.String" length="10" not-null="false" />
+    <property name="FPerformType" column="f_PerformType" type="System.String" length="30" not-null="false" />
+    <property name="FThird" column="f_Third" type="System.String" length="2" not-null="false" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,1223 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>dragNode</title>
+  <style type="text/css">
+      #holder
+        {
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            position: absolute;
+            z-index: 999;
+            overflow-x:hidden;
+            overflow-y:hidden;
+        }
+        .test1
+        {
+            position: absolute;
+            width: 55px;
+            height: 35px;
+            top: 0px;
+            z-index: 0;
+            /*font-size: 5px;*/
+        }
+        .test0
+          {
+              position: absolute;
+              width: 55px;
+              height: 35px;
+              top: 0px;
+              z-index: 0;
+              /*font-size: 5px;*/
+              text-decoration:underline;
+              color:blue;
+          }
+
+        .test2
+      {
+          position: absolute;
+          width: 55px;
+          height: 35px;
+          top: 0px;
+          z-index: 0;
+          /*font-size: 5px;*/
+          font-style:italic;
+          color:brown;
+      }
+        .nodeText
+        {
+            position: absolute;
+            width: 55px;
+            height: 35px;
+            top: 0px;
+            z-index: 0;
+            /*font-size: 5px;*/
+        }
+  </style> 
+
+  
+  </head>
+
+<body>
+    <div id="holder">
+    </div>
+ 
+</body>
+
+    <!--<script language="javascript" type="text/javascript" src="raphael.js"></script>
+    <script language="javascript" type="text/javascript" src="node_modules\jquery\dist\jquery.js"></script>-->
+<script language="javascript" type="text/javascript" src="../../NG3Resource/raphael-master/node_modules/jquery/dist/jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="../../NG3Resource/raphael-master/raphael.js"></script>
+<script type="text/javascript">
+            var r;//画布
+            var shapes = [];//存储节点
+            var connections = []; //用来存储连线
+            var shapesContainer = [];//节点虚线框
+            var connectionsContainer = [];//连线虚线框
+
+            var selx,sely;
+            var isMouseDown = 0;
+            var isNodeSelected = 0;//节点被选择标记
+            var NodeSelected; //标记被选中节点
+            var NodeSelectedType;//被选中节点的类项 线或者时节点 0节点 1线
+            var doesDragInLine=0;//鼠标是否悬在连线上的监听
+            var whichLineBeDrag;//鼠标悬停在的连线对象
+
+            var isSelrectDefined = 0;//鼠标拖选框存在标记
+            var selObjects = []; //选中的节点组
+
+            var nodeObjects = [];//节点对象，包含图像和虚线框
+            var setShape;//添加连线的临时节点
+            var setConnection;//添加连线的临时连线
+            var hasSetShape = 0;//临时节点存在标记
+            //计算鼠标拖动圈中的节点
+            var selShapesConstruct = function () {
+                for (var i = 0; i < nodeObjects.length; i++) {
+                    var isContain = 0;
+                    if (nodeObjects[i].shapes.attrs.x < selrect.attrs.x + selrect.attrs.width && nodeObjects[i].shapes.attrs.x > selrect.attrs.x && nodeObjects[i].shapes.attrs.y < selrect.attrs.y + selrect.attrs.height && nodeObjects[i].shapes.attrs.y > selrect.attrs.y) {
+                        isContain = 1;
+                    }
+                    if (nodeObjects[i].shapes.attrs.x + nodeObjects[i].shapes.attrs.width < selrect.attrs.x + selrect.attrs.width && nodeObjects[i].shapes.attrs.x + nodeObjects[i].shapes.attrs.width > selrect.attrs.x && nodeObjects[i].shapes.attrs.y < selrect.attrs.y + selrect.attrs.height && nodeObjects[i].shapes.attrs.y > selrect.attrs.y) {
+                        isContain = 1;
+                    }
+                    if (nodeObjects[i].shapes.attrs.x + nodeObjects[i].shapes.attrs.width < selrect.attrs.x + selrect.attrs.width && nodeObjects[i].shapes.attrs.x + nodeObjects[i].shapes.attrs.width > selrect.attrs.x && nodeObjects[i].shapes.attrs.y + nodeObjects[i].shapes.attrs.height < selrect.attrs.y + selrect.attrs.height && nodeObjects[i].shapes.attrs.y + nodeObjects[i].shapes.attrs.height > selrect.attrs.y) {
+                        isContain = 1;
+                    }
+                    if (nodeObjects[i].shapes.attrs.x < selrect.attrs.x + selrect.attrs.width && nodeObjects[i].shapes.attrs.x > selrect.attrs.x && nodeObjects[i].shapes.attrs.y + nodeObjects[i].shapes.attrs.height < selrect.attrs.y + selrect.attrs.height && nodeObjects[i].shapes.attrs.y + nodeObjects[i].shapes.attrs.height > selrect.attrs.y) {
+                        isContain = 1;
+                    }
+                    if (isContain == 1) {
+                        selObjects.push(nodeObjects[i]);
+                    }
+                }
+            }
+            var findShapesById = function (id) {
+                for (var i = 0; i < shapes.length; i++){
+                    if (shapes[i].id == id) {
+                        return shapes[i];
+                    }
+                }
+            }
+
+            //根据id查找节点对象
+            var findObjectById = function (id) {
+                for (var l = 0; l < nodeObjects.length; l++) {
+                    if (nodeObjects[l].id == id) {
+                        return nodeObjects[l];
+                    }
+                }
+            }
+
+            //隐藏所有节点的虚线框 !!加入隐藏全名div处理
+            var hideAllShapesContainer = function () {
+                for (var i = 0; i < nodeObjects.length; i++) {
+                    nodeObjects[i].shapesContainer.hide();
+                }
+                $('.nodeText').hide();
+            }
+
+            //拖动节点开始时的事件
+            var dragger = function () {
+                this.ox = this.attr("x");
+                this.oy = this.attr("y");
+                this.animate({ "fill-opacity": .2 }, 500);
+                //分割线
+                isNodeSelected = 1;
+                NodeSelectedType = 0;
+                var obj = findObjectById(this.id);
+                obj.shapesContainer.ox = obj.shapesContainer.attr("x");
+                obj.shapesContainer.oy = obj.shapesContainer.attr("y");
+            };
+
+            var selrectDragger = function () {
+                this.ox = this.attr("x");
+                this.oy = this.attr("y");
+                this.animate({ "fill-opacity": .2 }, 500);
+                //分割线
+                isNodeSelected = 1;
+                NodeSelectedType = 0;
+                for (var i = 0; i < selObjects.length; i++) {
+                    selObjects[i].shapes.ox = selObjects[i].shapes.attr("x");
+                    selObjects[i].shapes.oy = selObjects[i].shapes.attr("y");
+                    selObjects[i].shapesContainer.ox = selObjects[i].shapesContainer.attr("x");
+                    selObjects[i].shapesContainer.oy = selObjects[i].shapesContainer.attr("y");
+                }
+            }
+
+            var setShapeDragger = function () {
+                this.ox = this.attr("x");
+                this.oy = this.attr("y");
+                this.animate({ "fill-opacity": .2 }, 500);
+                //分割线
+                isNodeSelected = 1;
+                NodeSelectedType = 0;
+            };
+
+            //拖动事件
+            var move = function (dx, dy) {
+                //if (this.attrs.x <= 0) {
+                //    dx = -this.attrs.x+1;
+                //}else if(this.attrs.y <= 0){
+                //    dy = -this.attrs.y+1;
+                //}else if(this.attrs.x + dx + this.attrs.width >= $(window).width()){
+                //    dx = $(window).width() - (this.attrs.x + dx + this.attrs.width) - 1;
+                //}else if(this.attrs.y + dy + this.attrs.height >= $(window).height()){
+                //    dy = $(window).height() - (this.attrs.y + dy + this.attrs.height) - 1;
+                //}
+                var att = { x: this.ox + dx, y: this.oy + dy };
+                this.attr(att);
+                $("#" + this.id).offset({ top: this.oy + dy + 5, left: this.ox + dx + 5 });
+                $("#" + this.id+1).offset({ top: this.oy + dy + 55, left: this.ox + dx + 5 });
+                var obj = findObjectById(this.id);
+                att = { x: obj.shapesContainer.ox + dx, y: obj.shapesContainer.oy + dy };
+                obj.shapesContainer.attr(att);
+                for (var i = connections.length; i--;) {
+                    r.drawArr(connections[i]);
+                }
+            };
+            
+            //拖动事件
+            var modifyMove = function (shape,dx, dy) {              
+                var att = { x: shape.attrs.x + dx, y: shape.attrs.y + dy };
+                shape.attr(att);
+                //$("#" + shape.id).offset({ top: shape.attrs.y + dy + 5, left: shape.attrs.x + dx + 5 });
+                $("#" + shape.id).offset({ top: shape.attrs.y + 5, left: shape.attrs.x + 5 });
+                $("#" + shape.id+1).offset({ top: shape.attrs.y + 55, left: shape.attrs.x + 5 });
+                var obj = findObjectById(shape.id);
+                att = { x: obj.shapesContainer.attrs.x + dx, y: obj.shapesContainer.attrs.y + dy };
+                obj.shapesContainer.attr(att);
+                for (var i = connections.length; i--;) {
+                    r.drawArr(connections[i]);
+                }
+            };
+
+            var selrectMove = function (dx, dy) {
+                var att = { x: this.ox + dx, y: this.oy + dy };
+                this.attr(att);
+
+                for (var i = 0; i < selObjects.length; i++) {
+                    att = { x: selObjects[i].shapes.ox + dx, y: selObjects[i].shapes.oy + dy };
+                    selObjects[i].shapes.attr(att);
+                    att = { x: selObjects[i].shapesContainer.ox + dx, y: selObjects[i].shapesContainer.oy + dy };
+                    selObjects[i].shapesContainer.attr(att);
+
+                    $("#" + selObjects[i].shapes.id).offset({ top: selObjects[i].shapes.oy + dy + 5, left: selObjects[i].shapes.ox + dx + 5 });
+                    $("#" + selObjects[i].shapes.id + 1).offset({ top: selObjects[i].shapes.oy + dy + 55, left: selObjects[i].shapes.ox + dx + 5 });
+                }
+                for (var i = connections.length; i--;) {
+                    r.drawArr(connections[i]);
+                }
+            };
+
+            var setShapeMove = function (dx, dy) {
+                var att = { x: this.ox + dx, y: this.oy + dy };
+                this.attr(att);
+                r.drawArr(setConnection);
+                setConnection.circle1.remove();
+                setConnection.circle2.remove();
+                setConnection.circle3.remove();
+            };
+            //拖动结束后的事件
+            var up = function () {
+                this.animate({ "fill-opacity": 0 }, 500);
+                isNodeSelected = 0;
+                if (findShapesById(this.id) == null || findShapesById(this.id) == '') {
+                    return;
+                }
+                var dx = 0;
+                var dy = 0;
+                if (this.attrs.x <= 0) {
+                    dx = -this.attrs.x + 1;
+                }
+                if (this.attrs.y <= 0) {
+                    dy = -this.attrs.y+1;
+                }
+                if (this.attrs.x + dx + this.attrs.width >= $(window).width()) {
+                    dx = $(window).width() - (this.attrs.x + dx + this.attrs.width) - 1;
+                }
+                if (this.attrs.y + dy + this.attrs.height >= $(window).height()) {
+                    dy = $(window).height() - (this.attrs.y + dy + this.attrs.height) - 1;
+                }
+                modifyMove(this,dx, dy);
+            };
+            var setShapeUp = function () {
+                this.animate({ "fill-opacity": 0 }, 500);
+                isNodeSelected = 0;
+                var breakFlag = 0;
+                //判断是否连到了一个节点，然后销毁原点和连线
+                for (var i = 0; i < nodeObjects.length; i++) {
+                    if (this.attrs.x > nodeObjects[i].shapesContainer.attrs.x && this.attrs.x < nodeObjects[i].shapesContainer.attrs.x + nodeObjects[i].shapesContainer.attrs.width && this.attrs.y > nodeObjects[i].shapesContainer.attrs.y && this.attrs.y < nodeObjects[i].shapesContainer.attrs.y + nodeObjects[i].shapesContainer.attrs.height) {
+
+                        //不能自己指向自己
+                        if (setConnection.obj1 == nodeObjects[i].shapes)
+                            break;
+
+                        //不画重复的线
+                        breakFlag = 0
+                        for (var l = 0; l < connections.length; l++) {
+                            if (connections[l].obj1 == setConnection.obj1 && connections[l].obj2 == nodeObjects[i].shapes) {
+                                breakFlag = 1;
+                                break;
+                            }
+                            if (connections[l].obj1 == nodeObjects[i].shapes && connections[l].obj2 == setConnection.obj1) {
+                                breakFlag = 1;
+                                break;
+                            }
+
+                        }
+                        if (breakFlag == 1) {
+                            break;
+                        }
+                        //正常画线
+                        connections.push(r.drawArr({ obj1: setConnection.obj1, obj2: nodeObjects[i].shapes }));
+
+                        break;
+                    }
+                }
+                setShape.remove();
+                setConnection.arrPath.remove();
+                setConnection.circle1.remove();
+                setConnection.circle2.remove();
+                setConnection.circle3.remove();
+                hasSetShape = 0;
+            };
+            $(function () {
+                //创建绘图对象
+                r = Raphael("holder", $(window).width(), $(window).height());
+                //var text = getUrlParam('text');
+                //var param = window.parent.load(text);
+                var param = window.parent.load();
+                var obj;
+                if (param[0]!=''&&param[0]!=null) {
+                    for (var i = 0; i < param[0].length; i++) {
+                        obj = param[0][i];
+                        shapes[i] = r.rect(obj.x, obj.y, obj.width, obj.height, 4);
+                        shapes[i].id = obj.id;
+                        shapes[i].text = obj.text;
+                        shapes[i].rightname = obj.rightname;
+                        shapes[i].managername = obj.managername;
+                        shapes[i].moduleno = obj.moduleno;
+                        shapes[i].url = obj.url;
+                        shapes[i].suite = obj.suite;
+                        shapes[i].rightkey = obj.rightkey;
+                        shapes[i].functionname = obj.functionname;
+                        shapes[i].nodeType = obj.nodeType;
+                        shapes[i].attr({ fill: '#EE9611', stroke: '#EE9611', "fill-opacity": 0, "stroke-width": 2, cursor: "move" });
+                        shapes[i].drag(move, dragger, up);
+
+                        shapesContainer[i] = r.rect(obj.x-10, obj.y-10, obj.width+20, obj.height+20, 4);
+                        shapesContainer[i].attr({ stroke: '#EE9611', "stroke-width": 2, "stroke-dasharray": "-" });
+                        shapesContainer[i].id = obj.id;
+                        shapesContainer[i].hide();
+
+                        var object = new Object();
+                        object.id = obj.id;
+                        object.shapes = shapes[i];
+                        object.shapesContainer = shapesContainer[i];
+                        nodeObjects[i] = object;
+
+                        var tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = nameIntercept(obj.text);
+                        tempDiv.id = obj.id;
+                        var nodeType = shapes[i].nodeType;
+                        if (nodeType == 0) {
+                            tempDiv.className = "test0";
+                        } else if (nodeType == 1) {
+                            tempDiv.className = "test1";
+                        } else {
+                            tempDiv.className = "test2";
+                        }
+
+                        if (myIsIE()) {
+                            tempDiv.style.fontSize = '13px';
+                        } else {
+                            tempDiv.style.fontSize = '5px';
+                        }
+
+                      
+                        document.body.appendChild(tempDiv);
+                        $("#" + obj.id).offset({ top: obj.y + 5, left: obj.x + 5 });
+
+                        var tempDiv2 = document.createElement('div');
+                        tempDiv2.innerHTML = obj.text;
+                        tempDiv2.id = obj.id+1;
+                        tempDiv2.className = "nodeText";
+                        if (myIsIE()) {
+                            tempDiv2.style.fontSize = '13px';
+                        } else {
+                            tempDiv2.style.fontSize = '5px';
+                        }
+                        document.body.appendChild(tempDiv2);
+                        $("#" + obj.id + 1).offset({ top: obj.y + 55, left: obj.x + 5 });
+                        $("#" + obj.id + 1).hide();
+
+                        shapes[i].click(function () {
+                            hasSetShape = 1;
+                            setShape = r.rect(this.attrs.x + this.attrs.width + 30, this.attrs.y + this.attrs.height / 2, 8, 8, 4);
+                            setShape.attr({ fill: "#ff3333", stroke: "#ff3333", "fill-opacity": 0, "stroke-width": 2, cursor: "move" });
+                            setShape.drag(setShapeMove, setShapeDragger, setShapeUp);
+                            setConnection = r.drawArr({ obj1: this, obj2: setShape });
+                            setConnection.circle1.remove();
+                            setConnection.circle2.remove();
+                            setConnection.circle3.remove();
+                            findObjectById(this.id).shapesContainer.show();
+                            $("#" + this.id + 1).show();
+                            isNodeSelected = 1;
+                            NodeSelectedType = 0;
+                            NodeSelected = findObjectById(this.id);
+                        })
+
+                        shapes[i].dblclick(function () {
+                            findObjectById(this.id).shapesContainer.show();
+                            $("#" + this.id + 1).show();
+                            isNodeSelected = 1;
+                            NodeSelectedType = 0;
+                            NodeSelected = findObjectById(this.id);
+                            //window.parent.editText();
+                        })
+
+                        shapes[i].mouseover(function () {
+                            findObjectById(this.id).shapesContainer.show();
+                        })
+
+                        shapes[i].mouseout(function () {
+                            //移开鼠标且没有
+                            //debugger;
+                            if (isNodeSelected == 1 && NodeSelectedType == 0) {
+                                if (NodeSelected.shapes.id == this.id) {
+
+                                } else {
+                                    findObjectById(this.id).shapesContainer.hide();
+                                }
+                            } else {
+                                findObjectById(this.id).shapesContainer.hide();
+                            }
+                        })
+                    }
+                }
+
+                if (param[1] != '' && param[1] != null) {
+                    for (var i = 0; i < param[1].length; i++) {
+                        obj = param[1][i];
+                        var shape1 = findShapesById(obj.obj1id);
+                        var shape2 = findShapesById(obj.obj2id);
+                        connections.push(r.drawArr({ obj1: shape1, obj2: shape2 }));
+                    }
+                }
+            });
+
+            //if (e.which == 3) {
+            //    if (isNodeSelected&&confirm("确定要删除该节点吗？")==true) {
+            //        if (isNodeSelected) { //节点被选择标记
+            //            if (NodeSelectedType) { //被选中节点的类项 线或者时节点 0节点 1线
+            //                for (var i = 0; i < connections.length; i++) {
+            //                    if (connections[i] == NodeSelected) {
+            //                        connections.splice(i, 1);
+            //                        NodeSelected.arrPath.remove();  //标记被选中节点
+            //                        NodeSelected.circle1.remove();
+            //                        NodeSelected.circle2.remove();
+            //                        NodeSelected.circle3.remove();
+            //                        break;
+            //                    }
+            //                }
+            //            } else {
+            //                for (var i = 0; i < nodeObjects.length; i++) {
+            //                    if (nodeObjects[i] == NodeSelected) {
+            //                        nodeObjects.splice(i, 1);
+            //                        //先从节点组除去
+            //                        removeConnectionsByShape(connections, NodeSelected.shapes);
+            //                        NodeSelected.shapes.remove();  //标记被选中节点
+            //                        NodeSelected.shapesContainer.remove();
+            //                        var divName = '#' + NodeSelected.id;
+            //                        $(divName).remove();
+            //                        setShape.remove();
+            //                        setConnection.arrPath.remove();
+            //                        hasSetShape = 0;
+            //                        break;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    } else {
+            //        if (setShape.attrs) {
+            //            if (e.clientX < setShape.attrs.x + setShape.attrs.width && e.clientX > setShape.attrs.x && e.clientY < setShape.attrs.y + setShape.attrs.height && e.clientY > setShape.attrs.y) {
+            //                return;
+            //            } else {
+            //                setShape.remove();
+            //                setConnection.arrPath.remove();
+            //                setConnection.circle1.remove();
+            //                setConnection.circle2.remove();
+            //                setConnection.circle3.remove();
+            //                hasSetShape = 0;
+            //            }
+            //        } else {
+            //            setShape.remove();
+            //            setConnection.arrPath.remove();
+            //            setConnection.circle1.remove();
+            //            setConnection.circle2.remove();
+            //            setConnection.circle3.remove();
+            //            hasSetShape = 0;
+            //        }
+            //        retuen;
+            //    }
+            //}
+            //else if (e.which == 1) {
+            //    isMouseDown = 1;
+            //    //如果点在临时节点外面，销毁临时节点
+            //    if (hasSetShape == 1) {
+            //        if (setShape.attrs) {
+            //            if (e.clientX < setShape.attrs.x + setShape.attrs.width && e.clientX > setShape.attrs.x && e.clientY < setShape.attrs.y + setShape.attrs.height && e.clientY > setShape.attrs.y) {
+            //                return;
+            //            } else {
+            //                setShape.remove();
+            //                setConnection.arrPath.remove();
+            //                setConnection.circle1.remove();
+            //                setConnection.circle2.remove();
+            //                setConnection.circle3.remove();
+            //                hasSetShape = 0;
+            //            }
+            //        } else {
+            //            setShape.remove();
+            //            setConnection.arrPath.remove();
+            //            setConnection.circle1.remove();
+            //            setConnection.circle2.remove();
+            //            setConnection.circle3.remove();
+            //            hasSetShape = 0;
+            //        }
+            //    }
+            //    //鼠标是否在节点内
+            //    var doesDragInNode = 0;
+            //    var whichNodeBeDrag;
+            //    for (var i = 0; i < nodeObjects.length; i++) {
+            //        var obj = nodeObjects[i].shapes.attrs;
+            //        if (e.clientX < obj.x + obj.width && e.clientX > obj.x && e.clientY < obj.y + obj.height && e.clientY > obj.y) {
+            //            whichNodeBeDrag = nodeObjects[i];
+            //            doesDragInNode = 1;
+            //        }
+            //    }
+            //    if (doesDragInNode == 1) {
+            //        var obj = whichNodeBeDrag.shapes.attrs;
+            //        if (e.clientX < obj.x + obj.width && e.clientX > obj.x && e.clientY < obj.y + obj.height && e.clientY > obj.y) {
+            //            hideAllShapesContainer();
+            //            whichNodeBeDrag.shapesContainer.show();
+            //        } else {
+            //            hideAllShapesContainer();
+            //            isNodeSelected = 0;
+            //        }
+            //    } else {
+            //        hideAllShapesContainer();
+            //        isNodeSelected = 0;
+            //    }
+            //    if (doesDragInLine == 1) {
+            //        if (isNodeSelected == 1 && NodeSelectedType == 1) {
+            //            whichLineBeDrag.circle1.show();
+            //            whichLineBeDrag.circle2.show();
+            //            whichLineBeDrag.circle3.show();
+            //        } else {
+            //            hideAllConnectionsCircle();
+            //        }
+            //    } else {
+            //        hideAllConnectionsCircle();
+            //        isNodeSelected = 0;
+            //    }
+            //    if (isSelrectDefined == 0) { //没有鼠标拉框才创建拉框                    
+            //        if (doesDragInNode == 0 && doesDragInLine == 0) { //如果当前鼠标不在节点内，且不在连线上，才创建拉框
+            //            selx = e.clientX;
+            //            sely = e.clientY;
+            //            selrect = r.rect(selx, sely, 0, 0, 4);
+            //            //var kk = selrect.getBBox();
+            //            isSelrectDefined = 1;
+            //            selrect.ox = selrect.attr("x");
+            //            selrect.oy = selrect.attr("y");
+            //            var color = Raphael.getColor();
+            //            selrect.attr({ fill: color, stroke: color, "fill-opacity": 0, "stroke-width": 2, cursor: "move", "stroke-dasharray": "-" });
+            //            selrect.drag(selrectMove, selrectDragger, up);
+            //        }
+            //    } else {
+            //        if (e.clientX < selrect.attrs.x + selrect.attrs.width && e.clientX > selrect.attrs.x && e.clientY < selrect.attrs.y + selrect.attrs.height && e.clientY > selrect.attrs.y) {
+            //        } else {//创建了拉框，点了外面一下，取消拉框
+            //            selrect.remove();
+            //            for (var i = 0; i < selObjects.length; i++) {
+            //                selObjects[i].shapesContainer.hide();
+            //            }
+            //            selObjects.splice(0, selObjects.length);
+            //            isSelrectDefined = 0;
+            //        }
+            //    }
+            //}
+
+            $('body').mousedown(function (e, fun) {
+                isMouseDown = 1;
+                //如果点在临时节点外面，销毁临时节点
+                if (hasSetShape == 1) {
+                    if (setShape.attrs) {
+                        if (e.clientX < setShape.attrs.x + setShape.attrs.width && e.clientX > setShape.attrs.x && e.clientY < setShape.attrs.y + setShape.attrs.height && e.clientY > setShape.attrs.y) {
+                            return;
+                        } else {
+                            setShape.remove();
+                            setConnection.arrPath.remove();
+                            setConnection.circle1.remove();
+                            setConnection.circle2.remove();
+                            setConnection.circle3.remove();
+                            hasSetShape = 0;
+                        }
+                    } else {
+                        setShape.remove();
+                        setConnection.arrPath.remove();
+                        setConnection.circle1.remove();
+                        setConnection.circle2.remove();
+                        setConnection.circle3.remove();
+                        hasSetShape = 0;
+                    }
+                }
+                //鼠标是否在节点内
+                var doesDragInNode = 0;
+                var whichNodeBeDrag;
+                for (var i = 0; i < nodeObjects.length; i++) {
+                    var obj = nodeObjects[i].shapes.attrs;
+                    if (e.clientX < obj.x + obj.width && e.clientX > obj.x && e.clientY < obj.y + obj.height && e.clientY > obj.y) {
+                        whichNodeBeDrag = nodeObjects[i];
+                        doesDragInNode = 1;
+                    }
+                }
+                if (doesDragInNode == 1) {
+                    var obj = whichNodeBeDrag.shapes.attrs;
+                    if (e.clientX < obj.x + obj.width && e.clientX > obj.x && e.clientY < obj.y + obj.height && e.clientY > obj.y) {
+                        hideAllShapesContainer();
+                        whichNodeBeDrag.shapesContainer.show();
+                        $("#" + whichNodeBeDrag.shapes.id + 1).show();
+                    } else {
+                        hideAllShapesContainer();
+                        isNodeSelected = 0;
+                    }
+                } else {
+                    hideAllShapesContainer();
+                    //isNodeSelected = 0;
+                }
+                if (doesDragInLine == 1) {
+                    if (isNodeSelected == 1 && NodeSelectedType == 1) {
+                        hideAllConnectionsCircle();
+                        whichLineBeDrag.circle1.show();
+                        whichLineBeDrag.circle2.show();
+                        whichLineBeDrag.circle3.show();
+                    } else {
+                        hideAllConnectionsCircle();
+                    }
+                } else {
+                    hideAllConnectionsCircle();
+                    //isNodeSelected = 0;
+                }
+
+                if (doesDragInLine != 1 && doesDragInNode != 1) {
+                    isNodeSelected = 0;
+                }
+
+                if (isSelrectDefined == 0) { //没有鼠标拉框才创建拉框                    
+                    if (doesDragInNode == 0 && doesDragInLine == 0) { //如果当前鼠标不在节点内，且不在连线上，才创建拉框
+                        selx = e.clientX;
+                        sely = e.clientY;
+                        selrect = r.rect(selx, sely, 0, 0, 4);
+                        //var kk = selrect.getBBox();
+                        isSelrectDefined = 1;
+                        selrect.ox = selrect.attr("x");
+                        selrect.oy = selrect.attr("y");
+                        var color = Raphael.getColor();
+                        selrect.attr({ fill: color, stroke: color, "fill-opacity": 0, "stroke-width": 2, cursor: "move", "stroke-dasharray": "-" });
+                        selrect.drag(selrectMove, selrectDragger, up);
+                    }
+                } else {
+                    if (e.clientX < selrect.attrs.x + selrect.attrs.width && e.clientX > selrect.attrs.x && e.clientY < selrect.attrs.y + selrect.attrs.height && e.clientY > selrect.attrs.y) {
+                    } else {//创建了拉框，点了外面一下，取消拉框
+                        selrect.remove();
+                        for (var i = 0; i < selObjects.length; i++) {
+                            selObjects[i].shapesContainer.hide();
+                        }
+                        selObjects.splice(0, selObjects.length);
+                        isSelrectDefined = 0;
+                    }
+                }
+
+
+            })
+
+            $('body').mouseup(function (e, fun) {
+
+                isMouseDown = 0;
+                if (isSelrectDefined == 1) {
+                    //创建了拉框，计算出拉框内所有节点，存起来
+                    selShapesConstruct();
+                    for (var i = 0; i < selObjects.length; i++) {
+                        selObjects[i].shapesContainer.show();
+                    }
+                }
+
+                //if (e.which == 3) {
+                //    if (isNodeSelected && confirm("确定要删除该节点吗？") == true) {
+                //        if (isNodeSelected) { //节点被选择标记
+                //            if (NodeSelectedType) { //被选中节点的类项 线或者时节点 0节点 1线
+                //                for (var i = 0; i < connections.length; i++) {
+                //                    if (connections[i] == NodeSelected) {
+                //                        connections.splice(i, 1);
+                //                        NodeSelected.arrPath.remove();  //标记被选中节点
+                //                        NodeSelected.circle1.remove();
+                //                        NodeSelected.circle2.remove();
+                //                        NodeSelected.circle3.remove();
+                //                        break;
+                //                    }
+                //                }
+                //            } else {
+                //                for (var i = 0; i < nodeObjects.length; i++) {
+                //                    if (nodeObjects[i] == NodeSelected) {
+                //                        nodeObjects.splice(i, 1);
+                //                        //先从节点组除去
+                //                        removeConnectionsByShape(connections, NodeSelected.shapes);
+                //                        NodeSelected.shapes.remove();  //标记被选中节点
+                //                        NodeSelected.shapesContainer.remove();
+                //                        var divName = '#' + NodeSelected.id;
+                //                        $(divName).remove();
+                //                        $(divName + 1).remove();
+                //                        setShape.remove();
+                //                        setConnection.arrPath.remove();
+                //                        hasSetShape = 0;
+                //                        break;
+                //                    }
+                //                }
+                //            }
+                //        }
+                //    } else {
+                //        if (setShape.attrs) {
+                //            if (e.clientX < setShape.attrs.x + setShape.attrs.width && e.clientX > setShape.attrs.x && e.clientY < setShape.attrs.y + setShape.attrs.height && e.clientY > setShape.attrs.y) {
+                //                return;
+                //            } else {
+                //                setShape.remove();
+                //                setConnection.arrPath.remove();
+                //                setConnection.circle1.remove();
+                //                setConnection.circle2.remove();
+                //                setConnection.circle3.remove();
+                //                hasSetShape = 0;
+                //            }
+                //        } else {
+                //            setShape.remove();
+                //            setConnection.arrPath.remove();
+                //            setConnection.circle1.remove();
+                //            setConnection.circle2.remove();
+                //            setConnection.circle3.remove();
+                //            hasSetShape = 0;
+                //        }
+                //        retuen;
+                //    }
+                //}
+
+                //if (e.which == 3) {
+                //    if (isNodeSelected) {
+                //        window.parent.delNode(isNodeSelected);
+                //    } else {
+                //        delNode_no(isNodeSelected);
+                //    }
+                //}
+
+                if (e.which == 3) {
+                    //右键点击不会触发Raphael的click事件，所以，右键点击时，先判断是否点击了节点，如果是，
+                    //再手动执行节点的点击事件，然后再弹出删除提示，这样被删除的节点就是选中的节点
+                    var doesDragInNode = 0;
+                    var whichNodeBeDrag;
+                    for (var i = 0; i < nodeObjects.length; i++) {
+                        var obj = nodeObjects[i].shapes.attrs;
+                        if (e.clientX < obj.x + obj.width && e.clientX > obj.x && e.clientY < obj.y + obj.height && e.clientY > obj.y) {
+                            whichNodeBeDrag = nodeObjects[i];
+                            doesDragInNode = 1;
+                        }
+                    }
+                    if (whichNodeBeDrag != null) {
+                        var temp = whichNodeBeDrag.shapes;
+                        hasSetShape = 1;
+                        setShape = r.rect(temp.attrs.x + temp.attrs.width + 30, temp.attrs.y + temp.attrs.height / 2, 8, 8, 4);
+                        setShape.attr({ fill: "#ff3333", stroke: "#ff3333", "fill-opacity": 0, "stroke-width": 2, cursor: "move" });
+                        setShape.drag(setShapeMove, setShapeDragger, setShapeUp);
+                        setConnection = r.drawArr({ obj1: temp, obj2: setShape });
+                        setConnection.circle1.remove();
+                        setConnection.circle2.remove();
+                        setConnection.circle3.remove();
+                        findObjectById(temp.id).shapesContainer.show();
+                        $("#" + temp.id + 1).show();
+                        isNodeSelected = 1;
+                        NodeSelectedType = 0;
+                        NodeSelected = findObjectById(temp.id);
+                    }
+
+                    if (isNodeSelected) {
+                        window.parent.delNode(isNodeSelected);
+                    } else {
+                        delNode_no(isNodeSelected);
+                    }
+                }
+
+            })
+
+            $('body').mousemove(function (e, f) {
+                if (isMouseDown == 1 && isNodeSelected == 0) {
+                    //鼠标按下的拖动监听，这时一定创建了拉框，未选中节点才继续画框
+                    if (isSelrectDefined) {
+                        if (e.clientX < selrect.attrs.x + selrect.attrs.width && e.clientX > selrect.attrs.x && e.clientY < selrect.attrs.y + selrect.attrs.height && e.clientY > selrect.attrs.y) {
+
+                        } else {
+                            if (e.offsetX - selrect.ox < 0 || e.offsetY - selrect.oy < 0) {
+                                return;
+                            }
+                            var att = { width: e.offsetX - selrect.ox, height: e.offsetY - selrect.oy };
+                            selrect.attr(att);
+                        }
+                    } else {
+
+                    }
+                }
+            })
+
+            $(document).keydown(function (event) {
+                if (event.keyCode == 8 || event.keyCode == 46) {
+                    if (isNodeSelected) { //节点被选择标记
+                        if (NodeSelectedType) { //被选中节点的类项 线或者时节点 0节点 1线
+                            for (var i = 0; i < connections.length; i++) {
+                                if (connections[i] == NodeSelected) {
+                                    connections.splice(i, 1);
+                                    NodeSelected.arrPath.remove();  //标记被选中节点
+                                    NodeSelected.circle1.remove();
+                                    NodeSelected.circle2.remove();
+                                    NodeSelected.circle3.remove();
+                                    break;
+                                }
+                            }
+                        } else {
+                            for (var i = 0; i < nodeObjects.length; i++) {
+                                if (nodeObjects[i] == NodeSelected) {
+                                    nodeObjects.splice(i, 1);
+                                    //先从节点组除去
+                                    removeConnectionsByShape(connections, NodeSelected.shapes);
+                                    NodeSelected.shapes.remove();  //标记被选中节点
+                                    NodeSelected.shapesContainer.remove();
+                                    var divName = '#' + NodeSelected.id;
+                                    $(divName).remove();
+                                    $(divName+1).remove();
+                                    setShape.remove();
+                                    setConnection.arrPath.remove();
+                                    hasSetShape = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+
+  
+
+        var addNodeObject = function (param,nodeType) {
+            //type: 0 系统功能树节点； 1 用户自定义节点； 2 流程导航图节点 
+            if (param.x == null || param.x == '') {
+                param.x = 10;
+                param.y = 10;
+            }
+            var color = Raphael.getColor();
+            var tempShape = r.rect(param.x, param.y, 60, 40, 4);
+            tempShape.attr({ fill: color, stroke: color, "fill-opacity": 0, "stroke-width": 2, cursor: "move" });
+            tempShape.id = guid();
+            tempShape.code = param.code;
+            tempShape.text = param.text;
+            tempShape.rightname = param.rightname;
+            tempShape.managername= param.managername;
+            tempShape.moduleno= param.moduleno;
+            tempShape.url= param.url;
+            tempShape.suite= param.suite;
+            tempShape.rightkey= param.rightkey;
+            tempShape.functionname = param.functionname;
+            tempShape.drag(move, dragger, up);
+
+            tempShape.nodeType = nodeType;
+
+            var tempShapesContainer = r.rect(param.x - 10, param.y - 10, 60 + 20, 40 + 20, 4);
+            tempShapesContainer.attr({ stroke: color, "stroke-width": 2, "stroke-dasharray": "-" });
+            tempShapesContainer.id = tempShape.id;
+            tempShapesContainer.hide();
+
+            var object = new Object();
+            object.id = tempShape.id;
+            object.shapes = tempShape;
+            object.shapesContainer = tempShapesContainer;
+
+            shapes[shapes.length] = tempShape;
+            nodeObjects[nodeObjects.length] = object;
+
+            tempShape.click(function () {
+                hasSetShape = 1;
+                setShape = r.rect(this.attrs.x + this.attrs.width + 30, this.attrs.y + this.attrs.height / 2, 8, 8, 4);
+                setShape.attr({ fill: "#ff3333", stroke: "#ff3333", "fill-opacity": 0, "stroke-width": 2, cursor: "move" });
+                setShape.drag(setShapeMove, setShapeDragger, setShapeUp);
+                setConnection = r.drawArr({ obj1: this, obj2: setShape });
+                setConnection.circle1.remove();
+                setConnection.circle2.remove();
+                setConnection.circle3.remove();
+                findObjectById(this.id).shapesContainer.show();
+                $("#" + this.id + 1).show();
+                isNodeSelected = 1;
+                NodeSelectedType = 0;
+                NodeSelected = findObjectById(this.id);
+            })
+
+            tempShape.mouseover(function () {
+                findObjectById(this.id).shapesContainer.show();
+            })
+
+            tempShape.mouseout(function () {
+                //移开鼠标且没有
+                //debugger;
+                if (isNodeSelected == 1 && NodeSelectedType == 0) {
+                    if (NodeSelected.shapes.id == this.id) {
+
+                    } else {
+                        findObjectById(this.id).shapesContainer.hide();
+                    }
+                } else {
+                    findObjectById(this.id).shapesContainer.hide();
+                }
+            })
+
+
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = nameIntercept(param.text);
+            tempDiv.id = tempShape.id;
+
+            if (nodeType == 0) {
+                tempDiv.className = "test0";
+            } else if (nodeType == 1) {
+                tempDiv.className = "test1";
+            } else {
+                tempDiv.className = "test2";
+            }
+            
+            if (myIsIE()) {
+                tempDiv.style.fontSize = '13px';
+            } else {
+                tempDiv.style.fontSize = '5px';
+            }
+
+
+            document.body.appendChild(tempDiv);
+            $("#" + tempShape.id).offset({ top: param.y + 5, left: param.x + 5 });
+
+            var tempDiv2 = document.createElement('div');
+            tempDiv2.innerHTML = param.text;
+            tempDiv2.id = tempShape.id+1;
+            tempDiv2.className = "nodeText";
+
+            if (myIsIE()) {
+                tempDiv2.style.fontSize = '13px';
+            } else {
+                tempDiv2.style.fontSize = '5px';
+            }
+
+            document.body.appendChild(tempDiv2);
+            $("#" + tempShape.id + 1).offset({ top: param.y + 55, left: param.x + 5 });
+            $("#" + tempShape.id + 1).hide();
+        }
+
+        //根据节点删除连线
+        var removeConnectionsByShape = function(connections,shapes){
+            var completeFlag = false;
+            if(connections.length == 0){
+                return;
+            }
+            while(!completeFlag){
+                if(connections.length == 0){
+                    return;
+                }
+                for(var i = 0; i < connections.length; i++){
+                    if(connections[i].obj1 == shapes || connections[i].obj2 == shapes){
+                        connections[i].arrPath.remove();                        
+                        connections.splice(i,1);
+                        break;
+                    }
+                    if(i==(connections.length-1)){
+                            completeFlag = true;
+                    }
+                }                  
+            }
+
+        }
+
+        //根据线找到连线对象
+        var findObjectByPath = function(path){
+            for(var i = 0; i < connections.length; i++){
+                if(connections[i].arrPath == path){
+                    return connections[i];
+                }
+            }
+        }
+
+        //隐藏所有连线的选中标记
+        var hideAllConnectionsCircle = function(){
+            for(var i = 0; i < connections.length; i++){
+                connections[i].circle1.hide();
+                connections[i].circle2.hide();
+                connections[i].circle3.hide();
+            }
+        }
+
+       //随着节点位置的改变动态改变箭头
+        Raphael.fn.drawArr = function (obj) {
+            var point = getStartEnd(obj.obj1, obj.obj2);
+            var path1 = getArr(point.start.x, point.start.y, point.end.x, point.end.y, 20);
+           
+
+            if (obj.arrPath) {
+                obj.arrPath.attr({ path: path1 });
+            } else {
+                obj.arrPath = this.path(path1);
+                obj.arrPath.click(function () {
+                    findObjectByPath(this).circle1.show();
+                    findObjectByPath(this).circle2.show();
+                    findObjectByPath(this).circle3.show();
+                    isNodeSelected = 1;
+                    NodeSelectedType = 1;
+                    NodeSelected = findObjectByPath(this);
+                });
+                obj.arrPath.mouseover(function () {
+                    obj.circle1.show();
+                    obj.circle2.show();
+                    obj.circle3.show();
+                    doesDragInLine = 1;
+                });
+                obj.arrPath.mouseout(function () {
+                    if(isNodeSelected == 1 && NodeSelectedType == 1){
+                        if(NodeSelected.arrPath == this){
+
+                        }else{                       
+                            var path = findObjectByPath(this);
+                            if(path != undefined){
+                                path.circle1.hide();
+                                path.circle2.hide();
+                                path.circle3.hide();                            
+                        }}
+                    }else{                       
+                        var path = findObjectByPath(this);
+                        if(path != undefined){
+                            path.circle1.hide();
+                            path.circle2.hide();
+                            path.circle3.hide();                            
+                        }
+                    }
+                    doesDragInLine = 0;
+                })
+            }
+
+            if (obj.circle1) {
+                obj.circle1.attr({cx:(point.start.x+point.end.x)/2,cy:(point.start.y+point.end.y)/2,r:5});
+                obj.circle2.attr({cx:point.start.x,cy:point.start.y,r:5});
+                obj.circle3.attr({cx:point.end.x,cy:point.end.y,r:5});
+            } else {
+                var circle1 = new Object();
+                circle1.x = (point.start.x+point.end.x)/2;
+                circle1.y = (point.start.y+point.end.y)/2;
+                circle1.r = 5;
+                obj.circle1 = this.circle(circle1.x,circle1.y,circle1.r);
+                var circle2 = new Object();
+                circle2.x = point.start.x;
+                circle2.y = point.start.y;
+                circle2.r = 5;
+                obj.circle2 = this.circle(circle2.x,circle2.y,circle2.r);
+                var circle3 = new Object();
+                circle3.x = point.end.x;
+                circle3.y = point.end.y;
+                circle3.r = 5;
+                obj.circle3 = this.circle(circle3.x,circle3.y,circle3.r);
+            }
+
+            obj.arrPath.attr({   
+                        "stroke":"#2A6570", // border color of the rectangle   
+                        "stroke-width":4 // the width of the border  
+                    });  
+
+            obj.circle1.attr({ fill: "#0000ff", stroke: "#0000ff", "fill-opacity": 0, "stroke-width": 2}); 
+            obj.circle2.attr({ fill: "#0000ff", stroke: "#0000ff", "fill-opacity": 0, "stroke-width": 2}); 
+            obj.circle3.attr({ fill: "#0000ff", stroke: "#0000ff", "fill-opacity": 0, "stroke-width": 2}); 
+            obj.circle1.hide();
+            obj.circle2.hide();
+            obj.circle3.hide();
+            //,"stroke-dasharray":"."
+
+            return obj;
+        };
+
+        function getStartEnd(obj1, obj2) {
+            var bb1 = obj1.getBBox(),
+                bb2 = obj2.getBBox();
+            var p = [
+                    { x: bb1.x + bb1.width / 2, y: bb1.y - 1 },
+                    { x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1 },
+                    { x: bb1.x - 1, y: bb1.y + bb1.height / 2 },
+                    { x: bb1.x + bb1.width + 1, y: bb1.y + bb1.height / 2 },
+                    { x: bb2.x + bb2.width / 2, y: bb2.y - 1 },
+                    { x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1 },
+                    { x: bb2.x - 1, y: bb2.y + bb2.height / 2 },
+                    { x: bb2.x + bb2.width + 1, y: bb2.y + bb2.height / 2 }
+                ];
+            var d = {}, dis = [];
+            for (var i = 0; i < 4; i++) {
+                for (var j = 4; j < 8; j++) {
+                    var dx = Math.abs(p[i].x - p[j].x),
+                        dy = Math.abs(p[i].y - p[j].y);
+                    if (
+                         (i == j - 4) ||
+                         (((i != 3 && j != 6) || p[i].x < p[j].x) &&
+                         ((i != 2 && j != 7) || p[i].x > p[j].x) &&
+                         ((i != 0 && j != 5) || p[i].y > p[j].y) &&
+                         ((i != 1 && j != 4) || p[i].y < p[j].y))
+                       ) {
+                        dis.push(dx + dy);
+                        d[dis[dis.length - 1]] = [i, j];
+                    }
+                }
+            }
+            if (dis.length == 0) {
+                var res = [0, 4];
+            } else {
+                res = d[Math.min.apply(Math, dis)];
+            }
+            var result = {};
+            result.start = {};
+            result.end = {};
+            result.start.x = p[res[0]].x;
+            result.start.y = p[res[0]].y;
+            result.end.x = p[res[1]].x;
+            result.end.y = p[res[1]].y;
+            return result;
+        }
+
+              //获取组成箭头的三条线段的路径
+        function getArr(x1, y1, x2, y2, size) {
+            var angle = Raphael.angle(x1, y1, x2, y2);//得到两点之间的角度
+            var a45 = Raphael.rad(angle - 10);//角度转换成弧度
+            var a45m = Raphael.rad(angle + 10);
+            var x2a = x2 + Math.cos(a45) * size;
+            var y2a = y2 + Math.sin(a45) * size;
+            var x2b = x2 + Math.cos(a45m) * size;
+            var y2b = y2 + Math.sin(a45m) * size;
+            var result = ["M", x1, y1, "L", x2, y2, "L", x2a, y2a, "M", x2, y2, "L", x2b, y2b];
+            return result;
+        }
+
+        //生成唯一值
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        function guid() {
+            return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+        }
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
+        }
+
+    //处理节点名的函数，大于八个字的名字用省略号填充
+        function nameIntercept(text) {
+            if (text.length > 8) {
+                return text.substring(0,7)+'…';
+            }
+            return text;
+        }
+
+        //删除节点回调函数——是
+        function delNode_yes(isNodeSelected) {
+            if (isNodeSelected) { //节点被选择标记
+                if (NodeSelectedType) { //被选中节点的类项 线或者时节点 0节点 1线
+                    for (var i = 0; i < connections.length; i++) {
+                        if (connections[i] == NodeSelected) {
+                            connections.splice(i, 1);
+                            NodeSelected.arrPath.remove();  //标记被选中节点
+                            NodeSelected.circle1.remove();
+                            NodeSelected.circle2.remove();
+                            NodeSelected.circle3.remove();
+                            break;
+                        }
+                    }
+                } else {
+                    for (var i = 0; i < nodeObjects.length; i++) {
+                        if (nodeObjects[i] == NodeSelected) {
+                            nodeObjects.splice(i, 1);
+                            //先从节点组除去
+                            removeConnectionsByShape(connections, NodeSelected.shapes);
+                            NodeSelected.shapes.remove();  //标记被选中节点
+                            NodeSelected.shapesContainer.remove();
+                            var divName = '#' + NodeSelected.id;
+                            $(divName).remove();
+                            $(divName + 1).remove();
+                            setShape.remove();
+                            setConnection.arrPath.remove();
+                            hasSetShape = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        //删除节点回调函数——否
+        function delNode_no(isNodeSelected) {
+            if (setShape.attrs) {
+                if (e.clientX < setShape.attrs.x + setShape.attrs.width && e.clientX > setShape.attrs.x && e.clientY < setShape.attrs.y + setShape.attrs.height && e.clientY > setShape.attrs.y) {
+                    return;
+                } else {
+                    setShape.remove();
+                    setConnection.arrPath.remove();
+                    setConnection.circle1.remove();
+                    setConnection.circle2.remove();
+                    setConnection.circle3.remove();
+                    hasSetShape = 0;
+                }
+            } else {
+                setShape.remove();
+                setConnection.arrPath.remove();
+                setConnection.circle1.remove();
+                setConnection.circle2.remove();
+                setConnection.circle3.remove();
+                hasSetShape = 0;
+            }
+            retuen;
+        }
+
+        function myIsIE() {
+            if (!!window.ActiveXObject || "ActiveXObject" in window)
+                return true;
+            else
+                return false;
+        }
+</script>
+</html>

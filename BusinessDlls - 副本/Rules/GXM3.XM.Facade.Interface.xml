@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GXM3.XM.Facade.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlBudgetDtlFacade">
+            <summary>
+            ProjectDtlBudgetDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.Interface.IProjectDtlBudgetDtlFacade.UpdateDtlFBudgetAmount(System.Int64[],System.Decimal[])">
+            <summary>
+            预算根据明细表主键回填预算金额
+            </summary>
+            <param name="phid"></param>
+            <param name="FAmount"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.Interface.IProjectDtlBudgetDtlFacade.UpdateBudgetDtlList(System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel})">
+            <summary>
+            生成预算时回填明细
+            </summary>
+            <param name="oldxm3BudgetDtl"></param>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlFundApplFacade">
+            <summary>
+            ProjectDtlFundAppl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlImplPlanFacade">
+            <summary>
+            ProjectDtlImplPlan业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlPerformTargetFacade">
+            <summary>
+            ProjectDtlPerformTarget业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlPurchaseDtlFacade">
+            <summary>
+            ProjectDtlPurchaseDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlPurDtl4SOFFacade">
+            <summary>
+            ProjectDtlPurDtl4SOF业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectDtlTextContentFacade">
+            <summary>
+            ProjectDtlTextContent业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Facade.Interface.IProjectMstFacade">
+            <summary>
+            ProjectMst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Facade.Interface.IProjectMstFacade.SaveProjectMst(GXM3.XM.Model.Domain.ProjectMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="projectMstEntity"></param>
+            <param name="projectDtlImplPlanEntities"></param>
+            <param name="projectDtlTextContentEntities"></param>
+            <param name="projectDtlFundApplEntities"></param>
+            <param name="projectDtlBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.Interface.IProjectMstFacade.SaveProjectMst(GXM3.XM.Model.Domain.ProjectMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlTextContentModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPurchaseDtlModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPurDtl4SOFModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlPerformTargetModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlFundApplModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlBudgetDtlModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.ProjectDtlImplPlanModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="projectMstEntity"></param>
+            <param name="projectDtlTextContentEntities"></param>
+            <param name="projectDtlPurchaseDtlEntities"></param>
+            <param name="projectDtlPurDtl4SOFEntities"></param>
+            <param name="projectDtlPerformTargetEntities"></param>
+            <param name="projectDtlFundApplEntities"></param>
+            <param name="projectDtlBudgetDtlEntities"></param>
+            <param name="projectDtlImplPlanEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Facade.Interface.IProjectMstFacade.UpdateFProjStatus(System.Int64)">
+            <summary>
+            更改项目状态,项目状态更改成“单位备选”时,删除当前预算，并把对应项目的状态改为“单位备选”
+            </summary>
+            <param name="phid"></param>
+        </member>
+        <member name="M:GXM3.XM.Facade.Interface.IProjectMstFacade.AddData(System.String[])">
+            <summary>
+            项目同步数据到老G6H
+            </summary>
+            <param name="ids"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

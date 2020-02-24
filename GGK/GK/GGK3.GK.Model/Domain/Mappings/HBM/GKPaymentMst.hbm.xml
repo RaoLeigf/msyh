@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GGK3.GK.Model.Domain" assembly="GGK3.GK.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GKPaymentMstModel" table="gk3_payment_mst">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="OrgPhid" column="org_phid" type="System.Int64" not-null="false" />
+		<property name="OrgCode" column="org_code" type="System.String" length="50" not-null="false" />
+		<property name="RefbillPhid" column="refbill_phid" type="System.Int64" not-null="false" />
+		<property name="RefbillCode" column="refbill_code" type="System.String" length="50" not-null="false" />
+		<property name="FCode" column="f_code" type="System.String" length="50" not-null="false" />
+		<property name="FPaymethod" column="f_paymethod" type="System.Int64" not-null="false" />
+		<property name="FAmountTotal" column="f_amount_total" type="System.Decimal" not-null="false" />
+		<property name="FApproval" column="f_approval" type="System.Byte" not-null="false" />
+		<property name="FState" column="f_state" type="System.Byte" not-null="false" />
+		<property name="FDescribe" column="f_describe" type="System.String" length="500" not-null="false" />
+		<property name="FDate" column="f_date" type="System.DateTime" not-null="false" />
+		<property name="FBilltype" column="f_billtype" type="System.String" length="50" not-null="false" />
+		<property name="FYear" column="f_year" type="System.String" length="4" not-null="false" />
+    <property name="FDelete" column="f_delete" type="System.Byte" not-null="false" />
+		<property name="FSeqno" column="f_seqno" type="System.String" length="50" not-null="false" />
+		<property name="FSubmitterId" column="f_submitter_id" type="System.Int64" not-null="false" />
+		<property name="FSubmitdate" column="f_submitdate" type="System.DateTime" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3D439830-7810-4DEE-A0DF-5786F298E819}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GQT3.QT.Service</RootNamespace>
+    <AssemblyName>GQT3.QT.Service</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GQT3.QT.Service.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.ExceptionHandling, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Dac">
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Dac.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Service, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="NG.KeepConn, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\NG.KeepConn.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL" />
+    <Reference Include="NG3.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL" />
+    <Reference Include="NG3.Data.Service, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\NG3.Data.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Exceptions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\NG3.Exceptions.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=2.2.1.0, Culture=neutral,  =MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML">
+      <HintPath>..\..\BusinessDlls\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net">
+      <HintPath>..\..\BusinessDlls\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base">
+      <HintPath>..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BankAccountService.cs" />
+    <Compile Include="BudgetAccountsService.cs" />
+    <Compile Include="CorrespondenceSettings2Service.cs" />
+    <Compile Include="CorrespondenceSettingsService.cs" />
+    <Compile Include="ExpenseCategoryService.cs" />
+    <Compile Include="GHProjDtlShareService.cs" />
+    <Compile Include="OrgRelatitem2Service.cs" />
+    <Compile Include="PaymentMethodService.cs" />
+    <Compile Include="PerformEvalTargetClassService.cs" />
+    <Compile Include="PerformEvalTargetService.cs" />
+    <Compile Include="PerformEvalTargetTypeService.cs" />
+    <Compile Include="PerformEvalTypeService.cs" />
+    <Compile Include="ProcurementCatalogService.cs" />
+    <Compile Include="ProcurementProceduresService.cs" />
+    <Compile Include="ProcurementTypeService.cs" />
+    <Compile Include="ProjectThresholdService.cs" />
+    <Compile Include="ProjLibProjService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QtAccountService.cs" />
+    <Compile Include="QtAttachmentService.cs" />
+    <Compile Include="QtBaseProjectService.cs" />
+    <Compile Include="QTControlSetService.cs" />
+    <Compile Include="QtCoverUpDataService.cs" />
+    <Compile Include="QtCoverUpForOrgService.cs" />
+    <Compile Include="QtDtlStageService.cs" />
+    <Compile Include="QTEditMemoService.cs" />
+    <Compile Include="QTIfApproveService.cs" />
+    <Compile Include="QTMemoService.cs" />
+    <Compile Include="QTModifyService.cs" />
+    <Compile Include="QTIndividualInfoService.cs" />
+    <Compile Include="QtNaviGationService.cs" />
+    <Compile Include="QtOrgDygxService.cs" />
+    <Compile Include="QTProductService.cs" />
+    <Compile Include="QTProductUserDygxService.cs" />
+    <Compile Include="QTProductUserService.cs" />
+    <Compile Include="QTProjectMstService.cs" />
+    <Compile Include="QtSysCodeSeqService.cs" />
+    <Compile Include="QTSysSetService.cs" />
+    <Compile Include="QtTableCustomizeService.cs" />
+    <Compile Include="QtVenueService.cs" />
+    <Compile Include="QtXmDistributeService.cs" />
+    <Compile Include="QtYJKService.cs" />
+    <Compile Include="QtZcgnflService.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="SourceOfFundsService.cs" />
+    <Compile Include="SysSettingService.cs" />
+    <Compile Include="UserOrgService.cs" />
+    <Compile Include="VCorrespondenceSetting2Service.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\GData\Common\GData3.Common.Utils\GData3.Common.Utils.csproj">
+      <Project>{A4DA9236-7F50-4C27-B4C7-2B3F051E0FC1}</Project>
+      <Name>GData3.Common.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GGK\GK\GGK3.GK.Facade.Interface\GGK3.GK.Facade.Interface.csproj">
+      <Project>{0947CD35-EA38-499F-B7DF-7BC72F0E0885}</Project>
+      <Name>GGK3.GK.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GGK\GK\GGK3.GK.Model\GGK3.GK.Model.csproj">
+      <Project>{8C7038CE-B766-414F-B5E1-D15710157E85}</Project>
+      <Name>GGK3.GK.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GSP\SP\GSP3.SP.Facade.Interface\GSP3.SP.Facade.Interface.csproj">
+      <Project>{00EB0419-6A34-4215-895B-EB12AE4D971E}</Project>
+      <Name>GSP3.SP.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GSP\SP\GSP3.SP.Model\GSP3.SP.Model.csproj">
+      <Project>{259AD850-29EA-46A1-80C7-DCD20149220A}</Project>
+      <Name>GSP3.SP.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GXM\GXM3.XM\GXM3.XM.Facade.Interface\GXM3.XM.Facade.Interface.csproj">
+      <Project>{76659e18-e8c8-4cad-9829-57923ff05bf5}</Project>
+      <Name>GXM3.XM.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GXM\GXM3.XM\GXM3.XM.Model\GXM3.XM.Model.csproj">
+      <Project>{229f2520-c7ca-4086-9da9-cccc9abe0f75}</Project>
+      <Name>GXM3.XM.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GYS\GYS3.YS\GYS3.YS.Facade.Interface\GYS3.YS.Facade.Interface.csproj">
+      <Project>{5072505e-c383-492a-8108-f0edf4882db7}</Project>
+      <Name>GYS3.YS.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GYS\GYS3.YS\GYS3.YS.Model\GYS3.YS.Model.csproj">
+      <Project>{dd639bb1-92fc-4da9-a0a0-c5f1ac91b7f5}</Project>
+      <Name>GYS3.YS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Enterprise3.WebApi.GQT3.QT.Model\Enterprise3.WebApi.GQT3.QT.Model.csproj">
+      <Project>{24DA844C-BDA1-4C64-BC52-4ADF71487B1B}</Project>
+      <Name>Enterprise3.WebApi.GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Facade.Interface\GQT3.QT.Facade.Interface.csproj">
+      <Project>{c2328d95-250f-4968-8b7a-62ca2ecfb146}</Project>
+      <Name>GQT3.QT.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47ee9856-f415-4171-8609-b0531db86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Service.Interface\GQT3.QT.Service.Interface.csproj">
+      <Project>{b481911f-af15-4453-bbe8-d0e72b33a4cc}</Project>
+      <Name>GQT3.QT.Service.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\i6Rules\ /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

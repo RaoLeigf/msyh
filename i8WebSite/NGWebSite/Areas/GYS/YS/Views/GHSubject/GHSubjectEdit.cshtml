@@ -1,0 +1,1375 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src="@Url.Script("~/NG3Resource/js/NG3APPcommon.js")" type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+
+    @*
+        <script src=@Url.Script("~/NG3Resource/js/G6H/GHProjNameHelp.js") type="text/javascript" charset="utf-8"></script>*@
+    <script src=@Url.Script("~/NG3Resource/js/ExMergeGrid.js") type="text/javascript" charset="utf-8"></script>
+
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/GHSubjectEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/YJK.js") type="text/javascript" charset="utf-8"></script>
+    @*<script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>*@
+    <script type="text/javascript">
+    //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+    var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+    var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+    //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+    var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+    if (Ext.isEmpty(defCustomInfo)) {
+        //数据库没有，取js模板的individualConfigInfo
+        defCustomInfo = individualConfigInfo;
+    }
+
+    //自定义信息与多语言合并
+    var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+    var otype = '@ViewBag.OType';
+    var busid = '@ViewBag.ID';
+    //var busno = '@ViewBag.No';
+    var FKmlb = '@ViewBag.FKmlb';
+    var deleteBefore = '@ViewBag.deleteBefore';
+    var deleteAndAdd = '@ViewBag.deleteAndAdd';
+    //var workflowOtype = otype;
+
+    var attachGuid = '';
+    var attachment;
+
+    var FType = '@ViewBag.FType';
+    var FDeclarationDept;
+    var sessionFYear=sessionStorage.getItem("FYear");
+
+    Ext.onReady(function () {
+
+           //审批流控件
+        var wfinfojson = "";
+        var workflowPanel;
+        var wfinfo = Ext.htmlDecode('@ViewBag.WorkFlowInfo');
+        //工具栏
+        var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+            region: 'north',
+            ngbuttons: [
+                'save', 'attachment',
+                //'addrow', 'deleterow',
+                { id: "BudgetDtl", text: "子科目明细", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "BudgetDtl" },
+                '->', 'print', 'close'
+            ]
+        });
+
+        //工作流面板
+        if (wfinfo != "" && !Ext.isEmpty(wfinfo)) {
+            wfinfojson = Ext.decode(wfinfo);
+            otype = "edit";
+            workflowPanel = Ext.create('Ext.panel.Panel', {
+                region: 'north',
+                border: 'fit',
+                items: [
+                    {
+                        xtype: 'ngWorkFlowPanel',
+                        toolbar: ngToolbar, //单据toolbar
+                        otype: otype, //单据otype
+                        bizType: "GHSubject", //注册的表单id（原商业对象）
+                        bizPhid: busid, //单据phid
+                        showToolBarItems: ['attachment'], //任务办理时可见toolbar按钮itemid数组
+                        workFlowInfo: wfinfojson,
+                        bizSaveAsync: true,
+                        bizSaveFn: function (callback) { //单据保存方法，方法需返回bool值，Ajax方法需使用同步模式
+                            save(callback);
+                        },
+                        listeners: {
+                            taskComplete: function (compId, wfParam) {
+                                //在这里进行自定义组件任务处理，并把工作流参数传到服务端，并在服务端调用工作流api
+
+                                debugger;
+                            }
+                        }
+                    }
+                ]
+            });
+        }
+
+
+        if (workflowPanel) {
+            otype = "edit";
+        }
+
+
+
+        //定义GHSubject_form
+        var GHSubject_formInitialConfig = {
+            region: 'north',
+            frame: true,
+            split: true,
+            minWidth: 600,
+            buskey: 'PhId', //对应的业务表主键
+            otype: otype //操作类型,add||edit
+        };
+        var GHSubject_formConfig = GHSubject_formInitialConfig;
+        if (individualInfo.form) {
+            Ext.apply(GHSubject_formConfig, individualInfo.form['GHSubject']);
+        }
+        var GHSubject_form = Ext.create('Ext.ng.TableLayoutForm', GHSubject_formConfig);
+
+        //获取GHSubjectMst_grid自带model
+        var GHSubjectMst_modelFields = [
+            {
+                "name": "FSubjectCode",
+                "type": "string",
+                "mapping": "FSubjectCode"
+            },
+            {
+                "name": "FSubjectName",
+                "type": "string",
+                "mapping": "FSubjectName"
+            },
+            {
+                "name": "FProjName",
+                "type": "string",
+                "mapping": "FProjName"
+            },
+            {
+                "name": "FProjAmount",
+                "type": "float",
+                "mapping": "FProjAmount"
+            },
+            {
+                "name": "FFillDept",
+                "type": "string",
+                "mapping": "FFillDept"
+            },
+            {
+                "name": "FFillDept_EXName",
+                "type": "string",
+                "mapping": "FFillDept_EXName"
+            },
+            {
+                "name": "FYear",
+                "type": "string",
+                "mapping": "FYear"
+            },
+            {
+                "name": "FDeclarationUnit",
+                "type": "string",
+                "mapping": "FDeclarationUnit"
+            },
+            {
+                "name": "FDeclarationUnit_EXName",
+                "type": "string",
+                "mapping": "FDeclarationUnit_EXName"
+            },
+            {
+                "name": "PhId",
+                "type": "int",
+                "mapping": "PhId"
+            },
+            {
+                "name": "FBudgetDept",
+                "type": "string",
+                "mapping": "FBudgetDept"
+            },
+            {
+                "name": "FDateofDeclaration",
+                "type": "date",
+                "mapping": "FDateofDeclaration"
+            },
+            {
+                "name": "FProjCode",
+                "type": "string",
+                "mapping": "FProjCode"
+            },
+            {
+                "name": "FKMLB",
+                "type": "string",
+                "mapping": "FKMLB"
+            },
+            {
+                "name": "Mstphid",
+                "type": "int",
+                "mapping": "Mstphid"
+            },
+            {
+                "name": "FDeclarer",
+                "type": "string",
+                "mapping": "FDeclarer"
+            },
+            {
+                "name": "NgRecordVer",
+                "type": "int",
+                "mapping": "NgRecordVer"
+            },
+            {
+                "name": "FAmountEdit",
+                "type": "float",
+                "mapping": "FAmountEdit"
+            },
+            {
+                "name": "FAmountAfterEdit",
+                "type": "float",
+                "mapping": "FAmountAfterEdit"
+            }
+        ]
+        //调用$MergIndividualModelCol合并grid的Model
+        var GHSubjectMst_allFields = $MergIndividualModelCol(GHSubjectMst_modelFields, individualInfo, 'GHSubjectMst');
+        //定义模型
+        Ext.define('GHSubjectMst_model', {
+            extend: 'Ext.data.Model',
+            fields: GHSubjectMst_allFields
+        });
+        //定义GHSubjectMst_store
+        var GHSubjectMst_store = Ext.create('Ext.ng.JsonStore', {
+            model: 'GHSubjectMst_model',
+            pageSize: 20
+        });
+        //定义GHSubjectMst_cellEditing
+        var GHSubjectMst_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+            clicksToEdit: 1    //单击编辑，单元格修改
+        });
+        //从自定义信息中获取到grid的配置
+        var GHSubjectMst_indvidualGrid = individualInfo.grid['GHSubjectMst'];
+        //动态内容的配置不能写在插件中
+        var GHSubjectMst_gridInitialConfig = {
+            stateful: false,
+            region: 'center',
+            stateId: '5660c939-93e0-4eca-906b-e8995fc43b50', //这里请使用guid，防止冲突
+            store: GHSubjectMst_store,
+            otype: otype, //操作类型,add||edit
+            plugins: [GHSubjectMst_cellEditing]
+        }
+        //动态配置与静态配置合并
+        var GHSubjectMst_gridConfig = Ext.apply(GHSubjectMst_gridInitialConfig, GHSubjectMst_indvidualGrid);
+        //定义GHSubjectMst_grid
+        var GHSubjectMst_grid = Ext.create('Ext.ng.GridPanel', GHSubjectMst_gridConfig);
+
+        //获取GHSubjectMstBudgetDtl_grid自带model
+        var GHSubjectMstBudgetDtl_modelFields = [
+            {
+                "name": "FDtlName",
+                "type": "string",
+                "mapping": "FDtlName"
+            },
+            {
+                "name": "Fqty",
+                "type": "float",
+                "mapping": "Fqty"
+            },
+            {
+                "name": "FMeasUnit",
+                "type": "string",
+                "mapping": "FMeasUnit"
+            },
+            {
+                "name": "FPrice",
+                "type": "float",
+                "mapping": "FPrice"
+            },
+            {
+                "name": "FAmount",
+                "type": "float",
+                "mapping": "FAmount"
+            },
+            {
+                "name": "FExpensesChannel",
+                "type": "string",
+                "mapping": "FExpensesChannel"
+            },
+            {
+                "name": "FExpensesChannel_EXName",
+                "type": "string",
+                "mapping": "FExpensesChannel_EXName"
+            },
+            {
+                "name": "FOtherInstructions",
+                "type": "string",
+                "mapping": "FOtherInstructions"
+            },
+            {
+                "name": "PhId",
+                "type": "int",
+                "mapping": "PhId"
+            },
+            {
+                "name": "Mstphid",
+                "type": "int",
+                "mapping": "Mstphid"
+            },
+            {
+                "name": "FProjCode",
+                "type": "string",
+                "mapping": "FProjCode"
+            },
+            {
+                "name": "FDtlCode",
+                "type": "string",
+                "mapping": "FDtlCode"
+            },
+            {
+                "name": "FName",
+                "type": "string",
+                "mapping": "FName"
+            },
+            {
+                "name": "FBudgetset",
+                "type": "string",
+                "mapping": "FBudgetset"
+            },
+            {
+                "name": "NgRecordVer",
+                "type": "int",
+                "mapping": "NgRecordVer"
+            },
+            {
+                "name": "FAmountEdit",
+                "type": "float",
+                "mapping": "FAmountEdit"
+            },
+            {
+                "name": "FAmountAfterEdit",
+                "type": "float",
+                "mapping": "FAmountAfterEdit"
+            }
+        ]
+        //调用$MergIndividualModelCol合并grid的Model
+        var GHSubjectMstBudgetDtl_allFields = $MergIndividualModelCol(GHSubjectMstBudgetDtl_modelFields, individualInfo, 'GHSubjectMstBudgetDtl');
+        //定义模型
+        Ext.define('GHSubjectMstBudgetDtl_model', {
+            extend: 'Ext.data.Model',
+            fields: GHSubjectMstBudgetDtl_allFields
+        });
+        //定义GHSubjectMstBudgetDtl_store
+        var GHSubjectMstBudgetDtl_store = Ext.create('Ext.ng.JsonStore', {
+            model: 'GHSubjectMstBudgetDtl_model',
+            pageSize: 20
+        });
+        //定义GHSubjectMstBudgetDtl_cellEditing
+        var GHSubjectMstBudgetDtl_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+            clicksToEdit: 1    //单击编辑，单元格修改
+        });
+        //从自定义信息中获取到grid的配置
+        var GHSubjectMstBudgetDtl_indvidualGrid = individualInfo.grid['GHSubjectMstBudgetDtl'];
+        //动态内容的配置不能写在插件中
+        var GHSubjectMstBudgetDtl_gridInitialConfig = {
+            stateful: false,
+            region: 'center',
+            stateId: '3ce38292-3eab-4e0f-baf0-923cc29e9179', //这里请使用guid，防止冲突
+            store: GHSubjectMstBudgetDtl_store,
+            otype: otype, //操作类型,add||edit
+            plugins: [GHSubjectMstBudgetDtl_cellEditing],
+            listeners: {
+                'afterrender': function () {
+                    GHSubjectMstBudgetDtl_grid.getColumn('FExpensesChannel_EXName').getEditor().on("beforetriggerclick", function (str) {
+                        //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                        var FDeclarationUnit = GHSubject_form.queryById("FDeclarationUnit").getValue();
+                        if (!FDeclarationUnit) {
+                            Ext.MessageBox.alert("提示", '申报单位不能为空');
+                            return false;
+                        }
+                        GHSubjectMstBudgetDtl_grid.getColumn('FExpensesChannel_EXName').getEditor().setOutFilter({ DWDM: FDeclarationUnit });
+
+                    });
+                    this.getColumn('FExpensesChannel_EXName').getEditor().on('helpselected', function (obj) {
+                        var data = GHSubjectMstBudgetDtl_grid.getSelectionModel().getSelection();
+                        data[0].set('FExpensesChannel', obj.code);
+                        data[0].set('FExpensesChannel_EXName', obj.name);
+                    });
+                }
+            }
+        }
+        //动态配置与静态配置合并
+        var GHSubjectMstBudgetDtl_gridConfig = Ext.apply(GHSubjectMstBudgetDtl_gridInitialConfig, GHSubjectMstBudgetDtl_indvidualGrid);
+        //定义GHSubjectMstBudgetDtl_grid
+        var GHSubjectMstBudgetDtl_grid = Ext.create('Ext.ng.GridPanel', GHSubjectMstBudgetDtl_gridConfig);
+
+        var myViewport =  Ext.create('Ext.container.Viewport', {
+            id: "viewPort",
+            layout: 'border',
+            items:
+                [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        layout: 'border',
+                        region: 'center',
+                        autoScroll: true,
+                        bodyStyle: 'padding-right:20px',
+                        //style: 'overflow-y:scroll,padding-right:20px',
+                        items: [ GHSubject_form, GHSubjectMst_grid]
+                        //items: [ngToolbar, GHSubject_form,GHSubjectMst_grid,GHSubjectMstBudgetDtl_grid]
+                    }
+                ]
+        });
+		GHSubject_form.queryById("FDeclarationDept").on("beforetriggerclick", function (str) {
+			var unitCode = GHSubject_form.queryById("FDeclarationUnit").getValue();
+			if (unitCode) {
+				filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+			}
+			else {
+				Ext.MessageBox.alert('请先选择申报单位');
+				return false; 
+			}
+			if (filter) {
+				GHSubject_form.queryById("FDeclarationDept").setClientSqlFilter(filter);
+			}
+
+		});
+		GHSubject_form.queryById("FDeclarationDept").on("helpselected", function (obj) {
+			if(FDeclarationDept!=obj.data.OCode){
+				var FProcessStatus = ""; //预算申报进度
+                Ext.Ajax.request({
+                    params: { 'oCode': GHSubject_form.queryById("FDeclarationUnit").getValue(), 'deptCode': obj.data.OCode, 'FYear': sessionFYear },
+                    url: C_ROOT + 'GYS/YS/BudgetMst/FindBudgetProcessCtrl',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            FProcessStatus = resp.Msg;
+
+                        }
+                    }
+                });
+                /*if ((FType == "tz" && FProcessStatus == '3') || (FType == "z" && FProcessStatus == '3') || (FType == "c" && FProcessStatus == '1')) {
+				
+				}else{
+					Ext.MessageBox.alert('提示', deptName + "处于" + FProcessStatusName+"阶段，无法进行年中调整！");
+				}*/
+                   
+				if(FProcessStatus == '3'){
+					if(FType != "tz" && FType != "z")
+					{
+						Ext.MessageBox.alert('提示', obj.data.OName + "处于年中调整阶段，无法进行年初新增！");
+						GHSubject_form.queryById("FDeclarationDept").setValue(FDeclarationDept);
+						var codectl = [GHSubject_form.queryById('FDeclarationDept')]; 
+						BatchBindCombox(codectl);
+						return null;
+					}
+				}
+				else if(FProcessStatus == '1')
+				{
+					if(FType != "c")
+					{
+						if(FType=="z"){
+							Ext.MessageBox.alert('提示', obj.data.OName + "处于年初申报阶段，无法进行年中新增！");
+						}else{
+							Ext.MessageBox.alert('提示', obj.data.OName + "处于年初申报阶段，无法进行年中调整！");
+						}
+						GHSubject_form.queryById("FDeclarationDept").setValue(FDeclarationDept);
+						var codectl = [GHSubject_form.queryById('FDeclarationDept')]; 
+						BatchBindCombox(codectl);
+						return null;
+					}
+				}else{
+					if(FType == "c"){
+						Ext.MessageBox.alert('提示', "当前进度不允许年初新增！");
+					}else if(FType == "z"){
+						Ext.MessageBox.alert('提示', "当前进度不允许年中新增！");
+					}else{
+						Ext.MessageBox.alert('提示', "当前进度不允许年中调整！");
+					}
+					GHSubject_form.queryById("FDeclarationDept").setValue(FDeclarationDept);
+						var codectl = [GHSubject_form.queryById('FDeclarationDept')]; 
+						BatchBindCombox(codectl);
+                    return null;
+				}
+						
+                /*} else {
+                    var FProcessStatusName = "";
+                    if (FProcessStatus == '1') {
+                        FProcessStatusName = "年初申报";
+                    } else if (FProcessStatus == '2') {
+                        FProcessStatusName = "初报完成";
+                    } else {
+                        FProcessStatusName = "调整完成";
+                    }
+                    Ext.MessageBox.alert('提示', deptName + "处于" + FProcessStatusName+"阶段，无法进行年中调整！");
+                    return null;
+                }*/
+			
+				FDeclarationDept=obj.data.OCode
+				GHSubject_form.queryById("FDeclarationDept").setValue(obj.data.OCode);
+				var codectl = [GHSubject_form.queryById('FDeclarationDept')]; 
+				BatchBindCombox(codectl);
+				
+				GHSubjectMst_store.removeAll();
+				GHSubjectMstBudgetDtl_store.removeAll();
+				if (FType == "tz") {
+					var SubjectTitle = "";
+					if (FKmlb == "1") {
+						SubjectTitle = "基本支出";
+					} else {
+						SubjectTitle = "收入预算";
+					}
+					GHSubject_form.queryById("FProjName").setValue(obj.data.OName + SubjectTitle+"汇总数据（调整）");
+				}
+				Ext.Ajax.request({
+					params: {
+						'FDwdm': GHSubject_form.queryById("FDeclarationUnit").getValue(), 'FKmlb': FKmlb, 'Dept': FDeclarationDept, 'deleteBefore': deleteBefore, 'deleteAndAdd': deleteAndAdd, 'FType': FType,'FYear': sessionFYear},
+					url: C_ROOT + 'GYS/YS/GHSubject/FindSubjectData',
+					async: false,
+					success: function (response) {
+						var resp = Ext.JSON.decode(response.responseText);
+						if (resp.Record.length > 0) {
+							for (var i = 0; i < resp.Record.length; i++) {
+								var budgetdtldata = GHSubjectMst_grid.getSelectionModel();
+								GHSubjectMst_store.insert(GHSubjectMst_store.getCount(), budgetdtldata);
+								if (resp.Record[i].FProjName == "" || resp.Record[i].FProjCode == "") {
+									GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FSubjectCode', resp.Record[i].FKmdm);
+									GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FSubjectName', resp.Record[i].Fkmmc);
+								}
+
+								GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FProjName', resp.Record[i].FProjName);
+								GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FFillDept', resp.Record[i].FFillDept);
+								GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FFillDept_EXName', resp.Record[i].FFillDept_Name);
+								GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FProjCode', resp.Record[i].FProjCode);
+								GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FYear', resp.Record[i].FYear);
+
+							}
+						}
+					}
+				});
+
+				//同步列表中单据内容至新单据
+				if (deleteAndAdd == "1") {
+					Ext.Ajax.request({
+						params: {
+							'FDwdm': GHSubject_form.queryById("FDeclarationUnit").getValue(), 'FKmlb': FKmlb, 'Dept': FDeclarationDept, 'deleteBefore': deleteBefore, 'deleteAndAdd': deleteAndAdd, 'FType': FType ,'FYear': sessionFYear},
+						url: C_ROOT + 'GYS/YS/GHSubject/FindSubjectDtlData',
+						async: false,
+						success: function (response) {
+							var resp = Ext.JSON.decode(response.responseText);
+							if (resp.Record.length > 0) {
+								for (var i = 0; i < resp.Record.length; i++) {
+									var budgetdtldata = GHSubjectMstBudgetDtl_grid.getSelectionModel();
+									GHSubjectMstBudgetDtl_store.insert(GHSubjectMstBudgetDtl_store.getCount(), budgetdtldata);
+
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FDtlName', resp.Record[i].FDtlName);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('Fqty', resp.Record[i].Fqty);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FMeasUnit', resp.Record[i].FMeasUnit);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FPrice', resp.Record[i].FPrice);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmount', resp.Record[i].FAmount);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FOtherInstructions', resp.Record[i].FOtherInstructions);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FBudgetset', resp.Record[i].FBudgetset); //分部门填为0，汇总的为1
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FProjCode', resp.Record[i].FProjCode);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FName', resp.Record[i].FName);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FExpensesChannel', resp.Record[i].FExpensesChannel);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FExpensesChannel_EXName', resp.Record[i].FExpensesChannel_EXName);
+									GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmountEdit', resp.Record[i].FAmountEdit);
+                                    GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmountAfterEdit', resp.Record[i].FAmount + resp.Record[i].FAmountEdit);
+                                    
+                                    GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FYear', resp.Record[i].FYear);
+								}
+
+								if (GHSubjectMst_store.getCount() >= 1) {
+									for (var i = 0; i < GHSubjectMst_store.getCount(); i++) {
+										if (GHSubjectMst_store.getAt(i).get("FProjName") == "") {
+											continue;
+										}
+										GHSubjectMstBudgetDtl_store.clearFilter();
+										var projectCode = GHSubjectMst_store.getAt(i).get("FProjCode");
+										GHSubjectMstBudgetDtl_store.filter("FProjCode", projectCode);
+										if (GHSubjectMstBudgetDtl_store.getCount() > 0) {
+											var Amount = 0;
+											var Amount2 = 0;
+											for (var j = 0; j < GHSubjectMstBudgetDtl_store.getCount(); j++) {
+												Amount += GHSubjectMstBudgetDtl_store.getAt(j).get('FAmount');
+												Amount2 += GHSubjectMstBudgetDtl_store.getAt(j).get('FAmountEdit');
+											}
+											GHSubjectMst_store.getAt(i).set('FProjAmount', Amount);
+											GHSubjectMst_store.getAt(i).set('FAmountEdit', Amount2);
+											GHSubjectMst_store.getAt(i).set('FAmountAfterEdit', Amount + Amount2);
+										}
+									}
+									GHSubjectMstBudgetDtl_store.clearFilter();
+
+									var SumAmount = 0;
+									var SumAmount2 = 0;
+									//先汇总子科目
+									for (var s = GHSubjectMst_store.getCount() - 1; s >= 0; s--) {
+										if (GHSubjectMst_store.getAt(s).get("FFillDept") == "") {
+											GHSubjectMst_store.getAt(s).set('FProjAmount', SumAmount);
+											GHSubjectMst_store.getAt(s).set('FAmountEdit', SumAmount2);
+											GHSubjectMst_store.getAt(s).set('FAmountAfterEdit', SumAmount + SumAmount2);
+											SumAmount = 0;
+											SumAmount2 = 0;
+											continue;
+										}
+
+										SumAmount += GHSubjectMst_store.getAt(s).get('FProjAmount');
+										SumAmount2 += GHSubjectMst_store.getAt(s).get('FAmountEdit');
+
+									}
+
+									//根据子科目汇总上级
+									for (var z = 0; z < GHSubjectMst_store.getCount(); z++) {
+										if (GHSubjectMst_store.getAt(z).get("FProjCode") != "" || GHSubjectMst_store.getAt(z).get("FSubjectCode") == "")
+											continue;
+
+										var fkmdm = GHSubjectMst_store.getAt(z).get("FSubjectCode");
+										var sunParentAmount = 0;
+										var sunParentAmount2 = 0;
+										var time = 0;
+										for (var y = z + 1; y < GHSubjectMst_store.getCount(); y++) {
+
+											if (GHSubjectMst_store.getAt(y).get("FSubjectCode").indexOf(fkmdm) == 0) {
+												time++;
+												sunParentAmount += GHSubjectMst_store.getAt(y).get("FProjAmount");
+												sunParentAmount2 += GHSubjectMst_store.getAt(y).get("FAmountEdit");
+											}
+										}
+										//不是最末级科目，进行汇总
+										if (time > 0) {
+											GHSubjectMst_store.getAt(z).set('FProjAmount', sunParentAmount);
+											GHSubjectMst_store.getAt(z).set('FAmountEdit', sunParentAmount2);
+											GHSubjectMst_store.getAt(z).set('FAmountAfterEdit', sunParentAmount + sunParentAmount2);
+										}
+									}
+
+
+
+
+
+
+								}
+
+
+							}
+
+
+
+						}
+					});
+				}
+			}else{
+				console.log(111);
+			}
+
+		});
+
+
+        if (workflowPanel) {
+            //SyncWorkFlowUI(wfinfojson);
+            //插入审批流控件
+            myViewport.insert(1, workflowPanel);
+        }
+
+        //只有调整单据能看到调整金额
+        if (FType == 'tz') {
+            GHSubjectMst_grid.getColumn('FAmountEdit').show();
+            GHSubjectMst_grid.getColumn('FAmountAfterEdit').show();
+            GHSubjectMstBudgetDtl_grid.getColumn('FAmountEdit').show();
+            GHSubjectMstBudgetDtl_grid.getColumn('FAmountAfterEdit').show();
+            GHSubjectMst_grid.getColumn('FProjAmount').setText('调整前金额');
+        } else {
+            GHSubjectMst_grid.getColumn('FAmountEdit').hide();
+            GHSubjectMst_grid.getColumn('FAmountAfterEdit').hide();
+            GHSubjectMstBudgetDtl_grid.getColumn('FAmountEdit').hide();
+            GHSubjectMstBudgetDtl_grid.getColumn('FAmountAfterEdit').hide();
+        }
+
+        //当修改、查看时取数、绑定
+        if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+            Ext.Ajax.request({
+                params: { 'id': busid, 'tabtype': 'ghsubject' },
+                url: C_ROOT + 'GYS/YS/GHSubject/GetGHSubjectInfo',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        var mstformobj = GHSubject_form.getForm();
+                        mstformobj.setValues(resp.Data);
+
+
+                        if (resp.Data.FProjName == "各部门基本支出汇总数据" || resp.Data.FProjName == "各部门收入预算汇总数据"){
+                            GHSubject_form.queryById('FProjName').setReadOnly(true);
+                        }
+
+                        //只有调整单据能看到调整金额
+                        if (GHSubject_form.queryById("FType").getValue() == 'tz') {
+                            GHSubjectMst_grid.getColumn('FAmountEdit').show();
+                            GHSubjectMst_grid.getColumn('FAmountAfterEdit').show();
+                            GHSubjectMstBudgetDtl_grid.getColumn('FAmountEdit').show();
+                            GHSubjectMstBudgetDtl_grid.getColumn('FAmountAfterEdit').show();
+                            GHSubjectMst_grid.getColumn('FProjAmount').setText('调整前金额');
+                        } else {
+                            GHSubjectMst_grid.getColumn('FAmountEdit').hide();
+                            GHSubjectMst_grid.getColumn('FAmountAfterEdit').hide();
+                            GHSubjectMstBudgetDtl_grid.getColumn('FAmountEdit').hide();
+                            GHSubjectMstBudgetDtl_grid.getColumn('FAmountAfterEdit').hide();
+                        }
+
+                        //mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                        mstformobj.fireEvent('dataready', resp.Data);
+
+                        //代码转名称
+                        var codectl = [
+                            GHSubject_form.queryById('FDeclarationUnit'),
+                            // GHSubject_form.queryById('FBudgetDept'),
+                            GHSubject_form.queryById('FDeclarationDept')
+                        ];
+                        BatchBindCombox(codectl);
+
+                    } else {
+                        NGMsg.Error(resp.Msg);
+                    }
+                }
+            });
+
+            //GHSubjectMst明细
+            Ext.apply(GHSubjectMst_store.proxy.url = C_ROOT + 'GYS/YS/GHSubject/GetGHSubjectInfo');
+            Ext.apply(GHSubjectMst_store.proxy.extraParams, { 'id': busid, 'tabtype': 'subjectmst' });
+            GHSubjectMst_store.cachePageData = false;
+            GHSubjectMst_store.load();
+            GHSubjectMst_store.cachePageData = true;
+
+            //GHSubjectMstBudgetDtl明细
+            Ext.apply(GHSubjectMstBudgetDtl_store.proxy.url = C_ROOT + 'GYS/YS/GHSubject/GetGHSubjectInfo');
+            Ext.apply(GHSubjectMstBudgetDtl_store.proxy.extraParams, { 'id': busid, 'tabtype': 'subjectmstbudgetdtl' });
+            GHSubjectMstBudgetDtl_store.cachePageData = false;
+            GHSubjectMstBudgetDtl_store.load();
+            GHSubjectMstBudgetDtl_store.cachePageData = true;
+        }
+        
+        //当新增时
+        if (otype == $Otype.ADD) {
+            var orgCode = "";
+            var dept = "";
+            var orgName = "";
+            var deptName = "";
+            Ext.Ajax.request({
+                params: { 'userID': $user.id },
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                async: false,
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        var orgDept = resp.Msg;
+                        var orgDeptArray = orgDept.split(",");
+                        orgCode = orgDeptArray[0];
+                        dept = orgDeptArray[1];
+                        orgName = orgDeptArray[2];
+                        deptName = orgDeptArray[3];
+                    }
+                }
+            });
+            GHSubject_form.queryById("FDeclarationUnit").setValue(orgCode);
+            GHSubject_form.queryById("FDeclarationDept").setValue(dept);
+			FDeclarationDept=dept;
+            GHSubject_form.queryById("FBudgetDept").setValue("省总");
+            GHSubject_form.queryById("FDeclarer").setValue($appinfo.username);
+            var date = new Date();
+            GHSubject_form.queryById("FDateofDeclaration").setValue(date);
+            GHSubject_form.queryById("FYear").setValue(sessionFYear);
+            GHSubject_form.queryById("FApproveStatus").setValue(1); //未上报
+            GHSubject_form.queryById("FProjAttr").setValue(FKmlb); //支出或收入
+
+            //代码转名称
+            var codectl = [GHSubject_form.queryById('FDeclarationUnit'), GHSubject_form.queryById('FDeclarationDept')]; //
+            BatchBindCombox(codectl);
+            if (FType == "tz") {
+                var SubjectTitle = "";
+                if (FKmlb == "1") {
+                    SubjectTitle = "基本支出";
+                } else {
+                    SubjectTitle = "收入预算";
+                }
+                GHSubject_form.queryById("FProjName").setValue(deptName + SubjectTitle+"汇总数据（调整）");
+            }
+            //setTimeout(GHSubject_form.queryById("FProjName").setValue(GHSubject_form.queryById('FDeclarationDept').rawValue), 5000);
+           
+            /*var FType2 = FType;
+            if (FType == 'tz') {
+                FType2 = 'c';//年中调整调整年初的科目
+            }*/
+            
+            GHSubject_form.queryById("FType").setValue(FType);
+            Ext.Ajax.request({
+                params: {
+                    'FDwdm': orgCode, 'FKmlb': FKmlb, 'Dept': dept, 'deleteBefore': deleteBefore, 'deleteAndAdd': deleteAndAdd, 'FType': FType,'FYear':sessionFYear },
+                url: C_ROOT + 'GYS/YS/GHSubject/FindSubjectData',
+                async: false,
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Record.length > 0) {
+                        for (var i = 0; i < resp.Record.length; i++) {
+                            var budgetdtldata = GHSubjectMst_grid.getSelectionModel();
+                            GHSubjectMst_store.insert(GHSubjectMst_store.getCount(), budgetdtldata);
+                            if (resp.Record[i].FProjName == "" || resp.Record[i].FProjCode == "") {
+                                GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FSubjectCode', resp.Record[i].FKmdm);
+                                GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FSubjectName', resp.Record[i].Fkmmc);
+                            }
+
+                            GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FProjName', resp.Record[i].FProjName);
+                            GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FFillDept', resp.Record[i].FFillDept);
+                            GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FFillDept_EXName', resp.Record[i].FFillDept_Name);
+                            GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FProjCode', resp.Record[i].FProjCode);
+                            
+                            GHSubjectMst_store.getAt(GHSubjectMst_store.getCount() - 1).set('FYear', resp.Record[i].FYear);
+
+                        }
+                    }
+                }
+            });
+
+            //同步列表中单据内容至新单据
+            if (deleteAndAdd == "1") {
+                Ext.Ajax.request({
+                    params: {
+                        'FDwdm': orgCode, 'FKmlb': FKmlb, 'Dept': dept, 'deleteBefore': deleteBefore, 'deleteAndAdd': deleteAndAdd, 'FType': FType ,'FYear': sessionFYear},
+                    url: C_ROOT + 'GYS/YS/GHSubject/FindSubjectDtlData',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length > 0) {
+                            for (var i = 0; i < resp.Record.length; i++) {
+                                var budgetdtldata = GHSubjectMstBudgetDtl_grid.getSelectionModel();
+                                GHSubjectMstBudgetDtl_store.insert(GHSubjectMstBudgetDtl_store.getCount(), budgetdtldata);
+
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FDtlName', resp.Record[i].FDtlName);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('Fqty', resp.Record[i].Fqty);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FMeasUnit', resp.Record[i].FMeasUnit);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FPrice', resp.Record[i].FPrice);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmount', resp.Record[i].FAmount);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FOtherInstructions', resp.Record[i].FOtherInstructions);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FBudgetset', resp.Record[i].FBudgetset); //分部门填为0，汇总的为1
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FProjCode', resp.Record[i].FProjCode);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FName', resp.Record[i].FName);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FExpensesChannel', resp.Record[i].FExpensesChannel);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FExpensesChannel_EXName', resp.Record[i].FExpensesChannel_EXName);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmountEdit', resp.Record[i].FAmountEdit);
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmountAfterEdit', resp.Record[i].FAmount + resp.Record[i].FAmountEdit);
+
+                                
+                                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FYear', resp.Record[i].FYear);
+                            }
+
+                            if (GHSubjectMst_store.getCount() >= 1) {
+                                for (var i = 0; i < GHSubjectMst_store.getCount(); i++) {
+                                    if (GHSubjectMst_store.getAt(i).get("FProjName") == "") {
+                                        continue;
+                                    }
+                                    GHSubjectMstBudgetDtl_store.clearFilter();
+                                    var projectCode = GHSubjectMst_store.getAt(i).get("FProjCode");
+                                    GHSubjectMstBudgetDtl_store.filter("FProjCode", projectCode);
+                                    if (GHSubjectMstBudgetDtl_store.getCount() > 0) {
+                                        var Amount = 0;
+                                        var Amount2 = 0;
+                                        for (var j = 0; j < GHSubjectMstBudgetDtl_store.getCount(); j++) {
+                                            Amount += GHSubjectMstBudgetDtl_store.getAt(j).get('FAmount');
+                                            Amount2 += GHSubjectMstBudgetDtl_store.getAt(j).get('FAmountEdit');
+                                        }
+                                        GHSubjectMst_store.getAt(i).set('FProjAmount', Amount);
+                                        GHSubjectMst_store.getAt(i).set('FAmountEdit', Amount2);
+                                        GHSubjectMst_store.getAt(i).set('FAmountAfterEdit', Amount + Amount2);
+                                    }
+                                }
+                                GHSubjectMstBudgetDtl_store.clearFilter();
+
+                                var SumAmount = 0;
+                                var SumAmount2 = 0;
+                                //先汇总子科目
+                                for (var s = GHSubjectMst_store.getCount() - 1; s >= 0; s--) {
+                                    if (GHSubjectMst_store.getAt(s).get("FFillDept") == "") {
+                                        GHSubjectMst_store.getAt(s).set('FProjAmount', SumAmount);
+                                        GHSubjectMst_store.getAt(s).set('FAmountEdit', SumAmount2);
+                                        GHSubjectMst_store.getAt(s).set('FAmountAfterEdit', SumAmount + SumAmount2);
+                                        SumAmount = 0;
+                                        SumAmount2 = 0;
+                                        continue;
+                                    }
+
+                                    SumAmount += GHSubjectMst_store.getAt(s).get('FProjAmount');
+                                    SumAmount2 += GHSubjectMst_store.getAt(s).get('FAmountEdit');
+
+                                }
+
+                                //根据子科目汇总上级
+                                for (var z = 0; z < GHSubjectMst_store.getCount(); z++) {
+                                    if (GHSubjectMst_store.getAt(z).get("FProjCode") != "" || GHSubjectMst_store.getAt(z).get("FSubjectCode") == "")
+                                        continue;
+
+                                    var fkmdm = GHSubjectMst_store.getAt(z).get("FSubjectCode");
+                                    var sunParentAmount = 0;
+                                    var sunParentAmount2 = 0;
+                                    var time = 0;
+                                    for (var y = z + 1; y < GHSubjectMst_store.getCount(); y++) {
+
+                                        if (GHSubjectMst_store.getAt(y).get("FSubjectCode").indexOf(fkmdm) == 0) {
+                                            time++;
+                                            sunParentAmount += GHSubjectMst_store.getAt(y).get("FProjAmount");
+                                            sunParentAmount2 += GHSubjectMst_store.getAt(y).get("FAmountEdit");
+                                        }
+                                    }
+                                    //不是最末级科目，进行汇总
+                                    if (time > 0) {
+                                        GHSubjectMst_store.getAt(z).set('FProjAmount', sunParentAmount);
+                                        GHSubjectMst_store.getAt(z).set('FAmountEdit', sunParentAmount2);
+                                        GHSubjectMst_store.getAt(z).set('FAmountAfterEdit', sunParentAmount + sunParentAmount2);
+                                    }
+                                }
+
+
+
+
+
+
+                            }
+
+
+                        }
+
+
+
+                    }
+                });
+            }
+
+
+        }
+
+
+
+        //当修改时
+        if (otype == $Otype.EDIT) {
+        }
+
+        //当查看时
+        if (otype == $Otype.VIEW) {
+            ngToolbar.get('save').disable();
+        }
+
+        //if (workflowPanel) {
+        //    SyncWorkFlowUI(wfinfojson);
+        //    //插入审批流控件
+        //    myViewport.insert(1, workflowPanel);
+        //}
+
+
+        //保存
+        ngToolbar.get('save').on('click', function () {
+            save();
+
+        });
+
+
+        function save(callback) {
+            var GHSubject_formvf = GHSubject_form.isValid();
+            var GHSubjectMst_gridvf = GHSubjectMst_grid.isValid();
+            var GHSubjectMstBudgetDtl_gridvf = GHSubjectMstBudgetDtl_grid.isValid();
+            if (!GHSubject_formvf || !GHSubjectMst_gridvf || !GHSubjectMstBudgetDtl_gridvf) {
+                return;
+            }
+
+            for(var i=0;i<GHSubjectMstBudgetDtl_store.getCount();i++){
+                if(GHSubjectMstBudgetDtl_store.getAt(i).get('FAmount')+GHSubjectMstBudgetDtl_store.getAt(i).get('FAmountEdit')==0){
+                    Ext.MessageBox.alert("提示", '子科目明细的金额不能为0！');
+                    return;
+                }
+            }
+
+            var flg;
+            //调用二次开发脚本的校验方法
+            if (typeof beforeSaveEdit === "function") {
+                flg = beforeSaveEdit();
+                if (!flg) return;
+            }
+
+            var mydata = {};
+            var ghsubjectformData = GHSubject_form.getFormData();
+            myData = Ext.apply(mydata, { 'ghsubjectformData': ghsubjectformData });
+            var subjectmstbudgetdtlgridData = GHSubjectMstBudgetDtl_grid.getChangeForEntity();
+            myData = Ext.apply(mydata, { 'subjectmstbudgetdtlgridData': subjectmstbudgetdtlgridData });
+            var subjectmstgridData = GHSubjectMst_grid.getChangeForEntity();
+            myData = Ext.apply(mydata, { 'subjectmstgridData': subjectmstgridData });
+
+
+            myData = Ext.apply(mydata, { 'deleteBefore': deleteBefore });
+            myData = Ext.apply(mydata, { 'deleteAndAdd': deleteAndAdd });
+
+            var extendData;
+            //调用二开代码获取二开需要保存的数据
+            if (typeof getExtendData === "function") {
+                extendData = getExtendData();
+                myData = Ext.apply(mydata, extendData);//合并
+            }
+            Ext.Ajax.request({
+                params: mydata,
+                url: C_ROOT + 'GYS/YS/GHSubject/save',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        LoadAttach.Save("", attachGuid, resp.KeyCodes[0]);//保存附件
+                        if (callback) {
+                            callback();
+                            $NG3Refresh();
+                        } else {
+                            NGMsg.Success("保存成功", 10, function () {
+
+                                if (window.external.RefreshWebListPage != undefined) {
+                                    window.external.RefreshWebListPage();
+                                } else {
+                                    $NG3Refresh();
+                                }
+
+                                $CloseTab();
+                            });
+                        }
+
+
+                    } else {
+                        NGMsg.Error(resp.Msg);
+                    }
+                }
+            });
+        }
+
+        //附件
+        ngToolbar.get('attachment').on('click', function () {
+            OpenAttachment();
+        });
+
+        //打印
+        ngToolbar.get('print').on('click', function () {
+            $Print("PrintTest1", GHSubjectMst_grid, "列表");
+        });
+
+        //调用二次开发脚本
+        if (typeof AllReady === "function") {
+            AllReady();
+        }
+
+
+        //定义窗口
+        Ext.define("Ext.ng.gh.baseWindow", {
+            extend: 'Ext.window.Window',
+            cancelback: Ext.emptyFn,
+            closeAction: 'close',
+            initComponent: function () {
+                var me = this;
+                me.callParent();
+                me.on("close", Ext.bind(function (p, opts) {
+                    me.invokeCancelback();
+                }, me));
+            },
+            invokeCancelback: function () {
+                var me = this;
+                if (otype == $Otype.EDIT || otype == $Otype.ADD) {
+                    saveSubjectMstAmount(GHSubjectMstBudgetDtl_store);
+                }
+                GHSubjectMstBudgetDtl_store.clearFilter();
+                if (!Ext.isEmpty(me.cancelback)) {
+                    me.cancelback();
+                }
+            }
+        });
+        var projWin;
+        var projWinToolbar = Ext.create('Ext.ng.Toolbar', {
+            region: 'north',
+            ngbuttons: [
+                'addrow', { id: "copyRow", text: "复制", width: this.itemWidth, iconCls: "icon-AddRow", langkey: "copyRow" },
+                'deleterow', "-", "save", "->" //, 'cancel'
+            ]
+        });
+        //弹出窗口
+        ngToolbar.get('BudgetDtl').on('click', function () {
+            var data = GHSubjectMst_grid.getSelectionModel().getSelection();
+            if (data.length <= 0) {
+                Ext.MessageBox.alert('提示', "请您先选择子项目！");
+                return;
+            }
+
+            if (data[0].get('FProjName') == "") {
+                Ext.MessageBox.alert('提示', "请先选择子项目！");
+                return;
+            }
+
+            GHSubjectMstBudgetDtl_store.clearFilter();
+            GHSubjectMstBudgetDtl_store.filter("FProjCode", data[0].data.FProjCode);
+
+            projWin = Ext.create("Ext.ng.gh.baseWindow", {
+                title: '子项目明细',
+                modal: true,
+                height: 450,
+                width: 1000,
+                layout: 'border',
+                items: [
+                    projWinToolbar,
+                    GHSubjectMstBudgetDtl_grid
+                ]
+            });
+            projWin.show();
+        });
+
+        if (otype == $Otype.VIEW) {
+            projWinToolbar.get('addrow').hide();
+            projWinToolbar.get('deleterow').hide();
+           // projWinToolbar.get('save').hide();
+        }
+
+        projWinToolbar.items.get('addrow').on('click', function () {
+            var data = GHSubjectMst_grid.getSelectionModel().getSelection();
+            var cbbudgetdtldata = GHSubjectMstBudgetDtl_grid.getSelectionModel();
+            GHSubjectMstBudgetDtl_store.insert(GHSubjectMstBudgetDtl_store.getCount(), cbbudgetdtldata);
+            GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('MstPhId', busid);
+            GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FBudgetset', "0"); //分部门填为0，汇总的为1
+            GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FProjCode', data[0].data.FProjCode);
+            GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FName', data[0].data.FProjName);
+        });
+        //复制
+        projWinToolbar.items.get('copyRow').on('click', function () {
+            var data = GHSubjectMst_grid.getSelectionModel().getSelection();
+            var selection = GHSubjectMstBudgetDtl_grid.getSelectionModel().getSelection();
+            if (selection.length > 0) {
+                GHSubjectMstBudgetDtl_store.add(selection[0].data);
+                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('Fqty', 0);
+                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FMeasUnit', "");
+                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FPrice', 0);
+                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FAmount', 0);
+                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('FOtherInstructions', '');
+                GHSubjectMstBudgetDtl_store.getAt(GHSubjectMstBudgetDtl_store.getCount() - 1).set('PhId', 0);
+            } else {
+                Ext.MessageBox.alert('提示', "请选择需要增加的子项目明细！");
+                return;
+            }
+        });
+
+        projWinToolbar.items.get('deleterow').on('click', function () {
+            var selection = GHSubjectMstBudgetDtl_grid.getSelectionModel().getSelection();
+            if (selection) {
+                GHSubjectMstBudgetDtl_store.remove(selection);
+            }
+        });
+
+        projWinToolbar.items.get('save').on('click', function () {
+            if (otype == $Otype.EDIT || otype == $Otype.ADD) {
+                saveSubjectMstAmount(GHSubjectMstBudgetDtl_store);
+            }
+            GHSubjectMstBudgetDtl_store.clearFilter();
+            projWin.close();
+
+        });
+
+        //金额等于数量乘以单价
+        GHSubjectMstBudgetDtl_grid.on('edit', function (editor, context) {
+            if (context.field == "Fqty") {
+                context.record.data.FAmount = context.record.data.Fqty * context.record.data.FPrice;
+                this.getView().refresh(true);
+            }
+            if (context.field == "FPrice") {
+                context.record.data.FAmount = context.record.data.Fqty * context.record.data.FPrice;
+                this.getView().refresh(true);
+                //debugger;
+            }
+            if (context.field == "FAmountEdit") {
+                context.record.data.FAmountAfterEdit = context.record.data.FAmount + context.record.data.FAmountEdit;
+                this.getView().refresh(true);
+                //debugger;
+            }
+        });
+
+        GHSubjectMstBudgetDtl_grid.getColumn('FAmount').renderer = function (val) {
+            if (val) {
+                var moneyRend = Ext.util.Format.usMoney;
+                var newvalue = moneyRend(val);
+                return newvalue.replace('$', '');
+            } else {
+                return '';
+            }
+        };
+        GHSubjectMstBudgetDtl_grid.getColumn('FAmountEdit').renderer = function (val) {
+            if (val) {
+                var moneyRend = Ext.util.Format.usMoney;
+                var newvalue = moneyRend(val);
+                return newvalue.replace('$', '');
+            } else {
+                return '';
+            }
+        };
+        GHSubjectMstBudgetDtl_grid.getColumn('FAmountAfterEdit').renderer = function (val) {
+            if (val) {
+                var moneyRend = Ext.util.Format.usMoney;
+                var newvalue = moneyRend(val);
+                return newvalue.replace('$', '');
+            } else {
+                return '';
+            }
+        };
+        GHSubjectMst_grid.getColumn('FProjAmount').renderer = function (val) {
+            if (val) {
+                var moneyRend = Ext.util.Format.usMoney;
+                var newvalue = moneyRend(val);
+                return newvalue.replace('$', '');
+            } else {
+                return '';
+            }
+        };
+        GHSubjectMst_grid.getColumn('FAmountEdit').renderer = function (val) {
+            if (val) {
+                var moneyRend = Ext.util.Format.usMoney;
+                var newvalue = moneyRend(val);
+                return newvalue.replace('$', '');
+            } else {
+                return '';
+            }
+        };
+        GHSubjectMst_grid.getColumn('FAmountAfterEdit').renderer = function (val) {
+            if (val) {
+                var moneyRend = Ext.util.Format.usMoney;
+                var newvalue = moneyRend(val);
+                return newvalue.replace('$', '');
+            } else {
+                return '';
+            }
+        };
+        
+        ////支出渠道
+        //GHSubjectMstBudgetDtl_grid.getColumn('FExpensesChannel_EXName').getEditor().on("beforetriggerclick", function (str) {
+        //    //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+        //    var FDeclarationUnit = GHSubject_form.queryById("FDeclarationUnit").getValue();
+        //    if (!FDeclarationUnit) {
+        //        Ext.MessageBox.alert("提示", '申报单位不能为空');
+        //        return false;
+        //    }
+        //    GHSubjectMstBudgetDtl_grid.getColumn('FExpensesChannel_EXName').getEditor().setOutFilter({ DWDM: FDeclarationUnit });
+
+        //});
+
+        //GHSubjectMstBudgetDtl_grid.getColumn('FExpensesChannel_EXName').getEditor().on('helpselected', function (obj) {
+        //    var data = GHSubjectMstBudgetDtl_grid.getSelectionModel().getSelection();
+        //    data[0].set('FExpensesChannel', obj.code);
+        //    data[0].set('FExpensesChannel_EXName', obj.name);
+        //});
+
+        function saveSubjectMstAmount(BudgetDtlstore) {
+            var Amount = 0;
+            var Amount2 = 0;
+            var Amount3 = 0;
+            var data = GHSubjectMst_grid.getSelectionModel().getSelection();
+            BudgetDtlstore.filter("FProjCode", data[0].data.FProjCode);
+            for (var i = 0; i < BudgetDtlstore.getCount(); i++) {
+                Amount += BudgetDtlstore.getAt(i).get('FAmount');
+                Amount2 += BudgetDtlstore.getAt(i).get('FAmountEdit');
+                Amount3 += BudgetDtlstore.getAt(i).get('FAmountAfterEdit');
+            }
+
+            data[0].set('FProjAmount', Amount);
+            data[0].set('FAmountEdit', Amount2);
+            data[0].set('FAmountAfterEdit', Amount3);
+            //查找选择科目的父级汇总金额
+            if (otype == $Otype.EDIT || otype == $Otype.ADD) {
+                var SumAmount = 0;
+                var SumAmount2 = 0;
+                var SumAmount3 = 0;
+                //先汇总子科目
+                for (var i = GHSubjectMst_store.getCount() - 1; i >= 0; i--) {
+                    if (GHSubjectMst_store.getAt(i).get("FFillDept") == "") {
+                        GHSubjectMst_store.getAt(i).set('FProjAmount', SumAmount);
+                        SumAmount = 0;
+                        GHSubjectMst_store.getAt(i).set('FAmountEdit', SumAmount2);
+                        SumAmount2 = 0;
+                        GHSubjectMst_store.getAt(i).set('FAmountAfterEdit', SumAmount3);
+                        SumAmount3 = 0;
+                        continue;
+                    }
+
+                    SumAmount += GHSubjectMst_store.getAt(i).get('FProjAmount');
+                    SumAmount2 += GHSubjectMst_store.getAt(i).get('FAmountEdit');
+                    SumAmount3 += GHSubjectMst_store.getAt(i).get('FAmountAfterEdit');
+                }
+
+                //根据子科目汇总上级
+                for (var i = 0; i < GHSubjectMst_store.getCount(); i++) {
+                    if (GHSubjectMst_store.getAt(i).get("FProjCode") != "" || GHSubjectMst_store.getAt(i).get("FSubjectCode") == "")
+                        continue;
+
+                    var fkmdm = GHSubjectMst_store.getAt(i).get("FSubjectCode");
+                    var sunParentAmount = 0;
+                    var sunParentAmount2 = 0;
+                    var sunParentAmount3 = 0;
+                    var time = 0;
+                    for (var j = i + 1; j < GHSubjectMst_store.getCount(); j++) {
+
+                        if (GHSubjectMst_store.getAt(j).get("FSubjectCode").indexOf(fkmdm) == 0) {
+                            time++;
+                            sunParentAmount += GHSubjectMst_store.getAt(j).get("FProjAmount");
+                            sunParentAmount2 += GHSubjectMst_store.getAt(j).get("FAmountEdit");
+                            sunParentAmount3 += GHSubjectMst_store.getAt(j).get("FAmountAfterEdit");
+                        }
+                    }
+                    //不是最末级科目，进行汇总
+                    if (time > 0) {
+                        GHSubjectMst_store.getAt(i).set('FProjAmount', sunParentAmount);
+                        GHSubjectMst_store.getAt(i).set('FAmountEdit', sunParentAmount2);
+                        GHSubjectMst_store.getAt(i).set('FAmountAfterEdit', sunParentAmount3);
+                    }
+                }
+            }
+
+        }
+
+        //附件方法
+        function OpenAttachment(buscode) {
+            var param = {
+                product: "", //传相应产品，i6、i6s、i6P、A3、GE，可为空
+                attachguid: attachGuid, //会话guid,可传空生成方法cs代码:Guid.NewGuid().ToString()
+                attachTName: "c_pfc_attachment",
+                busTName: "ys3_Subject", //传相应业务表
+                busid: busid, //传相应产品业务单据phid
+                bustypecode: "GHSubjectInfo"//业务类型编码
+            };
+            var result = LoadAttach.InitBeforeOpen(param);
+            var obj = eval(result);
+            if (obj) {
+                if (obj.status == "success") //初始化成功
+                {
+                    attachGuid = obj.msg;
+                } else {
+                    Ext.MessageBox.alert('提示', "附件初始化失败");
+                    return;
+                }
+            } else {
+                Ext.MessageBox.alert('提示', "附件初始化失败");
+                return;
+            }
+            var opt = {
+                product: "", //传相应产品，可为空
+                mode: "NG3", //固定传NG3
+                openbymianframe: "1", //通过主框架打开附件 0或空否  1 是固定传1
+                oper: "winfrom", //web、pb、winfrom、progress（进度条模式）,固定传 winfrom
+                asr_tbl: "c_pfc_attachment",
+                tbl: "ys3_Subject", //传相应业务表
+                fill: $appinfo.logid, //传相应操作员id
+                fillname: $appinfo.username, //传相应操作员姓名
+                chkSign: "0", //默认传0
+                chkCheckIn: "0", //默认传0
+                btnAdd: "1", //新增按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                addserverstuts: "0", //导入按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnScan: "1", //扫描按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnDelete: "1", //删除按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnEdit: "1", //编辑按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnView: "1", //查看按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnDownload: "1", //下载按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnCancel: "1", //取消按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnOk: "1", //确定按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                btnWebAdd: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                btnWebOk: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                archivestuts: "2", //归档按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                status: otype, //add 新增模式，view 查看模式， edit 编辑模式
+                showlist: "1", //显示文件列表 0 不显示 1显示
+                zip: "0", //附件压缩 0 不压缩 1 压缩
+                filenum: "", //附件上传数量限制 0或空不限制附件上传数量
+                filetype: "", //附件上传类型限制目前仅支持传入"image",如果传了"image"附件控件就只能上传图片
+                guid: attachGuid //传第二步附件初始化获得的guid
+            };
+            LoadAttach.Init(opt);
+        }
+        
+    });
+
+    </script>
+}

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="secuser">
+      <Field Name="logid" IsKey="true" />
+      <Field Name="u_name"  />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="logid" Target="Client" Value="logid"/>
+      <Exp Field="logid" paramName="logid_like" Target="Client" Oper="Like" Value="logid_like"/>
+      <Exp Field="u_name" paramName="u_name_like" Target="Client" Oper="Like" Value="u_name_like"/>
+      <Exp Field="lg_sign" paramName="lg_sign" Target="Client" Value="lg_sign"/>
+    </Query>
+    <OrderBy>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+    <Values>
+
+    </Values>
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

@@ -1,0 +1,310 @@
+﻿
+        * {
+            font-family: '宋体',tahoma,Verdana, "微软雅黑",Arial,SimSon,sans-serief !important;
+            font-size: 9pt !important;
+        }
+		
+		
+    
+ /* ------------tab begin---------------------*/
+ 
+/*tabpanel突出显示*/
+.x-tab-default .x-tab-inner {
+    font-weight: normal;
+}
+
+.x-tab-default-active .x-tab-inner {
+    font-weight: normal;
+}
+
+
+/*tab的颜色*/
+    .x-tab-default-top, .x-tab-default-left, .x-tab-default-right {
+    border-radius: 6px 6px 0px 0px;
+    border-bottom: 1px solid #d0d0d0;
+    background-image: none;
+    background-color:#e8f2ff;/* #eaeaea */
+    background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,rgba(192, 219, 245, 0.87)),color-stop(100%,#f4f4f4));/*颜色淡一点*/
+    /*background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,rgba(156, 201, 247, 0.87)),color-stop(100%,#f4f4f4));*//* tab背景色*/
+    /* background-image: -webkit-gradient(linear,50% 0,50% 100%,color-stop(0%,rgba(122, 170, 220, 0.87)),color-stop(100%,#f4f4f4));*/
+    /*background-image: -webkit-linear-gradient(top,#dcdcdc,#eaeaea);*/
+    background-image: -moz-linear-gradient(top,#dcdcdc,#eaeaea);
+    background-image: -o-linear-gradient(top,#dcdcdc,#eaeaea);
+    background-image: linear-gradient(top,#dcdcdc,#eaeaea);
+    -webkit-box-shadow: white 0 1px 0 0 inset,white -1px 0 0 0 inset,white 1px 0 0 0 inset;
+    -moz-box-shadow: white 0 1px 0 0 inset,white -1px 0 0 0 inset,white 1px 0 0 0 inset;
+    box-shadow: white 0 1px 0 0 inset,white -1px 0 0 0 inset,white 1px 0 0 0 inset;
+}
+
+
+
+.x-tab-default .x-tab-inner {
+    font-size: 11px;    
+    font-family: tahoma,arial,verdana,sans-serif;
+    color: #0A0A0A;
+    line-height: 13px;
+}
+
+/*激活之后字体*/
+.x-tab-default-active .x-tab-inner {
+    font-weight: normal;
+}
+
+/*激活之后背景*/
+ .x-tab-default-top-active, .x-tab-default-left-active, .x-tab-default-right-active {
+    background-color: white;
+    background-image: none;
+}
+
+    
+
+/*光标放到tab上*/
+.x-tab-default-top-over,
+.x-tab-default-left-over,
+.x-tab-default-right-over {
+  background-image: none;
+  background-color: whitesmoke; /*#e8f2ff;*/  
+}
+
+/*tab的边上的颜色*/
+.x-tab-bar-default-left {   
+    background-color: #923232;    
+    background-image: -webkit-linear-gradient(left,#E9F2F9,#E9F2F9);    
+}
+
+/*tabbar的颜色*/
+.x-tab-bar-body {
+    z-index: 2;
+    position: relative;
+    background-color: #f0f0f0;	
+}
+
+
+/*隐藏横向滚动条按钮*/
+/*.x-tab-bar-default .x-tabbar-scroll-left, .x-tab-bar-default .x-tabbar-scroll-right {
+    height: 0px;
+    width: 0px;
+}*/
+
+/*隐藏垂直滚动条按钮*/
+/**.x-tab-bar-default .x-tabbar-scroll-top, .x-tab-bar-default .x-tabbar-scroll-bottom {
+    width: 0px;
+    height: 0px;
+}*/
+/* ------------tab end---------------------*/
+
+
+
+/*panel frame的边框颜色*/
+.x-panel-default-framed {
+    border-color:#C0C0C0;/*#f6f6f6*/;
+    padding: 0;
+    border-width: thin;
+	margin: 3px;
+}
+
+/*panel framed框的背景颜色*/
+.x-panel-body-default-framed {
+    background: #f6f6f6;/* #FFFFFF;*/
+    border-color: #157fcc;
+    color: black;
+    font-size: 13px;
+    font-size: normal;
+    border-width: 1px;
+    border-style: solid;
+}
+/*panel的背景颜色*/
+.x-panel-body-default {
+    background: #FFFFFF;
+    border-color: #dfdfdf;
+    color: black;
+    font-size: 13px;
+    border-width: 1px;
+    border-style: solid;
+	border-radius: 3px;
+}
+
+/*容器边框颜色*/
+.x-border-layout-ct {
+    background-color: #f6f6f6;/*#FFFFFF*/; 
+}
+
+/*panel背景色*/
+.x-panel-header-default {
+    background-image: none;
+    background-color: #f6f6f6;
+}
+
+/*panel边框*/
+.x-panel-header-default {
+    font-size: 13px;
+    border: 1px solid #f6f6f6;
+}
+
+/*panel 标题的字体颜色 */
+.x-panel-header-text-container-default {
+    color: #666;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: arial,helvetica,verdana,sans-serif;
+    line-height: 15px;
+    padding: 1px 0 0;
+    text-transform: none;
+}
+
+
+/*tab 边框*/
+.x-tab-default {
+    border-color: #B8D7F5;
+    margin: 0 1px 0 0;
+    cursor: pointer;
+	/*height:28px;*/
+}
+/*tab下的横条*/
+.x-tab-bar-strip-default {
+    border-style: solid;
+    border-color: #A7C6DC;
+    background-color: #F6F6F6;
+}
+
+/*tabbar高度*/
+/*.x-tab-bar-body-default-horizontal {
+    height: 30px;
+}*/
+
+
+.x-toolbar {
+    padding: 2px 0px 3px 10px;
+}
+
+/*toobar按钮背景*/
+.x-btn-default-toolbar-small {
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;
+    background-image: none;
+    background-color: #f6f6f6;  
+	border-color: #f6f6f6;
+}
+
+/*toobar按钮边框*/
+.x-btn-default-toolbar-small-over {
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;
+    background-image: -webkit-linear-gradient(top,#c1ddf1,#c1ddf1 50%,#c1ddf1 51%,#c1ddf1);
+    background-color: #c1ddf1;
+    border-color:#4b9cd7;	
+}
+
+/*toobar按钮字体大小*/
+.x-btn-default-toolbar-small .x-btn-inner {
+    font-size: 12px;
+    font-weight: normal;
+    font-family: helvetica,arial,verdana,sans-serif;
+    color: #333f49;    
+}
+
+
+/*按钮扁平化*/
+.x-btn-default-small {    
+    border-width: 1px;
+    border-style: solid;
+    background-image: -webkit-linear-gradient(top,#F0F0F0,#F0F0F0 50%,#F0F0F0 51%,#F0F0F0);    
+    border-color: #F0F0F0;
+	padding-top: 5px;
+}
+/*按钮光标放上颜色*/
+.x-btn-default-small-over {  
+    border-radius: 3px;
+    padding: 3px 3px 3px 3px;
+    border-width: 1px;
+    border-style: solid;
+    background-image: -webkit-linear-gradient(top,#c1ddf1,#c1ddf1 50%,#c1ddf1 51%,#c1ddf1);
+    background-color: #3892d3;
+    border-color:#4b9cd7;	
+}
+
+/*按钮字体颜色*/
+.x-btn-default-small .x-btn-inner {
+    font-size: 12px;
+    font-weight: normal;    
+    color: #333f49;
+    padding: 0 5px;
+}
+
+
+/*滚动条样式*/
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-button:vertical{display:inl}
+::-webkit-scrollbar-track:vertical{background-color:black}
+::-webkit-scrollbar-track-piece{background:#f4f4f4}
+::-webkit-scrollbar-thumb:vertical{	background-color:#d3d3d3;border-radius:5px;}
+::-webkit-scrollbar-thumb:vertical:hover{background-color:#a9a9a9}
+::-webkit-scrollbar-corner:vertical{background-color:#535353}
+::-webkit-scrollbar-resizer:vertical{background-color:#ff6e00}
+
+::-webkit-scrollbar-button:horizontal{display:none}
+::-webkit-scrollbar-track:horizontal{background-color:black}
+::-webkit-scrollbar-track-piece{background:#f4f4f4}
+::-webkit-scrollbar-thumb:horizontal{background-color:#d3d3d3;border-radius:5px}
+::-webkit-scrollbar-thumb:horizontal:hover{background-color:#a9a9a9}
+::-webkit-scrollbar-corner:horizontal{background-color:#535353}
+::-webkit-scrollbar-resizer:horizontal{background-color:#ff6e00}
+
+
+/*输入框的字体*/
+.x-form-text {
+    color: #333f49;
+    border-radius: 3px;
+}
+
+/*滚动条箭头*/
+.x-tab-bar-default .x-tabbar-scroll-left {
+    background-image: url(../icons/default-plain-scroll-left.png);
+    width:16px;
+}
+.x-tab-bar-default .x-tabbar-scroll-right {
+    background-image: url(../icons/default-plain-scroll-right.png);
+    width:16px;
+}
+.x-tab-bar-default .x-tabbar-scroll-top {
+    background-image: url(../icons/default-plain-scroll-top.png);
+}
+.x-tab-bar-default .x-tabbar-scroll-bottom {
+    background-image: url(../icons/default-plain-scroll-bottom.png);
+}
+
+/*.x-tab-bar-default .x-tabbar-scroll-left {
+    background-image: url(../icons/previous.png);
+     width:17px;
+    height: 34px;
+}
+.x-tab-bar-default .x-tabbar-scroll-right {
+    background-image: url(../icons/next.png);
+     width:17px;
+     height:34px;
+}
+.x-tab-bar-default .x-tabbar-scroll-top {
+    background-image: url(../icons/first.png);
+}
+.x-tab-bar-default .x-tabbar-scroll-bottom {
+    background-image: url(../icons/last.png);
+}*/
+
+/*滚动条箭头样式，覆盖extjs原生样式*/
+.x-tab-bar-default .x-box-scroller {
+    cursor: pointer;
+    filter: alpha(opacity=50);
+    opacity: .5;
+    background-color: #F6F6F6;
+}
+/*滚动条箭头鼠标覆盖时的样式，覆盖extjs原生样式*/
+.x-tab-bar-default .x-box-scroller-hover {
+    cursor: pointer;
+    filter: alpha(opacity=50);
+    opacity: .5;
+    background-color: #B8D7F5;
+}

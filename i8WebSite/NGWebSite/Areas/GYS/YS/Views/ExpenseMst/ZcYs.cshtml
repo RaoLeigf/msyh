@@ -1,0 +1,224 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+	<script src=@Url.Script("~/NG3Resource/js/ExMergeGrid.js") type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript">
+        //工具栏
+		var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+			region: 'north',
+            rightName: 'GHSubjectSelect', //权限名称
+			ngbuttons: [
+                { id: "SX", text: "刷新", width: this.itemWidth, iconCls: "icon-Refresh" }
+			]
+		});
+		
+		
+        Ext.onReady(function () {
+
+			var store = Ext.create('Ext.ng.JsonStore', {
+				//pageSize: 25,
+				fields: [{
+    "name": "FBudgetDept_EXName",
+    "type": "string",
+    "mapping": "FBudgetDept_EXName"
+  },
+  {
+  
+    "name": "FProjName",
+    "type": "string",
+    "mapping": "FProjName"
+  },
+  {
+    "name": "FBudgetAmount",
+    "type": "string",
+    "mapping": "FBudgetAmount"
+  },
+  {
+    "name": "FProjAmount",
+    "type": "string",
+    "mapping": "FProjAmount"	
+  },
+  {
+    "name": "FBillNO",
+    "type": "string",
+    "mapping": "FBillNO"	
+  },
+  {
+    "name": "FDeclarationDept",
+    "type": "string",
+    "mapping": "FDeclarationDept"	
+				}],
+				//url: C_ROOT + 'GQT/QT/BudgetAccounts/GetBudgetAccountsListDYGXdtl',
+				url: C_ROOT + 'GYS/YS/BudgetMst/GetXmZcYs?userID='+$user.id,
+				autoLoad:false
+			});
+			
+			var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+			
+			grid = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-48,
+				store: store,
+				autoScroll: true,
+                columnLines: true,
+                region: 'center',
+				//border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					xtype:'rownumberer',
+					header:'行号',
+					width:80
+					
+				}, {	
+				/*header: '主表主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {*/
+				header: '预算部门',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FBudgetDept_EXName',
+					//hidden:true
+				}, {
+					header: '项目名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FProjName',
+				}, {
+					header: '年初预算金额',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FBudgetAmount',
+					align: "right"
+				}, {
+					header: '已编报数',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FProjAmount',
+					align: "right"
+				}, {
+					header: '剩余可编报数',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FBillNO',
+					align: "right"
+				}, {
+					header: '账务实际发生数',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'FDeclarationDept',
+					align: "right"
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					},
+
+				},
+				/*viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				},*/
+				bbar: [pagingbar]
+			});
+			
+			
+			store.load(function(){
+                ExMergeGrid(grid, [1], false);
+				
+			});
+
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,grid]
+            });
+			
+			//刷新
+            ngToolbar.get('SX').on('click', function () {
+                store.load();
+            });
+			
+			grid.getColumn('FBudgetAmount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '0.00';
+                }
+            };
+			
+			grid.getColumn('FProjAmount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '0.00';
+                }
+            };
+			
+			grid.getColumn('FBillNO').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '0.00';
+                }
+            };
+			
+			grid.getColumn('FDeclarationDept').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '0.00';
+                }
+            };
+
+		});
+
+
+		function NG3Refresh() {
+            grid.store.reload();
+        }
+
+    </script>
+}
+
+

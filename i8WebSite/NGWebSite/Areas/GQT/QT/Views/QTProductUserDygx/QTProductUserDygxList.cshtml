@@ -1,0 +1,387 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+	
+	<script type="text/javascript">
+
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var store2;
+		var grid;
+		var grid2;
+		var deletedata=[];
+		
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save', 'addrow','deleterow',
+                    '->', 'close'
+                ]
+            });
+
+			         
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                autoLoad: true,
+				sorters:[{
+					property:'UserNo',
+					direction:'ASC'
+				}],
+                fields: [
+                    {
+                        "name": "PhId",
+                        "type": "int",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "UserNo",
+                        "type": "string",
+                        "mapping": "UserNo"
+                    },
+                    {
+                        "name": "UserName",
+                        "type": "string",
+                        "mapping": "UserName"
+                    }
+                ],
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetRelationYSBMList'
+            });
+
+            grid = Ext.create('Ext.ng.GridPanel', {
+                autoScroll: true,
+                columnLines: true,
+                border: false,
+                store: store,
+                height: document.documentElement.clientHeight - 28,
+                columns: [
+                    {
+                        header: '主键',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'PhId',
+                        hidden: true
+                    },
+                    {
+                        header: '操作员代码',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 100,
+                        dataIndex: 'UserNo',
+                        hidden: false
+                    },
+                    {
+                        header: '操作员名称',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'UserName',
+                        hidden: false
+                    }
+                ],
+				listeners:{
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						var params={'Fg3userPhid':record.get('PhId')};
+						Ext.apply(store2.proxy.extraParams,params);
+						store2.load(function(){
+							deletedata=[];
+						})
+						
+					}
+				}
+            });
+			
+			storeProduct = Ext.create('Ext.ng.JsonStore',{
+				autoLoad:false,
+				fields: [
+                    {
+                        "name": "PhId",
+                        "type": "int",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "ProductBZ",
+                        "type": "string",
+                        "mapping": "ProductBZ"
+                    }
+                ],
+				url: C_ROOT + 'GQT/QT/QTProduct/GetQTProductList'
+			});
+			
+			storeProductUser = Ext.create('Ext.ng.JsonStore',{
+				autoLoad:false,
+				fields: [
+                    {
+                        "name": "PhId",
+                        "type": "int",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "ProductBZ",
+                        "type": "string",
+                        "mapping": "ProductBZ"
+                    }
+                ],
+				url: C_ROOT + 'GQT/QT/QTProduct/GetQTProductList'
+			});
+			
+			store2 = Ext.create('Ext.ng.JsonStore',{
+				autoLoad:false,
+				fields: [
+                    {
+                        "name": "PhId",
+                        "type": "int",
+                        "mapping": "PhId"
+                    },
+                    {
+                        "name": "ProductBZ",
+                        "type": "string",
+                        "mapping": "ProductBZ"
+                    },
+					{
+                        "name": "ProductUserCode",
+                        "type": "string",
+                        "mapping": "ProductUserCode"
+                    }
+                ],
+				url: C_ROOT + 'GQT/QT/QTProductUserDygx/GetQTProductUserDygxList'
+			});
+			
+			grid2 = Ext.create('Ext.ng.GridPanel',{
+				autoScroll: true,
+                columnLines: true,
+                border: false,
+                store: store2,
+				height: document.documentElement.clientHeight - 28,
+                columns: [
+                    {
+                        header: '主键',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'PhId',
+                        hidden: true
+                    },
+                    {
+                        header: '产品标志',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'ProductBZ',
+                        hidden: false,
+						editor: {
+							xtype: "combobox",
+							store:storeProduct,
+							editable:false,
+							valueField:'ProductBZ',
+							displayField:'ProductBZ'
+						}
+                    },
+                    {
+                        header: '产品用户代码',
+                        flex: 1,
+                        sortable: false,
+                        menuDisabled: true,
+                        draggable: false,
+                        width: 200,
+                        dataIndex: 'ProductUserCode',
+                        hidden: false,                            
+						editor: {
+                      helpid: "G6H_ProductUser",
+                      /*valueField: "ProductUserCode",
+                      displayField: "ProductUserName",
+                      userCodeField: "ProductUserCode",*/
+                      ORMMode: false,
+                      isInGrid: true,
+                      helpResizable: true,
+                      xtype: "ngRichHelp"
+						}
+                  }
+                ],
+				plugins:[
+					Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false  //不解析成html
+					})
+				],
+				listeners:{
+					
+				}
+			});
+			
+			/*grid2.getColumn('ProductUserCode').getEditor().on("beforetriggerclick", function (obj) {
+				
+				alert(1);
+			});*/
+			
+			/*grid2.queryById("ProductUserCode").on("helpselected", function (obj) {
+				alert(1);
+			})*/
+			/*grid2.getColumn('ProductUserCode').getEditor().on('helpselected', function (obj) {
+                //var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                //data[0].set('FBudgetAccounts', obj.code);
+                //data[0].set('FBudgetAccounts_EXName', obj.name);
+				alert(1);
+            });*/
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar,
+                    {
+                        region: 'west',
+                        xtype: "panel",
+                        items: [grid],
+                        width: 300
+                    },
+					{
+                        region: 'center',
+                        xtype: "panel",
+                        items: [grid2]
+                        
+                    }
+                ]
+            });
+			
+			/*grid2.getColumn('FPaymentMethod_EXName').getEditor().on('helpselected', function (obj) {
+                //var data = grid2.getSelectionModel().getSelection();
+                //data[0].set('FPaymentMethod', obj.code);
+                //data[0].set('FPaymentMethod_EXName', obj.name);
+				alert(1);
+            });*/
+			
+
+			//保存
+			ngToolbar.get('save').on('click', function () {
+				for(var i=0;i<store2.getCount();i++){
+					if(store2.getAt(i).get('ProductBZ')=='' || store2.getAt(i).get('ProductUserCode')==''){
+						Ext.MessageBox.alert('提示', '请填写完整！');
+						return;
+					}
+				}
+				
+				//alert(store2.getModifiedRecords().length);
+				var Userdata={'PhId':grid.getSelectionModel().getSelection()[0].data.PhId,'UserNo':grid.getSelectionModel().getSelection()[0].data.UserNo,'UserName':grid.getSelectionModel().getSelection()[0].data.UserName};
+				var adddata=[];
+				for(var i=0;i<store2.getModifiedRecords().length;i++){
+					//alert(store2.getModifiedRecords()[i].data.PhId);
+					//if(store2.getModifiedRecords()[i].data.PhId==''){
+						adddata.push({'PhId':store2.getModifiedRecords()[i].data.PhId,'ProductBZ':store2.getModifiedRecords()[i].data.ProductBZ,'ProductUserCode':store2.getModifiedRecords()[i].data.ProductUserCode})
+					//}
+				}
+				//alert(store2.getModifiedRecords().length);
+				Ext.Ajax.request({
+					params: { 'Userdata':Userdata, 'adddata':adddata,'deletedata':deletedata},
+					url: C_ROOT + 'GQT/QT/QTProductUserDygx/Save2',
+					success: function (response) {
+						var resp = Ext.JSON.decode(response.responseText);
+						if (resp.Status === "success") {
+							var params={'Fg3userPhid':grid.getSelectionModel().getSelection()[0].data.PhId};
+							Ext.apply(store2.proxy.extraParams,params);
+							store2.load(function(){
+								deletedata=[];
+							})
+							Ext.MessageBox.alert('提示', '保存成功！');
+						} else {
+							Ext.MessageBox.alert('提示', resp.Msg);
+						}
+					}
+				});
+				
+				//debugger;
+			});
+			
+			//增行
+            ngToolbar.items.get('addrow').on('click', function () {
+				var data=grid.getSelectionModel().getSelection();
+				//var data2 = grid2.getSelectionModel().getSelection();
+				//var rowid;
+				/*if(data2.length>0){
+					rowid=grid2.getStore().indexOf(data[0]);
+				}else{*/
+					//rowid=store2.getCount();
+				//}
+				
+				if (data.length > 0) {
+					var model1 = grid2.getSelectionModel();
+					var rowid=store2.getCount();
+					
+					store2.insert(rowid, model1);
+				}
+			})
+			
+			//删行
+            ngToolbar.items.get('deleterow').on('click', function () {
+				var selection = grid2.getSelectionModel().getSelection();
+				deletedata.push(selection[0].data.PhId);
+				store2.remove(selection);
+				
+			})
+			
+			grid2.getColumn('ProductBZ').getEditor().on('change', function (str) {
+				var ProductBZ = str.value;
+				var data = grid2.getSelectionModel().getSelection();
+				var rowid=grid2.getStore().indexOf(data[0]);
+				data[0].set('ProductUserCode','' );
+				for(var i=0;i<store2.getCount();i++){
+					if(store2.getAt(i).get('ProductBZ')==ProductBZ&&i!=rowid){
+						str.value='';
+					    Ext.MessageBox.alert("提示", '已设置对应该产品的用户');
+						return;
+					}
+				}
+			});
+			
+			grid2.getColumn('ProductUserCode').getEditor().on('beforetriggerclick', function (str) {
+				var ProductBZ = grid2.getSelectionModel().getSelection()[0].data.ProductBZ;
+                if (!ProductBZ) {
+                    Ext.MessageBox.alert("提示", '请先选择产品');
+                    return false;
+                }
+                var filter = "(Z_QTProductUser.ProductBZ='" + ProductBZ + "')";
+                grid2.getColumn('ProductUserCode').getEditor().setClientSqlFilter(filter);
+            });
+			
+			grid2.getColumn('ProductUserCode').getEditor().on('helpselected', function (obj) {
+                var data = grid2.getSelectionModel().getSelection();
+                //data[0].set('FPaymentMethod', obj.code);
+                data[0].set('ProductUserCode', obj.data.productusercode);
+				//store2.getAt(0).set('ProductUserCode', obj.dm);
+				//alert(obj.name);
+            });
+			
+			
+			
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

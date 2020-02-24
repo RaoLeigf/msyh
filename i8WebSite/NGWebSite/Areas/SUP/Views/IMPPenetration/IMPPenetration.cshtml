@@ -1,0 +1,113 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+      
+    ViewBag.Title = "IMP穿透";
+}
+
+
+@section script
+{
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+ 
+        <link href="~/NG3Resource/css/mainTreeTab.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+
+
+        var frame1;
+        Ext.onReady(function () {
+           frame1 = document.createElement("IFRAME");
+           frame1.frameBorder = 0;
+           frame1.name = 'frame1';
+           frame1.id = 'frame1';
+           frame1.src = C_ROOT + 'NG3Resource/IMPPenetration/IMPPenetration.html';
+           //frame1.height = 10000;
+            //frame1.width = 10000;
+           frame1.width = "100%";
+           frame1.height = "100%";
+           //frame1.height = document.body.scrollHeight;
+           //frame1.width = document.body.clientWidth;
+           //frame1.scrolling = "no";
+           frame1.onload = function () {
+               frame1.contentWindow;
+           }
+
+           var naviPanel = Ext.create('Ext.panel.Panel', {
+               region: 'center',
+               itemId: 'naviPanel',
+               //width: 10000,
+               //height: 10000,
+               layout: 'fit',
+               //overflowX: 'scroll',
+               //overflowY: 'scroll',
+               autoScroll:false,
+               contentEl: frame1,
+               //enableDragDrop: true,
+
+           });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [
+                    {
+                        xtype:'panel',
+                        layout: 'border',
+                        region: 'center',
+                        items: [
+                            naviPanel
+                        ]
+                    }
+
+                ]
+            });
+       });
+
+
+        var load = function () {
+            var param = new Object();
+            param.buscode = '@ViewBag.buscode';
+            param.text = '@ViewBag.text';
+            param.temppkitem = '@ViewBag.temppkitem';
+            param.temppkvalue = '@ViewBag.temppkvalue';
+            return param;
+        }
+
+        var lookUpDown = function (buscode, temppkitem, temppkvalue, type) {
+            var param;
+            Ext.Ajax.request({
+                    params: {
+                        'buscode': buscode,
+                        'temppkitem': temppkitem,
+                        'temppkvalue': temppkvalue,
+                        'type': type,
+                    },
+                    url: C_ROOT + 'IMP/Engine/Engine/GetNextNode',
+                    async: false, //同步
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        param = resp;
+                    }
+                });
+            return param;
+        }
+
+        var delNode = function (isNodeSelected) {
+            debugger;
+            //alert('aaaaa');
+            Ext.Msg.confirm('提示', '确定要删除该节点吗', function (op) {
+                if (op == 'yes') {
+                    frame1.contentWindow.delNode_yes(isNodeSelected);
+                } else if (op == 'no') {
+                    frame1.contentWindow.delNode_no(isNodeSelected);
+                }
+            });
+        }
+
+        var openNodeUrl = function (text, url, param) {
+            $OpenTab(text, C_ROOT + url + '?' + param);
+        }
+    </script>
+
+
+}

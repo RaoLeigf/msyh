@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding = "GBK"?>
+<CMS>
+  <eb>
+    <pub>
+      <TransCode>QPAYENT</TransCode>
+      <CIS>{{cis}}</CIS>
+      <BankCode>{{bankCode}}</BankCode>
+      <ID>{{id}}</ID>
+      <TranDate></TranDate>
+      <TranTime></TranTime>
+      <fSeqno></fSeqno>
+    </pub>
+    <in>
+      <QryfSeqno>{{qryfSeqno}}</QryfSeqno>
+      <QrySerialNo>{{qrySerialNo}}</QrySerialNo>
+      <ReqReserved1></ReqReserved1>
+      <ReqReserved2></ReqReserved2>
+    </in>
+  </eb>
+</CMS>

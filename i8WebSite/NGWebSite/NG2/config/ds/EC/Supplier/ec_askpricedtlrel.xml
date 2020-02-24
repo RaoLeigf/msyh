@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_askpricedtlrel">
+      <Field Name="askpriceid" IsKey="true" />
+      <Field Name="lineid" IsKey="true" />
+      <Field Name="supcomp"  />
+      <Field Name="uicaccflg" />
+    </Table>
+  </Tables>
+  <Create>
+    <Table Name="ec_askpricedtlrel">
+      <Values>
+
+      </Values>
+    </Table>
+  </Create>
+  <Destroy>
+    
+  </Destroy>
+  <!--待报价询价单取消拒绝-->
+  <Undo>
+    <Sql>
+      delete ec_askpricedtlrel [where]
+    </Sql>
+    <Where>
+      <Exp Field="supcomp" Target="AppInfo" Value="LoginID" />
+      <Exp Field="uicaccflg" Value="2" />
+    </Where>
+    <Query>
+      <Exp Field="askpriceid" Target="Client" Value="askpriceid" Type="Array">
+        <Exp Field="ec_askpricedtlrel.askpriceid" ParamName ="askpriceid"  TypeKey="0"/>
+        <Exp Field="ec_askpricedtlrel.lineid" ParamName="lineid" TypeKey="1" />
+      </Exp>
+    </Query>
+  </Undo>
+  <!--待报价询价单拒绝-->
+  <Refuse>
+    <Sql>
+      Insert ec_askpricedtlrel [values]
+    </Sql>
+    <Values>
+      <Exp Field="askpriceid" Target="Field" Value="askpriceid" />
+      <Exp Field="lineid" Target="Field" Value="lineid" />
+      <Exp Field="supcomp" Target="AppInfo" Value="LoginID" />
+      <Exp Field="uicaccflg" Value="2" />
+    </Values>
+  </Refuse>
+</DataService>

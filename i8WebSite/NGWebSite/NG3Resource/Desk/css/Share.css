@@ -1,0 +1,107 @@
+body{
+	overflow-x:hidden;
+	-webkit-overflow-x:hidden;
+	width:100%;
+	margin:0;
+	padding:0;
+	background-color:#FFF;
+	font: 14px/1.5 "Segoe UI","Lucida Grande",Helvetica,Arial,FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",Roboto,Arial,sans-serif  !important ;
+	min-height:640px;
+	min-width:1366px;
+}
+body, html {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+ 
+@media only screen and (max-width:1000px)
+{
+body{
+	overflow-x:hidden;
+	width:102%;
+	margin:0;
+	padding:0;
+	background-color:#FFF;
+	font: 14px/1.5 "Segoe UI","Lucida Grande",Helvetica,Arial,FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",Roboto,Arial,sans-serif;
+}	
+}
+.outer-container,.content {
+    width: 200px; height: 200px;
+}
+.outer-container {
+    position: relative;
+    overflow: hidden;
+}
+.inner-container {
+    position: absolute; left: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+ /* for Chrome */
+.inner-container::-webkit-scrollbar {
+    display: none;
+}
+.container {
+    position: absolute;
+    width: 430px;
+    top: 120px;
+    right: 100px;
+}
+a{
+	text-decoration:none !important;
+	color:inherit;
+	
+	font-size:14px;
+
+}
+ul,li{
+	padding:0;
+	margin:0;
+	list-style:none;
+}
+body,h1,h2,h3,h4,p{
+	margin:0;padding:0;
+}
+
+
+img{
+	display:block;
+	
+}
+.miao{
+	display:block;
+	width:175px;
+	height:95px;
+	position:fixed;
+	z-index:100;
+	top:50%;
+	right:-88px;
+	margin-top:-47px;
+	background:url(../img/jixiangwu.png);
+
+}
+.anme{
+		animation: mymove2 2s infinite;
+}
+.top_box{
+	width:100%;
+	height:145px !important;
+}
+.top_box1{
+	width:1000px;
+	height:85px !important;
+	margin:auto auto 0;
+	}
+@keyframes mymove2
+{
+	0%{
+		right:-88px;
+	}
+	50%{
+		right:-85px;
+	}
+	100%{
+		right:-88px;
+	}
+}

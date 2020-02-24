@@ -1,0 +1,10 @@
+﻿<Data>
+  <items>
+	  <item ID="0301" str="合同信息"/>
+	  <item ID="0302" str="团队信息"/>
+	  <item ID="0303" str="项目策划" para="~/PMS/ProjectExercise"/>
+	  <item ID="0304" str="待办事宜" para="~/PMS/ProjectToDo"/>
+	  <item ID="0305" str="项目报告"/>
+	  <item ID="0306" str="团队绩效"/>
+  </items>
+</Data>

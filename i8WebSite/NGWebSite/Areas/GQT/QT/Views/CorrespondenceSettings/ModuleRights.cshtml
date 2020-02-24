@@ -1,0 +1,330 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src="@Url.Content("~/NG3Resource/js/help/OrgHelp.js")" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+
+        Ext.onReady(function() {
+
+            var otype = 'add';
+            var attrcode = "0";
+            var nodeaddtype = 'child';
+            var myMask = new Ext.LoadMask(document.body, { msg: "正在处理数据..." });
+            var leftloadstatus = true;
+            var itemloadstatus = true;
+            var FunctionMode = '@ViewBag.FunctionMode';
+            var choosedModules = null;
+            var RemnantCount = 0;
+            var CheckedCount = 0;
+            var orgattrstore = Ext.create('Ext.data.TreeStore', {
+                // autoLoad: true,
+                proxy: {
+                    type: 'ajax',
+                    url: '../CorrespondenceSettings/GetModules'
+                }
+
+            });
+            var attlist = null
+            var changgelist=[];
+            //定义模型
+            Ext.define('itemmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'cno',
+                        type: 'string',
+                        mapping: 'cno'
+                    }, {
+                        name: 'cname',
+                        type: 'string',
+                        mapping: 'cname'
+                    }, {
+                        name: 'parentcno',
+                        type: 'string',
+                        mapping: 'parentcno'
+                    }, {
+                        name: 'verifyflag',
+                        type: 'string',
+                        mapping: 'verifyflag'
+                    }, {
+                        name: 'orderno',
+                        type: 'string',
+                        mapping: 'orderno'
+                    }, {
+                        name: 'product',
+                        type: 'string',
+                        mapping: 'product'
+                    }, {
+                        name: 'chk',
+                        type: 'string',
+                        mapping: 'chk'
+                    }, {
+                        name: 'children',
+                        type: 'string',
+                        mapping: 'children'
+                    }, {
+                        name: 'leaf',
+                        type: 'string',
+                        mapping: 'leaf'
+                    }
+                ]
+            });
+
+            var leftStore = Ext.create('Ext.data.TreeStore', {
+                // model: 'itemmodel',
+                proxy: {
+                    type: 'ajax',
+                    url: '../CorrespondenceSettings/GetLoginOrg'
+                },
+            });
+
+            var leftTrees = Ext.create('Ext.tree.TreePanel', {
+                region: 'center',
+                width: '100%',
+                heigth: '100%',
+                title: '组织列表',
+                style: "padding-right:0px;border:0px;",
+                bodyStyle: "padding-right:0px;border:0px;",
+                border: false,
+                frame: true,
+                columnLines: true,
+                store: leftStore,
+                expanded:false,
+                hideHeaders: true,
+                animate: true,
+                collapsible: false,
+                useArrows: true,
+                rootVisible: false,
+                multiSelect: true,
+                autoScroll: true,
+                columns: [
+                     {
+                        text: '组织名称',
+                        flex: 1,
+                        xtype: 'treecolumn',
+                        dataIndex: 'text',
+                        hidden: false,
+                        hideable: false,
+                        align: 'left',
+                        renderer: function (value, metaData, record) {
+                            var text = value;
+                            if (record.data.Selected == "Y")
+                            {
+                                //text = '<font color="red">' + value + '</font>';
+                                text = value+'(已选)'
+                            }
+                            return text
+                        }
+                    }
+                ],
+                listeners: {
+                    checkchange(node,checked){
+                        if(checked){
+                            var checkedLength = leftTrees.getChecked().length
+                            
+                            if(CheckedCount+RemnantCount<checkedLength){
+                                Ext.MessageBox.alert('提示', '已超过授权总数，无法选中！');
+                                node.set('checked',false)
+                            }
+                        }
+                    },
+                    load(store,records,staus){
+                        CheckedCount = leftTrees.getChecked().length
+                    }
+                }
+            });
+
+            leftTrees.addCls(leftTrees.autoWidthCls);
+
+            //关系属性列表 
+            var attrgrid = Ext.create('Ext.tree.TreePanel', {
+                region: 'center',
+                width: '100%',
+                heigth: '100%',
+                title: '模块',
+                style: "padding-right:0px;border:0px;",
+                bodyStyle: "padding-right:0px;border:0px;",
+                border: false,
+                frame: true,
+                columnLines: true,
+                store: orgattrstore,
+                hideHeaders: true,
+                animate: true,
+                collapsible: false,
+                useArrows: true,
+                rootVisible: false,
+                autoScroll: true,
+                columns: [
+                    {
+                    //     text: '模块代码',
+                    //     flex: 1,
+                    //     sortable: false,
+                    //     dataIndex: 'id',
+                    //     hideable: false,
+                    //     hidden: true,
+                    //     renderer: function (value, parm, record) {
+                            
+                    //         return record.data.cno;
+                    //     }
+                    // }, {
+                        text: '模块名称',
+                        flex: 1,
+                        dataIndex: 'text',
+                        sortable: false,
+                        hideable: false,
+                        hidden: false,
+                        xtype: 'treecolumn',
+                        // renderer: function (value, parm, record) {
+                        //     return record.data.cname;
+                        // }
+                    }
+                ],
+                listeners: {
+                    itemdblclick(a,b,c,d,e){
+                        if(b.raw.leaf){
+                            debugger
+                            attrgrid
+                            choosedModules = b.raw
+                            if(changgelist[choosedModules.cno]){
+                                RemnantCount=changgelist[choosedModules.cno].RemnantCount;
+                            }else{
+                                RemnantCount = b.raw.RemnantCount || 0
+                            }
+                            Ext.apply(leftStore.proxy.extraParams, { 'moduleno': b.raw.cno }); //b.raw.cno
+                            leftStore.load()
+                        }
+                    },
+                    /*load(a,res){
+                        attlist = res
+                    },
+                    render(){
+                        debugger
+                        orgattrstore
+                        choosedModules={
+                            cno:'NBF'
+                        }
+                        if(choosedModules){
+                            debugger
+                            var newModules = null
+                            function getByCno(list){
+                                for(var i=0;i<list.length;i++){
+                                    if(newModules){
+                                        return
+                                    }
+                                    if(list[i].raw.cno == choosedModules.cno){
+                                        newModules = list[i].raw
+                                        return
+                                    }
+                                    if(list[i].childNodes&&list[i].childNodes.length){
+                                        getByCno(list[i].childNodes)
+                                    }
+                                }
+                            }
+                            getByCno(records.childNodes)
+                            if(newModules){
+                                attrgrid.getSelectionModel().select(newModules)
+                            }
+                        }
+                    }*/
+                }
+            });
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save', '->', 'close'
+                ]
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        autoScroll: false,
+                        layout: 'border',
+                        bodyStyle: "padding-right:0px;border:0px;",
+                        items: [
+                            {
+                                xtype: 'tabpanel',
+                                region: 'west',
+                                width: '20%',
+                                items: [attrgrid]
+                            }, {
+                                xtype: 'panel',
+                                region: 'center',
+                                autoScroll: false,
+                                layout: 'border',
+                                bodyStyle: "padding-right:5px;border:0px;padding-left:5px;width:'80%'",
+                                collapsible: false,
+                                items: [
+                                    {
+                                        xtype: 'tabpanel',
+                                        region: 'west',
+                                        width: '90%',
+                                        items: [leftTrees]
+                                    }, 
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                if(choosedModules == null){
+                    return
+                }
+                var checkedCno = [],checkedList = leftTrees.getChecked()
+                for(var i=0; i<checkedList.length; i++){
+                    // checkedCno.push(checkedList[i].raw.cno)
+                    checkedCno.push({ 'moduleno': choosedModules.cno, 'ocode': checkedList[i].raw.cno});
+					
+                }
+                Ext.Ajax.request({
+                    params: {"moduleno": choosedModules.cno,"data":checkedCno },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings/SaveRights',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', '保存成功');
+                            //orgattrstore.load();
+                            /*changgelist.push({'cno':choosedModules.cno,'RemnantCount':choosedModules.RemnantCount-checkedList.length+CheckedCount,'UsedCount':choosedModules.UsedCount-CheckedCount+checkedList.length});*/
+                            if(changgelist[choosedModules.cno]){
+                                changgelist[choosedModules.cno].RemnantCount=changgelist[choosedModules.cno].RemnantCount-checkedList.length+CheckedCount;
+                                changgelist[choosedModules.cno].UsedCount=changgelist[choosedModules.cno].UsedCount-CheckedCount+checkedList.length;
+                            }else{
+                                changgelist[choosedModules.cno]={
+                                    'RemnantCount':choosedModules.RemnantCount-checkedList.length+CheckedCount,'UsedCount':choosedModules.UsedCount-CheckedCount+checkedList.length
+                                }
+                            }
+                            CheckedCount=checkedList.length;
+                            
+                            RemnantCount=changgelist[choosedModules.cno].RemnantCount
+                            checkedCno = [];
+                        } else {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                });
+                console.log(choosedModules.cno,checkedCno)
+            });
+
+            
+
+        });
+
+    </script>
+}
+
+

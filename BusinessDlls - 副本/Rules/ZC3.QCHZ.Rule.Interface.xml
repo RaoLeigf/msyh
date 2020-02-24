@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZC3.QCHZ.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:ZC3.QCHZ.Rule.Interface.INqmx04DtlRule">
+            <summary>
+            Nqmx04Dtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Rule.Interface.INqmx04MstRule">
+            <summary>
+            Nqmx04Mst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Rule.Interface.IUploadfileInfoRule">
+            <summary>
+            UploadfileInfo业务逻辑层接口
+            </summary>
+        </member>
+    </members>
+</doc>

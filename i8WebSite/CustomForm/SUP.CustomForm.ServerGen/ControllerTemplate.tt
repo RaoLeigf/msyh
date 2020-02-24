@@ -1,0 +1,1136 @@
+﻿<#@ template language="C#" #>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.SessionState;
+using System.Xml;
+using System.Xml.Serialization;
+using System.IO;
+using System.Drawing;
+
+using Enterprise3.Common.Model;
+using Enterprise3.NHORM.Controller;
+using Enterprise3.NHORM.Rule;
+using Enterprise3.Rights.AnalyticEngine;
+using Enterprise3.Common.BizBase;
+
+using Microsoft.CSharp;
+using MySql.Data;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using NG3;
+using NG3.Aop;
+using NG3.Aop.Transaction;
+using NG3.Bill.Base;
+using NG3.Data;
+using NG3.Data.Service;
+using NG3.Web.Controller;
+using NG3.Web.Mvc;
+using SUP.Common.Base;
+using SUP.Common.DataAccess;
+using SUP.CustomForm.Controller;
+using SUP.CustomForm.DataAccess;
+using SUP.CustomForm.Rule;
+
+namespace <#=nameSpace + ".Controller"#>
+{
+    //Controller层
+	public class <#= className #>ListController : CustomAFController
+	{
+		private <#="I"+className+"Fac"#> Fac;
+		private CustomCommonController customCommon;
+
+		public <#= className #>ListController()
+		{
+			//Fac = new <#=className#>Fac();
+			Fac = AopObjectProxy.GetObject<I<#=className#>Fac>(new <#=className#>Fac());
+			customCommon = new CustomCommonController();
+		}
+
+		/*List页面*/
+		public ActionResult Index()
+		{
+			//多语言支持			
+			base.InitialMultiLanguage("<#= EForm #>");
+
+			//标签页标题
+			ViewBag.Title = base.GetMenuLanguage("<#= EForm #>");
+			if (string.IsNullOrEmpty(ViewBag.Title)) { ViewBag.Title = "<#= Title #>"; }
+
+			//判断是否单点登录
+            if (string.IsNullOrWhiteSpace(ViewBag.IsSso))
+            {
+                ViewBag.IsSso = "false";
+            }
+
+			//判断是否记账
+			ViewBag.IsIad = System.Web.HttpContext.Current.Request.Params["isiad"];
+
+			//获取公共选项设置
+			ViewBag.EditBySelf = customCommon.GetOptionValue("edit");      //仅修改自己的单据
+			ViewBag.DeleteBySelf = customCommon.GetOptionValue("delete");  //仅删除自己的单据
+			ViewBag.CheckBySelf = customCommon.GetOptionValue("check");    //仅允许他人审核自己的单据
+			ViewBag.EditAttach = customCommon.GetOptionValue("attach");    //单据审核后也允许修改附件
+			if (string.IsNullOrWhiteSpace(ViewBag.EditAttach))
+            {
+                ViewBag.EditAttach = "1";
+            }
+
+			//默认项目
+			ViewBag.defaultPc = new Enterprise3.Common.BizBase.CommonBiz().GetCurrentProjectId();
+			
+			//性能优化
+			this.ToolbarRightNames = new string[] { "<#= QForm #>" };
+            this.QueryPanelIDs = new string[] { "Web:<#= PForm #>List" };
+            this.GridStateIDs = new string[] { "<#= tableNameM #>grid" };
+
+			return View("<#=className#>List");
+		}
+
+		/*获得主表列表数据;*/
+		public string GetList()
+		{
+			string limit = System.Web.HttpContext.Current.Request.Params["limit"];
+			string page = System.Web.HttpContext.Current.Request.Params["page"];
+			string clientJsonQuery = System.Web.HttpContext.Current.Request.Params["queryfilter"];
+			
+			//组织树传递数据			
+			string clientfilter = System.Web.HttpContext.Current.Request.Params["clientfilter"];
+			string orgFilter = string.Empty;
+
+			if (!string.IsNullOrEmpty(clientfilter))
+			{
+				Dictionary<string, object> dic = DataConverterHelper.ConvertToDic(clientfilter);
+
+				long[] cnttypes = { };
+				long[] orgs = { };
+				long[] projs = { };
+				customCommon.AnalyOrgQuery(dic, ref cnttypes, ref orgs, ref projs);
+
+				string inWhere = string.Empty;
+				
+				if (orgs.Length > 0)
+				{
+					for (int i = 0; i < orgs.Length; i++)
+					{
+						inWhere += "," + Convert.ToString(orgs[i]);
+					}
+					inWhere = inWhere.Substring(1);
+					orgFilter += " ocode in (" + inWhere + ")";
+				}
+
+				//主表是否有pc项目列
+				var mstDt = DbHelper.GetDataTable("select * from <#= tableNameM #> where 1=2");
+				if (mstDt.Columns.Contains("pc"))
+				{
+					if (projs.Length > 0)
+					{
+						inWhere = "";
+						if (!string.IsNullOrEmpty(orgFilter))  //不为空说明有组织过滤条件
+						{
+							orgFilter += " and ";
+						}
+					
+						for (int i = 0; i < projs.Length; i++)
+						{
+							inWhere += "," + Convert.ToString(projs[i]);
+						}
+						inWhere = inWhere.Substring(1);
+						orgFilter += " pc in (" + inWhere + ")";
+					}
+				}
+			}
+
+			if (page == null)
+				page="0";
+
+			int pageSize = int.Parse(limit);
+			int pageIndex = int.Parse(page);
+			int totalRecord = 0;
+			
+			DataTable dt = Fac.GetMasterList(clientJsonQuery, pageSize, pageIndex, ref totalRecord, orgFilter);
+			string json = DataConverterHelper.ToJson(dt, totalRecord);
+
+			return json;
+		}
+
+		/*删除信息;*/
+		public string Delete(string id)
+		{
+			var extendParam = System.Web.HttpContext.Current.Request.Params["extendParam"];
+
+            int iret = Fac.Delete(id, extendParam);
+
+            JObject jResult = new JObject();
+            if (iret != -1)
+            {
+                jResult.Add("status", "OK");
+                return JsonConvert.SerializeObject(jResult);
+            }
+            else
+            {
+                jResult.Add("status", "Fail");
+                return JsonConvert.SerializeObject(jResult);
+            }
+		}
+
+		/*审核或去审核;*/
+		public string Verify(string id)
+		{
+			var isApplyCheck = System.Web.HttpContext.Current.Request.Params["isapplycheck"];
+			var paramValue = System.Web.HttpContext.Current.Request.Params["paramvalue"];
+			var receiverId = System.Web.HttpContext.Current.Request.Params["receiverid"];
+			var extendParam = System.Web.HttpContext.Current.Request.Params["extendParam"];
+
+            int iret = Fac.Verify(id, extendParam);
+
+            JObject jResult = new JObject();
+            if (iret != -1)
+            {
+				//去审核成功后代办事宜中删除记录
+				if (isApplyCheck == "1")
+				{
+					ApplyCheck apply = new ApplyCheck();
+					bool rtnBool = apply.DeleteApplyCheck(string.Empty, string.Empty, NG3.AppInfoBase.LoginID, paramValue, receiverId);
+					jResult.Add("RemoveStatus", rtnBool ? "true" : "false");
+				}
+
+                jResult.Add("status", "OK");				
+                return JsonConvert.SerializeObject(jResult);
+            }
+            else
+            {
+                jResult.Add("status", "Fail");
+                return JsonConvert.SerializeObject(jResult);
+            }
+		}
+	}
+	
+	[SessionState(SessionStateBehavior.ReadOnly)] 
+	public class <#=className#>EditController : CustomAFController
+	{
+		private <#="I"+className+"Fac"#> Fac;
+		private CustomCommonController customCommon;
+
+        public <#= className #>EditController()
+        {
+            //Fac = new <#=className#>Fac();
+			Fac = AopObjectProxy.GetObject<I<#=className#>Fac>(new <#=className#>Fac());
+			customCommon = new CustomCommonController();
+        }
+
+		/*编辑页面*/
+		public ActionResult Index()
+		{
+			//多语言支持
+			base.InitialMultiLanguage("<#= EForm #>");
+
+			ViewBag.OType = System.Web.HttpContext.Current.Request.Params["otype"];
+            ViewBag.ID = System.Web.HttpContext.Current.Request.Params["id"];
+			ViewBag.IsSso = System.Web.HttpContext.Current.Request.Params["issso"];
+			ViewBag.CurDate = DateTime.Now.ToString("yyyy-MM-dd");
+			ViewBag.CurTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			ViewBag.TreeOrgId = System.Web.HttpContext.Current.Request.Params["treeorgid"];
+			ViewBag.TreeProjId = System.Web.HttpContext.Current.Request.Params["treeprojid"];
+			ViewBag.IsApplyCheck = System.Web.HttpContext.Current.Request.Params["isapplycheck"];
+			ViewBag.BusType = System.Web.HttpContext.Current.Request.Params["bustype"];  //2：来自查看原始单据；其它：普通打开
+			ViewBag.IDs = System.Web.HttpContext.Current.Request.Params["ids"];  //任务分解下级单据id集合
+
+			//获取公共选项设置
+			ViewBag.EditAttach = customCommon.GetOptionValue("attach");  //单据审核后允许的修改附件
+			if (string.IsNullOrWhiteSpace(ViewBag.EditAttach))
+            {
+                ViewBag.EditAttach = "1";
+            }
+
+			//任务分解：流程id，节点id，模板id
+			ViewBag.PhidWork = System.Web.HttpContext.Current.Request.Params["phidwork"];
+			ViewBag.PhidWorkNode = System.Web.HttpContext.Current.Request.Params["phidworknode"];
+			ViewBag.PhidTemplate = System.Web.HttpContext.Current.Request.Params["phidtemplate"];
+
+			//判断该流程id和节点id的单据是否存在
+			if (!string.IsNullOrEmpty(ViewBag.PhidWork) && !string.IsNullOrEmpty(ViewBag.PhidWorkNode))
+            {                
+                string exphid = DbHelper.GetString(string.Format("select phid from <#= tableNameM #> where s_task_wf='{0}' and s_task_node='{1}'", ViewBag.PhidWork, ViewBag.PhidWorkNode));
+				if (!string.IsNullOrEmpty(exphid))
+                {
+                    ViewBag.OType = "edit";
+					ViewBag.ID = exphid;
+                }
+            }			
+
+			//标签页标题
+			ViewBag.Title = base.GetMenuLanguage("<#= EForm #>");
+			if (string.IsNullOrEmpty(ViewBag.Title))
+            {
+				ViewBag.Title = "<#= Title #>";
+
+				if (!string.IsNullOrEmpty(ViewBag.WorkFlowInfo))
+				{
+					ViewBag.Title += "-工作流";
+				}
+				else
+				{
+					if (ViewBag.OType == "add")
+					{
+						ViewBag.Title += "-新增";
+					}
+					else if (ViewBag.OType == "edit")
+					{
+						ViewBag.Title += "-修改";
+					}
+					else if (ViewBag.OType == "view")
+					{
+						if (ViewBag.BusType == "2")
+						{
+							ViewBag.Title += "-原汇总信息";
+						}
+						else
+						{
+							ViewBag.Title += "-查看";
+						}
+					}
+					else if (ViewBag.OType == "copy")
+					{
+						ViewBag.Title += "-复制";
+					}
+				}
+            }
+
+            //判断是否单点登录
+            if (string.IsNullOrWhiteSpace(ViewBag.IsSso))
+            {
+                ViewBag.IsSso = "false";
+            }
+
+			if (ViewBag.OType == "add" || ViewBag.OType == "copy")  //新增或复制
+			{
+				try
+				{
+					bool hasRule = Enterprise3.Common.BizBase.CommonBiz.HasBillNoRule("<#= EForm #>");
+					if (hasRule)
+					{
+						var billId = new Enterprise3.NHORM.Rule.BillNoCommon();
+						ViewBag.BillNo = billId.GetBillNo("<#= EForm #>", false).BillNoList.Last();
+					}
+					else
+					{
+						ViewBag.BillNo = CustomCommonController.GetBillNo("<#= tableNameM #>");
+					}
+				}
+				catch (Exception)
+                {
+					ViewBag.billNo = CustomCommonController.GetBillNo("<#= tableNameM #>");
+                }
+			}
+
+			//性能优化
+			List<string> list = new List<string>();
+			list.Add("<#= tableNameM #>workflowhisgrid");
+			<# foreach (var detailInfo in detailInfoList) { #>
+				list.Add("<#= detailInfo.TableName #>grid");
+			<# } #>
+			this.GridStateIDs = list.ToArray();
+
+			return View("<#=className#>Edit");
+		}
+
+		/*获取表头信息;*/
+		public string GetMasterInfo(string id)
+		{
+            DataTable dt = Fac.GetMasterInfo(id);
+            JObject jResult = new JObject();
+
+			<# foreach (var bitmapName in bitmapNameList) { #>
+			string <#= bitmapName #>url = dt.Rows[0]["<#= bitmapName #>_url"].ToString();
+			string <#= bitmapName #>attachphid = dt.Rows[0]["<#= bitmapName #>_attachphid"].ToString();
+			if (!string.IsNullOrEmpty(<#= bitmapName #>url) && !string.IsNullOrEmpty(<#= bitmapName #>attachphid) && !System.IO.File.Exists(Request.PhysicalApplicationPath + <#= bitmapName #>url))
+			{
+			    byte[] buffer = NG3UploadFileService.NG3GetEx("", long.Parse(<#= bitmapName #>attachphid));
+				string dirPath = AppDomain.CurrentDomain.BaseDirectory + "/NG3Resource/TempImgUpload/";
+                if (!Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath);
+                }
+                System.IO.File.WriteAllBytes(Request.PhysicalApplicationPath + <#= bitmapName #>url, buffer);
+			}
+			<# } #>
+
+            if (dt.Rows.Count > 0)
+            {
+                JObject dataObj = dt.Rows[0].ToJObject();
+                jResult.Add("Status", "OK");
+                jResult.Add("Data", dataObj);
+                return JsonConvert.SerializeObject(jResult);
+            }
+            else
+            {
+                jResult.Add("Status", "Fail");
+                return JsonConvert.SerializeObject(jResult);
+            }
+		}
+
+	<# foreach (var detailInfo in detailInfoList) { #>
+		/*此段生成GetDetailInfo相关的方法，一张detail明细表对应一个GetDetailInfo方法;*/
+		public string Get<#= detailInfo.TableName #>List()
+		{
+			string id = System.Web.HttpContext.Current.Request.Params["id"];
+			string ids = System.Web.HttpContext.Current.Request.Params["ids"];
+			string bustype = System.Web.HttpContext.Current.Request.Params["bustype"];  //1：来自汇总；2：来自查看原始单据；其它：普通查询			
+			string phidwork = System.Web.HttpContext.Current.Request.Params["phidwork"];  //任务分解：流程id
+			string istreegrid = System.Web.HttpContext.Current.Request.Params["istreegrid"];
+			string nodeid = System.Web.HttpContext.Current.Request.Params["node"];
+			string json = string.Empty;
+			
+			DataTable dt = null;  //返回的dt
+
+			//普通查询明细grid
+			if (string.IsNullOrEmpty(bustype))
+            {
+				dt = Fac.Get<#= detailInfo.TableName #>List(id, 0);
+            }
+			//汇总流程是先删除此单据明细记录，新增下级单据的汇总行再保存并返回汇总行；查看原始单据是直接返回汇总行
+			else
+			{
+				DataTable dts = Fac.Get<#= detailInfo.TableName #>List(ids, 1);
+				dts.TableName = "<#= detailInfo.TableName #>";
+
+				//数据汇总
+                if (dts.Rows.Count > 0)
+                {
+					//获取任务分解用到的明细表的分组小计信息
+					DataSet ds_subtotal = SUP.CustomForm.DataAccess.Common.GetSubtotalDS("<#=EForm#>", phidwork);
+					DataTable dt_subtotal = ds_subtotal.Tables["<#= detailInfo.TableName #>"];
+
+					//任务分解汇总下级单据
+					dt = customCommon.MergeGrid(dts, id, dt_subtotal, bustype);  //bustype：1汇总，2查看原始单据
+                }
+			}
+
+			//树grid需要转换成树json
+			if (istreegrid == "1")  
+			{
+				CustomTreeBuilder builder = new CustomTreeBuilder();
+				string filter = "(s_tree_pid is null or s_tree_pid='' or s_tree_pid='0')";
+
+				if ("root" == nodeid)  //首次加载
+				{
+					JArray ja = builder.GetTreeList(dt, "s_tree_pid", "s_tree_id", filter, "phid", TreeDataLevelType.TopLevel, 5);
+					json = JsonConvert.SerializeObject(ja);
+				}
+				else  //懒加载
+				{
+					JArray ja = builder.GetTreeList(dt, "s_tree_pid", "s_tree_id", filter, "phid", TreeDataLevelType.LazyLevel);
+					json = JsonConvert.SerializeObject(ja);
+				}
+			}
+			else
+			{
+				json = SUP.Common.Base.DataConverterHelper.ToJson(dt, 1);
+			}
+
+			return json;
+		}
+	<# } #>
+
+
+		public string Save()
+		{
+			string formdata = System.Web.HttpContext.Current.Request.Params["formdata"];
+			DataTable masterdt = DataConverterHelper.ToDataTable(formdata, "<#= "select * from " + tableNameM #>");
+
+			<# foreach (var bitmapName in bitmapNameList) { #>
+			string <#= bitmapName #>path = Request.PhysicalApplicationPath + masterdt.Rows[0]["<#= bitmapName #>_url"].ToString();
+			if (System.IO.File.Exists(<#= bitmapName #>path))
+			{
+			    byte[] buffer;
+				using (FileStream fs = new FileStream(<#= bitmapName #>path, FileMode.Open, FileAccess.Read))
+				{
+				    buffer = new byte[fs.Length];
+                    fs.Read(buffer, 0, (int)fs.Length);
+				}
+
+				string attachphid = masterdt.Rows[0]["<#= bitmapName #>_attachphid"].ToString();
+				if (string.IsNullOrEmpty(attachphid))
+				{
+				    JObject jo = (JObject)JsonConvert.DeserializeObject(NG3UploadFileService.NG3UploadEx("", buffer));
+				    if (jo["success"] != null && jo["success"].ToString() == "true")
+				    {
+				        masterdt.Rows[0]["<#= bitmapName #>_attachphid"] = jo["phid"].ToString();
+				    }
+				}
+				else
+				{
+				    NG3UploadFileService.NG3ModifyEx("", long.Parse(attachphid), buffer);
+				}
+			}
+			<# } #>
+
+			IList<DataTable> detailList = new List<DataTable>();
+
+		<# foreach (var detailInfo in detailInfoList) { #>
+			/*每张detail明细表生成对应的保存语句;*/
+			string <#= detailInfo.TableName #>data = System.Web.HttpContext.Current.Request.Params["<#= detailInfo.TableName #>data"];
+			DataTable <#= detailInfo.TableName #>detaildt = new DataTable();
+			<#= detailInfo.TableName #>detaildt = DataConverterHelper.ToDataTable(<#= detailInfo.TableName #>data, "<#= "select * from " + detailInfo.TableName #>");
+			<#= detailInfo.TableName #>detaildt.TableName = "<#= detailInfo.TableName #>";
+			detailList.Add(<#= detailInfo.TableName #>detaildt);
+		<# } #>
+
+            int iret = 0;
+			string id = string.Empty;
+			string msg=string.Empty;
+			/****************************************
+             * 这里多出来两个参数 ;
+             * SQL（SQL语句）;
+             * exec （存储过程的方法名和参数）;
+             ****************************************/
+            var sqlStr = System.Web.HttpContext.Current.Request.Params["sql"];
+            var exec = System.Web.HttpContext.Current.Request.Params["exec"];
+			var extendParam = System.Web.HttpContext.Current.Request.Params["extendParam"];
+
+			//任务分解的模板id
+			string phidtemplate = System.Web.HttpContext.Current.Request.Params["phidtemplate"];
+
+            if (!string.IsNullOrEmpty(sqlStr))
+            {
+                var sqlStrSplit = sqlStr.Trim().Split(';');
+                IList<string> sqlList = new List<string>();
+                foreach (string sql in sqlStrSplit)
+                {
+                    if (!string.IsNullOrEmpty(sql))
+                    {
+                        sqlList.Add(sql);
+                    }
+                }
+
+                iret = Fac.Save(masterdt, detailList, ref id, sqlList, exec, extendParam, phidtemplate);
+            }
+            else
+            {
+				iret = Fac.Save(masterdt, detailList, ref id, new List<string>(), exec, extendParam, phidtemplate);
+            }
+
+            JObject jResult = new JObject();
+            if (iret != -1)
+            {				
+				//拼返回结果串
+                jResult.Add("Status", "OK");
+				jResult.Add("id", id);
+                return JsonConvert.SerializeObject(jResult);
+            }
+            else
+            {
+                jResult.Add("Status", "Fail");
+                return JsonConvert.SerializeObject(jResult);
+            }
+		}
+
+		<# foreach (var bitmapName in bitmapNameList) { #>
+		/// <summary>
+        /// 图片上传
+        /// </summary>
+        /// <returns></returns>
+        [ActionAuthorize(NG3.Web.Mvc.Level.NonCheck)]
+        public string <#= bitmapName #>ImageUpload()
+        {
+            System.Web.HttpRequest request = System.Web.HttpContext.Current.Request;
+            System.Web.HttpPostedFile imgreq = request.Files[0];
+            string path = string.Empty;
+            string filetype = imgreq.FileName.Substring(imgreq.FileName.LastIndexOf(".") + 1);
+			if(filetype != "png" && filetype != "jpg" && filetype != "bmp")
+			{
+			    return DataConverterHelper.SerializeObject(new
+                {
+                    success = false,
+                    msg = "请选择图片文件！"
+                });
+			}
+            using (Stream imgstream = imgreq.InputStream)
+            {
+                using (var img = Image.FromStream(imgstream))
+                {                    
+                    path = ImageSaveFile(img, filetype);
+                }
+            }
+            return DataConverterHelper.SerializeObject(new
+            {
+                success = true,
+                path = path
+            });
+        }		
+		<# } #>
+
+		<# if (bitmapNameList.Count > 0) { #>
+       
+        private string ImageSaveFile(Image img, string filetype)
+        {
+            var dirPath = AppDomain.CurrentDomain.BaseDirectory + "/NG3Resource/TempImgUpload/";
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            
+            string path = string.Format("/NG3Resource/TempImgUpload/{0}.{1}", Guid.NewGuid().ToString(), filetype);
+            img.Save(AppDomain.CurrentDomain.BaseDirectory + path);
+            return path;
+        }
+
+		<# } #>
+
+		<# if (HasAsrGrid == "1") { #>
+		/// <summary>
+        /// 获取附件单据体
+        /// <summary>
+        public string GetAsrGridList(string tablename,string asr_code)
+        {
+		    DataTable dt = new DataTable();
+            dt.TableName = "AsrGrid";
+
+            dt.Columns.Add(new DataColumn("asr_name", Type.GetType("System.String")));
+            dt.Columns.Add(new DataColumn("logid", Type.GetType("System.String")));
+            dt.Columns.Add(new DataColumn("asr_dt", Type.GetType("System.String")));
+
+            DataTable attachInfoDt = NG3UploadFileService.NG3GetAttachInfo(NG3.AppInfoBase.UserConnectString, tablename, "c_pfc_attachment", asr_code);
+			DataRow dr;
+			for (int i = 0;i < attachInfoDt.Rows.Count; i++)
+			{
+			    dr = dt.NewRow();
+			    dr["asr_name"] = attachInfoDt.Rows[i]["asr_name"];
+                dr["logid"] = attachInfoDt.Rows[i]["asr_fillname"];
+				dr["asr_dt"] = attachInfoDt.Rows[i]["asr_filldt"];
+				dt.Rows.Add(dr);
+			}
+
+			return  DataConverterHelper.ToJson(dt, dt.Rows.Count);
+        }
+		<# } #>
+
+		/// <summary>
+        /// 拷贝附件
+        /// <summary>
+		public string CopyAttachment(string oritablename, string desttablename, string oriphid)
+		{
+		    var billId = new Enterprise3.NHORM.Rule.BillNoCommon();
+			string origuid = Guid.NewGuid().ToString();
+			NG3UploadFileService.InitEx(origuid, "c_pfc_attachment", oritablename, oriphid, NG3.AppInfoBase.LoginID, NG3.AppInfoBase.UserName, NG3.AppInfoBase.UserConnectString);
+			string asr_code = billId.GetBillId(desttablename, "phid").ToString();
+			return NG3UploadFileService.CopyAttach("c_pfc_attachment", desttablename, asr_code, NG3.AppInfoBase.LoginID, NG3.AppInfoBase.UserName, NG3.AppInfoBase.UserConnectString, origuid);
+		}
+
+	}
+
+
+	//Facade层
+	public interface <#="I"+className+"Fac"#>
+	{	
+		DataTable GetMasterList(string clientFilter, int pageSize, int PageIndex, ref int totalRecord, string orgFilter);
+
+		DataTable GetMasterInfo(string phid);
+		
+	<# foreach (var detailInfo in detailInfoList) { #>
+		/*生成GetDetailInfo相关的接口;*/
+		DataTable Get<#= detailInfo.TableName #>List(string id, int type);
+	<# } #>
+
+		int Save(DataTable masterdt, IList<DataTable> detaildt, ref string id, IList<string> sqlList, string execStr, string extendParam, string phidtemplate);
+
+		int Delete(string phid, string extendParam);
+
+		int Verify(string phid, string extendParam);
+
+		void FuncParser(ref int iRet, string extendParam);
+
+		int MergeSubmit(DataTable dts, string id);
+	}
+
+	public class <#=className+"Fac"#>:<#="I"+className+"Fac"#>
+	{
+		private <#=className+"Dac"#> dac=new <#=className+"Dac"#>();
+
+		[DBControl]
+		public DataTable GetMasterList(string clientFilter, int pageSize, int PageIndex, ref int totalRecord, string orgFilter)
+		{
+			return dac.GetMasterList(clientFilter, pageSize, PageIndex, ref totalRecord, orgFilter);
+		}
+
+		[DBControl]
+		public DataTable GetMasterInfo(string phid)
+		{
+			return dac.GetMasterInfo(phid);
+		}				
+		
+	<# foreach (var detailInfo in detailInfoList) { #>
+		/*这段代码生成GetDetailInfo相关的方法，一张detail明细表对应一个方法;*/
+		[DBControl]
+		public DataTable Get<#= detailInfo.TableName #>List(string id, int type)
+		{
+			return dac.Get<#= detailInfo.TableName #>List(id, type);
+		}
+	<# } #>
+
+		[DBControl(ControlOption = DbControlOption.BeginTransaction)]
+		public int Save(DataTable masterdt, IList<DataTable> detailList, ref string id, IList<string> sqlList, string execStr, string extendParam, string phidtemplate)
+		{
+			//单据保存，附件先保存，以免dac中保存时把code清空
+			int iRet = dac.Save(masterdt, detailList, ref id, sqlList, execStr, phidtemplate);
+
+			//附件保存
+			string saveparms = string.Empty;
+			string code = masterdt.Rows[0]["code"].ToString();
+
+			if (!string.IsNullOrEmpty(code) && code.Length > 30)  //guid长度为36
+			{
+				saveparms += code + "||" + id + "@@##";
+			}
+			
+			foreach (DataTable dt in detailList)
+			{
+				foreach (DataRow row in dt.Rows)
+				{
+					if (!string.IsNullOrEmpty(row["code"].ToString()) && row["code"].ToString().Length > 30 )
+					{
+						saveparms += row["code"].ToString() + "||" + row["phid"].ToString() + "@@##";
+					}
+				}
+			}
+
+			if (!string.IsNullOrEmpty(saveparms))
+			{
+				saveparms = saveparms.TrimEnd('#', '@');
+				string sRet = NG3UploadFileService.BatchSave(saveparms, NG3.AppInfoBase.UserConnectString);
+				//附件保存失败
+				if (sRet != "1")
+				{
+					throw new Exception("BatchSave返回值：" + sRet);
+				}
+			}
+
+			//执行元数据函数
+			FuncParser(ref iRet, extendParam);
+			
+			return iRet;
+		}
+
+		[DBControl(ControlOption = DbControlOption.BeginTransaction)]
+		public int Delete(string phid, string extendParam)
+		{
+			int iRet = dac.Delete(phid);
+
+			//执行元数据函数
+			FuncParser(ref iRet, extendParam);
+
+			return iRet;
+		}
+
+		[DBControl(ControlOption = DbControlOption.BeginTransaction)]
+		public int Verify(string phid, string extendParam)
+		{
+			int iRet = dac.Verify(phid);
+
+			//执行元数据函数
+			FuncParser(ref iRet, extendParam);
+
+			return iRet;
+		}
+
+		//执行注册好的元数据函数
+		public void FuncParser(ref int iRet, string extendParam)
+		{			
+			if (iRet >= 0 && !string.IsNullOrEmpty(extendParam))
+            {
+				string resultStr = new ServerFuncParserRule().FuncParser("<#=PForm#>", extendParam);
+				if (resultStr.Equals("fail"))
+					iRet = -1;
+			}
+		}
+
+		[DBControl]
+		public int MergeSubmit(DataTable dts, string id)
+		{
+			return dac.MergeSubmit(dts, id);
+		}
+	}
+
+
+	//DataAccess层
+	public class <#=className+"Dac"#>
+	{
+	    /// <summary>
+        /// 获取列表数据;
+        /// </summary>
+        /// <param name="clientFilter">查询条件</param>
+        /// <param name="pageSize">页面长度</param>
+        /// <param name="PageIndex">页码</param>
+        /// <param name="totalRecord">总记录条数</param>
+        /// <returns></returns>
+		public DataTable GetMasterList(string clientFilter, int pageSize, int PageIndex ,ref int totalRecord, string orgFilter)
+        {
+			/*
+            string sql = "<#=sqlList#>";
+
+			int index = sql.IndexOf("LEFT OUTER", StringComparison.OrdinalIgnoreCase);
+			if(index > 0)
+			{
+				sql = sql.Substring(0,index);
+			}
+
+			index = sql.IndexOf("WHERE", StringComparison.OrdinalIgnoreCase);
+			if(index > 0)
+			{
+				sql = sql.Substring(0,index);
+			}
+			*/
+
+			string sql = "select * from <#= tableNameM #>";
+
+            string sortField = "<#= tableNameM #>.phid asc";
+            DataTable dt;
+
+			//信息权限加where
+			string infoRightQuery = string.Empty;
+			try
+            {
+				var infoRight = new InfoRightControl("<#=EForm#>", AppInfoBase.UserID);
+				infoRightQuery = infoRight.GetSqlWhere();
+			}
+			catch (Exception e)
+            {
+                var msg = e;
+            }
+			finally
+			{
+				string whereStr = string.Empty;
+				string query = string.Empty;
+				IDataParameter[] p = DataConverterHelper.BuildQueryWithParam(clientFilter, ref query);
+
+				if (!string.IsNullOrEmpty(query))
+				{
+					whereStr += " and (" + query + ")";
+				}
+
+				if (!string.IsNullOrEmpty(infoRightQuery))
+				{
+					whereStr += " and (" + infoRightQuery + ")";
+				}
+				
+				if (!string.IsNullOrEmpty(orgFilter))
+				{
+					whereStr += " and (" + orgFilter + ")";
+				}
+
+				//过滤掉任务分解的模板数据
+                DataTable tmpDt = DbHelper.GetDataTable(sql + " where 1=2");
+                if (tmpDt.Columns.Contains("s_task_phid"))  //有任务分解模板id列
+                {
+                    whereStr += " and s_task_phid is null";
+                }
+
+				if (!string.IsNullOrEmpty(whereStr))
+				{
+					sql += " where " + whereStr.Substring(4).Trim();
+				}
+
+				string sqlstr = PaginationAdapter.GetPageDataSql(sql, pageSize, ref PageIndex, ref totalRecord, sortField, p);
+				dt = DbHelper.GetDataTable(sqlstr, p);
+
+				<#= Common.GetCodeToNameDac(CodeToNameList, sqlList) #>
+			}
+
+			return SetCodeNull(dt);
+		}
+
+		/// <summary>
+        /// 根据phid获取单条记录;
+        /// </summary>
+		public DataTable GetMasterInfo(string phid)
+		{
+			string sql = "select * from <#= tableNameM #> where phid = {0}";
+
+            IDataParameter[] p = new NGDataParameter[1];
+            p[0] = new NGDataParameter("phid", phid);
+
+            DataTable dt = DbHelper.GetDataTable(sql, p);
+
+			return SetCodeNull(dt);
+		}
+
+	<# foreach (var detailInfo in detailInfoList) { #>
+		public DataTable Get<#= detailInfo.TableName #>List(string id, int type)
+		{
+		<# if (detailInfo.Sql.IndexOf("where", StringComparison.OrdinalIgnoreCase) > 0) { #>
+			string sql = "<#= detailInfo.Sql #> and m_code={0}";
+		<# } else { #>
+			string sql = "<#= detailInfo.Sql #> where m_code={0}";
+		<# } #>
+
+			if (type == 1) { sql = sql.Replace("m_code={0}", "m_code in ({0})"); } 
+			DataTable dt = DbHelper.GetDataTable(string.Format(sql, id));
+
+			//grid帮助列分两列并代码转名称
+			<#= Common.GetCodeToNameDac(CodeToNameGrid, detailInfo.Sql, detailInfo.TableName) #>
+
+			//增加汇总合并列并赋值
+            dt.Columns.Add("s_groupfield");
+		<# if (detailInfo.Groupfield.Count > 0) { #>
+            foreach (DataRow dr in dt.Rows)
+            {
+                dr["s_groupfield"] = <#= Common.GetGroupFieldCol(detailInfo.Groupfield) #>;
+            }
+		<# } #>
+
+			return SetCodeNull(dt);
+		}
+	<# } #>
+
+		/// <summary>
+        /// 保存修改记录;
+        /// </summary>
+		public int Save(DataTable masterdt, IList<DataTable> detailList, ref string id, IList<string> sqlList, string execStr, string phidtemplate)
+		{
+			string mastercode = string.Empty;
+            string detailcode = string.Empty;
+            var billId = new Enterprise3.NHORM.Rule.BillNoCommon();
+			bool exception = false;  //调主键服务是否发生异常
+
+			//主表保存
+            foreach (DataRow dr in masterdt.Rows)
+            {
+                if (dr.RowState == DataRowState.Deleted) continue;
+                if (dr.RowState == DataRowState.Added)
+                {
+					try
+					{                        
+						mastercode = billId.GetBillId("<#= tableNameM #>", "phid").ToString();
+					}
+					catch (Exception)
+					{
+						//因为url的关系可能调不到主键服务，则调自己写的取主键函数
+						exception = true;
+						mastercode = CustomCommonController.GetBillId("<#= tableNameM #>");
+					}
+
+                    dr["phid"] = mastercode;
+                    if (dr.Table.Columns.Contains("fillpsn")) { dr["fillpsn"] = AppInfoBase.UserID; }
+                    if (dr.Table.Columns.Contains("ischeck")) { dr["ischeck"] = 0; }
+                    if (dr.Table.Columns.Contains("is_wf")) { dr["is_wf"] = 0; }
+                    if (dr.Table.Columns.Contains("asr_flg") && dr["asr_flg"] == null) { dr["asr_flg"] = 0; }
+                    id = mastercode;
+                    
+                    try
+                    {              
+						bool hasRule = Enterprise3.Common.BizBase.CommonBiz.HasBillNoRule("<#= EForm #>");          
+                        if (hasRule)
+						{
+							var billno = billId.GetBillNo("<#= EForm #>", true).BillNoList.Last();
+                            dr["bill_no"] = billno;
+						}
+                        else
+                        {
+                            dr["bill_no"] = CustomCommonController.GetBillNo("<#= tableNameM #>");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        dr["bill_no"] = CustomCommonController.GetBillNo("<#= tableNameM #>");
+                    }
+                }
+                else
+                {
+                    mastercode = dr["phid"].ToString();
+                    id = mastercode;
+                }
+            }
+            int iRet = DbHelper.Update(masterdt, "select * from <#= tableNameM #>");
+
+			//明细表保存
+			foreach (DataTable dt in detailList)
+			{
+				foreach (DataRow dr in dt.Rows)
+				{
+					if (dr.RowState == DataRowState.Added)
+					{
+						if (!exception)
+                        {
+							try
+							{
+								detailcode = billId.GetBillId(dt.TableName, "phid").ToString();							
+							}
+							catch (Exception)
+							{
+								//因为url的关系可能调不到主键服务，则调自己写的取主键函数
+								exception = true;
+								detailcode = CustomCommonController.GetBillId(dt.TableName);
+							}
+						}
+						else
+                        {
+                            detailcode = (Convert.ToInt64(detailcode) + 1).ToString();
+                        }
+						dr["phid"] = detailcode;
+						dr["m_code"] = mastercode;
+					}
+				}
+				iRet += DbHelper.Update(dt, "select * from " + dt.TableName);
+			}
+
+			//单据主键回填到任务分解模板表
+            if (!string.IsNullOrEmpty(phidtemplate))
+            {
+                DbHelper.ExecuteNonQuery(string.Format("update work_templatemain set phidbill={0} where phid={1}", mastercode, phidtemplate));
+            }
+
+			/********************************************
+             * 这一段用于执行存储过程;
+             ********************************************/
+            if (!string.IsNullOrEmpty(execStr))
+            {
+                var execList = execStr.Replace('(', ';').Replace(')', ' ').Trim().Split(';');
+				var sql="select name from sys.parameters where object_id = object_id('" + execList[0]+ "') order by parameter_id";
+				DataTable dtParaName = DbHelper.GetDataTable(sql);
+
+                var prosql = string.Format("call {0}",execList[0]);
+                var paraList = execList[1].Split(',');
+                IDataParameter[] para = new NGDataParameter[paraList.Length];// 参数长度;
+
+                for (int i = 0; i < paraList.Length; i++)
+                {
+                    var paraSeparate = paraList[i].Split('|');
+                    var dbType = paraSeparate[0].Trim();
+                    NGDbType ngdbType = new NGDbType();
+                    switch (dbType.ToLower())
+                    {
+                        case "string":
+                            ngdbType = NGDbType.VarChar;
+                            break;
+                        case "number":
+                            ngdbType = NGDbType.Numeric;
+                            break;
+                        case "int":
+                            ngdbType = NGDbType.Integer;
+                            break;
+                        default:
+                            ngdbType = NGDbType.VarChar;
+                            break;
+                    }
+                    var paraValue = paraSeparate[1].Trim();
+                    //para[i] = new NGDataParameter(dtParaName.Rows[i]["name"].ToString().Replace("@",""), ngdbType, paraValue);
+					para[i] = new NGDataParameter(paraSeparate[2], ngdbType, paraValue);
+                }
+
+                iRet += DbHelper.ExecuteNonQuery(prosql, para);
+            }
+
+			/********************************************
+             * 这一段用于执行update SQL语句;
+             ********************************************/
+            if (sqlList.Count > 0)
+            {
+                foreach(string sql in sqlList)
+                {
+                    iRet += DbHelper.ExecuteNonQuery(sql);
+                }
+            }			
+
+			return iRet;
+		}
+
+		/// <summary>
+		/// 删除记录;
+		/// <summary>
+		public int Delete(string phid)
+        {
+			string sql = "delete from <#= tableNameM #> where phid = '" + phid + "'";
+			int iRet = DbHelper.ExecuteNonQuery(sql);
+
+		<# foreach (var detailInfo in detailInfoList) { #>
+			sql = "delete from <#= detailInfo.TableName #> where m_code = '" + phid + "'";
+			iRet += DbHelper.ExecuteNonQuery(sql);
+		<# } #>
+
+			return iRet;
+        }
+
+		/// <summary>
+		/// 审核或去审核记录;
+		/// <summary>
+		public int Verify(string phid)
+        {
+			int iRet = 0;
+			string sql = "<#= sqlM #> where <#= tableNameM #>.phid={0}";
+
+            IDataParameter[] p = new NGDataParameter[1];
+            p[0] = new NGDataParameter("phid", phid);
+
+            DataTable dt = DbHelper.GetDataTable(sql, p);
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                string ischeck = dt.Rows[0]["ischeck"].ToString();
+
+                //审核
+                if (ischeck == "0" || string.IsNullOrEmpty(ischeck))
+                {
+                    dt.Rows[0]["ischeck"] = "1";
+                    dt.Rows[0]["check_dt"] = DateTime.Now;
+                    dt.Rows[0]["checkpsn"] = EntAppInfoBase.UserID;
+                }
+                //去审核
+                else if (ischeck == "1")
+                {
+                    dt.Rows[0]["ischeck"] = "0";
+                    dt.Rows[0]["check_dt"] = DBNull.Value;
+                    dt.Rows[0]["checkpsn"] = DBNull.Value;
+                }
+
+                iRet = DbHelper.Update(dt, "<#= sqlM #>");
+            }
+
+			return iRet;
+        }
+
+		/// <summary>
+        /// 清空附件会话guid;
+        /// <summary>
+        public DataTable SetCodeNull(DataTable dt)
+        {
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow dr in dt.Rows)
+                {
+                    dr["code"] = null;
+                }
+            }
+            return dt;
+        }
+
+		/// <summary>
+        /// 保存任务分解汇总数据
+        /// <summary>
+		public int MergeSubmit(DataTable dts, string id)
+		{
+			string sql = "delete from " + dts.TableName + " where m_code = '" + id + "'";
+			DbHelper.ExecuteNonQuery(sql);
+
+			var billId = new Enterprise3.NHORM.Rule.BillNoCommon();
+			foreach (DataRow dr in dts.Rows)
+			{
+				if (dr.RowState == DataRowState.Added)
+				{
+					dr["phid"] = billId.GetBillId(dts.TableName, "phid").ToString();				
+				}
+			}
+
+			int iRet = DbHelper.Update(dts, "select * from " + dts.TableName);
+
+			return iRet;
+		}
+	}
+}

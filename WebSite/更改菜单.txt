@@ -1,0 +1,171 @@
+--基础数据-企业级基础数据-G6H
+
+UPDATE fg3_menu 
+SET name = 'G6H'
+ WHERE code = '80b3c491-8f63-4f2f-af03-2663e44ba538';
+
+
+UPDATE fg3_menu 
+SET name = '项目管理-预立项'
+ , url = '/GXM/XM/ProjectMst/ProjectMstList?ProjStatus=1'
+ , apptype = 'mvc'
+ WHERE code = '77332d3a-3ab5-458e-9f96-6d2814ff6afd';
+UPDATE fg3_menu 
+SET name = '项目管理-立项'
+ , url = '/GXM/XM/ProjectMst/ProjectMstList?ProjStatus=2'
+ , apptype = 'mvc'
+ WHERE code = 'd4194bba-ae65-409c-bacf-de724c9f4112';
+UPDATE fg3_menu 
+SET name = '项目管理-项目查询'
+ , url = '/GXM/XM/ProjectMst/ProjectMstList'
+ , apptype = 'mvc'
+ WHERE code = '8eda4247-3aac-497f-97cd-cb84eff95bb9';
+
+
+
+
+UPDATE fg3_menu 
+SET name = '预算管理-预算申报-年初预算申报'
+ , url = '/GYS/YS/BudgetMst/BudgetMstList?workType=c'
+ , apptype = 'mvc'
+ WHERE code = 'cfea7970-a8e0-4994-9bcb-a1c8ea4b43b8';
+UPDATE fg3_menu 
+SET name = '预算管理-预算申报-年中预算调整'
+ , url = '/GYS/YS/BudgetMst/BudgetMstList?workType=z'
+ , apptype = 'mvc'
+ WHERE code = '4ad60720-6f26-4d7b-9f04-f340d5d46078';
+
+UPDATE fg3_menu 
+SET name = '预算管理-查询统计-预算汇总表'
+ , url = '/GXM/XM/ProjectMst/ProjectMstList'
+ , apptype = 'mvc'
+ WHERE code = '76ae07a6-4ec8-44e3-abeb-8a8d7a641e8c';
+UPDATE fg3_menu 
+SET name = '预算管理-查询统计-预算部门分解表'
+ , url = '/GYS/YS/BuDeptReport/BuDeptReportList'
+ , apptype = 'mvc'
+ WHERE code = '8ea8c469-8db9-4814-b83b-5014b6336e0f';
+UPDATE fg3_menu 
+SET name = '预算管理-查询统计-预算执行情况表'
+ , url = '/GYS/YS/BuDeptReport/BuImplementReportList'
+ , apptype = 'mvc'
+ WHERE code = '5a1f7974-fcd1-489f-8411-eddf64a354e8';
+UPDATE fg3_menu 
+SET name = '预算管理-查询统计-经费收支预算表'
+ , url = '/GYS/YS/BuDeptReport/BuIncomeExpendReportList'
+ , apptype = 'mvc'
+ WHERE code = '02cfbea0-bc35-4806-b5c2-48d4cac72efe';
+UPDATE fg3_menu 
+SET name = '预算管理-进度控制'
+ , url = '/GYS/YS/BudgetProcessCtrl/BudgetProcessCtrlList'
+ , apptype = 'mvc'
+ WHERE code = 'e04fbcb5-dbf3-4b14-a7eb-2ff625baea8a';
+
+
+UPDATE fg3_menu 
+SET name = '绩效评价管理-绩效目标评价'
+ , url = '/GJX/JX/PerformanceMst/PerformanceMstList'
+ , apptype = 'mvc'
+ WHERE code = '177ccd2e-a542-4f54-b096-5ab7cb56e2f3';
+
+
+
+UPDATE fg3_menu 
+SET name = '基础数据-预算科目'
+ , url = '/GQT/QT/BudgetAccounts/BudgetAccountsList'
+ , apptype = 'mvc'
+ WHERE code = '98be4280-f07d-4c8a-87ee-3898d7abb766';
+
+
+UPDATE fg3_menu 
+SET name = '基础数据-支出类别'
+ , url = '/GQT/QT/ExpenseCategory/ExpenseCategoryList'
+ , apptype = 'mvc'
+ WHERE code = 'b083ba3c-7fa4-4d87-8f07-3f76780131a3';
+UPDATE fg3_menu 
+SET name = '基础数据-支付方式'
+ , url = '/GQT/QT/PaymentMethod/PaymentMethodList'
+ , apptype = 'mvc'
+ WHERE code = '8c1fff9c-a7fd-460b-bcfe-a1be18d196cc';
+
+
+UPDATE fg3_menu 
+SET name = '对应关系-单位对应预算科目'
+ , url = '/GQT/QT/CorrespondenceSettings/RelationYSKM'
+ , apptype = 'mvc'
+ WHERE code = 'ac55c0a0-824b-4c19-b3c3-160b1de3b5b2';
+UPDATE fg3_menu 
+SET name = '对应关系-单位对应资金来源'
+ , url = '/GQT/QT/CorrespondenceSettings/RelationZJLY'
+ , apptype = 'mvc'
+ WHERE code = 'ec660c29-9ee5-40dc-a446-f2aceed9451e';
+UPDATE fg3_menu 
+SET name = '对应关系-单位对应项目'
+ , url = '/GQT/QT/CorrespondenceSettings/RelationYSK'
+ , apptype = 'mvc'
+ WHERE code = '90337456-6d87-4647-81f0-e966669f6390';
+UPDATE fg3_menu 
+SET name = '对应关系-单位对应支出类别'
+ , url = '/GQT/QT/CorrespondenceSettings2/RelationZCLB'
+ , apptype = 'mvc'
+ WHERE code = '1f7d9726-f4b1-47df-9f04-f008944d7f55';
+
+UPDATE fg3_menu 
+SET name = '对应关系-操作员默认单位部门设置'
+ , url = '/GQT/QT/CorrespondenceSettings/RelationDefaultOrg'
+ , apptype = 'mvc'
+ WHERE code = '3a6c5ebb-48eb-4aed-8881-22731774d895';
+UPDATE fg3_menu 
+SET name = '对应关系-单位是否申报单位'
+ , url = '/GQT/QT/CorrespondenceSettings2/IsOrgSB'
+ , apptype = 'mvc'
+ WHERE code = '67cf8566-fdb2-4273-87f0-051a25dea397';
+UPDATE fg3_menu 
+SET name = '对应关系-单位对应支出渠道'
+ , url = '/GQT/QT/VCorrespondenceSetting2/RelationZCQD'
+ , apptype = 'mvc' 
+ WHERE code = 'c3948662-4ca0-47d4-abf6-ad99b7aac95e';
+UPDATE fg3_menu 
+SET name = '对应关系-操作员对应预算部门'
+ , url = '/GQT/QT/CorrespondenceSettings/RelationYSBM'
+ , apptype = 'mvc' 
+ WHERE code = 'a9d69236-39b0-4d82-8f3d-5406a10c81f5';
+
+UPDATE fg3_menu 
+SET name = '基础数据-资金来源'
+ , url = '/GQT/QT/SourceOfFunds/SourceOfFundsList'
+ , apptype = 'mvc' 
+ WHERE code = 'eb10be24-0eb7-4cfc-aa47-a6031b58bef7';
+
+UPDATE fg3_menu  set url='/GQT/QT/ProcurementType/ProcurementTypeList',name='基础数据-采购类型设置'  
+ WHERE code='adda4b2d-c3b8-492e-951c-8a28738f405b';
+ 
+UPDATE fg3_menu  set url='/GQT/QT/PerformEvalTarget/PerformEvalTargetList',name='基础数据-绩效项目评价指标详细' 
+ WHERE code='823455c1-fb8c-4458-ab55-c2c4e5f0edb8';
+
+UPDATE fg3_menu  set url='/GQT/QT/ProcurementProcedures/ProcurementProceduresList',name='基础数据-采购程序设置'     
+ WHERE code='717fcd8c-ca3c-47f6-b3ab-dcc539312e59';
+
+UPDATE fg3_menu  set url='/GQT/QT/PerformEvalTargetClass/PerformEvalTargetClassList',name='基础数据-绩效评价指标类别设置'   
+ WHERE code='0fe2ae2d-6277-48bd-9af8-20008c3ffaa9';
+
+--------------------
+UPDATE fg3_menu  set name='G6H-2'   
+ WHERE code='f7e8e700-e57f-4145-9861-b5c659f79f79';
+
+update fg3_menu set 
+ url='/GQT/QT/ProcurementCatalog/ProcurementCatalogList' ,
+ name='基础数据-采购目录设置' 
+WHERE code='d8d76b31-1528-4e33-a960-da9755e1d91e';
+
+update fg3_menu set 
+ url='/GQT/QT/PerformEvalType/PerformEvalTypeList',
+ name='基础数据-绩效评价类型' 
+WHERE code='7d8f7bfd-377d-4515-b4f9-5ceec49311c2';
+
+update fg3_menu set 
+ url='/GQT/QT/ProjectThreshold/ProjectThresholdList',
+ name='基础数据-绩效项目阈值设置' 
+WHERE code='66668924-9ae3-464a-bdbe-33d725227cba';
+
+

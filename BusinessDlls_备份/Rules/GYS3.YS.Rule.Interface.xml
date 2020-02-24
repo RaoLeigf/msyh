@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GYS3.YS.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GYS3.YS.Rule.Interface.IBuDeptReportRule">
+            <summary>
+            BudgetDtlBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlBudgetDtlRule">
+            <summary>
+            BudgetDtlBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlFundApplRule">
+            <summary>
+            BudgetDtlFundAppl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlImplPlanRule">
+            <summary>
+            BudgetDtlImplPlan业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlPerformTargetRule">
+            <summary>
+            BudgetDtlPerformTarget业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlPurchaseDtlRule">
+            <summary>
+            BudgetDtlPurchaseDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlPurDtl4SOFRule">
+            <summary>
+            BudgetDtlPurDtl4SOF业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetDtlTextContentRule">
+            <summary>
+            BudgetDtlTextContent业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetMstRule">
+            <summary>
+            BudgetMst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IBudgetProcessCtrlRule">
+            <summary>
+            BudgetProcessCtrl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IExpenseDtlRule">
+            <summary>
+            ExpenseDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IExpenseMstRule">
+            <summary>
+            ExpenseMst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.IGHSubjectRule">
+            <summary>
+            GHSubject业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.ISubjectMstBudgetDtlRule">
+            <summary>
+            SubjectMstBudgetDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Rule.Interface.ISubjectMstRule">
+            <summary>
+            SubjectMst业务逻辑层接口
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,1518 @@
+﻿@{
+    if (ViewBag.WfOType == "taskhandle")
+    {
+        ViewBag.Title = "编报说明-处理";
+    }
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
+        ViewBag.Title = "编报说明";
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    #webofficeiframe {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
+@section Script
+{
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/js/help/EmpHelp.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/js/help/OrgHelp.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/js/WM/WMHelp.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/EasyUI/jquery.min.js")" type="text/javascript"></script>
+    <script src="@Url.Script("~/NG3Resource/IndividualInfo/WM/Archive/ArcDispatch/ArcDispatch.js")" type="text/javascript"></script>
+    @*<script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>*@
+    <script type="text/javascript">
+
+        var kgShow = false; //金格是否已经显示
+        var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+        //自定义界面
+        var info = Ext.htmlDecode('@ViewBag.individualInfo');
+
+        if (Ext.isEmpty(info)) { //数据库没有，取js模板的individualConfigInfo
+            //插件NewEmpInfoEdit中定义的UI信息默认值，每个插件都必须是这个值
+            info = individualConfigInfo;
+        }
+
+        var individualInfo = $DealIndividualInfo(info, Lang);
+    </script>
+    <script type="text/javascript">
+        Ext.useShims = true; //帮助显示在最顶层
+        var busno = '@ViewBag.No';
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        var deptInfo = Ext.isEmpty('@ViewBag.DeptDic')?{}: Ext.decode(Ext.htmlDecode('@ViewBag.DeptDic'));
+        var kingID = '@ViewBag.KingID';//正文
+        var pobject = '@ViewBag.Pobject';//稿纸
+        var forceout = '@ViewBag.ForceOut';
+        var isCreateCno = "0";
+        var billNoStatus = "@ViewBag.BillNoStatus";
+        var templateid,templateRelate = '@ViewBag.TemplateRelate';
+        var paper = '@ViewBag.Paper',contentPaper="@ViewBag.Paper";
+        var workFlowInfo = Ext.isEmpty('@ViewBag.WorkFlowInfo') ? {} : Ext.JSON.decode(Ext.htmlDecode('@ViewBag.WorkFlowInfo'));
+        var $FlowNode, $FlowNodeProperties, $FlowNodePropertiesJson;
+        if (!Ext.isEmpty(workFlowInfo)) {
+            $FlowNode = workFlowInfo.compId;
+            $FlowNodeProperties = workFlowInfo.biz_properties;
+            $FlowNodePropertiesJson = Ext.htmlEncode(Ext.JSON.encode(workFlowInfo.biz_properties));
+        }
+        var attachGuid = '';
+        var attachmentpannel;
+        var $KingGridUrl; $KingGridFileType = 'office', $KingGridShowed = false;
+        var $PDFID = '@ViewBag.PDFID';
+
+        var Task_wfParam, Task_kingGrid, Task_fileType, Task_SendformData;
+
+        var isOpenOffice = false; //是否打开过正文tab页
+
+        var backUrl = "@Url.Content("~/NG3Resource/pic/newgrand.gif")";
+        var img_reg = /\.([jJ][pP][gG]){1}$|\.([jJ][pP][eE][gG]){1}$|\.([gG][iI][fF]){1}$|\.([pP][nN][gG]){1}$|\.([bB][mM][pP]){1}$/;
+        var senderform;
+        var fistsave = false;
+
+        var NG3Refresh = function (informccode) {
+            doDispatchPublish(informccode);
+        };
+
+        function doDispatchPublish(infomccode) {
+            NG3Ajaxrequest({
+                params: {
+                    'sendformData': Task_SendformData,
+                    'wfParam': Task_wfParam,
+                    'kingGrid': Task_kingGrid,
+                    'fileType': Task_fileType
+                },
+                url: '@Url.Content("~/WM/Archive/ArcDispatch/TaskComplete")',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        $CloseTab();
+                    } else {
+                        NGMsg.Error(resp.Msg);
+                    }
+                }
+            }, "正在提交...");
+        }
+
+        function ShowEmpHelp() {
+            var mempwin = Ext.create('Ext.ng.MultiEmpHelpWindow', {
+                modal: true,
+                fieldLabel: '选择人员',
+                name: 'txtEmpsHelp',
+                id: 'txtEmpsHelp',
+                listeners: {
+                    PBhelpselected: function (data, str) {
+                        var sda = Ext.JSON.decode(data);
+                        senderform.queryById("EmpName").setValue(sda.name);
+                        senderform.queryById("EmpId").setValue(sda.code);
+                    }
+
+                }
+            });
+            Ext.useShims = true;
+            mempwin.show();
+        }
+
+        function ClearEmp() {
+            senderform.queryById("EmpName").setValue('');
+            senderform.queryById("EmpId").setValue('');
+        }
+
+        function RefreshList() {
+            if (window.external.RefreshWebListPage != undefined) {
+                window.external.RefreshWebListPage();
+            } else {
+                $NG3Refresh();
+            }
+        }
+
+        function ViewFeedBack(userid) {
+            var win = Ext.create('Ext.ng.ArcFeedBackHelp', {
+                modal: true,
+                title: '反馈意见',
+                arcid: busid,
+                userid: userid,
+                doctype: "DOCDISPATCH"
+            });
+            win.show();
+        }
+
+        var sendObjsIsNeed = "@ViewBag.SendObjsIsNeed";
+        var showTaskName = '@ViewBag.HR_BtnShowTaskName';
+    </script>
+    <script type="text/javascript">
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    { itemId: 'ok', text: '提交', langKey: 'submit', iconCls: "icon-Check" }, { itemId: 'save', text: '保存', langKey: 'savedraft', iconCls: "icon-save" },
+                    { itemId: "location", text: "归档", langKey: 'archive' },
+                    { itemId: "topdf", text: "转PDF", iconCls: "icon-Operate" },
+                    { itemId: "createcno", text: "生成文号", iconCls: "icon-Operate" },
+                    { itemId: "changecontent", text: "切换到正文", iconCls: "icon-Operate" },
+                    '->', 'print', 'close'
+                ]
+            });
+
+
+
+            if ($FlowNode != 'WM3DOCDISPATCH_RegSend') {
+                ngToolbar.get('topdf').hide();
+            }
+            else {
+                ngToolbar.get('topdf').disable();
+            }
+
+            if ($FlowNode != "WM3DOCDISPATCH_OrderNum") {
+                ngToolbar.get('createcno').hide();
+            }
+            ngToolbar.get('ok').hide();
+            ngToolbar.get('topdf').hide();
+            ngToolbar.get('location').hide();
+            ngToolbar.get('createcno').hide();
+            ngToolbar.get('print').hide();
+            ngToolbar.get('changecontent').hide();
+
+            //控制附件的编辑性
+            var status = otype;
+            Ext.Array.each($FlowNodeProperties, function (rcd) {
+                if (rcd.control_id == 'Attach') {
+                    if (rcd.value == 1) {
+                        status = $Otype.EDIT;
+                    }
+                }
+            });
+
+            //附件路径
+            var srct = C_ROOT + 'SUP/Attachment/Index?attachTName=c_pfc_attachment&btnAdd=1&btnView=1&status=' + status + '&busTName=hr_arc_dispatch'
+                + '&busid=' + busid + '&attachguid=' + attachGuid
+                + '&autoSave=1&height=150&bustypecode=ArcDispatchList' +
+                '&orgid=' + $appinfo.orgid + '&busurl=' + escape('WM/Archive/ArcDispatch/ArcDispatchEdit?otype=view&id=$phid$');
+            //附件面板
+            var attachmentpannel = Ext.create('Ext.panel.Panel', {
+                xtype: 'panel',
+                bodyStyle: {
+                    width: '100%'
+                },
+                padding: '0 0 0 0',
+                height: '100',
+                html: '<iframe  id="refer" src="' + srct + '" width="100%" height="100%" scrolling="auto" frameborder="0"></iframe>'
+            });
+
+            //从自定义信息中获取到form的配置
+            var indvidualForm = individualInfo.form['dispatchpanel']; //wm_disptch_form_id
+
+            //动态内容的配置不能写在插件中
+            var formInitialConfig = {
+                otype: otype //操作类型,add||edit
+            }
+
+            //动态配置与静态配置合并
+            var formConfig = Ext.apply(formInitialConfig, indvidualForm);
+
+            //发文主信息
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', formConfig);
+
+            var indvidualForSendObjForm = individualInfo.form['sendobjpanel'];
+
+            var senderFormInitialConfig = {
+                otype: 'edit'
+            }
+
+            var senderFormConfig = Ext.apply(senderFormInitialConfig, indvidualForSendObjForm);
+
+            senderform = Ext.create('Ext.ng.TableLayoutForm', senderFormConfig);
+
+            //发文类型选择事件
+            Ext.getCmp('DocType').on('helpselected', function (obj) {
+                mstform.queryById('DocTypeCno').setValue(obj.data.cno);
+
+                if (forceout != '1') {
+                    SetTemplateId(obj.data.phid);
+                }
+            });
+
+            function SetTemplateId(doctype) {
+                if (otype.toLowerCase() == "add") {
+                    templateid = '';
+                    if (templateRelate == "") {
+                        return false;
+                    }
+                    var arr = templateRelate.split(",");
+                    for (var k = 0; k < arr.length; k++) {
+                        var arr1 = arr[k].split(":");
+                        if (arr1[0] == doctype) {
+                            templateid = arr1[1];
+                        }
+                    }
+                }
+            }
+
+            //组织选择
+            mstform.queryById('Cboo').on('helpselected', function (obj) {
+                mstform.queryById('ShortcBoo').setValue(obj.data.FldExOne);
+            });
+
+            //关联单据
+            mstform.queryById('RelateUrl').on('helpselected',function (obj) {
+                var arctype=obj.archivestype=='DOCDISPATCH'?'dispatch':'receipt';
+                var tmp = 'WM/Archive/MyArchive/ArcContentView?code=' + obj.phidarc + "&arctype=" + arctype;
+                this.setValue(tmp);
+                this.setFieldStyle("color:blue;cursor:hand;text-decoration:underline;");
+            });
+
+            //关联单据
+            mstform.queryById('RelateUrl').on('render',function (me) {
+                var input = me.el.down('input');
+                if (document.addEventListener) {
+                    input.dom.addEventListener('click', function () {
+                        if (!Ext.isEmpty(this.value)) {
+                            $OpenTab('关联单据查看', C_ROOT + this.value);
+                        }
+                    });
+                }
+                else {
+                    input.dom.attachEvent('click', function () {
+                        if (!Ext.isEmpty(this.value)) {
+                            $OpenTab('关联单据查看', C_ROOT + this.value);
+                        }
+                    });
+                }
+            });
+
+            senderform.queryById('RevUsualSendObj').on('helpselected',function(obj){
+                Ext.Ajax.request({
+                    params: { 'id': obj.userCode },
+                    url: '@Url.Content("~/WM/Archive/SendObjUsualMain/GetMultiSendObjUsualMainInfo")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            senderform.queryById("EmpName").setValue(resp.Data.RevEmpNames);
+                            senderform.queryById("EmpId").setValue(resp.Data.RevEmp);
+                            senderform.queryById("CbooId").setValue(resp.Data.RevCboo);
+                            var codectl = [];
+                            codectl.push(senderform.queryById('CbooId'));
+                            BatchBindCombox(codectl);
+                            senderform.queryById("RoleCbooName").setValue(resp.Data.RevActor);
+                            senderform.queryById("RoleCbooId").setValue(resp.Data.RevActorId);
+                        } else {
+                            Ext.MessageBox.alert('提示', resp.Msg);
+                        }
+                    }
+                });
+            });
+
+            senderform.queryById('SelectEmp').on('click',function(me){
+                ShowEmpHelp();
+            });
+
+            senderform.queryById('ClearEmp').on('click',function(me){
+                ClearEmp();
+            });
+
+            senderform.queryById('RoleCbooName').on('helpselected',function(obj){
+                this.setValue(obj.name); //设置选中文本值
+                senderform.queryById('RoleCbooId').setValue(obj.cno); //设置选中id值
+            });
+
+
+            @*mstform.on('beforerender', function (view, opt) {
+                if (otype == $Otype.VIEW || (otype == $Otype.EDIT && '@ViewBag.OpenType' != 'listtoedit')) {
+
+                    //工作流表单
+                    var workflowform = Ext.create('Ext.ng.TableLayoutForm', {
+                        region: 'north',
+                        frame: true,
+                        split: true,
+                        minWidth: 400,
+                        padding: '0 0 0 0',
+                        autoHeight: false,
+                        width: '100%',
+                        //buskey: busid, //对应的业务表主键属性
+                        // otype: otype, //操作类型,add||edit||view
+                        bodyStyle: 'padding:0px',
+                        columnsPerRow: 3,
+                        fieldDefaults: {
+                            labelWidth: 87,
+                            anchor: '100%',
+                            msgTarget: 'side'
+                        },
+                        fields: [
+                            {
+                                xtype: 'ngComboBox',
+                                fieldLabel: '办理意见',
+                                itemId: 'Suggest',
+                                name: 'Suggest',
+                                queryMode: 'remote', //local指定为本地数据,如果是后台传输则值为remote
+                                editable: false,
+                                mustInput: false,
+                                helpid: 'CommonWordHelp',
+                                hidden: Ext.isEmpty(workFlowInfo.wftaskid),
+                                valueType: 'string',
+                                margin: '0 10 5 0',
+                                displayField: 'Cname',
+                                valueField: 'PhId',
+                                datasource: 'default', //加载的数据源类型
+                                colspan: 1
+                            },
+                            {
+                                xtype: 'label',
+                                margin: '0 10 5 8',
+                                text: '流转历史:',
+                                name: 'lzhis',
+                                hidden: Ext.isEmpty(workFlowInfo.wftaskid),
+                                colspan: 2
+                            },
+                            {
+                                xtype: 'ngWorkFlowPanel',
+                                toolbar: ngToolbar, //单据toolbar
+                                itemId: 'workflowpanel',
+                                otype: otype, //单据otype
+                                bizType: 'WM3DOCDISPATCH', //注册的表单id（原商业对象）
+                                colspan: 3,
+                                showFlowHis: true,
+                                bizPhid: busid, //单据phid
+                                showToolBarItems: ['createcno','topdf','attachment'], //任务办理时可见toolbar按钮itemid数组
+                                workFlowInfo: workFlowInfo, //@ViewBag.WorkFlowInfo内容转成的JSON对象
+                                //bizSaveFn: function () { Save();} //单据保存方法，方法需返回bool值，Ajax方法需使用同步模式
+                            },
+                            {
+                                xtype: 'panel',
+                                colspan: 3,
+                                padding: '0 0 0 10',
+                                height: 150,
+                                items: [attachmentpannel]
+                            }
+                        ]
+                    });
+
+                    //办理意见设置默认显示值
+                    workflowform.queryById('Suggest').on('beforerender', function (com, opt) {
+                        com.setValue('--常用语--');
+                    });
+                    //办理意见-切换值事件
+                    workflowform.queryById('Suggest').on('select', function (combo, records, eOpts) {
+                        var displayValue = this.getRawValue();
+                        if (displayValue != "--常用语--") {
+                            mstform.queryById("wf_remark").setValue(displayValue);
+                        }
+                    });
+                    workflowform.queryById('Suggest').setClientSqlFilter("(ctype='1' or (ctype='0' and phid_filler='" + $appinfo.userID + "'))");
+                    //工作流处理时单据保存方法
+                    workflowform.queryById('workflowpanel').bizSaveFn = function () {
+                        //if (otype == $Otype.EDIT) {//审批时保存正文修改内容故注释
+                        return Save();
+                        //}
+                    }
+                    //在这里进行自定义组件任务处理，并把工作流参数传到服务端，并在服务端调用工作流api
+                    workflowform.queryById('workflowpanel').on('taskComplete', function (compId, wfParam) {
+
+                        if (window.frames['webofficeiframe']) {
+                            Task_kingGrid = window.frames['webofficeiframe'].SaveDocument();
+                            if (!Task_kingGrid || Task_kingGrid == '' || Task_kingGrid == '0') {
+                                NGMsg.Error('正文保存发生错误');
+                                return;
+                            }
+                            Task_fileType = window.frames['webofficeiframe'].WebOffice.FileType;
+                        }
+
+
+                        if (compId == 'WM3DOCDISPATCH_RegSend') { //分发
+                            if (!CheckSendObj()) {
+                                NGMsg.Info('请录入发送对象!');
+                                return;
+                            }
+                        }
+
+                        var mstvf = mstform.isValid();
+                        var sendervf = senderform.isValid();
+                        if (!mstvf || !sendervf) {
+                            return;
+                        }
+
+                        //var mstformData = mstform.getFormData();
+                        Task_SendformData = senderform.getFormData();
+
+                        if (compId == 'WM3DOCDISPATCH_Publish') { //发布
+                            Task_wfParam = wfParam;
+                            $OpenTab('公告-新增', C_ROOT + 'WM/Inform/Inform/NoticeEdit?from=dispatch&otype=add&code=' + busid);
+                        }
+                        else if (compId == 'WM3DOCDISPATCH_BackArc') { //归档
+                            BackArc(wfParam);
+                        }
+                        else if (compId == 'WM3DOCDISPATCH_OrderNum') {
+                            OrderNum(wfParam);
+                        }
+                        else {
+                            CommonCustomTask(wfParam);
+                        }
+                    });
+
+                    this.insert(2, workflowform);
+                }
+            });*@
+
+            //编号
+            function OrderNum(wfParam) {
+
+                var cnoVal = mstform.queryById('Cno').getValue();
+                var myData = {
+                    'wfParam': wfParam,
+                    'sendformData': Task_SendformData,
+                    'kingGrid': Task_kingGrid,
+                    'fileType': Task_fileType,
+                    'cno': cnoVal,
+                    'iscreatecno': isCreateCno
+                };
+
+                NG3Ajaxrequest({
+                    params: myData,
+                    url: '@Url.Content("~/WM/Archive/ArcDispatch/OrderNum")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            $CloseTab();
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                }, '正在提交...');
+            }
+
+            //归档
+            function BackArc(wfParam) {
+                NG3Ajaxrequest({
+                    params: {
+                        'wfParam': wfParam,
+                        'sendformData': Task_SendformData,
+                        'kingGrid': Task_kingGrid,
+                        'fileType': Task_fileType
+                    },
+                    url: '@Url.Content("~/WM/Archive/ArcDispatch/ToPigeonhole")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            $CloseTab();
+                        } else {
+                            if (resp.Data == "777") {
+                                var win = Ext.create('Ext.ng.FileHelp', {
+                                    listeners: {
+                                        bntOk: function (obj) {
+                                            NG3Ajaxrequest({
+                                                params: {
+                                                    'title': mstform.queryById('Cname').getValue(),
+                                                    'wfParam': wfParam,
+                                                    'sendformData': Task_SendformData,
+                                                    'mstformid': wfParam.bizphid,
+                                                    'Label': obj.Label,
+                                                    'OriCopies': obj.OriCopies,
+                                                    'PageCount': obj.PageCount,
+                                                    'PhidFileType': obj.PhidFileType,
+                                                    'Pphid': obj.Pphid,
+                                                    'Remarks': obj.Remarks,
+                                                    'PhidOrg': obj.PhidOrg,
+                                                    'Type': obj.Type,
+                                                    'kingGrid': Task_kingGrid,
+                                                    'fileType': Task_fileType
+                                                },
+                                                url: '@Url.Content("~/WM/Archive/ArcDispatch/ManualToDossier")',
+                                                success: function (response) {
+                                                    var resp = Ext.JSON.decode(response.responseText);
+                                                    if (resp.Status === "success") {
+                                                        $CloseTab();
+                                                    } else {
+                                                        NGMsg.Error(resp.Msg);
+                                                    }
+                                                }
+                                            }, '正在提交...');
+                                        },
+                                        beforeshow: $winBeforeShow,
+                                        beforeclose:$winBeforeClose
+                                    }
+                                });
+                                win.show();
+                            } else {
+                                NGMsg.Error(resp.Msg);
+                            }
+                        }
+                    }
+                }, '正在提交...');
+            }
+
+            function CommonCustomTask(wfParam) {
+                NG3Ajaxrequest({
+                    params: {
+                        'wfParam': wfParam,
+                        'sendformData': Task_SendformData,
+                        'kingGrid': Task_kingGrid,
+                        'fileType': Task_fileType
+                    },
+                    url: '@Url.Content("~/WM/Archive/ArcDispatch/TaskComplete")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            $CloseTab();
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                }, '正在提交...');
+            }
+
+            //定义反馈模型
+            Ext.define('feedbackmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'userid',
+                        type: 'string',
+                        mapping: 'userid'
+                    }, {
+                        name: 'username',
+                        type: 'string',
+                        mapping: 'username'
+                    }, {
+                        name: 'cflagshow',
+                        type: 'string',
+                        mapping: 'cflagshow'
+                    }, {
+                        name: 'readdt',
+                        type: 'string',
+                        mapping: 'readdt'
+                    }, {
+                        name: 'isneedshow',
+                        type: 'string',
+                        mapping: 'isneedshow'
+                    }, {
+                        name: 'dt',
+                        type: 'string',
+                        mapping: 'dt'
+                    }, {
+                        name: 'remarks',
+                        type: 'string',
+                        mapping: 'remarks'
+                    }, {
+                        name: 'deptname',
+                        type: 'string',
+                        mapping: 'deptname'
+                    }, {
+                        name: 'orgname',
+                        type: 'string',
+                        mapping: 'orgname'
+                    }
+                ]
+            });
+
+            //反馈store
+            var feedbackstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'feedbackmodel',
+                pageSize: 25,
+                autoLoad: '@ViewBag.IsShowFeedBack'.toLowerCase() == 'true',
+                url: '../MyArchive/GetFeedBackList?archivestypes=dispatch&arcid=' + busid
+            });
+
+            //反馈分页
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: feedbackstore
+            });
+
+            //反馈grid
+            var feedbackgrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                //frame: true,
+                stateful: true,
+                id: 'wm3_dispatch_feedback_id',
+                stateId: 'wm3_dispatch_feedback_stateId',
+                store: feedbackstore,
+                buskey: 'userid', //对应的业务表主键属性
+                columnLines: true,
+                columns: [
+                    { xtype: 'rownumberer', text: '行号', width: 50 },
+                    {
+                        header: '操作员',
+                        dataIndex: 'userid',
+                        width: 100,
+                        flex: 1,
+                        hidden: true
+                    }, {
+                        header: '操作员',
+                        dataIndex: 'username',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false
+                    }, {
+                        header: '阅读状态',
+                        dataIndex: 'cflagshow',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false
+                    }, {
+                        header: '阅读时间',
+                        dataIndex: 'readdt',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false,
+                        renderer: Ext.util.Format.dateRenderer('Y-m-d')
+                    }, {
+                        header: '反馈状态',
+                        dataIndex: 'isneedshow',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false
+                    }, {
+                        header: '反馈时间',
+                        dataIndex: 'dt',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false,
+                        renderer: Ext.util.Format.dateRenderer('Y-m-d')
+                    }, {
+                        header: '反馈内容',
+                        dataIndex: 'remarks',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false
+                    }, {
+                        header: '职能机构',
+                        dataIndex: 'deptname',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false
+                    }, {
+                        header: '组织',
+                        dataIndex: 'orgname',
+                        flex: 1,
+                        sortable: false,
+                        hidden: false
+                    }
+                ],
+                bbar: pagingbar
+            });
+
+            //阅读时间
+            feedbackgrid.getColumn('readdt').renderer = function (value) {
+                if (value.indexOf('0001') < 0) {
+                    return value;
+                }
+            }
+            //反馈时间
+            feedbackgrid.getColumn('dt').renderer = function (value) {
+                if (value.indexOf('0001') < 0) {
+                    return value;
+                }
+            }
+            //反馈内容
+            feedbackgrid.getColumn('remarks').renderer = function (value, metaData, record) {
+                return '<a  href="#" onclick="ViewFeedBack(\'' + record.get("userid") + '\')">' + value + '</a>';
+            }
+
+            var kinggridpanel = Ext.create('Ext.panel.Panel', {
+                id: 'WebOfficePanel',
+                hideMode: 'offsets',
+                collapse: false,
+                region: 'center',
+                width: '100%',
+                layout: 'fit',
+                autoHeight: true,
+                height: '100%',
+                //html: kinggriddiv,
+                listeners: {
+                    beforeRender: function (com, eOpts) {
+                        com.setHeight(document.body.clientHeight - 20);
+                    }
+                }
+            });
+
+
+            var tabpanel = Ext.create('Ext.ng.TabPanel', {
+                id: 'tabs',
+                activeTab: 0,
+                region: 'center',
+                autoScroll: true,
+                overflowY: 'scroll',
+                layout: 'border',
+                defaults: {                   //解决金格控件加载的问题
+                    hideMode: 'offsets'
+                },
+                deferredRender: false, //解决金格控件加载的问题
+                tabBar: {
+                    items: [
+                        {
+                            xtype: 'tbfill'
+                        }, {
+                            xtype: 'text',
+                            text: '切换编辑器',
+                            hidden: true,
+                            style: 'color:red;margin-top: 5px !important;margin-right: 5px !important;',
+                            listeners: {
+                                click: function () {
+                                    var webofficetab = document.getElementById("webofficetab");
+                                    if (webofficetab != '' && webofficetab != null) {
+                                        $KingGridFileType = 'pdf';
+                                        if(Ext.isEmpty($PDFID)){
+                                            $KingGridUrl = "../ArcDispatch/WebPdfEdit?OpType=Add&FromType=dispatch";
+                                        }
+                                        else {
+                                            $KingGridUrl = "../ArcDispatch/WebPdfEdit?OpType=View&FromType=dispatch&RecordID=" + $PDFID;
+                                        }
+                                    }
+                                    else {
+                                        $KingGridFileType = 'office';
+                                        if(Ext.isEmpty(kingID)){
+                                            $KingGridUrl = "../ArcDispatch/WebOfficeEdit?OpType=Add&FromType=dispatch";
+                                        }
+                                        else{
+                                            $KingGridUrl = "../ArcDispatch/WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + kingID;
+                                        }
+                                    }
+
+                                    UpdateKingGrid($KingGridFileType,$KingGridUrl);
+                                }
+                            }
+                        }
+                    ]
+                },
+                listeners: {
+                    beforetabchange: function (tabpanel, nCard, oCard, eOpts) {
+                        document.body.focus(); //解决金格控件加载的问题
+                    },
+                    beforerender: function (view, opt) {
+                        //var cpt = this;
+                        //if (otype == $Otype.VIEW || (workFlowInfo.wftaskid && otype != view)) {
+                        //    cpt.items.remove(cpt.items.items[2]); //不显示附件tab页
+                        //    cpt.tabBar.items.remove(cpt.tabBar.items.items[2]); //不显示附件tab页
+                        //}
+                        @*if ('@ViewBag.IsShowFeedBack'.toLowerCase() != 'true') {
+                            var items = cpt.items.items;
+                            var citems = cpt.tabBar.items.items;
+                            cpt.items.remove(items[items.length - 1]); //不显示反馈列表
+                            cpt.tabBar.items.remove(citems[citems.length - 3]); //不显示反馈列表
+                        }*@
+                    }
+                },
+                items: [
+                    {
+                        title: '发文',
+                        id: 'main',
+                        bodyStyle: 'background:#dfe9f6',
+                        autoScroll: true,
+                        overflowY: 'scroll',
+                        items: mstform
+
+                    }, {
+                        title: '正文',
+                        id: 'content',
+                        items: kinggridpanel
+                    }
+                    //, {
+                    //    title: '附件',
+                    //    id: 'attach',
+                    //    items: attachmentpannel
+                    //}
+                    //, {
+                    //    title: '发送对象',
+                    //    id: 'receive',
+                    //    bodyStyle: 'background:#dfe9f6',
+                    //    items: senderform
+                    //}, {
+                    //    title: '反馈列表',
+                    //    id: 'feedbacklist',
+                    //    layout: 'border',
+                    //    items: feedbackgrid
+                    //}
+                ]
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                width: '100%',
+                items: [ngToolbar, tabpanel]
+            });
+
+            //当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'arcdispatch', 'otype': otype },
+                    url: '@Url.Content("~/WM/Archive/ArcDispatch/GetArcDispatchInfo")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mstform.getForm();
+                            mstformobj.setValues(resp.Data);
+
+                            if (showTaskName.toLowerCase() == 'y') {
+                                ngToolbar.get('wfbtn_taskcomplete').setText(resp.Data.curnodes);
+                            }
+
+                            //代码转名称
+                            var codectl=[mstform.queryById('DocType'), mstform.queryById('Cboo')];
+                            codectl.push(mstform.queryById('Emergency'));
+                            codectl.push(mstform.queryById('ArcseCrettype'));
+                            codectl.push(mstform.queryById('ArcseCretterm'));
+                            codectl.push(mstform.queryById('UnionBoo'));
+                            codectl.push(mstform.queryById('MainSend'));
+                            codectl.push(mstform.queryById('CopySend'));
+                            codectl.push(mstform.queryById('CopyReport'));
+                            codectl.push(mstform.queryById('CountersignDept'));
+                            codectl.push(mstform.queryById('StampCboo'));
+                            codectl.push(mstform.queryById('DrawEmp'));
+
+                            BatchBindCombox(codectl);
+
+                            //form绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstform.fireEvent('dataready', resp);
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.Msg);
+                        }
+                    }
+                });
+
+                Ext.Ajax.request({
+                    params: { 'arcid': busid },
+                    url: '@Url.Content("~/WM/Archive/ArcDispatchObj/GetArchiveSendObjInfo")',
+                    success: function (response) {
+                        if (!Ext.isEmpty(response.responseText)) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                var senderformobj = senderform.getForm();
+                                senderformobj.setValues(resp.Data);
+
+                                var codectl=[senderform.queryById('CbooId')];
+                                BatchBindCombox(codectl);
+                            }
+                        }
+                    }
+                });
+            }
+
+            function CreateCnoByOrderNum() {
+                if ($FlowNode == 'WM3DOCDISPATCH_OrderNum') {
+                    Ext.Array.each($FlowNodeProperties, function (rcd) {
+                        if (rcd.control_id == 'OrderNum') {
+                            if (rcd.value == 5) {
+                                //mstform.queryById("Cno").setReadOnly(false);//设置文号可编辑
+                                var currentCno = mstform.queryById("Cno").getValue();
+                                if(billNoStatus == '1')
+                                {
+                                    mstform.queryById("Cno").setReadOnly(true);//设置文号可编辑
+
+                                    //if (Ext.isEmpty(currentCno)){
+                                        Ext.Ajax.request({
+                                            url: '@Url.Content("~/WM/Archive/ArcDispatch/CreateBillNo")',
+                                            params: { 'id': busid },
+                                            success: function (response) {
+                                                var resp = Ext.JSON.decode(response.responseText);
+                                                if (resp.Status === "success") {
+                                                    if (!Ext.isEmpty(resp.Data)) {
+                                                        isCreateCno = "1";
+                                                        mstform.queryById("Cno").setValue(resp.Data);
+                                                    }
+                                                }
+                                                else {
+                                                    Ext.MessageBox.alert('提示', resp.Msg);
+                                                }
+                                            }
+                                        });
+                                    //}
+                                }
+                                else{
+                                    Ext.MessageBox.alert('提示',"发文编码规则未启用！");
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            ngToolbar.get('createcno').on('click',function(){
+                CreateCnoByOrderNum();
+            })
+
+            //当新增时
+            if (otype == $Otype.ADD) {
+                $KingGridUrl = "WebOfficeEdit?OpType=Add&FromType=dispatch&paper=" + paper;
+
+                if (busno != undefined && busno != "") {
+                    mstform.queryById("Cno").userSetReadOnly(true);
+                    mstform.queryById("Cno").setValue(busno);
+                }
+
+                mstform.queryById('IsPaper').setValue(paper);
+
+                var codectl = [];
+                if ("@ViewBag.DocType" != undefined && "@ViewBag.DocType" != "") {
+                    Ext.getCmp("DocType").setValue("@ViewBag.DocType");
+                    codectl.push(mstform.queryById('DocType'));
+                    if (forceout != '1') {
+                        SetTemplateId("@ViewBag.DocType");
+                    }
+                }
+                Ext.getCmp("DocType").setValue("166190108000001");
+                codectl.push(mstform.queryById('DocType'));
+
+                var userID = "@ViewBag.UserID";
+                if (userID != undefined && userID != "") {
+                    mstform.queryById("DrawEmp").setValue(userID);
+                    codectl.push(mstform.queryById('DrawEmp'));
+                }
+
+                if (!Ext.isEmpty(deptInfo.deptid)) {
+                    mstform.queryById("Cboo").setValue(deptInfo.deptid);
+                    mstform.queryById("ShortcBoo").setValue(deptInfo.deptcodevalue);
+                    codectl.push(mstform.queryById('Cboo'));
+                }
+
+                BatchBindCombox(codectl);
+
+                mstform.queryById('CstatusDec').setValue("拟稿");
+                mstform.queryById("DrawDt").setValue(new Date());
+
+                ngToolbar.get('location').setVisible(false); // 归档
+            }
+
+            if (otype == $Otype.EDIT) {
+
+                if (forceout == '1') {
+                    ngToolbar.get('ok').setVisible(false);
+                    ngToolbar.get('save').setText('保存');
+                }
+
+                var wfotype = workFlowInfo.wfotype || ""; //taskhandle
+                if (paper == '1') {
+                    $KingGridUrl = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + pobject + "&wfotype=" + wfotype + "&paper=" + paper + "&ArcID=" + busid + "&bizpropertiesJson=" + $FlowNodePropertiesJson;
+
+                }
+                else {
+                    $KingGridUrl = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + kingID + "&wfotype=" + wfotype + "&paper=" + paper + "&ArcID=" + busid + "&bizpropertiesJson=" + $FlowNodePropertiesJson;
+                }
+            }
+
+            if (otype == $Otype.ADD || otype == $Otype.EDIT) {
+                mstform.queryById("MainSend").userSetMustInput("@ViewBag.MainSendInputMust" == "Y" ? true : false);
+            }
+
+            //当修改时
+            if (!workFlowInfo.wftaskid && otype == $Otype.EDIT) {
+                ngToolbar.get('location').setVisible(false); // "归档
+            } else if (workFlowInfo.wftaskid && otype == $Otype.EDIT) {
+                ngToolbar.get('ok').setVisible(false);
+            }
+
+            //当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('location').setVisible(false); // "归档
+
+                ngToolbar.get('ok').setVisible(false);
+                ngToolbar.get('save').setVisible(false);
+
+                var wfotype = workFlowInfo.wfotype || ""; //taskhandle
+
+                $KingGridFileType = 'office';
+                if (paper == '1') {
+                    $KingGridUrl = "WebOfficeEdit?OpType=View&FromType=dispatch&RecordID=" + pobject + "&wfotype=" + wfotype + "&paper=" + paper + "&ArcID=" + busid + "&bizpropertiesJson=" + $FlowNodePropertiesJson + "&showReversion=@ViewBag.ArcViewIsShowReversion";
+                }
+                else {
+                     $KingGridUrl = "WebOfficeEdit?OpType=View&FromType=dispatch&RecordID=" + kingID + "&wfotype=" + wfotype + "&paper=" + paper + "&ArcID=" + busid + "&bizpropertiesJson=" + $FlowNodePropertiesJson + "&showReversion=@ViewBag.ArcViewIsShowReversion";
+                }
+
+                Ext.Array.each($FlowNodeProperties, function (rcd) {
+                    //if (rcd.control_id == 'Cno') {
+                    //    if (rcd.value == 1) {
+                    //        mstform.queryById("Cno").setReadOnly(false);
+                    //    }
+                    //}
+                    if (rcd.control_id == 'CountersignDept') {
+                        if (rcd.value == 1) {
+                            mstform.queryById("CountersignDept").setReadOnly(false);
+                        }
+                    }
+                });
+
+                var acceptRevisions = '@ViewBag.AcceptRevisions';
+
+                if($FlowNode == "WM3DOCDISPATCH_OrderNum"){
+                    mstform.queryById('Cno').userSetMustInput(true);
+                    if(billNoStatus == '4'){
+                        mstform.queryById('Cno').setReadOnly(false);
+                    }
+
+                    Ext.Array.each($FlowNodeProperties, function (rcd) {
+                        if (rcd.control_id == 'OrderNum') {
+                            if (rcd.value == 6) {
+                                ngToolbar.get('createcno').hide();
+                            }
+                        }
+                    });
+                }
+
+                //if ($FlowNode == 'WM3DOCDISPATCH_RegSend' && acceptRevisions == 'Y') {
+
+                //    if(Ext.isEmpty($PDFID)){
+
+                //        $KingGridUrl += "&acceptRevisions=" + acceptRevisions;
+
+                //        UpdateKingGrid($KingGridFileType, $KingGridUrl);
+
+                //        tabpanel.setActiveTab(1);
+
+                //        ngToolbar.get('topdf').enable();
+
+                //        var items = tabpanel.tabBar.items.items;
+                //        items[items.length - 1].show();
+                //    }
+                //    else {
+                //        $KingGridFileType = 'pdf';
+                //        $KingGridUrl = '../ArcDispatch/WebPdfEdit?OpType=View&RecordID=' + $PDFID + "&paper=" + paper;
+                //    }
+                //}
+                //else{
+                //    if (!Ext.isEmpty($PDFID)) {
+                //        $KingGridFileType = 'pdf';
+                //        $KingGridUrl = '../ArcDispatch/WebPdfEdit?OpType=View&RecordID=' + $PDFID;
+                //    }
+                //}
+            }
+
+            function Save() {
+                if (!fistsave) {
+                    var res = "0";
+                    var fileType = "";
+
+                    var mstvf = mstform.isValid();
+                    var sendervf = senderform.isValid();
+                    if (!mstvf || !sendervf) {
+                        return false;
+                    }
+
+                    //调用二次开发脚本的校验方法
+                    if (typeof beforeSaveEdit === "function") {
+                        var flg = beforeSaveEdit();
+                        if (!flg) return false;
+                    }
+
+                    var mstformData = mstform.getFormData();
+                    var sendformData = senderform.getFormData();
+
+                    if (window.frames['webofficeiframe']) {
+                        res = window.frames['webofficeiframe'].SaveDocument();
+                        if (!res || res == '' || res == '0') {
+                            Ext.MessageBox.alert('提示', '正文保存发生错误');
+                            return false;
+                        }
+                        fileType = window.frames['webofficeiframe'].WebOffice.FileType;
+                    }
+
+
+                    //var loadAttach = $("#refer")[0].contentWindow.LoadAttach;
+                    var loadAttach = '';
+                    var attachguid = loadAttach ? loadAttach.GUID : "";
+
+                    var myData = {
+                        'mstformData': mstformData,
+                        'sendformData': sendformData,
+                        'kingGrid': res,
+                        'fileType': fileType,
+                        'attachguid': attachguid
+                    };
+
+                    //调用二开代码获取二开需要保存的数据
+                    if (typeof getExtendData === "function") {
+                        var extendData = getExtendData();
+                        myData = Ext.apply(myData, extendData);//合并
+                    }
+
+                    NG3Ajaxrequest({
+                        params: myData,
+                        url: '@Url.Content("~/WM/Archive/ArcDispatch/save")',
+                        async: false,
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                busid = resp.KeyCodes[0];
+                                return true;
+                            } else {
+                                if (isOpenOffice) {
+                                    window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                                }
+                                return false;
+                            }
+                        }
+                    }, "保存中...");
+                }
+            }
+
+
+            //保存为草稿
+            ngToolbar.get('save').on('click', function () {
+                var res = "0";
+                var fileType = "";
+                if (!fistsave) {
+
+                    if (forceout == '1') {
+                        mstform.queryById('ForceOut').setValue('2');
+                    }
+
+                    var mstvf = mstform.isValid();
+                    var sendervf = senderform.isValid();
+                    if (!mstvf || !sendervf) {
+                        return;
+                    }
+
+                    //调用二次开发脚本的校验方法
+                    if (typeof beforeSaveEdit === "function") {
+                        var flg = beforeSaveEdit();
+                        if (!flg) return;
+                    }
+
+                    var mstformData = mstform.getFormData();
+                    var sendformData = senderform.getFormData();
+
+                    if (window.frames['webofficeiframe']) {
+                        res = window.frames['webofficeiframe'].SaveDocument();
+                        if (!res || res == '' || res == '0') {
+                            Ext.MessageBox.alert('提示', '正文保存发生异常');
+                            return;
+                        }
+                        fileType = window.frames['webofficeiframe'].WebOffice.FileType;
+                    }
+
+
+                    //var loadAttach = $("#refer")[0].contentWindow.LoadAttach;
+                    var loadAttach = '';
+                    var attachguid = loadAttach ? loadAttach.GUID : "";
+
+                    var myData = {
+                        'mstformData': mstformData,
+                        'sendformData': sendformData,
+                        'kingGrid': res,
+                        'fileType': fileType,
+                        'attachguid': attachguid,
+                        'contentpaper': contentPaper
+                    };
+
+                    //调用二开代码获取二开需要保存的数据
+                    if (typeof getExtendData === "function") {
+                        var extendData = getExtendData();
+                        myData = Ext.apply(myData, extendData);//合并
+                    }
+
+                    NG3Ajaxrequest({
+                        params: myData,
+                        url: '@Url.Content("~/WM/Archive/ArcDispatch/save")',
+                        success: function (response) {
+                            if (Ext.isEmpty(response.responseText)) {
+                                if (isOpenOffice) {
+                                    window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                                }
+                                return;
+                            }
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                RefreshList();
+                                alert("保存成功");
+                                $CloseTab();
+                            } else {
+                                if (isOpenOffice) {
+                                    window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                                }
+                                alert(resp.Msg);
+                            }
+                        },
+                        failure: function (response, opts) {//后台查重提示后处理
+                            if (isOpenOffice) {
+                                window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                            }
+                        }
+                    }, "保存中...");
+                }
+            });
+
+            //提交
+            ngToolbar.get('ok').on('click', function () {
+                var res = "0";
+                var fileType = "";
+                if (!fistsave) {
+
+                    var mstvf = mstform.isValid();
+                    var sendervf = senderform.isValid();
+                    if (!mstvf || !sendervf) {
+                        return;
+                    }
+
+                    //调用二次开发脚本的校验方法
+                    if (typeof beforeSaveEdit === "function") {
+                        var flg = beforeSaveEdit();
+                        if (!flg) return;
+                    }
+
+                    var mstformData = mstform.getFormData();
+                    var sendformData = senderform.getFormData();
+
+                    if (window.frames['webofficeiframe']) {
+                        res = window.frames['webofficeiframe'].SaveDocument();
+                        if (!res || res == '' || res == '0') {
+                            Ext.MessageBox.alert('提示', '正文保存发生错误');
+                            return;
+                        }
+                        fileType = window.frames['webofficeiframe'].WebOffice.FileType;
+                    }
+
+                    //var loadAttach = $("#refer")[0].contentWindow.LoadAttach;
+                    var loadAttach = '';
+                    var attachguid = loadAttach ? loadAttach.GUID : "";
+
+                    var myData = {
+                        'mstformData': mstformData,
+                        'sendformData': sendformData,
+                        'kingGrid': res,
+                        'fileType': fileType,
+                        'attachguid': attachguid,
+                        'contentpaper': contentPaper
+                    };
+
+                    //调用二开代码获取二开需要保存的数据
+                    if (typeof getExtendData === "function") {
+                        var extendData = getExtendData();
+                        myData = Ext.apply(myData, extendData);//合并
+                    }
+
+                    NG3Ajaxrequest({
+                        params: myData,
+                        url: '@Url.Content("~/WM/Archive/ArcDispatch/save")',
+                        success: function (response) {
+                            if (Ext.isEmpty(response.responseText)) {
+                                if (isOpenOffice) {
+                                    window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                                }
+                                return;
+                            }
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                fistsave = true;
+                                busid = resp.KeyCodes[0];
+                                tabpanel.setActiveTab(0);
+                                $WorkFlow.startFlow("WM3DOCDISPATCH", busid, function (bizid) {
+                                    RefreshList();
+                                    $CloseTab();
+                                }, function () {
+                                    window.document.location = C_ROOT + 'WM/Archive/ArcDispatch/ArcDispatchEdit?otype=edit&id=' + busid + '&opentype=listtoedit';
+                                });
+                            } else {
+                                if (isOpenOffice) {
+                                    window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                                }
+                                alert(resp.Msg);
+                            }
+                        },
+                        failure: function (response, opts) {//后台查重提示后处理
+                            if (isOpenOffice) {
+                                window.frames['webofficeiframe'].document.location = "WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + res;
+                            }
+                        }
+                    }, '保存中...');
+                } else {
+                    $WorkFlow.startFlow("WM3DOCDISPATCH", busid, function (bizid) {
+                        RefreshList();
+                        $CloseTab();
+                    });
+                }
+            });
+
+            //检查发文发送对象是否必填后验证数据
+            function CheckSendObj() {
+                if (sendObjsIsNeed == "Y") {
+                    var empvalue = senderform.queryById('EmpId').value;
+                    if (empvalue != "") {
+                        return true;
+                    }
+
+                    var cbovalue = senderform.queryById('CbooId').value;
+                    if (cbovalue != "") {
+                        return true;
+                    }
+
+                    var actvalue = senderform.queryById('RoleCbooId').value;
+                    if (actvalue != "") {
+                        return true;
+                    }
+
+                    return false;
+                }
+                return true;
+            }
+
+            //切换到正文
+            ngToolbar.get('changecontent').on('click', function () {
+                if (contentPaper == '0') {//稿纸
+                    contentPaper = "1";
+                    this.setText("切换到正文");
+                    if (Ext.isEmpty(pobject)) {
+                        $KingGridUrl = "../ArcDispatch/WebOfficeEdit?OpType=Add&FromType=dispatch";
+                    }
+                    else {
+                        $KingGridUrl = "../ArcDispatch/WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + pobject;
+                    }
+                }
+                else {//正文
+                    contentPaper = "0";
+                    this.setText("切换到稿纸");
+                    if (Ext.isEmpty(kingID)) {
+                        $KingGridUrl = "../ArcDispatch/WebOfficeEdit?OpType=Add&FromType=dispatch";
+                    }
+                    else {
+                        $KingGridUrl = "../ArcDispatch/WebOfficeEdit?OpType=Edit&FromType=dispatch&RecordID=" + kingID;
+                    }
+                }
+
+                UpdateKingGrid('office', $KingGridUrl);
+            });
+
+            //转pdf
+            ngToolbar.get('topdf').on('click', function () {
+
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'kinggrid': kingID },
+                    url: '@Url.Content("~/WM/Archive/ArcDispatch/Word2Pdf")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success" && !Ext.isEmpty(resp.Data)) {
+                            $PDFID = resp.Data;
+                            $KingGridFileType = 'pdf';
+                            $KingGridUrl = "../ArcDispatch/WebPdfEdit?OpType=View&RecordID=" + $PDFID;
+
+                            UpdateKingGrid($KingGridFileType,$KingGridUrl);
+                        }
+                        else {
+                            isError = true;
+                            Ext.MessageBox.alert('提示', resp.Msg);
+                        }
+                    }
+                });
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                $PrintHelp("ArcDispatchEdit", 'OM_ArcDispatchEdit', mstform, [], ['编报说明']);
+            });
+
+            //归档
+            ngToolbar.get('location').on('click', function () {
+                var compId = 'WM3DOCDISPATCH_BackArc';
+
+                var win = Ext.create('Ext.ng.FileHelp', {
+                    listeners: {
+                        bntOk: function (obj) { //这里是帮助确定按钮触发的事件
+                            NG3Ajaxrequest({
+                                params: {
+                                    'mstformid': mstform.queryById('PhId').getValue(),
+                                    'Label': obj.Label,
+                                    'OriCopies': obj.OriCopies,
+                                    'PageCount': obj.PageCount,
+                                    'PhidFileType': obj.PhidFileType,
+                                    'Pphid': obj.Pphid,
+                                    'Remarks': obj.Remarks,
+                                    'PhidOrg': obj.PhidOrg,
+                                    'Type': obj.Type,
+                                    'title': mstform.queryById('Cname').getValue()
+                                },
+                                url: '@Url.Content("~/WM/Archive/ArcDispatch/ListManualToDossier")',
+                                success: function (response) {
+                                    Ext.MessageBox.alert('提示', "归档成功", function () {
+                                        RefreshList();
+                                    });
+                                }
+                            }, '正在提交...');
+                        }
+                    }
+                });
+                win.show();
+            });
+
+
+            function GetKingGridDivStr(filetype, urlVal) {
+                if (filetype == 'office') {
+                    if (!Ext.isEmpty(templateid)) {
+                        urlVal += "&templateid=" + templateid;
+                    }
+                    var officeDiv = '<div id="webofficetab" style="height: 100%"><iframe src="' + urlVal + '" style="width:100% !important; height:100%;"   scrolling="auto"  id="webofficeiframe" name="webofficeiframe"></iframe></div>';
+                    return officeDiv;
+                }
+                else {
+                    var pdfDiv = '<div id="webpdftab" style="height: 100%"><iframe src="' + urlVal + '"  style="width:100% !important; height:100%;"  scrolling="auto"  id="webpdfiframe"></iframe></div>';
+                    return pdfDiv;
+                }
+            }
+
+            function UpdateKingGrid(filetype, urlVal) {
+
+                var htmlDiv = GetKingGridDivStr(filetype, urlVal);
+
+                kinggridpanel.body.update(htmlDiv);
+                kinggridpanel.doLayout();
+
+                $KingGridShowed = true;//标识金格控件已经加载过
+            }
+
+            //tab页切换事件
+            tabpanel.on('tabchange', function (tabPanel, newCard, oldCard, eOpts) {
+                var items = tabPanel.tabBar.items.items;
+                if (newCard.id == 'content') {
+                    if (paper == '1') {
+                        ngToolbar.get('changecontent').show();
+                    }
+
+                    if ($FlowNode == 'WM3DOCDISPATCH_RegSend') {
+                        ngToolbar.get('topdf').enable();
+                        items[items.length - 1].show();
+                        if (!$KingGridShowed) {
+                           UpdateKingGrid($KingGridFileType,$KingGridUrl);
+                        }
+                    }
+                    else if ($FlowNode == "WM3DOCDISPATCH_OrderNum") {
+                        var tempCno = mstform.queryById('Cno').getValue();
+                        $KingGridUrl += "&tempcno=" + tempCno;
+                        if (!$KingGridShowed) {
+                            UpdateKingGrid($KingGridFileType, $KingGridUrl);
+                        }
+                        items[items.length - 1].hide();
+                    }
+                    else{
+                        if (!$KingGridShowed) {
+                            UpdateKingGrid($KingGridFileType,$KingGridUrl);
+                        }
+                        items[items.length - 1].hide();
+                    }
+                } else {
+                    ngToolbar.get('topdf').disable();
+                    items[items.length - 1].hide();
+                }
+            });
+
+            //编辑窗口保存后回刷列表
+            var frame = $GetWFrame();
+            var listref = Ext.create('Ext.ng.ListRefresher');
+            if (frame) {
+                frame.ListObserver.add('PublicCellBack', listref);
+                listref.on('refreshlist', function (data) {
+                    doDispatchPublish(data);
+                });
+            }
+
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+        });
+    </script>
+}
+

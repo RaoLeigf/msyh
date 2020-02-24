@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="mail_box">
+      <Field Name="id" IsKey="true" />
+      <Field Name="orgid"  />
+      <Field Name="userid"  />
+      <Field Name="mailtype" />
+      <Field Name="isread" DataType="Boolean"/>
+      <Field Name="attachid" />
+      <Field Name="subject" />
+      <Field Name="sender" />
+      <Field Name="receiver" />
+      <Field Name="date" DataType="DateTime" />
+    </Table>
+  </Tables>
+  <Read sql="select [fields] from [table] [where] [orderby]">
+    <Where format="{orgid} and {userid}">      
+      <exp Field="orgid" Target="AppInfo" Value="Orgid" />
+      <exp Field="userid" Target="AppInfo" Value="userid" />
+    </Where>
+    <OrderBy format="{date}">
+      <exp Field="date" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Create>
+    <Values>
+      <exp Field="orgid" Target="AppInfo" Value="orgid" />
+      <exp Field="userid" Target="AppInfo" Value="userid" />
+      <exp Field="date" Target="Express" Value="now" />
+    </Values>
+  </Create>
+  <Update>  
+  </Update>
+  <Delete>
+    <Values>
+      <exp Field="mailtype" Value="4" />
+    </Values>
+  </Delete>
+  <Destroy>
+    
+  </Destroy>
+</DataService>

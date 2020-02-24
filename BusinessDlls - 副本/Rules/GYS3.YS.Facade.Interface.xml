@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GYS3.YS.Facade.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GYS3.YS.Facade.Interface.IBuDeptReportFacade">
+            <summary>
+            BudgetDtlBudgetDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlBudgetDtlFacade">
+            <summary>
+            BudgetDtlBudgetDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlFundApplFacade">
+            <summary>
+            BudgetDtlFundAppl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlImplPlanFacade">
+            <summary>
+            BudgetDtlImplPlan业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlPerformTargetFacade">
+            <summary>
+            BudgetDtlPerformTarget业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetDtlPerformTargetFacade.SaveBudgetDtlPerformTarget(GYS3.YS.Model.Domain.BudgetDtlPerformTargetModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlTextContentModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlFundApplModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlBudgetDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPerformTargetModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlImplPlanModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="budgetDtlPerformTargetEntity"></param>
+            <param name="budgetDtlTextContentEntities"></param>
+            <param name="budgetDtlFundApplEntities"></param>
+            <param name="budgetDtlBudgetDtlEntities"></param>
+            <param name="budgetDtlPerformTargetEntities"></param>
+            <param name="budgetDtlImplPlanEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlPurchaseDtlFacade">
+            <summary>
+            BudgetDtlPurchaseDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlPurDtl4SOFFacade">
+            <summary>
+            BudgetDtlPurDtl4SOF业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetDtlTextContentFacade">
+            <summary>
+            BudgetDtlTextContent业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetMstFacade">
+            <summary>
+            BudgetMst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.SaveBudgetMst(GYS3.YS.Model.Domain.BudgetMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlImplPlanModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlTextContentModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlFundApplModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlBudgetDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPerformTargetModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPurchaseDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPurDtl4SOFModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="budgetMstEntity"></param>
+            <param name="budgetDtlImplPlanEntities"></param>
+            <param name="budgetDtlTextContentEntities"></param>
+            <param name="budgetDtlFundApplEntities"></param>
+            <param name="budgetDtlPerformTargetEntities"></param>
+            <param name="budgetDtlBudgetDtlEntities"></param>
+            <param name="budgetDtlPurchaseDtlEntities"></param>
+            <param name="budgetDtlPurDtl4SOFEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.SaveBudgetMst(GYS3.YS.Model.Domain.BudgetMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlImplPlanModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlTextContentModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlFundApplModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlBudgetDtlModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlPerformTargetModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="budgetMstEntity"></param>
+            <param name="budgetDtlImplPlanEntities"></param>
+            <param name="budgetDtlTextContentEntities"></param>
+            <param name="budgetDtlFundApplEntities"></param>
+            <param name="budgetDtlPerformTargetEntities"></param>
+            <param name="budgetDtlBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.LoadWithPage(System.Int32,System.Int32,System.String,System.Collections.Generic.Dictionary{System.String,System.Object},System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <param name="nameSqlName"></param>
+            <param name="dic"></param>
+            <param name="sorts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.GetKingGridTagRelateData(System.String,System.Int64)">
+            <summary>
+            金格控件标签取数
+            </summary>
+            <param name="type"></param>
+            <param name="arcID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.AddData">
+            <summary>
+            同步数据到老G6H数据库
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.AddDataInSaveBudgetMst(GYS3.YS.Model.Domain.BudgetMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetDtlBudgetDtlModel})">
+            <summary>
+            项目生成预算时同步数据到老G6H数据库
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.AddYBF(System.Int64)">
+            <summary>
+            允许预备费抵扣
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetMstFacade.GetSJFSS(System.String,Enterprise3.Common.Model.Results.PagedResult{GYS3.YS.Model.Domain.BudgetMstModel})">
+            <summary>
+            获取实际发生数
+            </summary>
+            <param name="userID"></param>
+            <param name="BudgetMsts"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IBudgetProcessCtrlFacade">
+            <summary>
+            BudgetProcessCtrl业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IBudgetProcessCtrlFacade.UpdateBudgetProcess(System.Collections.Generic.List{GQT3.QT.Model.Domain.OrganizeModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.BudgetProcessCtrlModel},GQT3.QT.Model.Domain.OrganizeModel,System.String)">
+            <summary>
+            保存进度控制数据
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IExpenseDtlFacade">
+            <summary>
+            ExpenseDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IExpenseHxFacade">
+            <summary>
+            ExpenseHx业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IExpenseMstFacade">
+            <summary>
+            ExpenseMst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IExpenseMstFacade.SaveExpenseMst(GYS3.YS.Model.Domain.ExpenseMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.ExpenseDtlModel},System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            保存数据
+            </summary>
+            <param name="expenseMstEntity"></param>
+            <param name="expenseDtlEntities"></param>
+            <param name="NCmoney">年初预算金额</param>
+            <param name="SumFSurplusamount">数据库支出和返回的计算值</param>
+            <param name="beforeSum">本单据初始预计支出金额</param>
+            <param name="beforeFReturnamount">本单据初始预计返还金额</param>
+            <param name="Ifreturn">是否额度返还</param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IExpenseMstFacade.LoadWithPageForDept(System.String,System.Collections.Generic.Dictionary{System.String,System.Object},System.Boolean,System.String[])">
+            <summary>
+            部门代码转
+            </summary>
+            <param name="nameSqlName"></param>
+            <param name="dicWhere"></param>
+            <param name="isUseInfoRight"></param>
+            <param name="sorts"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IExpenseMstFacade.GetSJFSSbyCode(System.String,System.String)">
+            <summary>
+            通过项目代码和操作员获取财务实际发生数
+            </summary>
+            <param name="userID"></param>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.IGHSubjectFacade">
+            <summary>
+            GHSubject业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IGHSubjectFacade.SaveGHSubject(GYS3.YS.Model.Domain.GHSubjectModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="gHSubjectEntity"></param>
+            <param name="subjectMstEntities"></param>
+            <param name="subjectMstBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IGHSubjectFacade.AddData">
+            <summary>
+            同步数据到老G6H数据库
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.IGHSubjectFacade.AddDataSP">
+            <summary>
+            纳入预算同步数据到老G6H数据库
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.ISubjectMstBudgetDtlFacade">
+            <summary>
+            SubjectMstBudgetDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.ISubjectMstBudgetDtlFacade.SaveSubjectMstBudgetDtl(GYS3.YS.Model.Domain.SubjectMstBudgetDtlModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="subjectMstBudgetDtlEntity"></param>
+            <param name="subjectMstEntities"></param>
+            <param name="subjectMstBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GYS3.YS.Facade.Interface.ISubjectMstFacade">
+            <summary>
+            SubjectMst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GYS3.YS.Facade.Interface.ISubjectMstFacade.SaveSubjectMst(GYS3.YS.Model.Domain.SubjectMstModel,System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstModel},System.Collections.Generic.List{GYS3.YS.Model.Domain.SubjectMstBudgetDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="subjectMstEntity"></param>
+            <param name="subjectMstEntities"></param>
+            <param name="subjectMstBudgetDtlEntities"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

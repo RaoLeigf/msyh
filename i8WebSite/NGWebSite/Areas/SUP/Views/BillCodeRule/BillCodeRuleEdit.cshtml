@@ -1,0 +1,913 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script type="text/javascript">
+
+        var gridStore;
+        var itemsPerPage = 20;  //gird每页显示20行
+        var c_bcode = '@ViewBag.C_bcode';   //系统编码
+        var ruletype = '@ViewBag.RuleType'; //规则类型名称
+        var codelimit = '@ViewBag.CodeLimit';   //限长
+        var delimiter = '@ViewBag.Delimiter';   //分隔符
+        var codemode = '@ViewBag.CodeMode'; //编码项
+        var c_btype = '@ViewBag.C_btype';   //业务类型
+        var busphid = '@ViewBag.BusPhid'    //业务类型主键
+        var busname = '@ViewBag.BusName'    //业务类型名称
+        var loginid = '@ViewBag.LoginID';   //登录id
+        var deptno = '@ViewBag.Deptno'; //部门编码
+        var ocode = '@ViewBag.Ocode';   //组织号
+        var codevalue = '@ViewBag.CodeValue';   //组织简码
+        var previewdata = "";
+        Ext.onReady(function () {
+
+            Ext.define('gridModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'phid',
+                        type: 'System.String',
+                        mapping: 'phid'
+                    }, {
+                        name: 'lineid',
+                        type: 'System.Int64',
+                        mapping: 'lineid'
+                    }, {
+                        name: 'sortfield',
+                        type: 'System.Int64',
+                        mapping: 'sortfield'
+                    }, {
+                        name: 'c_bcode',
+                        type: 'System.String',
+                        mapping: 'c_bcode'
+                    }, {
+                        name: 'codeitem',
+                        type: 'System.String',
+                        mapping: 'codeitem',
+                    }, {
+                        name: 'codeitemcontent',
+                        type: 'System.String',
+                        mapping: 'codeitemcontent'
+                    }, {
+                        name: 'codeitemch',
+                        type: 'System.String',
+                        mapping: 'codeitemvalue'
+                    }, {
+                        name: 'codeitemvalue',
+                        type: 'System.String',
+                        mapping: 'codeitemvalue'
+                    }, {
+                        name: 'length',
+                        type: 'System.Int',
+                        mapping: 'length'
+                    }, {
+                        name: 'complement',
+                        type: 'System.String',
+                        mapping: 'complement'
+                    }, {
+                        name: 'alternative',
+                        type: 'System.String',
+                        mapping: 'alternative'
+                    }, {
+                        name: 'cutindex',
+                        type: 'System.String',
+                        mapping: 'cutindex'
+                    }
+                ]
+            });
+
+            Ext.define('billinfomodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'code',
+                        type: 'System.String',
+                        mapping: 'code'
+                    }, {
+                        name: 'name',
+                        type: 'System.String',
+                        mapping: 'name'
+                    },
+                ]
+            });
+
+            var ngToolBar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                height: 30,
+                ngbuttons: [
+                    { itemId: 'save', text: '保存', iconCls: 'icon-save' },
+                    { itemId: 'addRow', text: '增行', iconCls: 'icon-New' },
+                    { itemId: 'deleteRow', text: '删行', iconCls: 'icon-delete' },
+                    { itemId: 'up', text: '上移', iconCls: 'icon-Firstrec' },
+                    { itemId: 'down', text: '下移', iconCls: 'icon-LastRec' },
+                    '->', 'close'
+                ]
+            });
+
+
+
+
+            gridStore = window.Ext.create('Ext.ng.JsonStore', {
+                model: 'gridModel',
+                pageSize: itemsPerPage,
+                url: C_ROOT + 'SUP/BillCodeRule/GetBillCodeRuleDetailList?c_bcode=' + c_bcode,
+                listeners: {
+                    load: function () {
+                        previewdata = "";
+                        var count = gridStore.getCount();
+                        for (var i = 0; i < count; i++) {
+                            var record = gridStore.getAt(i);
+                            var value = record.data.codeitemvalue;
+                            var item = record.data.codeitem;
+                            var len = record.data.length;
+                            var comp = record.data.complement;
+                            var alter = record.data.alternative;
+                            var cut = record.data.cutindex;
+                            //var ch = record.data.codeitemch;
+                            //var content = record.data.codeitemcontent;
+                            if (item == "systeminfo" || item == "billinfo") {
+                                if (value == "") {
+                                    value = alter;
+                                    for (var j = 0; j < len - alter.length; j++) {
+                                        value = value + comp;
+                                    }
+                                } else if (value.length < len) {
+                                    if (comp == null) {
+                                        comp = "";
+                                    }
+                                    value = value + new Array(len - value.length + 1).join(comp, '');
+                                } else if (value.length > len) {
+                                    value = value.substring(cut);
+                                }
+                            }
+                            if (delimiter == " ") {
+                                previewdata = previewdata + value;
+                            } else if (i == 0) {
+                                previewdata = previewdata + value;
+                            } else {
+                                previewdata = previewdata + delimiter + value;
+                            }
+                            //if (item == "systeminfo") {
+                            //    switch (content) {
+                            //        case "operatorno":
+                            //            record.data.set('codeitemch', '当前操作员编码');
+                            //            ch = "当前操作员编码";
+                            //            break;
+                            //        case "deptno":
+                            //            ch = "当前操作员所在的部门编码";
+                            //            break;
+                            //        case "ocode":
+                            //            ch = "当前组织号";
+                            //            break;
+                            //        case "codevalue":
+                            //            ch = "当前组织简码";
+                            //            break;
+                            //    }
+                            //}
+                        }
+                        Ext.getCmp('preview').setValue("编码预览：" + previewdata);
+                    }
+                }
+            });
+            gridStore.cachePageData = false;
+            gridStore.load();
+            gridStore.cachePageData = true;
+
+            if (codemode == "2") {
+                var codeitemstore = Ext.create('Ext.data.Store', {
+                    fields: ['code', 'name'],
+                    data: [
+                        { "code": "serialnum", "name": "流水号" }
+                    ]
+                });
+            } else if (codemode == "3") {
+                var codeitemstore = Ext.create('Ext.data.Store', {
+                    fields: ['code', 'name'],
+                    data: [
+                        { "code": "custom", "name": "自定义" },
+                        { "code": "systeminfo", "name": "系统信息" },
+                        { "code": "datetime", "name": "日期" },
+                        { "code": "serialnum", "name": "流水号" }
+                    ]
+                });
+            } else {
+                var codeitemstore = Ext.create('Ext.data.Store', {
+                    fields: ['code', 'name'],
+                    data: [
+                        { "code": "custom", "name": "自定义" },
+                        { "code": "systeminfo", "name": "系统信息" },
+                        { "code": "billinfo", "name": "单据信息" },
+                        { "code": "datetime", "name": "日期" },
+                        { "code": "serialnum", "name": "流水号" }
+                    ]
+                });
+            }
+           
+
+            var systeminfostore = Ext.create('Ext.data.Store', {
+                fields: ['code', 'name'],
+                data: [
+                    { "code": "operatorno", "name": "当前操作员编码" },
+                    { "code": "deptno", "name": "当前操作员所在的部门编码" },
+                    { "code": "ocode", "name": "当前组织号" },
+                    { "code": "codevalue", "name": "当前组织简码" }
+                ]
+            });
+
+            var datetimestore = Ext.create('Ext.data.Store', {
+                fields: ['code', 'name'],
+                data: [
+                    { "code": "yyyyMMdd", "name": "yyyyMMdd" },
+                    { "code": "MMddyy", "name": "MMddyy" },
+                    { "code": "yyMMdd", "name": "yyMMdd" },
+                    { "code": "yyyyMM", "name": "yyyyMM" },
+                    { "code": "MMyy", "name": "MMyy" },
+                    { "code": "yyMM", "name": "yyMM" },
+                    { "code": "yyyy", "name": "yyyy" },
+                    { "code": "MM", "name": "MM" },
+                ]
+            });
+
+            var billinfostore = Ext.create('Ext.ng.JsonStore', {
+                model: 'billinfomodel',
+                url: C_ROOT + 'SUP/BillCodeRule/GetBillInfoHelp'
+            })
+
+            var schemectrlEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1,    //单击编辑，单元格修改
+                listeners: {
+                    beforeedit: function (editor, e) {
+                        var cols = {};
+                        var contentcell;
+                        var lengthcell;
+                        var compcell;
+                        var altercell;
+                        var cutcell;
+                        var row = gridPanel.getSelectionModel().getSelection();
+                        var codeitem = row[0].get('codeitem');
+                        if (e.column.dataIndex == "lineid" || e.column.dataIndex == 'codeitem') {
+                            return;
+                        } else {
+                            if (codeitem == "" || codeitem == null) {
+                                Ext.MessageBox.alert('提示', '请选择编码项');
+                                return;
+                            }
+                        }
+                        cols = e.column;
+                        //动态加载grid列
+                        switch (cols.dataIndex) {
+                            case "codeitemcontent":
+                                switch (codeitem) {
+                                    case "custom":
+                                        contentcell = Ext.create('Ext.form.field.Text', {
+                                            allowBlank: true,
+                                            blankText: '不允许为空',
+                                            listeners: {
+                                                blur: function (data) {
+                                                    row[0].set('length', data.value.length);
+                                                }
+                                            }
+                                        });
+                                        cols.setEditor(contentcell);
+                                        break;
+                                    case "systeminfo":
+                                        contentcell = Ext.create('Ext.form.ComboBox', {
+                                            store: systeminfostore,
+                                            valueField: "code",
+                                            displayField: 'name',
+                                            queryMode: 'local',
+                                            editable: false,
+                                        });
+                                        cols.renderer = function (value) {
+                                            var i = systeminfostore.find('code', value);
+                                            if (i >= 0) {
+                                                return systeminfostore.getAt(i).get('name');
+                                            }
+                                            return value;
+                                        }
+                                        cols.setEditor(contentcell);
+                                        break;
+                                    case "billinfo":
+                                        contentcell = Ext.create('Ext.form.ComboBox', {
+                                            store: billinfostore,
+                                            valueField: "code",
+                                            displayField: 'name',
+                                            queryMode: 'local',
+                                            editable: false,
+                                            listeners: {
+                                                focus: {
+                                                    fn: function () {
+                                                        Ext.apply(billinfostore.proxy.extraParams, { 'c_btype': c_btype });
+                                                        billinfostore.cachePageData = false;
+                                                        billinfostore.reload();
+                                                        billinfostore.cachePageData = true;
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        cols.renderer = function (value) {
+                                            var i = billinfostore.find('code', value);
+                                            if (i >= 0) {
+                                                return billinfostore.getAt(i).get('name');
+                                            }
+                                            return value;
+                                        }
+                                        cols.setEditor(contentcell);
+                                        break;
+                                    case "datetime":
+                                        contentcell = Ext.create('Ext.form.ComboBox', {
+                                            store: datetimestore,
+                                            valueField: "code",
+                                            displayField: 'name',
+                                            queryMode: 'local',
+                                            editable: false,
+                                            listeners: {
+                                                change: function (me, newValue, oldValue) {
+                                                    row[0].set('length', newValue.length);
+                                                }
+                                            }
+                                        });
+                                        cols.renderer = function (value) {
+                                            var i = datetimestore.find('code', value);
+                                            if (i >= 0) {
+                                                return datetimestore.getAt(i).get('name');
+                                            }
+                                            return value;
+                                        }
+                                        cols.setEditor(contentcell);
+                                        break;
+                                    case "serialnum":
+                                        contentcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true,
+                                        })
+                                        cols.setEditor(contentcell);
+                                        break;
+                                }
+                                break;
+                            case "length":
+                                switch (codeitem) {
+                                    case "custom":
+                                        lengthcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            titleAlign: 'center',
+
+                                        });
+                                        cols.setEditor(lengthcell);
+                                        break;
+                                    case "systeminfo":
+                                        lengthcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: false
+                                        });
+                                        cols.setEditor(lengthcell);
+                                        break;
+                                    case "billinfo":
+                                        lengthcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: false
+                                        });
+                                        cols.setEditor(lengthcell);
+                                        break;
+                                    case "datetime":
+                                        lengthcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(lengthcell);
+                                        break;
+                                    case "serialnum":
+                                        lengthcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: true,
+                                        })
+                                        cols.setEditor(lengthcell);
+                                        break;
+                                }
+                                break;
+                            case "complement":
+                                switch (codeitem) {
+                                    case "custom":
+                                        compcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(compcell);
+                                        break;
+                                    case "systeminfo":
+                                        compcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(compcell);
+                                        break;
+                                    case "billinfo":
+                                        compcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(compcell);
+                                        break;
+                                    case "datetime":
+                                        compcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(compcell);
+                                        break;
+                                    case "serialnum":
+                                        compcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(compcell);
+                                        break;
+                                }
+                                break;
+                            case "alternative":
+                                switch (codeitem) {
+                                    case "custom":
+                                        altercell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(altercell);
+                                        break;
+                                    case "systeminfo":
+                                        altercell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: false
+                                        });
+                                        cols.setEditor(altercell);
+                                        break;
+                                    case "billinfo":
+                                        altercell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: false
+                                        });
+                                        cols.setEditor(altercell);
+                                        break;
+                                    case "datetime":
+                                        altercell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(altercell);
+                                        break;
+                                    case "serialnum":
+                                        altercell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(altercell);
+                                        break;
+                                }
+                                break;
+                            case "cutindex":
+                                switch (codeitem) {
+                                    case "custom":
+                                        cutcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(cutcell);
+                                        break;
+                                    case "systeminfo":
+                                        cutcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: false
+                                        });
+                                        cols.setEditor(cutcell);
+                                        break;
+                                    case "billinfo":
+                                        cutcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: false,
+                                            allowBlank: false
+                                        });
+                                        cols.setEditor(cutcell);
+                                        break;
+                                    case "datetime":
+                                        cutcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(cutcell);
+                                        break;
+                                    case "serialnum":
+                                        cutcell = Ext.create('Ext.form.field.Text', {
+                                            readOnly: true,
+                                            allowBlank: true
+                                        });
+                                        cols.setEditor(cutcell);
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                }
+            });
+
+            var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                border: false,
+                frame: true,
+                store: gridStore,
+                columnLines: true,
+                otype: 'edit',
+                buskey: 'phid', //对应的明细表主键
+                columns: [
+                    {
+                        header: '主键',
+                        flex: 1,
+                        dataIndex: 'phid',
+                        align: 'center',
+                        titleAlign: 'center',
+                        hidden: true
+                    }, {
+                        header: '行号（主键）',
+                        flex: 1,
+                        dataIndex: 'lineid',
+                        align: 'center',
+                        titleAlign: 'center',
+                        hidden: true
+                    }, {
+                        header: '显示顺序',
+                        flex: 1,
+                        dataIndex: 'sortfield',
+                        align: 'center',
+                        titleAlign: 'center',
+                        hidden: false
+                    }, {
+                        header: '主表系统编码',
+                        dataIndex: 'c_bcode',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                        hidden: true
+                    }, {
+                        header: '编码项',
+                        dataIndex: 'codeitem',
+                        flex: 2,
+                        align: 'center',
+                        titleAlign: 'center',
+                        editor: {
+                            xtype: 'combobox',
+                            store: codeitemstore,
+                            queryMode: 'local',
+                            valueField: 'code',
+                            displayField: 'name',
+                            mustInput: true,
+                            editable: false,
+                            autoRender: true,
+                            listeners: {
+                                blur: function (me) {
+                                    var row = gridPanel.getSelectionModel().getSelection();
+                                    if (me.value == "serialnum") {
+                                        row[0].set('length', 4);
+                                    } else if (me.value == "systeminfo" || me.value == "billinfo") {
+                                        row[0].set('cutindex', 0);
+                                        row[0].set('alternative', 0);
+                                    }
+                                },
+                                change: function () {
+                                    var row = gridPanel.getSelectionModel().getSelection();
+                                    row[0].set('codeitemcontent', "");
+                                    row[0].set('length', "");
+                                    row[0].set('complement', "");
+                                    row[0].set('alternative', "");
+                                    row[0].set('cutindex', "");
+                                }
+                            }
+                        },
+                        renderer: function (value) {
+                            var i = codeitemstore.find('code', value);
+                            if (i >= 0) {
+                                return codeitemstore.getAt(i).get('name');
+                            }
+                            return value;
+                        }
+                    }, {
+                        header: '编码项内容',
+                        id: 'contentid',
+                        dataIndex: 'codeitemcontent',
+                        flex: 2,
+                        align: 'center',
+                        titleAlign: 'center',
+                        renderer: function (value) {
+                            var i = systeminfostore.find('code', value);
+                            if (i >= 0) {
+                                return systeminfostore.getAt(i).get('name');
+                            }
+                            return value;
+                        }
+                    }, {
+                        header: '编码项中文',
+                        dataIndex: 'codeitemch',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                        editable: false,
+                        hidden: true,
+                    }, {
+                        header: '编码项值',
+                        dataIndex: 'codeitemvalue',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                        editable: false,
+                        hidden: true,
+                    }, {
+                        header: '长度',
+                        dataIndex: 'length',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                    }, {
+                        header: '补位符',
+                        dataIndex: 'complement',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                    }, {
+                        header: '替代符',
+                        dataIndex: 'alternative',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                    }, {
+                        header: '超长截取起始位',
+                        dataIndex: 'cutindex',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                    }
+                ],
+                plugins: [schemectrlEditing]
+            });
+
+            var panel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                layout: 'border',
+                border: 0,
+                layout: 'fit',
+                items: [gridPanel],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    border: 0,
+                    items: [
+                        {
+                            xtype: 'textfield',
+                            id: 'biztype',
+                            width: 592,
+                            emptyText: '业务类型：' + busname + ruletype + '规则' + ' | 编码限长：' + codelimit + ' | 段间分隔符：' + delimiter + ' |'
+                        }, {
+                            xtype: 'textfield',
+                            id: 'preview',
+                            width: 591
+                        }
+                    ]
+                }]
+            });
+
+            //保存
+            ngToolBar.get('save').on('click', function () {
+                Ext.MessageBox.confirm('提示', '是否保存所有操作？', function (v) {
+                    if (v == "yes") {
+                        var griddata = gridPanel.getChange();
+                        if (griddata.indexOf("newRow") > 0 || griddata.indexOf("modifiedRow") > 0 || griddata.indexOf("deletedRow") > 0) {
+                            var regex = /^[A-Za-z0-9]+$/;
+                            var datesign = 0;
+                            var sersign = 0;
+                            for (var k = 0; k < gridStore.data.items.length; k++) {
+                                if (codemode == "1" || codemode == "3") {
+                                    if (gridStore.data.items[k].get('codeitem') == "datetime") {
+                                        datesign++;
+                                    } else if (gridStore.data.items[k].get('codeitem') == "serialnum") {
+                                        sersign++;
+                                    }
+                                    if (datesign > 1 || sersign > 1) {
+                                        Ext.MessageBox.alert('提示', '该编码方式只允许有一个日期和流水号');
+                                        return;
+                                    }
+                                } else if (codemode == "2") {
+                                    if (gridStore.data.items[k].get('codeitem') == "serialnum") {
+                                        sersign++;
+                                    } if (sersign > 1) {
+                                        Ext.MessageBox.alert('提示', '该编码方式只允许有一个流水号');
+                                        return;
+                                    }
+                                }
+                                if (gridStore.data.items[k].get('codeitem') == "custom") {
+                                    var checkdata = gridStore.data.items[k].get('codeitemcontent')
+                                    if (!regex.test(checkdata)) {
+                                        Ext.MessageBox.alert('提示', '自定义编码项的内容只允许输入字母和数字');
+                                        return;
+                                    }
+                                }
+                                if (gridStore.data.items[k].get('codeitem') == "systeminfo" || gridStore.data.items[k].get('codeitem') == "billinfo") {
+                                    var checkdata = gridStore.data.items[k].get('length')
+                                    if (checkdata == "" || checkdata == null) {
+                                        Ext.MessageBox.alert('提示', '系统信息，单据信息的长度和超长截取起始位不能为空');
+                                        return;
+                                    }
+                                }
+                                var lengthdata = gridStore.data.items[k].get('length');
+                                var lengthregex = /^[1-9]\d*$/;
+                                if (!lengthregex.test(lengthdata)) {
+                                    Ext.MessageBox.alert('提示','长度只允许输入正整数');
+                                }
+                            }
+                            var dedata = Ext.JSON.decode(griddata);
+                            if (dedata.table.modifiedRow != null){
+                                for (var i = 0; i < dedata.table.modifiedRow.length; i++) {
+                                    if (dedata.table.modifiedRow[i].row.complement != null){
+                                        if (dedata.table.modifiedRow[i].row.complement.length > 1) {
+                                            Ext.MessageBox.alert("提示", "补位符只能单个字符");
+                                            return;
+                                        }
+                                    }
+                                    if (dedata.table.modifiedRow[i].row.alternative != null) {
+                                        if (dedata.table.modifiedRow[i].row.codeitem == "systeminfo"){
+                                            if (dedata.table.modifiedRow[i].row.alternative.length != dedata.table.modifiedRow[i].row.length) {
+                                                Ext.MessageBox.alert('提示', '替代符长度必须等于长度');
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (dedata.table.newRow != null)
+                            {
+                                for (var i = 0; i < dedata.table.newRow.length; i++) {
+                                    if (dedata.table.newRow[i].row.complement != null)
+                                    {
+                                        if (dedata.table.newRow[i].row.complement.length > 1) {
+                                            Ext.MessageBox.alert("提示", "补位符只能单个字符");
+                                            return;
+                                        }
+                                    }
+                                    if (dedata.table.newRow[i].row.alternative != null) {
+                                        if (dedata.table.newRow[i].row.codeitem == "systeminfo") {
+                                            if (dedata.table.newRow[i].row.alternative.length != dedata.table.newRow[i].row.length) {
+                                                Ext.MessageBox.alert('提示', '替代符长度必须等于长度');
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            var count = gridStore.getCount();
+                            var num = 0;
+                            for (var i = 0; i < count; i++) {
+                                var record = gridStore.getAt(i);
+                                if (delimiter == "") {
+                                    num = num + parseInt(record.data.length);
+                                } else if (i != count - 1) {
+                                    num = num + parseInt(record.data.length) + 1;
+                                } else {
+                                    num = num + parseInt(record.data.length);
+                                }
+                            }
+                            if (num > parseInt(codelimit)) {
+                                Ext.MessageBox('提示', '编码总长度超过编码限长请修改');
+                                return;
+                            };
+                            if(num > 40 && delimiter == ""){
+                                Ext.MessageBox('提示','编码总长度加上段间分隔符超过40位，请修改');
+                                return;
+                            }
+                            if (codemode == "1" || codemode == "2") {
+                                var mark = 0;
+                                for (var j = 0; j < count; j++) {
+                                    var record = gridStore.getAt(j);
+                                    if (record.data.codeitem == "serialnum") {
+                                        mark = 1;
+                                    }
+                                }
+                                if (mark != 1) {
+                                    Ext.MessageBox.alert('提示', '当前编码方式必须包含流水号');
+                                    return;
+                                }
+                            }
+                            var myMask = new Ext.LoadMask(document.body, { msg: "正在保存中,请稍候..." });
+                            myMask.show();
+                            Ext.Ajax.request({
+                                url: C_ROOT + 'SUP/BillCodeRule/SaveDetails',
+                                params: { "griddata": griddata, "c_bcode": c_bcode },
+                                success: function (response) {
+                                    myMask.hide();
+                                    if (response.text > 0) {
+                                        check = true;
+                                        Ext.MessageBox.alert('提示', '保存成功');
+                                        gridStore.cachePageData = false;
+                                        //gridStore.load();
+                                        gridStore.load();
+                                        gridStore.cachePageData = true;
+                                    }
+                                },
+                                failure: function (response) {
+                                    myMask.hide();
+                                    Ext.MessageBox.alert('提示', '保存失败');
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.alert('提示', '数据没有更改!');
+                        }
+                    }
+                })
+            });
+
+            //增行
+            ngToolBar.get('addRow').on('click', function () {
+                var count = gridStore.getCount();
+                var m = Ext.create('gridModel', {
+                    c_bcode: '',
+                    lineid: count + 1,
+                    sortfield: count + 1
+                })
+                gridStore.add(m);
+            });
+
+            //删行
+            ngToolBar.get('deleteRow').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选中你要删除的行！');
+                } else {
+                    Ext.MessageBox.confirm('警告', '确定删除该条记录', function (e) {
+                        if (e == "yes") {
+                            gridStore.remove(gridPanel.getView().getSelectionModel().getSelection()[0]);
+                            var num = gridStore.getCount();
+                            for (var i = 0; i < num; i++) {
+                                //gridStore.getAt(i).set("lineid", i + 1);
+                                gridStore.getAt(i).set("sortfield", i + 1);
+                            }
+                        }
+                    })
+                }
+            });
+
+            //上移
+            ngToolBar.get('up').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data) {
+                    var index = gridStore.indexOf(data[0]);
+                    if (index > 0) {
+                        //gridStore.removeAt(index);
+                        //gridStore.insert(index - 1, data);
+                        //gridStore.getAt(index).set('lineid', (index - 1) + 1);
+                        //gridStore.getAt(index - 1).set('lineid', index + 1);
+                        gridStore.getAt(index).set('sortfield', (index - 1) + 1);
+                        gridStore.getAt(index - 1).set('sortfield', index + 1);
+                        gridStore.sort('sortfield', 'ASC');
+                        gridPanel.getView().refresh();
+                        //var num = gridStore.getCount();
+                        //for (var i = 0; i < num; i++) {
+                        //    gridStore.getAt(i).set("lineid", i+1);
+                        //}
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择行');
+                }
+            });
+
+            //下移
+            ngToolBar.get('down').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data) {
+                    var index = gridStore.indexOf(data[0]);
+                    if (index < gridStore.getCount() - 1) {
+                        //gridStore.removeAt(index);
+                        //gridStore.insert(index + 1, data);
+                        //gridStore.getAt(index).set('lineid', (index + 1) + 1);
+                        //gridStore.getAt(index + 1).set('lineid', index + 1);
+                        gridStore.getAt(index).set('sortfield', (index + 1) + 1);
+                        gridStore.getAt(index + 1).set('sortfield', index + 1);
+                        gridStore.sort('sortfield', 'ASC');
+                        gridPanel.getView().refresh();
+                        //var num = gridStore.getCount();
+                        //for (var i = 0; i < num; i++) {
+                        //    gridStore.getAt(i).set("lineid", i+1);
+                        //}
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择行');
+                }
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                title: 'Border Layout',
+                layout: 'border',
+                items: [
+                    ngToolBar,
+                    panel
+                ]
+            })
+        })
+    </script>
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="AddinOperatorModel" table="addin_method_operator">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="LoginId" column="loginid" type="System.String" length="50" not-null="false" />
+	</class>
+</hibernate-mapping>

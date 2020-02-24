@@ -1,0 +1,611 @@
+﻿@{
+    ViewBag.Title = "自定义字段设置";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+      
+      <script type="text/javascript">
+
+          var otype = 'edit';
+          var tableregcode = '@ViewBag.Code';
+          var tname = '@ViewBag.Tname';
+          var otype = '@ViewBag.OType';
+
+
+          var busid = '@ViewBag.BusID';
+          var bustype = '@ViewBag.BusType';
+          var busname = '@ViewBag.BusName';
+
+          Ext.onReady(function () {
+
+              var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                  region: 'north',
+                  //rightName: "EmpinfoList", //权限名称
+                  ngbuttons: ['save', 'addrow', 'deleterow', { itemId: "uisetting", text: "字段UI设置", width: this.itemWidth, iconCls: "icon-New" }, '->', 'close']
+              });
+
+              var form = Ext.create('Ext.ng.TableLayoutForm', {
+                  region: 'north',
+                  frame: true,
+                  split: true,
+                  buskey: 'id', //对应的业务表主键
+                  otype: 'view', //操作类型,add||edit
+                  columnsPerRow: 3,
+                  minWidth: 400,
+                  autoScroll: true,
+                  fields: [{
+                      xtype: 'ngText',
+                      fieldLabel: '表 名',
+                      name: 'tname'
+                  }, {
+                      xtype: 'ngText',
+                      fieldLabel: '表中文名',
+                      name: 'chn'
+                  }, {
+                      xtype: 'hiddenfield',
+                      fieldLabel: '编号',
+                      name: 'code'
+                  }]
+              });
+
+              Ext.define('Model', {
+                  extend: 'Ext.data.Model',
+                  fields: [{
+                      name: 'c_code',
+                      type: 'string',
+                      mapping: 'c_code'
+                  }, {
+                      name: 'c_bname',
+                      type: 'string',
+                      mapping: 'c_bname'
+                  }, {
+                      name: 'c_name',
+                      type: 'string',
+                      mapping: 'c_name'
+                  }, {
+                      name: 'c_fullname',
+                      type: 'string',
+                      mapping: 'c_fullname'
+                  }, {
+                      name: 'c_type',
+                      type: 'string',
+                      mapping: 'c_type'
+                  }, {
+                      name: 'collen',
+                      mapping: 'collen',
+                      type: 'string'
+                  }, {
+                      name: 'declen',
+                      mapping: 'declen',
+                      type: 'string'
+                  }, {
+                      name: 'null_flg',
+                      type: 'string',
+                      mapping: 'null_flg'
+                  }]
+              });
+
+              var store = Ext.create('Ext.ng.JsonStore', {
+                  model: 'Model',
+                  pageSize: 50,
+                  autoLoad: true,
+                  url: '../IndividualProperty/GetColumnsInfo?tname=' + tname
+              })
+
+              var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                  clicksToEdit: 1,
+                  listeners: {
+                      edit: function (editor, e) {
+
+                          //e.record.data['c_name'] = 'user_' + e.record.data['userdefname'];
+                          if (!Ext.isEmpty(e.record.data['userdefname'])) {
+                              var uname = e.record.data['userdefname'];
+                              var reg = new RegExp("\\w+");
+                              if (reg.test(uname)) {
+                                  e.record.set('c_name', 'user_' + uname);
+                              }
+                              else {
+                                  NGMsg.Error("字段名必须是字母、数字或者字母与数字的组合");
+                                  e.record.set('userdefname','');
+                              }                              
+                          }                  
+
+                      }
+                  }
+              });
+
+              var flag = Ext.create('Ext.ng.ComboBox', {
+                  valueField: "flag",
+                  displayField: 'name',
+                  queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote
+                  data: [{             //编辑状态下,状态列的下拉菜单的 data
+                      "flag": "1",
+                      "name": "是"
+                  }, {
+                      "flag": "0",
+                      "name": "否"
+                  }]
+              });
+
+              var filedtype = Ext.create('Ext.ng.ComboBox', {
+                  allowBlank: false,
+                  valueField: "value",
+                  displayField: 'name',
+                  queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote
+                  data: [{             //编辑状态下,状态列的下拉菜单的 data
+                      "value": '02',
+                      "name": 'varchar'
+                  }, {
+                      "value": '03',
+                      "name": 'integer'
+                  }, {
+                      "value": '04',
+                      "name": 'smallint'
+                  }, {
+                      "value": '05',
+                      "name": 'tinyint'
+                  }, {
+                      "value": '06',
+                      "name": 'numeric'
+                  }, {
+                      "value": '07',
+                      "name": 'datetime'
+                  },
+                  //{
+                  //    "value": '09',
+                  //    "name": 'text'
+                  //},
+                  {
+                      "value": '10',
+                      "name": 'bigint'
+                  }]
+              });
+
+              var uixtype = Ext.create('Ext.ng.ComboBox', {
+                  valueField: "value",
+                  displayField: 'name',
+                  queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote
+                  data: [{             //编辑状态下,状态列的下拉菜单的 data
+                      "value": 'ngText',
+                      "name": '单行文本'
+                  }, {
+                      "value": 'ngTextArea',
+                      "name": '多行文本'
+                  }, {
+                      "value": 'ngNumber',
+                      "name": '数字'
+                  }, {
+                      "value": 'ngDate',
+                      "name": '日期'
+                  }, {
+                      "value": 'ngDateTime',
+                      "name": '时间'
+                  }, {
+                      "value": 'ngComboBox',
+                      "name": '下拉'
+                  }, {
+                      "value": 'ngCommonHelp',
+                      "name": '帮助'
+                  }]
+              });
+
+              var rendflag = function (val) {
+                  if (val === '1') {
+                      return '是';
+                  }
+                  else {
+                      return '否';
+                  }
+              }
+
+              var rendFieldType = function (val) {
+
+                  var temp;
+                  switch (val) {
+                      case '02': temp = 'varchar';
+                          break;
+                      case '03': temp = 'integer';
+                          break;
+                      case '04': temp = 'smallint';
+                          break;
+                      case '05': temp = 'tinyint';
+                          break;
+                      case '06': temp = 'numeric';
+                          break;
+                      case '07': temp = 'datetime';
+                          break;
+                      case '09': temp = 'text';
+                          break;
+                      case '10': temp = 'bigint';
+                          break;
+                      default: temp = 'varchar';
+                  }
+
+                  return temp;
+              }
+
+              var rendUIxtype = function (val) {
+                  var temp;
+                  switch (val) {
+                      case 'ngText': temp = '单行文本';
+                          break;
+                      case 'ngTextArea': temp = '多行文本';
+                          break;
+                      case 'ngNumber': temp = '数字';
+                          break;
+                      case 'ngDate': temp = '日期';
+                          break;
+                      case 'ngDateTime': temp = '时间';
+                          break;
+                      case 'ngComboBox': temp = '下拉';
+                          break;
+                      case 'ngCommonHelp': temp = '帮助';
+                          break;
+                      default: temp = '单行文本';
+                  }
+
+                  return temp;
+              }
+
+              var grid = Ext.create('Ext.ng.GridPanel', {
+                  region: 'center',
+                  //frame: true,
+                  store: store,
+                  columnLines: true,
+                  buskey: 'c_code', //对应的业务表主键
+                  otype: otype, //操作类型,add||edit
+                  width: 1500,
+                  autoScroll: true,
+                  //bodyStyle: 'padding:20px;overflow-x:scroll',
+                  layout: {
+                      //type: 'hbox',
+                      //align: 'stretch'
+                  },
+                  columns: [{
+                      header: '编号',
+                      flex: 1,
+                      dataIndex: 'c_code',
+                      hidden: true
+                  }, {
+                      header: '表名',
+                      flex: 1,
+                      dataIndex: 'c_bname',
+                      hidden: true
+                  }, {
+                      header: '字段全名',
+                      flex: 1,
+                      sortable: true,
+                      mustInput: true,
+                      dataIndex: 'c_name'
+                  }, {
+                      header: '字段名',
+                      flex: 1,
+                      sortable: true,
+                      dataIndex: 'userdefname',                     
+                      editor: {
+                          //regex: new RegExp("\\w+"),
+                          //regexText: '只允许输入字母数字',
+                          maxLength:25,
+                          allowBlank: false
+                      }
+                  }, {
+                      header: '字段中文名',
+                      flex: 1,
+                      sortable: true,
+                      mustInput: true,
+                      dataIndex: 'c_fullname',
+                      editor: {
+                          allowBlank: false
+                      }
+                  }, {
+                      header: '字段类型',
+                      flex: 1,
+                      sortable: true,
+                      mustInput: true,
+                      dataIndex: 'c_type',
+                      editor: filedtype,
+                      renderer: rendFieldType
+                  }, {
+                      header: '字段长度',
+                      flex: 1,
+                      sortable: true,
+                      dataIndex: 'collen',
+                      editor: {
+                          xtype: 'numberfield',
+                          minValue: 0
+                      }
+                  }, {
+                      header: '精度',
+                      flex: 1,
+                      sortable: true,
+                      dataIndex: 'declen',
+                      editor: {
+                          xtype: 'numberfield',
+                          minValue: 0
+                      }
+                  }, {
+                      header: '是否允许空',
+                      flex: 1,
+                      sortable: true,
+                      dataIndex: 'null_flg',
+                      editor: flag,
+                      renderer: rendflag
+                  }],
+                  //                  viewConfig: {
+                  //                      forceFit: false,//true,
+                  //                      //scrollOffset: 0
+                  //                      width: 1700,
+                  //                      autoScroll:true,
+                  //                      overflowX:'auto'
+                  //                  },
+                  //forceFit: true,
+                  plugins: [cellEditing]//,
+                  //bbar: pagingbar
+              });
+
+              var panel = Ext.create('Ext.panel.Panel', {
+                  layout: 'fit',
+                  region: 'center',
+                  width: 1200,
+                  autoScroll: true,
+                  items: []
+              });
+
+              //布局
+              var viewport = Ext.create('Ext.container.Viewport', {
+                  id: "viewPort",
+                  layout: 'border',
+                  items: [ngToolbar, form, grid]
+              });
+
+              Ext.Ajax.request({
+                  params: { 'tname': tname, 'busid':busid },
+                          url: '../IndividualProperty/GetTableRegInfo',
+                          success: function (response) {
+                      var resp = Ext.JSON.decode(response.responseText);
+                      if (resp.status === "ok") {
+
+                          //debugger;
+                          var formobj = form.getForm();
+                          formobj.setValues(resp.data);
+
+                          //Ext.getCmp('province').bindData();
+                          //Ext.getCmp('city').bindData();
+
+                      } else {
+                          Ext.MessageBox.alert('数据获取失败', resp.status);
+                      }
+                          }
+              });
+
+              //增行
+              ngToolbar.get('addrow').on('click', function () {
+
+                  var data = [{
+                      'c_code': '',
+                      'c_bname': tname,
+                      'c_name': '',
+                      'c_fullname': '',
+                      'c_type': '02',
+                      'collen': '',
+                      'declen': '',
+                      'null_flg': '1'
+                  }];
+
+                  store.insert(store.getCount(), data);
+              });
+
+              //删行
+              ngToolbar.get('deleterow').on('click', function () {
+
+                  var data = grid.getSelectionModel().getSelection();
+                  if (data.length > 0) {                   
+
+                      if (Ext.isEmpty(data[0].data['c_code'])) {
+                          Ext.Msg.confirm('删除警告', '是否确认删除', function (btn, text) {
+                              if (btn == 'yes') {
+                                  store.remove(data[0]);
+                              }
+                          });                          
+                      }
+                      else {
+                          NGMsg.Info("这行数据已经保存，不可删除！");
+                      }                   
+
+                  }
+                  else {
+                      NGMsg.Info('请选择删除项!');
+                  }
+
+              });
+
+              grid.on('beforeedit', function (editor, e, eOpts) {
+
+                  if (otype === $Otype.VIEW) return false;
+
+                  var record = e.record;
+
+                  if (e.field === 'c_fullname') return true;//中文名称可修改
+
+                  //修改行
+                  if (record.data['c_code'] != '') {
+
+                      //字段长度、精度可修改
+                      if (e.field === 'collen' || e.field === 'declen') {
+                          //字段长度,varchar,numeric
+                          if (e.field === 'collen') {
+                              if (record.data['c_type'] === '02' || record.data['c_type'] === '06') {
+                                  return true;
+                              }
+                              else {
+                                  return false;
+                              }
+                          }
+                          //小数点长度numeric
+                          if (e.field === 'declen') {
+                              if (record.data['c_type'] === '06') {
+                                  return true;
+                              }
+                              else {
+                                  return false;
+                              }
+                          }
+                      }
+                      else {
+                          return false;
+                      }
+
+                  }
+                  else {
+
+                      //字段长度,varchar,numeric,text
+                      if (e.field === 'collen') {
+                          if (record.data['c_type'] === '02' || record.data['c_type'] === '06' || record.data['c_type'] === '09') {
+                              return true;
+                          }
+                          else {
+                              return false;
+                          }
+                      }
+                      //小数点长度numeric
+                      if (e.field === 'declen') {
+                          if (record.data['c_type'] === '06') {
+                              return true;
+                          }
+                          else {
+                              return false;
+                          }
+                      }
+                  }
+
+
+              });
+
+
+              ngToolbar.get('save').on('click', function () {
+
+                  if (!grid.hasModifyed()) {
+                      NGMsg.Info("单据并无更新,无需保存!");
+                      return;
+                  }
+
+                  var vg = grid.isValid();
+
+                  if (!vg) {
+                      return;
+                  }
+
+                  if (!checkData()) {
+                      return;
+                  }
+
+                  var griddata = grid.getChange();
+
+                  ngToolbar.get("save").disable();//禁用保存按钮
+                  var myMask = new Ext.LoadMask(document.body, { msg: "单据正在保存中,请稍候..." });
+                  myMask.show();//锁屏
+                  Ext.Ajax.request({
+                      params: { 'griddata': griddata },
+                      url: '@Url.Content("~/SUP/IndividualProperty/Save")',
+                      success: function (response) {
+                          var resp = Ext.JSON.decode(response.responseText);
+                          if (resp.Status === "success") {
+                              //store.commitChanges();
+                              store.load();                            
+
+                              NGMsg.Info('保存成功');
+                          } else {
+                              NGMsg.Error('保存失败:' + resp.Msg);
+                          }
+                          myMask.hide();//停止锁屏
+                          ngToolbar.get("save").enable();//保存失败，保存按钮设置为可用
+                      }
+                  });
+
+              });
+
+              function checkData() {
+
+                  var store = grid.store;
+                  var newRecords = store.getNewRecords(); //获得新增行
+                  var modifyRecords = store.getUpdatedRecords(); // 获取修改的行的数据，无法获取幻影数据
+
+                  for (var i = 0; i < modifyRecords.length; i++) {
+
+                      newRecords.push(modifyRecords[i]);
+                  }
+
+                  var count = 0;
+                  var flag = true;
+                  Ext.Array.each(store.data.items, function (record) {
+
+                      count++;
+                      var newobj = record.data;
+
+                      if (Ext.isEmpty(newobj['c_name'])) {
+                          Ext.create('Ext.ng.MessageBox').Error('第' + count + '行,字段全名不能为空!');
+                          return false;
+                      }
+
+                      var fieldtype = newobj['c_type'];
+                      if (fieldtype === '02') {
+
+                          if (Ext.isEmpty(record.data['collen'])) {
+                              Ext.create('Ext.ng.MessageBox').Error('第' + count + '行，varchar类型,字段长度不能为空!');
+                              grid.plugins[0].startEdit(7, count);
+                              flag = false;
+                          }
+                      }
+                      if (fieldtype === '09') {
+
+                          if (Ext.isEmpty(record.data['collen'])) {
+                              Ext.create('Ext.ng.MessageBox').Error('第' + count + '行，Text类型,字段长度不能为空!');
+                              grid.plugins[0].startEdit(7, count);
+                              flag = false;
+                          }
+                      }
+                      if (fieldtype === '06') {
+
+                          if (Ext.isEmpty(record.data['collen'])) {
+                              Ext.create('Ext.ng.MessageBox').Error('第' + count + '行,numeric类型,字段长度不能为空!');
+                              grid.plugins[0].startEdit(7, count);
+                              flag = false;
+                          }
+                          if (Ext.isEmpty(record.data['declen'])) {
+                              Ext.create('Ext.ng.MessageBox').Error('第' + count + '行,numeric类型,小数点位数不能为空!');
+                              grid.plugins[0].startEdit(8, count);
+                              flag = false;
+                          }
+
+                          if (!Ext.isEmpty(record.data['collen']) && !Ext.isEmpty(record.data['declen'])) {
+
+                              if (parseInt(record.data['collen']) < parseInt(record.data['declen'])) {
+                                  Ext.create('Ext.ng.MessageBox').Error('第' + count + '行,numeric类型,小数点位数(精度)不能超过字段长度!');
+                                  grid.plugins[0].startEdit(8, count);
+                                  flag = false;
+                              }
+
+                              if (parseInt(record.data['collen']) > 38) {
+                                  NGMsg.Error('第' + count + '行,numeric类型,字段长度不能超过38!');
+                                  grid.plugins[0].startEdit(8, count);
+                                  flag = false;
+                              }
+                          }
+                      }
+
+                  });
+
+                  return flag;
+
+              }
+
+              ngToolbar.get('uisetting').on('click', function () {
+                  $OpenTab('字段UI设置', '@Url.Content("~/")' + 'SUP/Designer/IndividualPropertyUIEdit?bustype=' + bustype + '&busname=' + busname + '&tname=' + tname + '&otype=' + $Otype.EDIT);
+              });
+
+          })
+
+      </script>
+}

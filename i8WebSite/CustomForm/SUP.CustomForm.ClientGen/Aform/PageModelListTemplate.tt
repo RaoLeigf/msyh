@@ -1,0 +1,12 @@
+﻿Ext.define('Aform.model.List', {
+    extend: 'Ext.data.Model',
+    config: {
+        fields: [
+                    {
+                        name: '<#= PkPropertyname #>',
+						type: 'string'
+                    },
+                    <#= Common.GetPageModelFieldsApp(gridPanel, 5) #>
+                ]
+    }
+});

@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_orgrelatitem">
+      <Field Name="relatid" IsKey="true"/>
+      <Field Name="ocode" IsKey="true"/>
+      <Field Name="relid" IsKey="true" />
+      <Field Name="parentorg"  />
+      <Field Name="relatindex"  />
+      <Field Name="ordertype"  />
+      <Field Name="isloadeddept"  format="0" />
+      <Field Name="isdept" format="0" />
+    </Table>
+    <Table Name="fg_orglist" >
+      <Field Name="oname" AsName="oname"/>
+    </Table>
+    <Table Name="fg_orgrelat" >
+      <Field Name="relatid" AsName="relatid2"/>
+      <Field Name="attrcode" AsName="attrcode"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join fg_orglist on fg_orglist.ocode = [table].ocode
+      left join fg_orgrelat on fg_orgrelat.relatid = [table].relatid
+      [where] [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="relatid" Target="Client" Value="relatid" />
+      <Exp Field="parentorg" Target="Client" value="parentorg"/>
+      <Exp Field="relatindex" Oper="LikeRight" Target="Client" value="relatindex"/>
+      <Exp Field="fg_orgrelat.attrcode"   paramName="attrcode" Target="Client" value="attrcode"/>      
+    </Query>
+    <OrderBy format="{relatid},{relatindex}">
+      <Exp Field="relatid" value="asc"/>
+      <Exp Field="relatindex" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="relatid"  Target="Client" Value="relatid" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>       
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>        
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <!--
+  select fg_orgrelatitem.*,fg_orglist.oname
+  from fg_orgrelatitem
+  left join fg_orgrelat on fg_orgrelat.relatid = fg_orgrelatitem.relatid
+  left join fg_orglist on fg_orglist.ocode = fg_orgrelatitem.ocode
+  where fg_orgrelat.attrcode = 'lg'
+  -->
+
+</DataService>
+
+

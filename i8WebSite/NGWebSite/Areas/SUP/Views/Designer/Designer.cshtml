@@ -1,0 +1,1716 @@
+﻿@{    
+    Layout = "~/Views/Shared/_AceLayout.cshtml";
+}
+@section script
+{
+    <style type="text/css">
+        .x-grid-group-hd
+        {
+            padding-top: 4px !important;
+        }
+    </style>
+    <script src="~/NG3Resource/extjs/ux/aceeditor/ace-0.2.0/src/ace.js" type="text/javascript" charset='utf-8'></script>
+    <script src="~/NG3Resource/js/SUP/Designer/Designer.js" type="text/javascript" charset='utf-8'></script>    
+
+<script src=@Url.Script("~/NG3Resource/js/help/CBSHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/WBSHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/ItemDataHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/PCHelp.js") type="text/javascript" charset="utf-8"></script>
+
+<script src=@Url.Script("~/NG3Resource/js/help/CntHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/help/BoqHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/WM/WMHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@Url.Script("~/NG3Resource/js/PMS/PMS/PC/LbHelp.js") type="text/javascript" charset="utf-8"></script>
+<script src=@ViewBag.GcHelpInUrl type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript" src=@ViewBag.srciptUrl></script>
+    <script type="text/javascript">
+                
+
+        var id = '@ViewBag.id';
+        var busType = '@ViewBag.busType';
+        var info = Ext.htmlDecode('@ViewBag.individualInfo');
+
+
+        Ext.onReady(function () {
+
+            document.oncontextmenu = function (e) { return false; }
+
+            //自定义信息主体结构
+            var individualInfo = { formPanel: [],
+                fieldSetFormPanel: [],
+                gridPanel: [],
+                tabPanel: []
+            };
+
+            var temp;
+            //自定义信息初始化
+            if (info.length > 0) {
+                temp = Ext.decode(info); //自定义对象
+                //individualInfo.formPanel.length = 0; //清空数组
+                //individualInfo.gridPanel.length = 0; //清空数组
+            }
+            else {
+                temp = individualConfigInfo; //从插件获取，插件中定义了这个变量
+            }
+
+            //初始化form
+            for (var panelInfo in temp.form) {
+                if (panelInfo) {
+                    var form = temp.form[panelInfo];
+                    form.plugins = new Ext.ux.dd.PanelFieldDragZone({
+                        ddGroup: "designContainer-dd"//temp.form[panelInfo].id + "ddGroup"
+                    });
+                    form.otype = 'view';
+                    if (!form.labelWidth) {
+                        form.labelWidth = 80;
+                    }
+                    var p = Ext.create('Ext.ng.TableLayoutForm', form);
+                    individualInfo.formPanel.push(p);
+                }
+            }
+
+            //初始化fieldSetForm
+            for (var panelInfo in temp.fieldSetForm) {
+                var form = temp.fieldSetForm[panelInfo];
+                form.plugins = new Ext.ux.dd.PanelFieldDragZone({
+                    ddGroup: "designContainer-dd"
+                });
+                form.otype = 'view';
+                //处理labelWidth
+                if (!form.labelWidth) {
+                    form.labelWidth = 80;
+                }
+                for (var i = 0; i < form.fieldSets.length; i++) {
+                    var fieldSet = form.fieldSets[i];
+                    if (!fieldSet.labelWidth) {
+                        fieldSet.labelWidth = 80;
+                    }
+                }
+                var p = Ext.create('Ext.ng.FieldSetForm', form);
+                individualInfo.fieldSetFormPanel.push(p);
+            }
+
+            //加载grid
+            for (var gridInfo in temp.grid) {
+                if (gridInfo) {
+
+                    var gridConfig = temp.grid[gridInfo];
+                    for (var i = 0; i < gridConfig.columns.length; i++) {
+                        var col = gridConfig.columns[i];
+                        var renderer = col.renderer;
+                        if (renderer && Ext.isString(renderer)) {
+                            col.renderer = Ext.decode(renderer); //字符串转成Function对象
+                        }
+
+                        if (col.locked) {//存在锁定列，移除,保存时再赋值回去，锁定列影响设计器
+                            col.userLocked = true;
+                            delete col.locked;
+                        }
+                    }
+                    gridConfig.otype = 'view';
+                    individualInfo.gridPanel.push(Ext.create('Ext.ng.GridPanel', gridConfig))
+                }
+            }
+
+            //加载tabpanel
+            for (var index in temp.tabPanel) {
+                if (index) {
+
+                    var tabConfig = temp.tabPanel[index];
+                    var p = Ext.create('Ext.tab.Panel', tabConfig);
+                    individualInfo.tabPanel.push(p);
+                }
+            }
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: "EmpinfoList", //权限名称
+                ngbuttons: ['save', { id: "toolbox", text: "工具箱", width: this.itemWidth, iconCls: "icon-Assign" },                                          
+                                 '->', 'close']
+                });
+
+            Ext.define('XtypeModel', {
+                extend: 'Ext.data.Model',
+                fields: [{ name: 'value', type: 'String' }, { name: 'text', type: 'String'}],
+                idProperty: 'value'
+            })
+
+            Ext.define('Ext.ng.PropertyCombo', {
+                extend: 'Ext.form.field.ComboBox',
+                valueField: 'value',
+                displayField: 'text',
+                editable: false,
+                queryMode: 'local',
+                selectOnFocus: true
+            })
+
+            var xtypeStore = Ext.create('Ext.data.Store', {
+                model: 'XtypeModel',
+                data: [{ value: 'ngCommonHelp', text: '帮助' },{ value: 'ngRichHelp', text: '帮助' },{ value: 'ngComboBox', text: '下拉' },
+                    { value: 'ngText', text: '单行文本' }, { value: 'ngTextArea', text: '多行文本' },
+                    { value: 'ngNumber', text: '数字' }, { value: 'ngDate', text: '日期' },
+                    { value: 'ngDateTime', text: '时间' }, { value: 'fieldset', text: '分组框' }//,
+                //{ value: 'ngRadio', text: '单选'}
+                    ]
+            });
+
+            //控件类型
+            var xtypeCombo = Ext.create('Ext.ng.PropertyCombo', {
+                store: xtypeStore
+            });
+            
+            //editor
+            var columnEditor = Ext.create('Ext.ng.ColumnEditorTrigger', {
+                editable: false
+            });
+         
+            var columnRender = Ext.create('Ext.ng.RendererTrigger', {
+                editable: false
+            });
+
+            var toolboxTreeStore = Ext.create('Ext.data.TreeStore', {
+                fields: [{ name: 'text', type: 'string' },
+                          { name: 'from', type: 'string' }, //控件来源标记                                             
+                          {name: 'control', type: Object }
+               ],
+                root: {
+                    text: 'Form Fields',
+                    id: 'formfields',
+                    //expanded: true,
+                    children: [{
+                        text: "Text",
+                        from: 'toolbox',
+                        control: designInfo.ngText,
+                        leaf: true
+                    }, {
+                        text: "TextArea",
+                        from: 'toolbox',
+                        control: designInfo.ngTextArea,
+                        leaf: true
+                    }, {
+                        text: "Date",
+                        from: 'toolbox',
+                        control: designInfo.ngDate,
+                        leaf: true
+                    }, {
+                        text: "DateTime",
+                        from: 'toolbox',
+                        control: designInfo.ngDateTime,
+                        leaf: true
+                    }, {
+                        text: "Number",
+                        from: 'toolbox',
+                        control: designInfo.ngNumber,
+                        leaf: true
+                    }, {
+                        text: "ComboBox",
+                        from: 'toolbox',
+                        control: designInfo.ngComboBox,
+                        leaf: true
+                    }, {
+                        text: "CommonHelp",
+                        from: 'toolbox',
+                        control: designInfo.ngCommonHelp,
+                        leaf: true
+                    }, {
+                        text: "Radio",
+                        from: 'toolbox',
+                        control: designInfo.ngRadio,
+                        aa: 'bb',
+                        leaf: true
+                    }, {
+                        text: "Checkbox",
+                        from: 'toolbox',
+                        control: designInfo.ngCheckbox,
+                        aa: 'bb',
+                        leaf: true
+                    }]
+                }//,
+                //               folderSort: true,
+                //               sorters: [{
+                //                   property: 'text',
+                //                   direction: 'ASC'
+                //               }]
+            });
+
+            var toolboxTree = Ext.create('Ext.tree.TreePanel',{
+                    id: "toolBoxTree",
+                    store: toolboxTreeStore,                   
+                    title: "基本控件",
+                    autoScroll: true,
+                    enableTabScroll: true,
+                    collapsible: true,
+                    split: true,
+                    rootVisible: false,
+                    lines: true,                    
+                    useArrows: true,
+                    draggable: true,
+                    loadMask: { msg: '正在加载数据，请稍侯...' },
+                    width: 120,
+                    minSize: 100,
+                    maxSize: 220,
+                    viewConfig: {
+                        plugins: {
+                            ptype: 'treeviewdragdrop',
+                            ddGroup: 'designContainer-dd',
+                            copy: true, //只拷贝不移除
+                            dropGroup: 'other'//防止在本树内产生拖动复制
+                            //dragGroup:'trashDrag'
+                            //dragText:'you are dragged'
+                        },
+                        copy: true //只拷贝不移除
+                    },
+                    listeners: {
+                        //            itemclick: function (view, re) {
+                        //                alert("itemclick");
+                        //            },
+                        //                        itemdblclick: function (view, node) {
+                        //                            alert("itemdbclick");
+                        //                        }
+                    }
+
+                });
+
+            //自定义字段
+            var individaulFieldTree = Ext.create('Ext.ng.TreePanel', {
+                region: 'east',
+                title: '自定义字段',
+                collapsed: false,
+                treeFields: [{ name: 'text', type: 'string' },
+                { name: 'from', type: 'string' },
+                { name: 'container_uitype', type: 'string' }, //控件UI类型 
+                { name: 'control', type: Object },
+                { name: 'listColumnInfo', type: Object }
+                ],
+                url: C_ROOT + 'SUP/IndividualProperty/GetIndividualFieldTree?bustype=' + busType,
+                viewConfig: {
+                    plugins: {
+                        ptype: 'treeviewdragdrop',
+                        ddGroup: 'designContainer-dd',
+                        copy: true, //只拷贝不移除
+                        dropGroup: 'other'//防止在本树内产生拖动复制
+                    },
+                    copy: true //防止被移除
+                },
+                listeners: {
+                    'afterrender': function () {
+                        this.expandAll();
+                    }
+                }
+            });
+
+            var accordion = Ext.create('Ext.Panel', {
+                title: '工具箱',
+                collapsible: true,
+                region: 'west',
+                margins: '5 0 5 5',
+                split: true,
+                hidden: true,
+                width: 210,
+                layout: 'accordion',
+                items: [individaulFieldTree]
+            });
+
+            var treeStore = Ext.create('Ext.data.TreeStore', {
+                autoLoad: false,
+                fields: [{ name: 'text', type: 'string' },
+                           { name: 'topContainerID', type: 'string' },
+                          { name: 'nodetype', type: Object }, //我的自定义属性,节点类型(form,grid,fieldsetform)
+                          { name: 'from', type: Object }, //我的自定义属性,节点来自devdefine(开发员定义),toolbox（工具箱）                         
+                          { name: 'control', type: Object },//控件的配置信息
+                          { name: 'isBillList', type: Boolean }
+                          
+               ]
+            });
+
+            var componentTree = Ext.create('Ext.tree.TreePanel',
+                {
+                    region: "center",
+                    id: "componentTree",
+                    store: treeStore,
+                    title: "组件布局结构树",
+                    autoScroll: true,
+                    enableTabScroll: true,
+                    //collapsible: true,
+                    collapsed: false,
+                    split: true,
+                    rootVisible: false,
+                    lines: true,
+                    useArrows: true,                    
+                    width: 220,
+                    minSize: 220,
+                    maxSize: 220,
+                    minWidth: 200,                  
+                    viewConfig: {
+                        plugins: { ptype: 'treeviewdragdrop' },
+                        listeners: {
+                            beforedrop: function (nodeEl, data, overModel) {
+
+                                //alert('beforedrop');
+
+                                var from = data.records[0].data['from']; //控件来源
+
+                                if ('toolbox' != from) {
+
+                                    if (data.records[0].data.nodetype === 'fieldsetform') {
+
+                                        if (data.records[0].parentNode.parentNode != overModel.parentNode.parentNode) {
+                                            return false; //不能移出父节点之外
+                                        }
+
+                                    }
+                                    else {
+                                        if (data.records[0].parentNode != overModel.parentNode) {
+                                            return false; //不能移出父节点之外
+                                        }
+                                    }
+                                }
+                                else {
+                                    var pid = data.records[0].parentNode.data['id'];
+                                    if (pid != 'formfields') {//非工具箱里的
+
+                                        //if (pid != overModel.parentNode.data.control.initialConfig.bindtable) {
+                                        if (overModel.parentNode.data.control.initialConfig.bindtable.indexOf(pid) < 0) {
+                                            return false;
+                                        }
+                                    }
+                                }
+
+
+                            },
+                            drop: function (node, data, overModel, dropPostion, eOpts) {                               
+
+                                //data.records[0].data['from'] = 'fromtoolbox'; //改一下、控件来源
+
+                                //RefreshForm(data.records[0].parentNode); //重排布局
+                                RefreshForm(true);
+                            }
+                        }
+                    }
+
+                });
+
+            //#region 创建propGrid--分组
+            Ext.define('propModel', {
+                extend: 'Ext.data.Model',
+                fields: ["group", "name", "value"],
+                idProperty: 'name'
+            })
+
+            var propStore = Ext.create("Ext.data.Store", {
+                model: "propModel",
+                groupField: "group",
+                data: []
+            });
+
+            var propGroups = { nullGroup: "其他",
+                xtype: "基本项", id: "基本项", otype: "基本项", hidden: "关键项", bindtable: "基本项", buskey: "基本项", region: "基本项", RunReadOnly: "关键项",
+                itemId: "基本项", from: "基本项", emptyText: '关键项', fieldLabel: "关键项", labelWidth: "关键项", name: "基本项", mustInput: "关键项", maxLength: "关键项",
+                dataIndex: "关键项", header: '关键项', columnsPerRow: "样式", colspan: "关键项", style: "样式", columnLines: "杂项", minWidth: "杂项",
+                collapsible: "杂项", title: "关键项"
+            };
+
+            var propGrid = Ext.create("Ext.grid.property.Grid", {
+                region: 'south',
+                columnLines: true,
+                forceFit: true,
+                title: '属性',
+                split: true,
+                height: 400,
+                width: 300,
+                collapsible: true,
+                //bodyStyle: 'padding-right:8px',
+                viewConfig: {
+                    enableTextSelection: true
+                },
+                store: propStore,
+                features: [{ ftype: "grouping", groupHeaderTpl: "{name}"}],
+                customEditors: {
+                    xtype: xtypeCombo,
+                    editor: columnEditor,
+                    renderer: columnRender,
+                    colspan: { xtype: 'numberfield', minValue: 1 },
+                    columnsPerRow: { xtype: 'numberfield', minValue: 1 },
+                    maxLength: { xtype: 'numberfield', minValue: 1 },
+                },
+                customRenderers: {
+                    xtype: function (v) {
+                        var combValue = xtypeStore.getById(v);
+                        return combValue ? combValue.get('text') : v;
+                    },
+                    editor: function (v) {
+                        return v;
+                    },
+                    render: function (v) {
+                        return v;
+                    }
+                },
+                propertyNames: {
+                },
+                SetPropStore: function (initConfig) {
+
+                    delete initConfig.readOnly;//不显示readOnly
+                    delete initConfig.otype;
+
+                    if (initConfig) {
+                        propGrid.source = initConfig;
+                        var tmpdata = [], group, value;
+                        for (var name in initConfig) {
+                            value = initConfig[name];
+                            if (typeof value != "object") {
+                                group = propGroups[name] || propGroups.nullGroup;
+                                tmpdata.push([group, name, value]);
+                            }
+                        }
+                        var data = propGrid.getSelectionModel().getSelection();
+                        var selectData = data.length > 0 ? data[0].data : null;
+                        propGrid.store.idProperty = "name";
+                        propGrid.store.loadData(tmpdata);
+                        if (selectData) { //设置上次的选中状态
+                            var all = propGrid.store.getRange();
+                            for (var i = 0; i < all.length; i++) {
+                                if (all[i].data.group == selectData.group && all[i].data.name == selectData.name) {
+                                    propGrid.getSelectionModel().select(all[i]);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                },
+                getColumn: function (colname) {
+                    var me = this;
+                    var obj;
+                    for (var i = 0; i < me.columns.length; i++) {
+                        if (colname === me.columns[i].dataIndex) {
+                            obj = me.columns[i]; break
+                        }
+                    }
+
+                    return obj;
+                }
+            });
+            //#endregion
+
+
+            var eastPanel = Ext.create('Ext.panel.Panel', {
+                id: 'eastpanel',
+                width: 240,
+                region: 'east',
+                minWidth: 150,
+                //maxWidth: 250,
+                split: true,
+                margins: '0',
+                layout: 'border',
+                border: false,
+                items: [componentTree, propGrid]
+            })
+
+            var designContainer = Ext.create('Ext.panel.Panel', {
+                id: 'designContainer',
+                region: 'center',
+                layout: 'card',
+                activeItem: 0,
+                border: false,
+                items: []
+            });
+
+            function AddItemToDesignPanel() {
+                for (var i = 0; i < individualInfo.formPanel.length; i++) {
+                    designContainer.add(individualInfo.formPanel[i]);
+                }
+
+                for (var i = 0; i < individualInfo.fieldSetFormPanel.length; i++) {
+                    designContainer.add(individualInfo.fieldSetFormPanel[i]);
+                }
+
+                if (individualInfo.gridPanel) {
+                    for (var i = 0; i < individualInfo.gridPanel.length; i++) {
+                        designContainer.add(individualInfo.gridPanel[i]);
+                    }
+                }
+            };
+
+            AddItemToDesignPanel();
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, designContainer, accordion, eastPanel]
+            });
+
+            //属性名称转换
+            propGrid.getColumn('name').renderer = function (val) {
+
+                var name = PropertyName[val];
+                if (name) {
+
+                    if (val === 'fieldLabel' || val === 'mustInput' || val === 'RunReadOnly' || val === 'hidden' ||
+                   val === 'boxLabel' || val === 'columnsPerRow' || val === 'title' || val === 'header' ||
+                   val === 'width' || val === 'colspan' || val === 'decimalSeparator' || val === 'matchFieldWidth' ||
+                   val === 'editor' || val === 'renderer' || val === 'labelWidth' || val === 'emptyText') {
+                        return '<font color="blue">' + name + ' </font>';
+                    } else {
+                        return name;
+                    }
+                }
+                else {
+                    return val;
+                }
+            };
+
+            function InitDDrop() {
+                var form = designContainer.getLayout().getActiveItem();
+                var body = form.body;
+                if (!form.formFieldDropTarget) {
+                    form.formFieldDropTarget = new Ext.dd.DropTarget(body, {
+                        ddGroup: "designContainer-dd",
+                        notifyEnter: function (ddSource, e, data) {
+                            if (!data.moveField) {  //增加控件
+                                body.stopAnimation();
+                                body.highlight();
+                            }
+                        },
+                        notifyDrop: function (ddSource, e, data) {
+                            var panel = designContainer.getLayout().getActiveItem();
+                            var topNode = GetCurrParentTreeNode(panel.id);
+                            var isBillList = panel.isBillList;//("billList" === panel.id);//是单据列表
+                            if (!data.moveField) {  //增加控件
+                                var node = data.records[0];//工具箱的自定义字段节点
+                                if (node.data.parentId != "formfields") {  //非基本控件
+                                    var fieldName = node.data.text;
+
+                                    if (!isBillList) {//单据列表不校验容器类型
+                                        //控件ui类型和拖入的容器的类型比较
+                                        if (node.data.container_uitype === 'formpanel' && topNode.data.nodetype === "grid") {
+                                            NGMsg.Warn('容器[' + topNode.data.text + ']为grid,字段[' + fieldName + ']的容器类型为form,请重新设置字段容器类型！', 20);
+                                            return false;
+                                        }
+                                        if (node.data.container_uitype === 'gridpanel' && ('fieldsetform' === topNode.data.nodetype || topNode.data.nodetype === "form")) {
+                                            NGMsg.Warn('容器[' + topNode.data.text + ']为form,字段[' + fieldName + ']的容器类型为grid,请重新设置字段容器类型！', 20);
+                                            return false;
+                                        }
+                                    }
+                                    if (!topNode.data.control.bindtable) {
+                                        NGMsg.Warn('容器[' + topNode.data.text + ']的bindtable属性未设置,请维护js模板文件!', 20);
+                                        return false;
+                                    }
+                                    //if (node.data.parentId != topNode.data.control.bindtable) { //自定义字段只能拖到对应的业务表
+                                    if (topNode.data.control.bindtable.indexOf(node.data.parentId) < 0) {
+                                        NGMsg.Warn('容器绑定的表名为[' + topNode.data.control.bindtable + '],而字段[' + fieldName + ']所在表名为[' + node.data.parentId + ']', 20);
+                                        return false;
+                                    }
+                                    if (topNode.data.nodetype === "form" && panel.query("[name='" + node.data.control.name + "']").length > 0) { //已经存在的项不允许重复拖入
+                                        NGMsg.Warn('容器[' + topNode.data.text + ']已经存在字段[' + fieldName + '],不允许重复添加!', 20);
+                                        return false;
+                                    }
+                                    if (topNode.data.nodetype === "fieldsetform" && panel.query("[name='" + node.data.control.name + "']").length > 0) { //已经存在的项不允许重复拖入
+                                        NGMsg.Warn('容器[' + topNode.data.text + ']已经存在字段[' + fieldName + '],不允许重复添加!', 20);
+                                        return false;
+                                    }
+                                    if (isBillList) {
+                                        var fieldName = node.data.control.name || node.data.control.dataIndex;
+                                        if (topNode.data.nodetype === "grid" && panel.query("[dataIndex='" + fieldName + "']").length > 0) { //已经存在的列不允许重复拖入                                         
+                                            NGMsg.Warn('容器[' + topNode.data.text + ']已经存在字段[' + fieldName + '],不允许重复添加!', 20);
+                                            return false;
+                                        }
+                                    }
+                                    else {
+                                        if (topNode.data.nodetype === "grid" && panel.query("[dataIndex='" + node.data.control.dataIndex + "']").length > 0) { //已经存在的列不允许重复拖入
+                                            //if (topNode.data.nodetype === "grid" && panel.query("[dataIndex='" + node.data.control.name + "']").length > 0) { //已经存在的列不允许重复拖入
+                                            NGMsg.Warn('容器[' + topNode.data.text + ']已经存在字段[' + fieldName + '],不允许重复添加!', 20);
+                                            return false;
+                                        }
+                                    }
+                                }
+                                var newobj = Ext.clone(node.data);
+                                if (isBillList && node.data.container_uitype === 'formpanel'){//从formpanel给单据列表拖动字段                                
+                                    newobj.control = newobj.listColumnInfo;//替换列信息
+                                }
+                                newobj.from = 'fromtoolbox';
+                                newobj.control.from = "fromtoolbox";
+                                if (node.data.parentId === "formfields") {  //基本控件
+                                    if (topNode.data.nodetype === "grid") {
+                                        var N = panel.query("[from='fromtoolbox']").length + 1;
+                                        newobj.text += N;
+                                        newobj.control = {
+                                            header: newobj.text, flex: 1, sortable: true, mustInput: false, dataIndex: "",
+                                            editor: { xtype: newobj.control.xtype, allowBlank: true }, from: "fromtoolbox"
+                                        };
+                                    }
+                                    else {
+                                        var N = panel.query(newobj.control.xtype + "[name][from='fromtoolbox']").length + 1;
+                                        newobj.text += N;
+                                        newobj.control.name += N;
+                                        newobj.control.fieldLabel += N;
+                                    }
+                                }
+                                var currNode = GetDropAreaOnTree(e, topNode);
+                                if (!currNode) { return false; }
+                                newobj.topContainerID = panel.id;
+                                var NodeN = currNode.childNodes.length;
+                                currNode.insertChild(NodeN, newobj);
+                                
+                                //richhelp和combox双列处理
+                                if (isBillList) {
+
+                                    if (newobj.control.helpid && newobj.control.dataIndex.endsWith("_name")) {
+                                        var dataIndex = newobj.control.dataIndex.substring(0, newobj.control.dataIndex.length - 5);
+                                        var valColumnObj = Ext.clone(newobj); //Ext.clone(node.data);
+                                        valColumnObj.from = 'fromtoolbox';
+                                        valColumnObj.id += "_id";
+                                        var header = valColumnObj.control.header || valColumnObj.control.name;
+                                        valColumnObj.text = header + "_id";
+                                        valColumnObj.control.from = "fromtoolbox";
+
+                                        valColumnObj.control.dataIndex = dataIndex;//去掉_name
+                                        valColumnObj.control.hidden = true;
+                                        valColumnObj.control.header += "_id";
+                                        valColumnObj.topContainerID = panel.id;
+                                        delete valColumnObj.control.editor;//editor
+
+                                        var NodeN = currNode.childNodes.length;
+                                        currNode.insertChild(NodeN, valColumnObj);
+                                    }
+                                }
+                                else {
+                                    if (topNode.data.nodetype === "grid" && !Ext.isEmpty(newobj.control.editor.helpid)) {
+                                        if (newobj.control.dataIndex.endsWith("_name")) {
+                                            var dataIndex = newobj.control.dataIndex.substring(0, newobj.control.dataIndex.length - 5);
+                                            var valColumnObj = Ext.clone(node.data);
+                                            valColumnObj.from = 'fromtoolbox';
+                                            valColumnObj.id += "_id";
+                                            valColumnObj.text = valColumnObj.control.header + "_id";
+                                            valColumnObj.control.from = "fromtoolbox";
+
+                                            valColumnObj.control.dataIndex = dataIndex;//去掉_name
+                                            valColumnObj.control.hidden = true;
+                                            valColumnObj.control.header += "_id";
+                                            valColumnObj.topContainerID = panel.id;
+                                            delete valColumnObj.control.editor;//editor
+
+                                            var NodeN = currNode.childNodes.length;
+                                            currNode.insertChild(NodeN, valColumnObj);
+
+                                        }
+                                    }
+                                }
+
+                                //RefreshForm(currNode, panel); //重排布局
+                                RefreshForm(true);
+                                body.LastDiv = topNode.data.nodetype === "grid" ? GetCurrField(panel, NodeN) : panel.query("[name='" + newobj.control.name + "']")[0].el;
+                                SelectedFieldToEdit(currNode.childNodes[NodeN], body.LastDiv, true, topNode.data.nodetype === "grid");
+                                return true;
+                            }
+                            else {   //移动控件
+                                e.canDroped = true;
+                                var field, targetEl = e.getTarget(data.pos == "left" ? 'label' : '', null, true);
+                                if (targetEl) {
+                                    targetEl = targetEl.up("." + Ext.form.Labelable.prototype.formItemCls);
+                                    if (targetEl && targetEl.id) {
+                                        field = Ext.getCmp(targetEl.id);
+                                    }
+                                }
+                                if (field) {
+                                    var currNode = GetDropAreaOnTree(e, topNode);
+                                    var dropNode = FindTreeNode(currNode, field);
+                                    var dragNode = FindTreeNode(topNode, data.field);
+                                    if (dragNode == dropNode) { return false; } //无拖动
+                                    var dorpIndex = currNode.indexOf(dropNode);
+                                    if (data.pos != "left") { //向后插入
+                                        dorpIndex = dorpIndex + 1;
+                                    }
+                                    currNode.insertChild(dorpIndex, dragNode);
+                                    //RefreshForm(currNode); //重排布局
+                                    RefreshForm(true);
+                                    body.LastDiv = panel.query("[name='" + dragNode.data.control.name + "']")[0].el;
+                                    SelectedFieldToEdit(dragNode, body.LastDiv, true, false);
+                                    return true;
+                                }
+                                return false;
+                            }
+                        }
+                    });
+                    body.on('mousedown', function (e) {
+                        if (propGrid.isEditing) { //propGrid正在编辑时，不需要重新定位树节点
+                            return false;
+                        }
+                        var panel = designContainer.getLayout().getActiveItem();
+                        var topNode = GetCurrParentTreeNode(panel.id);
+                        if (this.LastDiv && this.LastDiv.dom) {
+                            SelectedFieldToEdit(null, this.LastDiv, false, topNode.data.nodetype === "grid");
+                        }
+                        var targetEl = e.getTarget('', null, true), field, unSelected = true;
+                        if (targetEl) {
+                            var targetEl = targetEl.up('.' + Ext.form.Labelable.prototype.formItemCls);
+                            if (targetEl && targetEl.id) {
+                                this.LastDiv = targetEl;;
+                                field = Ext.getCmp(targetEl.id);
+                                SelectedFieldToEdit(FindTreeNode(topNode, field), this.LastDiv, true, false);
+                                unSelected = false;
+                            }
+                        }
+                        if (unSelected) {
+                            SelectedFieldToEdit(GetDropAreaOnTree(e, topNode, true));
+                        }
+                        return false;
+                    });
+                }
+            }
+
+            function GetCurrField(panel, nodeIndex) {
+                return panel.query("[from]")[nodeIndex].el;
+            }
+
+            function SelectedFieldToEdit(treeNode, doDiv, tf, isGrid) {
+                selectNode = treeNode;//当组件树前选中的节点
+                if (treeNode) {
+                    curnodeType = treeNode.data['control'].from;
+                    componentTree.getView().select(treeNode);
+                    RefreshPropGrid(treeNode,false);
+                }
+                if (!doDiv) { return; }
+                if (isGrid) {
+                    doDiv.setStyle({ "borderStyle": (tf ? "dashed" : ""), "borderWidth": "1px" });
+                }
+                else {
+                    doDiv = doDiv.up("");
+                    if (doDiv) {
+                        doDiv.setStyle({ "border": (tf ? "1px dashed gray" : "0px") });
+                    }
+                }
+            }
+
+            InitDDrop();
+
+            //鼠标操作区域对应的树节点
+            function GetDropAreaOnTree(e, topNode, unDrag) {
+                switch (topNode.data.nodetype) {
+                    case "fieldsetform":
+                        var targEl = e.getTarget('', null, true).up("." + Ext.form.FieldSet.prototype.baseCls);
+                        if (targEl && targEl.id) {
+                            var FieldSetItems = topNode.data.control.items.items;
+                            for (var i = 0; i < FieldSetItems.length; i++) {
+                                if (FieldSetItems[i].id === targEl.id) {
+                                    return topNode.childNodes[i];
+                                }
+                            }
+                        }
+                        else {
+                            return unDrag ? topNode : topNode.childNodes[topNode.childNodes.length - 1];
+                        }
+                    default:
+                        return topNode;
+                }
+            }
+
+            //获取当前激活的panel对应的tree节点
+            function GetCurrParentTreeNode(cid) {
+                var pNodes = componentTree.getRootNode().childNodes;
+                for (var i = 0; i < pNodes.length; i++) {
+                    if (pNodes[i].data.control.id === cid) {
+                        return pNodes[i];
+                    }
+                }
+            }
+
+            //通过字段查找树节点
+            function FindTreeNode(topNode, field) {
+                var childNodes = topNode.childNodes;
+                for (var i = 0; i < childNodes.length; i++) {
+                    var child = childNodes[i];
+                    if (child.data.control && child.data.control.xtype === field.xtype && child.data.control.fieldLabel === field.fieldLabel && child.data.control.name === field.name) {
+                        return childNodes[i];
+                    }
+                    else if (child.childNodes) {
+                        var tmpNode = FindTreeNode(child, field);
+                        if (tmpNode) { return tmpNode; }
+                    }
+                }
+                return null;
+            }
+            
+            //通过id查找树节点
+            function FindTreeNodeById(topNode, id) {
+                var childNodes = topNode.childNodes;
+                for (var i = 0; i < childNodes.length; i++) {
+                    var child = childNodes[i];
+                    if (child.data.control.id === id) {
+                        return child;
+                    }
+                    else if (child.childNodes) {
+                        var tmpNode = FindTreeNodeById(child, id);
+                        if (tmpNode) { return tmpNode; }
+                    }
+                }
+            }
+
+            //构建组件布局结构树
+            function BuildComTree() {
+                //处理formpanel
+                if (individualInfo.formPanel) {
+                    for (var i = 0; i < individualInfo.formPanel.length; i++) {
+
+                        var panel = individualInfo.formPanel[i];
+
+                        var children = [];
+                        for (var j = 0; j < panel.fields.length; j++) {
+
+                            //readonly和设计时冲突，用RunReadOnly替换，保存时再赋值回去
+                            if (panel.fields[j].readOnly) {
+                                panel.fields[j].RunReadOnly = panel.fields[j].readOnly;
+                                delete panel.fields[j].readOnly;
+                            }
+                            var newobj = {
+                                //id: panel.fields[j].name,
+                                text: panel.fields[j].fieldLabel || panel.fields[j].boxLabel,
+                                leaf: true,
+                                topContainerID: panel.id,
+                                nodetype: 'form',
+                                from: panel.fields[j].from || 'devdefine',
+                                control: panel.fields[j]
+                            };
+                            newobj.control.from = newobj.from;
+                            children.push(newobj);
+                        };
+
+                        var panelobj = {
+                            text: panel.desTitle || panel.id,
+                            control: panel,
+                            children: children,
+                            topContainerID: panel.id,
+                            nodetype: 'form',
+                            allowDrag: false
+                        }
+
+                        var root = componentTree.getRootNode();
+                        root.appendChild(panelobj);
+
+                    }
+                }
+
+                //处理formset
+                if (individualInfo.fieldSetFormPanel) {
+                    for (var i = 0; i < individualInfo.fieldSetFormPanel.length; i++) {
+                        var panel = individualInfo.fieldSetFormPanel[i];
+
+                        var flevelchildren = []; //第一层
+                        for (var j = 0; j < panel.fieldSets.length; j++) {
+
+                            var set = panel.fieldSets[j];
+                            var slevelChildren = []; //第二层
+                            for (var k = 0; k < set.allfields.length; k++) {
+
+                                //readonly和设计时冲突，用RunReadOnly替换，保存时再赋值给readOnly
+                                if (set.allfields[k].readOnly) {
+                                    set.allfields[k].RunReadOnly = set.allfields[k].readOnly;
+                                    delete set.allfields[k].readOnly;
+                                }
+                                var newobj = {
+                                    //id: set.allfields[k].name,
+                                    text: set.allfields[k].fieldLabel || set.allfields[k].boxLabel,
+                                    leaf: true,
+                                    topContainerID: panel.id,
+                                    nodetype: 'fieldsetform',
+                                    from: set.allfields[k].from || 'devdefine',
+                                    control: set.allfields[k]
+                                };
+                                newobj.control.from = newobj.from;
+                                slevelChildren.push(newobj);
+                            }
+
+                            var setobj = {
+                                text: set.desTitle || set.id,
+                                control: set,
+                                children: slevelChildren,
+                                topContainerID: panel.id,
+                                nodetype: 'fieldsetform',
+                                allowDrag: false
+                            }
+                            flevelchildren.push(setobj);
+                        }
+
+
+                        var panelobj = {
+                            text: panel.desTitle || panel.id,
+                            //expanded: true,
+                            control: panel,
+                            children: flevelchildren,
+                            topContainerID: panel.id,
+                            nodetype: 'fieldsetform',
+                            allowDrag: false
+                        }
+                        //var root = treeStore.getRootNode();
+                        var root = componentTree.getRootNode();
+                        root.appendChild(panelobj);
+                    }
+                }
+
+                //处理gridpanel
+                if (individualInfo.gridPanel) {
+                    for (var i = 0; i < individualInfo.gridPanel.length; i++) {
+                        var panel = individualInfo.gridPanel[i];
+
+                        var children = [];
+                        for (var j = 0; j < panel.initialConfig.columns.length; j++) {
+
+                            //readonly和设计时冲突，用RunReadOnly替换，保存时再赋值回去
+                            if (panel.columns[j].initialConfig.readOnly) {
+                                panel.columns[j].initialConfig.RunReadOnly = panel.columns[j].initialConfig.readOnly;
+                                delete panel.columns[j].initialConfig.readOnly;
+                            }
+
+                            panel.columns[j].menuDisabled = true;
+                            panel.columns[j].sortable = false;
+                            panel.columns[j].draggable = false;
+
+                            var columnConfig = panel.columns[j].initialConfig;
+                            if (panel.lockable) {
+                                columnConfig = panel.columns[j];//具有锁定列，直接取
+                            }
+                            var newobj = {
+                                //id: panel.columns[j].dataIndex,
+                                text: panel.columns[j].header || panel.columns[j].text,
+                                leaf: true,
+                                topContainerID: panel.id,
+                                nodetype: 'grid',
+                                from: panel.columns[j].from || 'devdefine',
+                                control: columnConfig
+                            };
+                            newobj.control.from = newobj.from;
+                            children.push(newobj);
+                        };
+
+                        var panelobj = {
+                            text: panel.desTitle || panel.id,
+                            //expanded: true,
+                            control: panel,
+                            children: children,
+                            topContainerID: panel.id,
+                            nodetype: 'grid',
+                            isBillList:panel.initialConfig.isBillList,
+                            allowDrag: false
+                        }
+
+                        var root = componentTree.getRootNode();
+                        root.appendChild(panelobj);
+                    }
+                }
+
+                //处理tabpanel
+                if (individualInfo.tabPanel) {
+
+                    for (var i = 0; i < individualInfo.tabPanel.length; i++) {
+
+                        var panel = individualInfo.tabPanel[i];
+
+                        var children = [];
+                        for (var j = 0; j < panel.initialConfig.items.length; j++) {
+
+                            var newobj = {
+                                id: panel.initialConfig.items[j].id,
+                                text: panel.initialConfig.items[j].title,
+                                leaf: true,
+                                topContainerID: panel.id,
+                                nodetype: 'tab',
+                                from: 'devdefine',
+                                control: panel.items.items[j]
+                            };
+                            children.push(newobj);
+                        }
+
+                        var panelobj = {
+                            text: panel.desTitle || panel.id,
+                            control: panel,
+                            children: children,
+                            topContainerID: panel.id,
+                            nodetype: 'tab',
+                            allowDrag: false
+                        }
+
+                        var root = componentTree.getRootNode();
+                        root.appendChild(panelobj);
+
+                    }
+
+                }
+            }
+
+            BuildComTree();
+
+            var allNodes;
+            //var activePanel;
+            var activePanelid;
+            var curnodeType;
+
+            if (componentTree.getRootNode().firstChild) {
+                activePanelid = componentTree.getRootNode().firstChild.data.control.id;
+            }
+
+            //重排form的布局
+            //function RefreshForm(parentNode, panel) { 
+            function RefreshForm(forceRefresh) {
+                //if (panel) { //当前的panel与树节点不匹配时，取当前panel
+                //    activePanelid = panel.id;
+                //}
+                //else {
+                    var selectM = componentTree.getSelectionModel();
+                    var select = selectM.getSelection();
+
+                    var tempPanelId;
+                    if (select.length > 0) {
+                        tempPanelId = select[0].data.topContainerID; //根容器id
+                    }
+                  
+                    if (Ext.isEmpty(activePanelid)) {
+                        tempPanelId = designContainer.getLayout().getActiveItem().id;
+                    }
+
+                    if ((tempPanelId === activePanelid) && !forceRefresh) {
+                        return;//不需要强制刷新
+                    } else {
+                        if (tempPanelId) {
+                            activePanelid = tempPanelId;
+                        }
+                    }                   
+
+                //}
+                var rootContainer = GetCurrParentTreeNode(activePanelid); //根容器节点
+                var allNodes = rootContainer.childNodes; //容器的子节点
+                var designPanel = rootContainer.data.control; //
+                var panelType = rootContainer.data.nodetype;
+
+                if (panelType === 'form') {
+                    designPanel.removeAll(true);
+
+                    var fieldArray = [];
+                    for (var i = 0; i < allNodes.length; i++) {
+                        fieldArray.push(allNodes[i].data['control']);
+                    }
+                    designPanel.otype = 'view'; //设置成只读
+                    var temp = designPanel.buildTableLayout(fieldArray, designPanel.columnsPerRow,true);
+
+                    designPanel.add(temp);                  
+                }
+                else if (panelType === 'fieldsetform') {
+
+                    if (designPanel.removeAll) {
+                        designPanel.removeAll(true);
+                    }
+
+                    var fieldSets = [];
+                    for (var i = 0; i < allNodes.length; i++) {
+
+                        var setNode = allNodes[i];
+                        setNode.data['control'].allfields = [];
+                        for (var j = 0; j < setNode.childNodes.length; j++) {
+                            var tempNode = setNode.childNodes[j];
+
+                            setNode.data['control'].allfields.push(tempNode.data['control']);
+                        }
+
+                        fieldSets.push(setNode.data['control']);
+                    }
+                    designPanel.otype = 'view'; //设置成只读
+                    var temp = designPanel.buildLayout(fieldSets,true);
+
+                    designPanel.add(temp);
+
+                }
+                else if (panelType === 'grid') {
+
+
+                    //designPanel.headerCt.removeAll(true);
+                    ////designPanel.headerCt.disabled = true;
+                    //designPanel.headerCt.items.items.length = 0; //清空
+
+                    //for (var i = 0; i < allNodes.length; i++) {
+                    //    allNodes[i].data.control.style = "text-align:center"; //默认列头居中
+
+                    //    if (allNodes[i].data.control.mustInput) {
+                    //        allNodes[i].data.control.style += ";color:OrangeRed";
+                    //    }
+
+                    //    var col = Ext.create('Ext.grid.column.Column', allNodes[i].data['control']);
+                    //    col.menuDisabled = true;
+                    //    col.sortable = false;
+                    //    //col.draggable = false;
+                    //    col.treeNode = allNodes[i];
+
+                    //    designPanel.headerCt.insert(i, col);
+                    //}
+
+                    //下面的方案，grid列数多的时候，滚动条也不卡
+                    var columns = [];
+                    for (var i = 0; i < allNodes.length; i++) {
+                        allNodes[i].data.control.style = "text-align:center"; //默认列头居中
+                        if (allNodes[i].data.control.mustInput) {
+                            allNodes[i].data.control.style += ";color:OrangeRed";
+                        }
+                        columns.push(Ext.apply({ menuDisabled: true, sortable: false }, allNodes[i].data['control']));
+                    }
+                    designPanel.reconfigure(designPanel.store, columns);
+
+                    //设置列头相关属性
+                    for (var i = 0; i < designPanel.columns.length; i++) {
+                        var col = designPanel.columns[i];
+                        //col.menuDisabled = true;
+                        col.sortable = false;
+                        col.treeNode = allNodes[i];//记录树节点
+                    }
+
+
+                    //刷新tree的顺序
+                    designPanel.un('columnmove', gridcolumnmove);
+                    designPanel.on('columnmove', gridcolumnmove);
+
+                    designPanel.un('headerclick', gridheaderclick);
+                    designPanel.on('headerclick', gridheaderclick);
+
+
+                    if (designPanel.store.getCount() == 0) {
+                        designPanel.store.insert(0, [{}]);//列显示不全，增加一行
+                    }
+
+                    //designPanel.getView().refresh();
+                }
+                else {
+                    designPanel.removeAll(true);
+
+                    var items = [];
+                    for (var i = 0; i < allNodes.length; i++) {
+                        //designPanel.add(allNodes[i].data['control']);
+                        items.push(allNodes[i].data['control'].initialConfig);
+                    }
+
+                    //var tab = Ext.create('Ext.tab.Panel', {id: designPanel.id,items: items });
+                    var tab = Ext.create('Ext.tab.Panel', { myId: designPanel.id, items: items });//用id,移动tab页的位置刷新没效果,改用myId
+                    tab.on('tabchange', tabchange);
+
+                    designPanel = tab;
+                }
+
+                designContainer.getLayout().setActiveItem(designPanel); //设置可见panel
+            }
+
+            var gridcolumnmove = function (ct, column, fromIdx, toIdx, eOpts) {
+                var activePanelid = designContainer.getLayout().getActiveItem().id;
+                var rootContainer = GetCurrParentTreeNode(activePanelid); //根容器节点
+                rootContainer.insertChild(toIdx, column.treeNode);
+            };
+
+            var gridheaderclick = function (ct, column, e, t, eOpts) {
+                var currNode = column.treeNode;
+                var panel = designContainer.getLayout().getActiveItem();
+                if (panel.body.LastDiv && panel.body.LastDiv.dom) {
+                    SelectedFieldToEdit(null, panel.body.LastDiv, false, false);
+                }
+                panel.body.LastDiv = column.el;
+                SelectedFieldToEdit(currNode, panel.body.LastDiv, true, false);
+
+            };
+
+            var tabchange =   function (tabpanel, newCard, oldCard,e) {
+              var panel = designContainer.getLayout().getActiveItem();
+              var topNode = GetCurrParentTreeNode(panel.myId);
+              //var topNode = componentTree.getRootNode();//从根节点开始搜索
+              panel.body.LastDiv = newCard.el;
+              SelectedFieldToEdit(FindTreeNodeById(topNode, newCard.id), panel.body.LastDiv, true, true);
+            }
+
+            //刷新属性窗口
+            function RefreshPropGrid(record) {
+                if (record.data.control) {
+                    if ('ngTableLayoutForm' === record.data.control.xtype || 'ngTableLayoutForm' === record.parentNode.data.control.xtype) {
+                        if ('ngTableLayoutForm' === record.data.control.xtype) {
+                            
+                            if (record.data.control.initialConfig.fieldDefaults) {
+                                record.data.control.initialConfig.labelWidth = record.data.control.initialConfig.fieldDefaults.labelWidth;//提到外面去
+                            }
+                            propGrid.SetPropStore(record.data.control.initialConfig);                          
+                            RefreshForm();                           
+                        }
+                        else {
+                            if (record.parentNode.data.control.id != activePanelid) {                             
+                               RefreshForm();                                
+                            }
+
+                            record.data.control = Ext.apply(Ext.clone(designInfo[record.data.control.xtype] || baseCtlInfo), record.data.control);
+                            if (record.data.control.regex) {
+                                record.data.control.regex = record.data.control.regex.toString();//正则表达式对象转string
+                            }
+                            propGrid.SetPropStore(record.data.control);
+                        }
+                    }
+                    else if ('ngGridPanel' === record.data.control.xtype || 'ngGridPanel' === record.parentNode.data.control.xtype) {//gridpanel
+
+                        if ('ngGridPanel' === record.data.control.xtype) {
+                            propGrid.SetPropStore(record.data.control.initialConfig);
+                            RefreshForm();
+                        }
+                        else {
+                            if (record.parentNode.data.control.id != activePanelid) {
+                                RefreshForm();
+                            }
+
+                            if ('triStateSort' in record.data.control) {
+                                delete record.data.control.triStateSort; //去掉没用的属性
+                            }
+                            record.data.control = Ext.apply(Ext.clone(gridColumnInfo), record.data.control.initialConfig || record.data.control);
+                            if (record.data.control.hidden) {
+                                delete record.data.control.editor;
+                            }
+
+                            //if (Ext.isObject(record.data.control.editor)) {
+                            //    var xtype = record.data.control.editor.xtype;
+                            //    if ('ngCommonHelp' === xtype || 'ngComboBox' === xtype) {
+                            //        record.data.control.renderer = function (val, metaData) {
+                            //            return metaData.column.getEditor().getCodeName(val);
+                            //        }
+                            //    }
+                            //}
+
+                            //if (Ext.isString(record.data.control.editor)) {
+                            //    if (record.data.control.editor.indexOf("ngCommonHelp") > 0 || record.data.control.editor.indexOf("ngComboBox") > 0) {
+                            //        record.data.control.renderer = function (val, metaData) {
+                            //            return metaData.column.getEditor().getCodeName(val);
+                            //        }
+                            //    }
+                            //}
+
+                            //propertygrid,不能正常显示对象,Object转string
+                            if (!Ext.isEmpty(record.data.control.renderer) && Ext.isFunction(record.data.control.renderer)) {
+                                var strRender = record.data.control.renderer.toString();
+                                var reg = new RegExp('\r\n', 'g');
+
+                                record.data.control.renderer = strRender.replace(reg, '');
+                            }
+
+                            //propertygrid,不能正常显示对象，需要encode成string
+                            if (!Ext.isEmpty(record.data.control.editor) && Ext.isObject(record.data.control.editor)) {
+                                record.data.control.editor = Ext.encode(record.data.control.editor);
+                            }
+
+                            propGrid.SetPropStore(record.data.control);
+                        }
+                    }
+                    else if ('tabpanel' === record.data.control.xtype || 'tabpanel' === record.parentNode.data.control.xtype) {
+                        if ('panel' === record.data.control.xtype) {
+
+                            if (record.parentNode.data.control.id != activePanelid) {
+                                RefreshForm();
+                            }
+
+                            record.data.control.initialConfig = Ext.apply(Ext.clone(designInfo[record.data.control.xtype]), record.data.control.initialConfig);
+                            propGrid.SetPropStore(record.data.control.initialConfig);
+                        }
+                        else {
+                            propGrid.SetPropStore(record.data.control.initialConfig);
+                            RefreshForm();
+                        }
+                    }
+                    else {
+                        if ('ngFieldSetForm' === record.data.control.xtype) {
+                            propGrid.SetPropStore(record.data.control.initialConfig);
+                            RefreshForm();
+                        }
+                        else if ('ngFieldSetForm' === record.parentNode.data.control.xtype) {
+                            if (record.parentNode.data.control.id != activePanelid) {
+                                RefreshForm();
+                            }
+
+                            record.data.control = Ext.apply(Ext.clone(designInfo[record.data.control.xtype] || baseCtlInfo), record.data.control);
+                            if (record.data.control.regex) {
+                                record.data.control.regex = record.data.control.regex.toString();//正则表达式对象转string
+                            }
+                            propGrid.SetPropStore(record.data.control);
+                        }
+                        else {
+                            if (record.parentNode.parentNode.data.control.id != activePanelid) {
+                                RefreshForm();
+                            }
+                            record.data.control = Ext.apply(Ext.clone(designInfo[record.data.control.xtype] || baseCtlInfo), record.data.control);
+                            propGrid.SetPropStore(record.data.control);
+                        }
+                    }
+
+                }
+            }
+
+            //属性设置
+            columnEditor.on('setproperty', function (val) {
+                var data = propGrid.getSelectionModel().getSelection();
+                data[0].set('value', val);
+                var jk = 0;
+            });
+
+            columnRender.on('setproperty', function (val) {
+                var data = propGrid.getSelectionModel().getSelection();
+                data[0].set('value', val);
+                var jk = 0;
+            });
+
+            ngToolbar.get('toolbox').on('click', function () {
+                if (accordion.collapsed) {
+                    accordion.hide();
+                    accordion.collapsed = false;
+                }
+                else if (accordion.hidden) {
+                    accordion.show();
+                }
+                else {
+                    accordion.hide();
+                }
+                //return;
+
+                var myFuncion = {
+                    header: '时间',
+                    flex: 1,
+                    dataIndex: 'dt',
+                    editor: {
+                        xtype: 'ngDateTime',
+                        name: 'dt'
+                    },
+                    renderer: function (val) {
+
+                        if (val) {
+                            var str = Ext.util.Format.date(val, 'Y-m-d H:i:s');
+                            return str;
+                        }
+                        else {
+                            return '';
+                        }
+                    }
+                };
+
+                var str = Ext.encode(myFuncion); //myFuncion.toString();
+                var temp = Ext.decode(str);
+
+                var dx;
+
+            });
+
+            var selectNode;//当组件树前选中的节点
+            componentTree.on('itemclick', function (view, record, item, index, e, eOpts) {
+                selectNode = record;
+                curnodeType = record.data.from;
+                RefreshPropGrid(record);
+                InitDDrop();
+            });
+
+            componentTree.on('itemcontextmenu', function (tree, record, item, index, e, eOpts) {
+
+                if (!record.data.leaf) { return; }
+
+                var pNode = record.parentNode;
+                var childNodeIndex = pNode.indexOf(record)+1;
+
+                var contextmenu = Ext.create('Ext.menu.Menu', {
+                    width: 100,
+                    height: 80,
+                    margin: '0 0 10 0',                   
+                    items: [{
+                        text: '上移', iconCls: 'icon-ArrowUp',
+                        handler: function () {
+                            var pNode = record.parentNode;                         
+                            pNode.insertChild(childNodeIndex, record.previousSibling);//上移没有效果，只能把上个节点下移                            
+                            //RefreshForm(pNode); //重排布局
+                            RefreshForm(true); //重排布局
+                        }
+                    }, {
+                        text: '下移', iconCls: 'icon-ArrowDown',
+                        handler: function () {
+                            var pNode = record.parentNode;
+                            var dropIndex = childNodeIndex + 1;
+                            pNode.insertChild(dropIndex, record);
+                            //RefreshForm(pNode); //重排布局
+                            RefreshForm(true);
+                        }
+                    }, {
+                        text: '删除节点', iconCls: 'icon-delete',
+                        handler: function () {
+
+                            Ext.Msg.confirm('删除警告', '是否删除', function (btn, text) {
+                                if (btn == 'yes') {                                  
+                                    var pNode = record.parentNode;
+                                    record.remove();
+                                    //RefreshForm(pNode);      
+                                    RefreshForm(true);
+                                }
+                            });
+
+                           
+                        }
+                    }]
+                });
+
+                if ('devdefine' === record.data.from || record.data.leaf === false) {
+                    contextmenu.items.items[2].setDisabled(true);
+                }
+                if (childNodeIndex == 1) {
+                    contextmenu.items.items[0].setDisabled(true);
+                }
+                if (record.parentNode.childNodes.length == childNodeIndex) {
+                    contextmenu.items.items[1].setDisabled(true);
+                }
+
+                e.preventDefault();
+                contextmenu.showAt(e.getXY());
+
+            })
+
+            //控制能否修改
+            propGrid.on('beforeedit', function (editor, e, eOpts) {
+                var name = e.record.data.name;
+
+                //if (name === 'id' || name === 'style' || name === 'bindtable' || name === 'from'
+                //    || name === 'xtype' || name === 'readOnly' || name === 'name' || name === 'region'
+                //    || name === 'desTitle' || name === 'buskey' || name === 'itemId' || name === 'queryMode') {
+                //    return false;
+                //}
+                //原始单据开发员定义的控件,有些属性禁止修改
+                //if (curnodeType === 'devdefine') {
+                //    if (name === 'maxLength') {
+                //        return false;
+                //    }
+                //}
+                               
+                if (name === 'fieldLabel' || name === 'mustInput' || name === 'RunReadOnly' || name === 'hidden' ||
+                    name === 'boxLabel' || name === 'columnsPerRow' || name === 'title' || name === 'header' ||
+                    name === 'width' || name === 'colspan' || name === 'decimalSeparator' || name === 'matchFieldWidth' ||
+                    name === 'editor' || name === 'renderer' || name === 'labelWidth' || name === 'emptyText' ||
+                    (curnodeType === 'fromtoolbox' && name === 'maxLength')) {
+                    propGrid.isEditing = true;
+                    return true;
+                }
+                else {
+                    return false;
+                }
+
+               
+            });
+
+            propGrid.on('edit', function (editor, e, eOpts) {
+                propGrid.isEditing = false;
+            });
+
+            propGrid.on('propertychange', function (source, recordId, value, oldValue, eOpts) {
+                if (source.$className != 'Ext.ng.TableLayoutForm') {
+
+                    if (recordId === 'fieldLabel' || recordId === 'title' || recordId === 'header') {//是控件
+                        var selectM = componentTree.getSelectionModel();
+                        var select = selectM.getSelection();
+                        //select[0].set('text', source.fieldLabel);
+                        select[0].set('text', value);
+                        select[0].commit();
+                    }
+                    else {//是form的initialConfig
+
+                        //var selectM = componentTree.getSelectionModel();//这个修改属性时，切换到另外一个节点，会把另外一个节点给改了
+                        //var select = selectM.getSelection();
+                        //select[0].commit();
+                        //Ext.apply(select[0].data.control, source); //把修改的属性同步到控件
+
+                        selectNode.commit();
+                        Ext.apply(selectNode.data.control, source); //把修改的属性同步到控件
+                    }
+                }
+
+                RefreshForm(true);
+            });
+
+            ngToolbar.get('save').on('click', function () {
+                var root = componentTree.getRootNode();
+
+                var individaul = {
+                    form: {},
+                    fieldSetForm: {},
+                    grid: {},
+                    tabPanel:{}
+                };
+
+                for (var i = 0; i < root.childNodes.length; i++) {
+
+                    var containerNode = root.childNodes[i];
+                    var container = containerNode.data.control;
+                    var nodetype = containerNode.data.nodetype;
+
+                    //Ext.encode(temp);//会爆，性能不行
+                    //nodetype: 'form',
+
+                    if ('form' === nodetype) {
+                        var obj = new Object();
+
+                        Ext.apply(obj, container.initialConfig); //初始设置
+                        obj.columnsPerRow = container.columnsPerRow;
+
+                        var tempFileds = new Array();
+
+                        for (var j = 0; j < containerNode.childNodes.length; j++) {
+
+                            //处理只读属性
+                            if (containerNode.childNodes[j].data.control.RunReadOnly != undefined) {
+                                containerNode.childNodes[j].data.control.readOnly = containerNode.childNodes[j].data.control.RunReadOnly;
+                            }
+                            else {
+                                delete containerNode.childNodes[j].data.control.readOnly;
+                            }
+
+                            containerNode.childNodes[j].data.control.from = containerNode.childNodes[j].data.from || 'devdefine';
+
+                            tempFileds.push(containerNode.childNodes[j].data.control);
+                        }
+
+                        obj.fields = tempFileds;
+
+                        //individaul.form.push(obj);
+                        delete obj.plugins; //删除这个拖拽对象，否则会堆栈溢出
+                        delete obj.otype;//设计时otype去掉
+                        individaul.form[obj.id] = obj;
+                    }
+                    else if ('fieldsetform' === nodetype) {
+
+                        var obj = new Object();
+
+                        Ext.apply(obj, container.initialConfig); //初始设置
+
+                        var Sets = [];
+                        for (var j = 0; j < containerNode.childNodes.length; j++) {
+
+                            var setNode = containerNode.childNodes[j];
+                            setNode.data['control'].allfields = [];
+                            for (var k = 0; k < setNode.childNodes.length; k++) {
+
+                                var tempNode = setNode.childNodes[k];
+
+                                //处理只读属性
+                                if (tempNode.data.control.RunReadOnly != undefined) {
+                                    tempNode.data.control.readOnly = tempNode.data.control.RunReadOnly;
+                                }
+                                else {
+                                    delete tempNode.data.control.readOnly;
+                                }
+
+                                setNode.data['control'].allfields.push(tempNode.data['control']);
+
+                            }
+
+                            Sets.push(setNode.data['control'])
+                        }
+
+                        obj.fieldSets = Sets;
+                        delete obj.plugins; //删除这个拖拽对象，否则会堆栈溢出
+                        delete obj.otype;//设计时otype去掉
+                        //去掉items,信息量太大
+                        for (var k = 0; k < obj.fieldSets.length; k++) {
+                            delete obj.fieldSets[k].items;
+                        }
+                        individaul.fieldSetForm[obj.id] = obj;
+                    }
+                    else if ('grid' === nodetype) {
+
+                        var obj = new Object();
+
+                        //Ext.apply(obj, container.initialConfig); //初始设置 , 信息太多,encode会爆
+
+                        obj.bindtable = container.initialConfig.bindtable;
+                        obj.buskey = container.initialConfig.buskey;
+                        obj.columnLines = container.initialConfig.columnLines;
+                        obj.id = container.initialConfig.id;
+                        obj.region = container.initialConfig.region;
+                        obj.desTitle = container.initialConfig.desTitle;
+                        if (container.initialConfig.isBillList) {
+                            obj.isBillList = true;
+                        }
+                        //obj.stateful = container.initialConfig.stateful;
+                        //obj.stateId = container.initialConfig.stateId;
+
+                        var tempColumns = new Array();
+
+                        for (var j = 0; j < containerNode.childNodes.length; j++) {
+
+                            if (Ext.isString(containerNode.childNodes[j].data.control.editor)) {
+                                containerNode.childNodes[j].data.control.editor = Ext.decode(containerNode.childNodes[j].data.control.editor); //string转object
+                            }
+
+                            if (Ext.isFunction(containerNode.childNodes[j].data.control.renderer)) {
+
+                                var strRender = containerNode.childNodes[j].data.control.renderer.toString();
+                                var reg = new RegExp('\r\n', 'g');
+
+                                containerNode.childNodes[j].data.control.renderer = strRender.replace(reg, ''); //回车换行符去掉,否则ext.decode失败
+                            }
+
+                            containerNode.childNodes[j].data.control.from = containerNode.childNodes[j].data.from || 'devdefine';
+
+                            //恢复readOnly属性
+                            if (containerNode.childNodes[j].data.control.RunReadOnly != undefined) {
+                                containerNode.childNodes[j].data.control.readOnly = containerNode.childNodes[j].data.control.RunReadOnly;
+                                delete containerNode.childNodes[j].data.control.RunReadOnly;
+                            }
+
+                            //恢复locked属性
+                            if (containerNode.childNodes[j].data.control.userLocked) {
+                                containerNode.childNodes[j].data.control.locked = true;
+                                delete containerNode.childNodes[j].data.control.userLocked;
+                            }
+
+                            tempColumns.push(containerNode.childNodes[j].data.control);
+                        }
+
+                        obj.columns = tempColumns;
+                        individaul.grid[obj.id] = obj;
+                    }
+                    else {//tab
+                        var obj = new Object();
+                        obj.id = container.initialConfig.id;
+                        obj.desTitle = container.initialConfig.desTitle;
+
+                        var tabs = [];
+                        for (var j = 0; j < containerNode.childNodes.length; j++) {
+                            tabs.push(containerNode.childNodes[j].data.control.initialConfig);
+                        }
+
+                        obj.items = tabs;
+                        individaul.tabPanel[obj.id] = obj;
+                    }
+
+                }
+
+                //return;
+                //alert(JSON.stringify(individaul));
+
+                var strinfo = JSON.stringify(individaul);
+
+                ngToolbar.get("save").disable();//禁用保存按钮
+                var myMask = new Ext.LoadMask(document.body, { msg: "单据正在保存中,请稍候..." });
+                myMask.show();//锁屏
+                Ext.Ajax.request({
+                    params: { 'id': id, 'uiinfo': strinfo },
+                    url: 'IndividualUI/SaveIndividualUI',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            NGMsg.Info('保存成功');
+                        } else {
+                            NGMsg.Error('保存失败:' + resp.Msg);
+                        }
+                        myMask.hide();//停止锁屏
+                        ngToolbar.get("save").enable();//保存失败，保存按钮设置为可用
+                    }
+                });
+
+
+            });
+
+        });
+
+      
+
+
+    </script>
+}

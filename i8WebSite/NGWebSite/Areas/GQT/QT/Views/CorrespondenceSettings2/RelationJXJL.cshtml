@@ -1,0 +1,498 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_PTE.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/RelationJXJLEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+        var deletedata = [];
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save','addrow','deleterow',
+                    '->',  'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "Dwdm",
+    "type": "string",
+    "mapping": "Dwdm"
+  },
+    {
+    "name": "Dydm",
+    "type": "string",
+    "mapping": "Dydm"
+  },
+  {
+    "name": "Dylx",
+    "type": "string",
+    "mapping": "Dylx"
+    },
+    {
+        "name": "DefStr1",
+        "type": "string",
+        "mapping": "DefStr1"
+    },
+    {
+        "name": "DefStr2",
+        "type": "string",
+        "mapping": "DefStr2"
+    },
+    {
+        "name": "DefStr3",
+        "type": "string",
+        "mapping": "DefStr3"
+    },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'list2');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetJXJLset'
+            });
+
+            //store.load();
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: '5b713ec4-ba23-480c-811b-cf97a9b7011f',
+				buskey: 'PhId', //对应的业务表主键属性
+				/*layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},*/
+				bbar: [pagingbar],
+				height:document.documentElement.clientHeight-28,
+				plugins:[
+					Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false  //不解析成html
+					})
+				]
+            };
+
+            function Gridrefresh() {
+                grid.getView().refresh(true);
+            }
+            var gridConfig = Ext.apply(initConfig, individualInfo.grid['list2']);
+            //定义grid不能加var,否则后面弹出框将取不到这个变量
+
+            grid = Ext.create('Ext.ng.GridPanel', gridConfig);
+            //gridOrg = grid;
+            //grid.addListener("itemdblclick", gridDblClick);
+			
+			
+			
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+},
+  {
+    "name": "Type",
+    "type": "string",
+    "mapping": "Type"
+				}],
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetSBUnit?uid='+$appinfo.userID,
+				autoLoad:true
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				//height: 390,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+					//renderer: function (value, parm, record) {
+					//    if (record.data.ctype == "1") {
+					//        return me.getEmpName(value, record.data.assigntype);
+					//    }
+					//    return value;
+					//}
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						var params={'Dwdm':record.get('OCode')};
+						Ext.apply(store.proxy.extraParams,params);
+						store.load(function(){
+							
+						})
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				}
+			});
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridOrg],
+				width:400
+				},{
+				region:'center',
+				xtype:"panel",
+				items:[grid],
+				}
+				]
+            });
+
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                var updatedata = [];
+                if(store.getModifiedRecords().length>0){
+                    for(var i=0;i<store.getModifiedRecords().length;i++){
+                        var data1=store.getModifiedRecords()[i].data;
+                        if(data1.DefStr1==='' ||  data1.DefStr2===''){
+                            Ext.MessageBox.alert('提示', '输入不全请补充！');
+                            return;
+                        }
+                        updatedata.push({ 'PhId': data1.PhId,'Dwdm': data1.Dwdm,'Dydm': data1.Dydm,'Dylx': data1.Dylx,'DefStr1': data1.DefStr1,'DefStr2': data1.DefStr2,'DefStr3': data1.DefStr3 });
+                    }
+                }
+
+                Ext.Ajax.request({
+                    params: { "updatedata": updatedata, "deletedata":deletedata },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/SaveJXJLset',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', '保存成功');
+                            store.load();
+                            deletedata = [];
+                        } else {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                });
+               
+            });
+
+			//增行
+            ngToolbar.items.get('addrow').on('click', function () {
+                var org=gridOrg.getSelectionModel().getSelection();
+                if(org.length>0){
+                    var model1 = grid.getSelectionModel();
+                    var rowid = store.getCount();
+
+                    store.insert(rowid, model1);
+                    store.getAt(store.getCount() - 1).set('Dwdm', org[0].data.OCode);
+                    store.getAt(store.getCount() - 1).set('Dydm', org[0].data.PhId);
+                    store.getAt(store.getCount() - 1).set('Dylx', 'JXJL');
+                    store.getAt(store.getCount() - 1).set('PhId', 0);
+                    // store.getAt(store.getCount() - 1).set('DefStr1', 0);
+                    // store.getAt(store.getCount() - 1).set('DefStr2', 0);
+                }
+            })
+
+            //删行
+            ngToolbar.items.get('deleterow').on('click', function () {
+                var selection = grid.getSelectionModel().getSelection();
+                var phid = selection[0].data.PhId;
+                if (!phid || phid.length == 0) {
+
+                } else {
+                    deletedata.push(selection[0].data.PhId);
+                }
+                store.remove(selection);
+                grid.view.refresh();
+
+            })
+
+            grid.on('edit', function (editor, context) {
+                if (context.field == "DefStr1") {
+                    var value=context.record.data.DefStr1; //zuo
+                    /*var value=context.record.data.DefStr1;
+                    if(context.record.data.DefStr2!=0&&value>context.record.data.DefStr2){
+                        Ext.MessageBox.alert('提示', '起始值不能大于结束值！');
+                        context.record.data.DefStr1=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    var max=100;
+                    var min=0;
+                    for(var i=0;i<store.getCount();i++){
+                        if(store.getAt(i).get('DefStr1')>value&&store.getAt(i).get('DefStr1')<max){
+                            max=store.getAt(i).get('DefStr1');
+                        }
+                        if(store.getAt(i).get('DefStr1')<=value&&store.getAt(i).get('DefStr2')>min){
+                            min=store.getAt(i).get('DefStr2');
+                        }
+                    }
+                    if(context.record.data.DefStr2!=0&&max<context.record.data.DefStr2){
+                        max=context.record.data.DefStr2;
+                    }
+                    if(value>max){
+                        Ext.MessageBox.alert('提示', '起始值不能大于'+max+'！');
+                        context.record.data.DefStr1=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    if(value<min){
+                        Ext.MessageBox.alert('提示', '起始值不能小于'+min+'！');
+                        context.record.data.DefStr1=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    console.log(min+"-"+max);*/
+                    if(context.record.data.DefStr2!=''&&+value>+context.record.data.DefStr2){
+                        Ext.MessageBox.alert('提示', '起始值不能大于结束值！');
+                        context.record.data.DefStr1=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    var index=context.rowIdx;
+                    for(var i=0;i<store.getCount();i++){
+                        // if(i!=index){
+                        //     arr.push({store.getAt(i).get('DefStr1'),store.getAt(i).get('DefStr2')})
+                        // }
+                        if(i!=index){
+                            if(context.record.data.DefStr2=='')
+                            {
+                                if(+store.getAt(i).get('DefStr1')<=+value&&+store.getAt(i).get('DefStr2')>+value){
+                                    Ext.MessageBox.alert('提示', '起始值输入不合法！');
+                                    context.record.data.DefStr1=context.originalValue;
+                                    this.getView().refresh(true);
+                                    return;
+                                }
+                            }else{
+                                if(+context.record.data.DefStr2<=+store.getAt(i).get('DefStr1') || +value>=+store.getAt(i).get('DefStr2')){
+                                    if(value == store.getAt(i).get('DefStr1')){
+                                        Ext.MessageBox.alert('提示', '起始值输入不合法！');
+                                        context.record.data.DefStr1=context.originalValue;
+                                        this.getView().refresh(true);
+                                        return;
+                                    }
+                                }else{
+                                    Ext.MessageBox.alert('提示', '起始值输入不合法！');
+                                    context.record.data.DefStr1=context.originalValue;
+                                    this.getView().refresh(true);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (context.field == "DefStr2") {
+                    var value=context.record.data.DefStr2;
+                    /*if(value<context.record.data.DefStr1){
+                        Ext.MessageBox.alert('提示', '结束值不能小于起始值！');
+                        context.record.data.DefStr2=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    var max=100;
+                    var min=0;
+                    for(var i=0;i<store.getCount();i++){
+                        if(store.getAt(i).get('DefStr1')>value&&store.getAt(i).get('DefStr1')<max){
+                            max=store.getAt(i).get('DefStr1');
+                        }
+                        if(store.getAt(i).get('DefStr1')<value&&store.getAt(i).get('DefStr2')>min){
+                            min=store.getAt(i).get('DefStr2');
+                        }
+                    }
+                    if(min>context.record.data.DefStr1){
+                        min=context.record.data.DefStr1;
+                    }
+                    if(value>max){
+                        Ext.MessageBox.alert('提示', '结束值不能大于'+max+'！');
+                        context.record.data.DefStr2=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    if(value<min){
+                        Ext.MessageBox.alert('提示', '结束值不能小于'+min+'！');
+                        context.record.data.DefStr2=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    console.log(min+"-"+max);*/
+                    if(+value<+context.record.data.DefStr1){
+                        Ext.MessageBox.alert('提示', '结束值不能小于起始值！');
+                        context.record.data.DefStr2=context.originalValue;
+                        this.getView().refresh(true);
+                        return;
+                    }
+                    var index=context.rowIdx;
+                    for(var i=0;i<store.getCount();i++){
+
+                        if(context.record.data.DefStr1==="")
+                        {
+                            if(+store.getAt(i).get('DefStr1')<+value&&+store.getAt(i).get('DefStr2')>+value){
+                                Ext.MessageBox.alert('提示', '起始值输入不合法！');
+                                return;
+                            }
+                        }else{
+                            if(i!=index){
+                                if(+value<=+store.getAt(i).get('DefStr1') || +context.record.data.DefStr1>=+store.getAt(i).get('DefStr2')){
+                                    
+                                }else{
+                                    Ext.MessageBox.alert('提示', '结束值输入不合法！');
+                                    context.record.data.DefStr2=context.originalValue;
+                                    this.getView().refresh(true);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+
+
+
+            //打印
+            /*ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });*/
+
+            grid.getColumn('DefStr1').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+            grid.getColumn('DefStr2').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+
+
+			//刷新列表中想修改或删除的行数据
+            function recoderefresh(data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/ProjectThreshold/GetProjectThresholdList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

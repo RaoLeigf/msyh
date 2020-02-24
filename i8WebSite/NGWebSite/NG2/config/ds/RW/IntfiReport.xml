@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fr_list">
+      <Field Name="id" AsName="rep_code" IsKey="true"/>
+      <Field Name="g_code" />
+      <Field Name="b_num"  />
+      <Field Name="t_code"  />
+      <Field Name="b_type"  />
+      <Field Name="mon"  />
+      <Field Name="memo" AsName="rep_name"/>
+      <Field Name="memo" AsName="rep_orgname"/>
+      <Field Name="ocode"/>
+      <Field Name="fmt"/>
+    </Table>
+    <Table Name="fr_group">      
+      <Field Name="g_name" />
+    </Table>
+    <Table Name="fr_type">
+      <Field Name="t_name" />
+    </Table>    
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] 
+      left join fr_group on [table].g_code = fr_group.g_code 
+      left join fr_type on [table].b_type = fr_type.t_code 
+      [where] [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+      <Exp Field="ocode" Target="Client" Value="ocode" />
+      <Exp Field="id" Target="Client" value="id"/>
+      <Exp Field="g_name" paramName="g_name_like" Target="Client"  Oper="Like" value="g_name_like"/>
+      <Exp Field="t_name" paramName="t_name_like" Target="Client"  Oper="Like" value="t_name_like"/>
+      <Exp Field="memo" paramName="rep_name_like" Target="Client"  Oper="Like" value="rep_name_like"/>
+    </Query>
+    <OrderBy format="{id}">
+      <Exp Field="id" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="id"  Target="Client" Value="id" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="id" Target="Client" Value="id"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="id" Target="Client" Value="id"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+
+
+</DataService>
+
+

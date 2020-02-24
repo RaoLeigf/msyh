@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title = "打印测试";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Script
+{
+    <script type="text/javascript">
+        var busid = '@ViewBag.ID';
+        
+        if (!busid || busid == "") {
+           busid="eppact"
+        }
+        var otype = 'edit';
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                showArrowBtn: false,
+                ngbuttons: [
+                     { itemId: 'print', id: "print", text: "打印列表", iconCls: 'icon-Import' },
+                     { itemId: 'printex', id: "printex", text: "列表套打", iconCls: 'icon-Import' },
+                     { itemId: 'printall', id: "printall", text: "全部打印", iconCls: 'icon-Import' },
+                     { itemId: 'printtpl', id: "printtpl", text: "模板打印", iconCls: 'icon-Import' }
+                ]
+            });
+
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 400,
+                autoScroll: true,
+                buskey: 'phid', //对应的业务表主键属性
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 4,
+                border: false,
+                fieldDefaults: {
+                    labelWidth: 87,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                fields: [
+					{
+					    xtype: 'ngText',
+					    fieldLabel: '编码',
+					    name: 'tname',
+					    id: 'tname',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '名称',
+					    name: 'chn',
+					    id: 'chn',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '英文名称',
+					    name: 'eng',
+					    id: 'eng',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: 'recoverseq',
+					    name: 'recoverseq',
+					    id: 'recoverseq',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '模块',
+					    name: 'moduleid',
+					    id: 'moduleid',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '版本',
+					    name: 'ver',
+					    id: 'ver',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}
+				]
+            });
+         
+            //ir3basedtl 定义模型
+	        Ext.define('model', {
+	            extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'id',
+					    type: 'System.Int32',
+					    mapping: 'id'
+					}, {
+					    name: 'tname',
+					    type: 'System.String',
+					    mapping: 'tname'
+					}, {
+					    name: 'fieldname',
+					    type: 'System.String',
+					    mapping: 'fieldname'
+					}, {
+					    name: 'seq',
+					    type: 'System.Int16',
+					    mapping: 'seq'
+					}, {
+					    name: 'ftype',
+					    type: 'System.String',
+					    mapping: 'ftype'
+					}, {
+					    name:  'len',
+					    type: 'System.Int16',
+					    mapping: 'len'
+					}, {
+					    name: 'declen',
+					    type: 'System.Int32',
+					    mapping: 'declen'
+					}, {
+					    name: 'chn',
+					    type: 'System.String',
+					    mapping: 'chn'
+					}, {
+					    name: 'eng',
+					    type: 'System.String',
+					    mapping: 'eng'
+					}, {
+					    name: 'japanese',
+					    type: 'System.String',
+					    mapping: 'japanese'
+					}, {
+					    name: 'primaryk',
+					    type: 'System.Int16',
+					    mapping: 'primaryk'
+					}, {
+					    name: 'cannull',
+					    type: 'System.Int16',
+					    mapping: 'cannull'
+					}
+                ]
+            });
+          
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+                autoLoad: false,
+                url: 'GetTestData'
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+
+            //ir3basedtl grid 
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                border: false,
+                frame: true,
+                store: store,
+                columnLines: true,
+                buskey: 'id,tname,fieldname', //对应的子表主键属性
+                columns: [
+					{
+					    header: '主键',
+					    dataIndex: 'id',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: '序号',
+					    dataIndex: 'seq',
+					    format: '0',
+					    width: 100,
+					    sortable: false
+					}, {
+					    header: '表名',
+					    dataIndex: 'tname',
+					    width: 100,
+					    sortable: false
+					}, {
+					    header: '字段',
+					    dataIndex: 'fieldname',
+					    width: 100,
+					    sortable: false
+					}, {
+					    header: '字段名',
+					    dataIndex: 'chn',
+					    width: 100,
+					    sortable: false
+					}, {
+					    header: 'eng字段名',
+					    dataIndex: 'eng',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					}, {
+					    header: 'japanese字段名',
+					    dataIndex: 'japanese',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+
+					}, {
+					    header: '类型',
+					    dataIndex: 'ftype',
+					    width: 100,
+					    sortable: false
+
+					}, {
+					    header: '长度',
+					    dataIndex: 'len',
+					    format: '0',
+					    width: 100,
+					    sortable: false
+					}, {
+					    header: '小数位',
+					    dataIndex: 'declen',
+					    format: '0',
+					    width: 100,
+					    sortable: false
+					}, {
+					    header: '是否为空',
+					    dataIndex: 'cannull',
+					    format: '0',
+					    width: 100,
+					    sortable: false
+					}
+				],
+                bbar: pagingbar
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, {
+                    id: 'myPanel',
+                    xtype: 'panel',
+                    region: 'center',
+                    autoScroll: true,
+                    overflowY: 'scroll',
+                    layout: 'border',
+                    border: true,
+                    items: [mstform, grid]
+                }]
+            });
+
+            //当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'mst' },
+                    url: C_ROOT + 'sup/print/GetTestData',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);                      
+                        var mstformobj = mstform.getForm();
+                        mstformobj.setValues(resp.data);
+                    }
+                });
+
+                //ir3basedtl明细
+                Ext.apply(store.proxy.extraParams, { 'id': busid, 'tabtype': 'ir3basedtl' });
+                store.cachePageData = false;
+                store.load();
+                store.cachePageData = true;
+            }
+            //直接打印列表
+            ngToolbar.get('print').on('click', function () {
+                //$Print(pageid, grid, title) 
+                //<pageid>业务id标识<pageid>
+                //<grid>NG3列表<grid>
+                //<title>NG3列表标题<title>
+                $Print("PrintTest1", grid, "打印模板列表");
+              
+            });
+            //列表套打
+            ngToolbar.get('printex').on('click', function () {
+                //$PrintEx(pageid, grid, title, gridprintmode)
+                //<pageid>业务id标识<pageid>
+                //<grid>NG3列表<grid>
+                //<title>NG3列表标题<title>
+                //<gridprintmode>套打模式 默认为0表示一页页批量打印,为1时表示将所有数据加载到打印控件中打印<gridprintmode>
+                $PrintEx("PrintTest2", grid, "打印模板列表","0");
+            });
+            //打印主+多明细
+            ngToolbar.get('printall').on('click', function () {
+               var titles=['主表','明细表'];
+               //$PrintForm(pageid, form, grids, titles)
+               //<pageid>业务id标识<pageid>
+               //<form>NG3 form 不可为空<form>
+               //<grids>数组 NG3列表<grids>
+               //<titles>数组 NG3列表标题<titles>
+               $PrintForm("PrintTest3", mstform, [grid], titles);
+            });
+            //使用模板打印
+            ngToolbar.get('printtpl').on('click', function () {
+                //$PrintHelp(pageid, typefile, form, grids, titles) 
+                //<pageid>业务id标识<pageid>
+                //<typefile>模板标识<typefile>
+                //<form>NG3 form不可为空<form>
+                //<grids>数组 NG3列表<grids>
+                //<titles>数组 NG3列表标题<titles>
+                var titles = ['主表', '明细表'];            
+                $PrintHelp("PrintTest4", 'PUB_LoanEdit4', mstform, [grid], titles)
+            });
+
+        });
+        
+    </script>
+}

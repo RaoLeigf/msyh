@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net" default-lazy-init="true" >
+
+
+  <!--SysUser-->
+  <!--<object id="GCW3.CW.Service.SysUser" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GCW3.CW.Service.SysUserService, GCW3.CW.Service" >
+        <property name="CurrentFacade" ref="GCW3.CW.Facade.SysUser"/>
+        <property name="SysUserOrganizeRoleRecordFacade" ref="GCW3.CW.Facade.SysUserOrganizeRoleRecord" />
+        <property name="SysUserTransferRecordFacade" ref="GCW3.CW.Facade.SysUserTransferRecord" />
+        <property name="SysOrganizeFacade" ref="GCW3.CW.Facade.SysOrganize"/>
+        <property name="SysRoleFacade" ref="GCW3.CW.Facade.SysRole"/>
+        <property name="PVoucherAuxiliaryTypeFacade" ref="GCW3.CW.Facade.PVoucherAuxiliaryType"/>
+        <property name="SystemConfigFacade" ref="GCW3.CW.Facade.SystemConfig"/>
+      </object>
+    </property>
+  </object>-->
+
+
+  <!--GXM3.XM-->
+  <object id="GXM3.XM.Service.ProjectMst" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GXM3.XM.Service.ProjectMstService, GXM3.XM.Service" >
+        <property name="CurrentFacade" ref="GXM3.XM.Facade.ProjectMst"/>
+        <property name="ProjectDtlImplPlanFacade" ref="GXM3.XM.Facade.ProjectDtlImplPlan" />
+        <property name="ProjectDtlTextContentFacade" ref="GXM3.XM.Facade.ProjectDtlTextContent" />
+        <property name="ProjectDtlFundApplFacade" ref="GXM3.XM.Facade.ProjectDtlFundAppl" />
+        <property name="ProjectDtlBudgetDtlFacade" ref="GXM3.XM.Facade.ProjectDtlBudgetDtl" />
+        <property name="ProjectDtlPurchaseDtlFacade" ref="GXM3.XM.Facade.ProjectDtlPurchaseDtl" />
+        <property name="ProjectDtlPurDtl4SOFFacade" ref="GXM3.XM.Facade.ProjectDtlPurDtl4SOF" />
+        <property name="ProjectDtlPerformTargetFacade" ref="GXM3.XM.Facade.ProjectDtlPerformTarget" />
+        <property name="BudgetMstFacade" ref="GYS3.YS.Facade.BudgetMst" />
+        <property name="QtSysCodeSeqFacade" ref="GQT3.QT.Facade.QtSysCodeSeq" />
+        <property name="ProjLibProjFacade" ref="GQT3.QT.Facade.ProjLibProj" />
+        <property name="CorrespondenceSettingsFacade" ref="GQT3.QT.Facade.CorrespondenceSettings"/>
+      </object>
+    </property>
+  </object>
+  <!--GXM3.QT-->
+  <object id="GQT3.QT.Service.BudgetAccounts" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.BudgetAccountsService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.BudgetAccounts"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.ExpenseCategory" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.ExpenseCategoryService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.ExpenseCategory"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.CorrespondenceSettings" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.CorrespondenceSettingsService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.CorrespondenceSettings"/>
+        <property name="UserFacade" ref="GQT3.QT.Facade.User" />
+        <property name="OrganizationFacade" ref="GQT3.QT.Facade.Organization" />
+        <property name="UserOrgFacade" ref="GQT3.QT.Facade.UserOrg"/>
+        <property name="QtBaseProjectFacade" ref="GQT3.QT.Facade.QtBaseProject"/>
+      </object>
+    </property>
+  </object>
+
+  <object id="GQT3.QT.Service.SourceOfFunds" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.SourceOfFundsService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.SourceOfFunds"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.CorrespondenceSettings2" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.CorrespondenceSettings2Service, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.CorrespondenceSettings2"/>
+        <property name="BudgetProcessCtrlFacade" ref="GYS3.YS.Facade.BudgetProcessCtrl"/>
+        <property name="OrganizationFacade" ref="GQT3.QT.Facade.Organization"/>
+        <property name="ProjectMstFacade" ref="GXM3.XM.Facade.ProjectMst"/>
+        <property name="OrgRelatitem2Facade" ref="GQT3.QT.Facade.OrgRelatitem2"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.PaymentMethod" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.PaymentMethodService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.PaymentMethod"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.QtSysCodeSeq" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.QtSysCodeSeqService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.QtSysCodeSeq"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.ProjLibProj" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.ProjLibProjService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.ProjLibProj"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.GHProjDtlShare" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.GHProjDtlShareService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.GHProjDtlShare"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.VCorrespondenceSetting2" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.VCorrespondenceSetting2Service, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.VCorrespondenceSetting2"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.UserOrg" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.UserOrgService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.UserOrg"/>
+        <property name="RWReportFacade" ref="GQT3.QT.Facade.RWReport" />
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.OrgRelatitem2" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.OrgRelatitem2Service, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.OrgRelatitem2"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.ProcurementType" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.ProcurementTypeService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.ProcurementType"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.ProcurementProcedures" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.ProcurementProceduresService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.ProcurementProcedures"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.PerformEvalTargetType" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.PerformEvalTargetTypeService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.PerformEvalTargetType"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.PerformEvalTarget" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.PerformEvalTargetService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.PerformEvalTarget"/>
+        <property name="PerformEvalTargetClassFacade" ref="GQT3.QT.Facade.PerformEvalTargetClass"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.PerformEvalTargetClass" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.PerformEvalTargetClassService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.PerformEvalTargetClass"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.ProcurementCatalog" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.ProcurementCatalogService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.ProcurementCatalog"/>
+        <!--<property name="ProjectDtlPurchaseDtlFacade" ref="GXM3.XM.Facade.ProjectDtlPurchaseDtl"/>-->
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.PerformEvalType" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.PerformEvalTypeService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.PerformEvalType"/>
+        <!--<property name="ProjectMstFacade" ref="GXM3.XM.Facade.ProjectMst"/>-->
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.ProjectThreshold" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.ProjectThresholdService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.ProjectThreshold"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.QtBaseProject" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.QtBaseProjectService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.QtBaseProject"/>
+        <property name="QtSysCodeSeqFacade" ref="GQT3.QT.Facade.QtSysCodeSeq"/>
+        <property name="SubjectMstFacade" ref="GYS3.YS.Facade.SubjectMst"/>
+        <property name="BudgetAccountsFacade" ref="GQT3.QT.Facade.BudgetAccounts"/>
+        <property name="SubjectMstBudgetDtlFacade" ref="GYS3.YS.Facade.SubjectMstBudgetDtl"/>
+        <property name="GHSubjectFacade" ref="GYS3.YS.Facade.GHSubject"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.QtZcgnfl" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.QtZcgnflService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.QtZcgnfl"/>
+      </object>
+    </property>
+  </object>
+  <object id="GQT3.QT.Service.QtOrgDygx" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GQT3.QT.Service.QtOrgDygxService, GQT3.QT.Service" >
+        <property name="CurrentFacade" ref="GQT3.QT.Facade.QtOrgDygx"/>
+        <property name="OrganizationFacade" ref="GQT3.QT.Facade.Organization"/>
+      </object>
+    </property>
+  </object>
+
+  <!--GYS3.YS-->
+  <object id="GYS3.YS.Service.BudgetMst" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GYS3.YS.Service.BudgetMstService, GYS3.YS.Service" >
+        <property name="CurrentFacade" ref="GYS3.YS.Facade.BudgetMst"/>
+        <property name="BudgetDtlImplPlanFacade" ref="GYS3.YS.Facade.BudgetDtlImplPlan" />
+        <property name="BudgetDtlTextContentFacade" ref="GYS3.YS.Facade.BudgetDtlTextContent" />
+        <property name="BudgetDtlFundApplFacade" ref="GYS3.YS.Facade.BudgetDtlFundAppl" />
+        <property name="BudgetDtlBudgetDtlFacade" ref="GYS3.YS.Facade.BudgetDtlBudgetDtl" />
+        <property name="BudgetDtlPerformTargetFacade" ref="GYS3.YS.Facade.BudgetDtlPerformTarget" />
+        <property name="BudgetDtlPurchaseDtlFacade" ref="GYS3.YS.Facade.BudgetDtlPurchaseDtl" />
+        <property name="BudgetDtlPurDtl4SOFFacade" ref="GYS3.YS.Facade.BudgetDtlPurDtl4SOF" />
+      </object>
+    </property>
+  </object>
+  <object id="GYS3.YS.Service.BudgetProcessCtrl" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GYS3.YS.Service.BudgetProcessCtrlService, GYS3.YS.Service" >
+        <property name="CurrentFacade" ref="GYS3.YS.Facade.BudgetProcessCtrl"/>
+        <property name="BudgetMstFacade" ref="GYS3.YS.Facade.BudgetMst"/>
+        <property name="OrganizationFacade" ref="GQT3.QT.Facade.Organization"/>
+        <property name="UserOrgFacade" ref="GQT3.QT.Facade.UserOrg"/>
+      </object>
+    </property>
+  </object>
+  <object id="GYS3.YS.Service.BuDeptReport" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GYS3.YS.Service.BuDeptReportService, GYS3.YS.Service" >
+        <property name="CurrentFacade" ref="GYS3.YS.Facade.BuDeptReport"/>
+      </object>
+    </property>
+  </object>
+  <object id="GYS3.YS.Service.GHSubject" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GYS3.YS.Service.GHSubjectService, GYS3.YS.Service" >
+        <property name="CurrentFacade" ref="GYS3.YS.Facade.GHSubject"/>
+        <property name="SubjectMstFacade" ref="GYS3.YS.Facade.SubjectMst" />
+        <property name="SubjectMstBudgetDtlFacade" ref="GYS3.YS.Facade.SubjectMstBudgetDtl" />
+      </object>
+    </property>
+  </object>
+
+  <object id="GYS3.YS.Service.ExpenseMst" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GYS3.YS.Service.ExpenseMstService, GYS3.YS.Service" >
+        <property name="CurrentFacade" ref="GYS3.YS.Facade.ExpenseMst"/>
+        <property name="ExpenseDtlFacade" ref="GYS3.YS.Facade.ExpenseDtl" />
+      </object>
+    </property>
+  </object>
+
+
+
+
+  <!--GJX3.JX-->
+  <object id="GJX3.JX.Service.PerformanceMst" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GJX3.JX.Service.PerformanceMstService, GJX3.JX.Service" >
+        <property name="CurrentFacade" ref="GJX3.JX.Facade.PerformanceMst"/>
+        <property name="PerformanceDtlEvalFacade" ref="GJX3.JX.Facade.PerformanceDtlEval" />
+        <property name="PerformanceDtlTextContFacade" ref="GJX3.JX.Facade.PerformanceDtlTextCont" />
+        <property name="PerformanceDtlBuDtlFacade" ref="GJX3.JX.Facade.PerformanceDtlBuDtl" />
+        <property name="PerformanceDtlTarImplFacade" ref="GJX3.JX.Facade.PerformanceDtlTarImpl" />
+        <property name="PerformEvalTargetTypeFacade" ref="GQT3.QT.Facade.PerformEvalTargetType"/>
+        <property name="PerformEvalTargetClassFacade" ref="GQT3.QT.Facade.PerformEvalTargetClass"/>
+      </object>
+    </property>
+  </object>
+
+  
+  <!--GSP3.SP-->
+  <object id="GSP3.SP.Service.GAppvalPost" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GSP3.SP.Service.GAppvalPostService, GSP3.SP.Service" >
+        <property name="CurrentFacade" ref="GSP3.SP.Facade.GAppvalPost"/>
+        <property name="GAppvalPost4OperFacade" ref="GSP3.SP.Facade.GAppvalPost4Oper" />
+      </object>
+    </property>
+  </object>
+  <object id="GSP3.SP.Service.GAppvalProc" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GSP3.SP.Service.GAppvalProcService, GSP3.SP.Service" >
+        <property name="CurrentFacade" ref="GSP3.SP.Facade.GAppvalProc"/>
+        <property name="GAppvalProcCondsFacade" ref="GSP3.SP.Facade.GAppvalProcConds" />
+      </object>
+    </property>
+  </object>
+  <object id="GSP3.SP.Service.GAppvalProc4Post" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GSP3.SP.Service.GAppvalProc4PostService, GSP3.SP.Service" >
+        <property name="CurrentFacade" ref="GSP3.SP.Facade.GAppvalProc4Post"/>
+      </object>
+    </property>
+  </object>
+  <object id="GSP3.SP.Service.GAppvalRecord" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GSP3.SP.Service.GAppvalRecordService, GSP3.SP.Service" >
+        <property name="CurrentFacade" ref="GSP3.SP.Facade.GAppvalRecord"/>
+      </object>
+    </property>
+  </object>
+  
+  
+
+  <!--GBK.BK--> 
+  <object id="GBK3.BK.Service.PaymentMst" parent="BaseTransactionManager" >
+    <property name="Target" >
+      <object type="GBK3.BK.Service.PaymentMstService, GBK3.BK.Service" >
+        <property name="CurrentFacade" ref="GBK3.BK.Facade.PaymentMst"/>
+      </object>
+    </property>
+  </object>
+
+</objects>
+
+
+
+
+

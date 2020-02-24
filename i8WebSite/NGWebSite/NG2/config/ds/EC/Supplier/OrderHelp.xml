@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_orderdtl">
+      <Field Name="orderid" IsKey="true" />
+      <Field Name="orderno" />
+      <Field Name="lineid"  />
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="ordersum"/>
+      <Field Name="remarks"/>
+      <Field Name="reqdate"/>
+      <Field Name="sendflg"/>
+      <Field Name="sendqty"/>
+      <Field Name="sendsum"/>
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"/>
+      <Field Name="descript" />
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname"></Field>
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname"></Field>
+    </Table>
+    <Table Name="wsp_supply_ordermst">
+      <Field Name="supcomp"></Field>
+      <Field Name="relid"></Field>
+      <Field Name="recorddate"></Field>
+      <Field Name="relno" />
+      <Field Name="ocode" />
+    </Table>
+    <Table Name="ec_purmst">
+      <Field Name="appflg"></Field>
+    </Table>
+    <Table Name="fg_supplyfile">
+      <Field Name="uicsendrate"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      inner join wsp_supply_ordermst on wsp_supply_ordermst.orderid = [table].orderid
+      inner join ec_purmst on wsp_supply_ordermst.relid = ec_purmst.purid
+      inner join fg_supplyfile on wsp_supply_ordermst.ocode = fg_supplyfile.ocode
+      and wsp_supply_ordermst.supcomp = fg_supplyfile.compno
+      left outer join itemdata on itemdata.itemno = [table].itemno
+      left outer join ranks on ranks.ranks = [table].ranks
+      left outer join msunit on msunit.msunit = [table].msunit
+      [where] [orderby]
+    </Sql>
+    <Where format="{sendflg1} or {sendflg2}">
+      <Exp Field="wsp_supply_orderdtl.sendflg" ParamName="sendflg1" Oper="IsNull"></Exp>
+      <Exp Field="wsp_supply_orderdtl.sendflg" ParamName="sendflg2" Oper="NotEqual" Value="2"></Exp>
+      <Exp Field="ec_purmst.appflg" ParamName="appflg1" Value="1" />
+      <Exp Field="supcomp"  Target="AppInfo" Value="LoginId"/>
+      <Exp Field="ocode" Target="AppInfo" Value="OCode"/>
+    </Where>
+    <Query>
+      <Exp Field="wsp_supply_orderdtl.itemno" paramName="itemno" Target="Client" Value="itemno"></Exp>
+      <Exp Field="wsp_supply_orderdtl.itemname" paramName="itemname" Target="Client" Value="itemname"></Exp>
+      <Exp Field="wsp_supply_ordermst.recorddate" paramName="recorddate1" Target="Client" Oper="GreaterThanOrEqual" Value="recorddate1"/>
+      <Exp Field="wsp_supply_ordermst.recorddate" paramName="recorddate2" Target="Client" Oper="LessThanOrEqual" Value="recorddate2" />
+      <Exp Field="wsp_supply_ordermst.relno" paramName="purno" Target="Client" Value="purno"/>
+      <Exp Field="wsp_supply_orderdtl.remarks" paramName="remarks" Target="Client" Value="remarks"/>
+    </Query>
+    <OrderBy format="{wsp_supply_ordermst.relid}">
+      <Exp Field="wsp_supply_ordermst.relid" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    <Values>
+
+    </Values>
+  </Destroy>
+</DataService>

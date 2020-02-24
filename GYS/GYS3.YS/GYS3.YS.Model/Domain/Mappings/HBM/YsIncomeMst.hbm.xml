@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="YsIncomeMstModel" table="ys3_incomemst">
+		<id name="PhId" access="property" column="Phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="FOrgID" column="F_orgID" type="System.Int64" not-null="false" />
+		<property name="FOrgcode" column="F_Orgcode" type="System.String" length="100" not-null="false" />
+		<property name="FYear" column="f_year" type="System.String" length="4" not-null="false" />
+		<property name="FApproval" column="f_approval" type="System.Byte" not-null="false" />
+		<property name="FIsbudget" column="F_Isbudget" type="System.Byte" not-null="false" />
+		<property name="FBudgeter" column="F_budgeter" type="System.Int64" not-null="false" />
+		<property name="FIsreport" column="F_Isreport" type="System.Byte" not-null="false" />
+		<property name="FReporttime" column="F_reporttime" type="System.DateTime" not-null="false" />
+    <property name="FBudgettime" column="F_Budgettime" type="System.DateTime" not-null="false" />
+		<property name="FReporter" column="F_reporter" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+    <property name="FDeclareTime" column="F_DeclareTime" type="System.DateTime" not-null="false" />
+    <property name="FDeclareAmount" column="F_DeclareAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+	</class>
+</hibernate-mapping>

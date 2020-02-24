@@ -1,0 +1,976 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src="@Url.Script("~/NG3Resource/js/NG3APPcommon.js")" type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/ExpenseMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/YJK.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var grid;
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                rightName: 'GHExpenseList', //权限名称
+                showArrowBtn: false,
+                layout: {
+                    overflowHandler: 'Menu'
+                },
+                ngbuttons: [
+                    { id: "add", text: "申报", width: this.itemWidth, iconCls: "icon-New", langkey: "add"},
+                    'edit', 'delete', 'view',
+                    'check', { id: "uncheck", text: "取消送审", width: this.itemWidth, iconCls: "icon-Unvalid", langkey: "uncheck" },
+                    'history', 'valid', { id: "unvalid", text: "取消审批", width: this.itemWidth, iconCls: "icon-Unvalid", langkey: "unvalid"},
+                    { id: "AmountHX", text: "额度核销", width: this.itemWidth, iconCls: "icon-Assign", langkey: "AmountHX" },
+                    { id: "AmountReturn", text: "额度返还", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "AmountReturn" },"refresh",
+                    '->', 'print', /*'close'*/
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "FDeclarationunit",
+    "type": "string",
+    "mapping": "FDeclarationunit"
+  },
+  {
+    "name": "FDeclarationunit_EXName",
+    "type": "string",
+    "mapping": "FDeclarationunit_EXName"
+  },
+  {
+    "name": "FBudgetDept",
+    "type": "string",
+    "mapping": "FBudgetDept"
+  },
+  {
+    "name": "FBudgetDept_EXName",
+    "type": "string",
+    "mapping": "FBudgetDept_EXName"
+  },
+  {
+    "name": "FProjname",
+    "type": "string",
+    "mapping": "FProjname"
+  },
+  {
+    "name": "FApprovestatus",
+    "type": "string",
+    "mapping": "FApprovestatus"
+                },
+                {
+                    "name": "FNextApprove",
+                    "type": "string",
+                    "mapping": "FNextApprove"
+                },
+  {
+    "name": "FDeclarer",
+    "type": "string",
+    "mapping": "FDeclarer"
+  },
+  {
+    "name": "FDateofdeclaration",
+    "type": "date",
+    "mapping": "FDateofdeclaration"
+  },
+  {
+    "name": "FApprover",
+    "type": "string",
+    "mapping": "FApprover"
+  },
+  {
+    "name": "FApprover_EXName",
+    "type": "string",
+    "mapping": "FApprover_EXName"
+  },
+  {
+    "name": "FApprovedate",
+    "type": "date",
+    "mapping": "FApprovedate"
+  },
+  {
+    "name": "FYear",
+    "type": "string",
+    "mapping": "FYear"
+  },
+  {
+    "name": "FProjcode",
+    "type": "string",
+    "mapping": "FProjcode"
+  },
+  {
+    "name": "FProjAttr",
+    "type": "string",
+    "mapping": "FProjAttr"
+  },
+  {
+    "name": "FDuration",
+    "type": "string",
+    "mapping": "FDuration"
+  },
+  {
+    "name": "FExpenseCategory",
+    "type": "string",
+    "mapping": "FExpenseCategory"
+  },
+  {
+    "name": "FExpenseCategory_EXName",
+    "type": "string",
+    "mapping": "FExpenseCategory_EXName"
+  },
+  {
+    "name": "FProjstatus",
+    "type": "int",
+    "mapping": "FProjstatus"
+  },
+  {
+    "name": "FStartdate",
+    "type": "date",
+    "mapping": "FStartdate"
+  },
+  {
+    "name": "FDeclarationDept",
+    "type": "string",
+    "mapping": "FDeclarationDept"
+  },
+  {
+    "name": "FDeclarationDept_EXName",
+    "type": "string",
+    "mapping": "FDeclarationDept_EXName"
+  },
+  {
+    "name": "FEnddate",
+    "type": "date",
+    "mapping": "FEnddate"
+  },
+  {
+    "name": "FIfperformanceappraisal",
+    "type": "int",
+    "mapping": "FIfperformanceappraisal"
+  },
+  {
+    "name": "FIfKeyEvaluation",
+    "type": "int",
+    "mapping": "FIfKeyEvaluation"
+  },
+  {
+    "name": "FProjAmount",
+    "type": "float",
+    "mapping": "FProjAmount"
+  },
+  {
+    "name": "FType",
+    "type": "string",
+    "mapping": "FType"
+  },
+  {
+    "name": "FBudgetamount",
+    "type": "float",
+    "mapping": "FBudgetamount"
+  },
+  {
+    "name": "FLifeCycle",
+    "type": "int",
+    "mapping": "FLifeCycle"
+  },
+  {
+    "name": "FVerno",
+    "type": "string",
+    "mapping": "FVerno"
+  },
+  {
+    "name": "FPlayamount",
+    "type": "float",
+    "mapping": "FPlayamount"
+  },
+  {
+    "name": "FServiceDept",
+    "type": "string",
+    "mapping": "FServiceDept"
+  },
+  {
+    "name": "FCarryover",
+    "type": "int",
+    "mapping": "FCarryover"
+  },
+  {
+    "name": "FFundStandard",
+    "type": "string",
+    "mapping": "FFundStandard"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  },
+  {
+    "name": "FIfpurchase",
+    "type": "int",
+    "mapping": "FIfpurchase"
+  },
+  {
+    "name": "FBillno",
+    "type": "string",
+    "mapping": "FBillno"
+  },
+  {
+    "name": "FPerformevaltype",
+    "type": "string",
+    "mapping": "FPerformevaltype"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'billList');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: false,
+                url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstList?userId=' + $appinfo.logid
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: 'a22db7be-f482-4e56-9dae-d7e15ae99607',
+				buskey: 'PhId', //对应的业务表主键属性
+				/*layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},*/
+				bbar: [pagingbar]
+			};
+
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['billList']);
+			grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+		    //内嵌查询
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+				pageid: "Web:GHExpenseMstList",//对应内嵌查询业务点标识
+                grid: grid,
+                columnsPerRow: 2 //每行2列
+            });
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, queryPanel, grid]
+            });
+
+
+
+			queryPanel.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+
+				var orgCode = "";
+                //var dept = "";
+				Ext.Ajax.request({
+                    params: { 'userID': $user.id },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var orgDept = resp.Msg;
+                            var orgDeptArray = orgDept.split(",");
+                            orgCode = orgDeptArray[0];
+                            //dept = orgDeptArray[1];
+
+							var filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + orgCode + "%')";
+
+							queryPanel.queryById("FBudgetDept").setClientSqlFilter(filter);
+                        }
+                    }
+                });
+
+            });
+
+            queryPanel.queryById("FDeclarationDept").on("beforetriggerclick", function (str) {
+
+                var orgCode = "";
+                //var dept = "";
+                Ext.Ajax.request({
+                    params: { 'userID': $user.id },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var orgDept = resp.Msg;
+                            var orgDeptArray = orgDept.split(",");
+                            orgCode = orgDeptArray[0];
+                            //dept = orgDeptArray[1];
+
+                            var filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + orgCode + "%')";
+
+                            queryPanel.queryById("FDeclarationDept").setClientSqlFilter(filter);
+                        }
+                    }
+                });
+
+            });
+
+grid.getColumn('FApprovestatus').renderer = function(val){
+ var temp;
+ switch (val) {
+ case '1': temp = '待上报'; break;
+ case '2': temp = '审批中'; break;
+ case '3': temp = '审批通过'; break;
+ case '4': temp = '额度返还'; break;
+ case '5': temp = '已退回'; break;
+  default: temp = '';
+  }
+  return temp;
+}
+
+grid.getColumn('FDateofdeclaration').renderer = function(val){
+ if (val) {
+     var str = Ext.util.Format.date(val, 'Y-m-d');
+     return str;
+ } else {
+     return '';
+  }
+};
+
+grid.getColumn('FApprovedate').renderer = function(val){
+ if (val) {
+     var str = Ext.util.Format.date(val, 'Y-m-d');
+     return str;
+ } else {
+     return '';
+  }
+};
+
+/*grid.getColumn('FProjAttr').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '延续项目'; break;
+ case 2: temp = '新增项目'; break;
+  default: temp = '';
+  }
+  return temp;
+}
+
+grid.getColumn('FDuration').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '一次性项目'; break;
+ case 2: temp = '经常性项目'; break;
+ case 3: temp = '跨年度项目'; break;
+  default: temp = '';
+  }
+  return temp;
+}
+
+grid.getColumn('FProjstatus').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '单位备选'; break;
+ case 2: temp = '纳入预算'; break;
+ case 3: temp = '项目执行'; break;
+ case 4: temp = '项目调整'; break;
+ case 5: temp = '项目暂停'; break;
+ case 6: temp = '项目终止'; break;
+ case 7: temp = '项目关闭'; break;
+  default: temp = '';
+  }
+  return temp;
+}*/
+
+grid.getColumn('FStartdate').renderer = function(val){
+ if (val) {
+     var str = Ext.util.Format.date(val, 'Y-m-d');
+     return str;
+ } else {
+     return '';
+  }
+};
+
+grid.getColumn('FEnddate').renderer = function(val){
+ if (val) {
+     var str = Ext.util.Format.date(val, 'Y-m-d');
+     return str;
+ } else {
+     return '';
+  }
+};
+
+/*grid.getColumn('FIfperformanceappraisal').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '是'; break;
+ case 2: temp = '否'; break;
+  default: temp = '';
+  }
+  return temp;
+}
+
+grid.getColumn('FIfKeyEvaluation').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '是'; break;
+ case 2: temp = '否'; break;
+  default: temp = '';
+  }
+  return temp;
+}
+
+grid.getColumn('FType').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '年初'; break;
+ case 2: temp = '年中新增'; break;
+ case 3: temp = '专项'; break;
+  default: temp = '';
+  }
+  return temp;
+}
+
+grid.getColumn('FCarryover').renderer = function(val){
+ var temp;
+ switch (val) {
+ case 1: temp = '未结转'; break;
+ case 2: temp = '已结转'; break;
+  default: temp = '';
+  }
+  return temp;
+}*/
+
+
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab(pageName + '-新增', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=add');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+					if (data[0].get('FApprovestatus') != '1') {
+						Ext.MessageBox.alert('提示', "单据已送审！");
+						return null;
+					}
+					if(data[0].get('FIfpurchase')=='1'){
+						Ext.MessageBox.confirm('提示', '该单据已发生额度返还业务，是否跳转至对应单据？', callBack);
+						function callBack(callBackid) {
+							if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+								return;
+							} else {
+								var id = data[0].get('FBillno');
+								$OpenTab(pageName + '-修改', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=edit&id=' + id);
+							}
+						}
+					}else{
+						var id = data[0].get('PhId');
+						$OpenTab(pageName + '-修改', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=edit&id=' + id);
+					}
+                }
+            });
+
+			//送审
+            ngToolbar.get('check').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要送审的单据！");
+                    return null;
+                }
+
+                /*if (data[0].get('FApproveStatus') == '2') {
+                    Ext.MessageBox.alert('提示', "单据已在审批流程中！");
+                    return null;
+                }
+                if (data[0].get('FApproveStatus') == '3') {
+                    Ext.MessageBox.alert('提示', "单据已审批！");
+                    return null;
+                }*/
+
+                if (data[0].get('FApprovestatus') != '1') {
+                    Ext.MessageBox.alert('提示', "单据已送审！");
+                    return null;
+                }
+
+                //启动审批流
+                $WorkFlow.startFlow("GHExpense", data[0].get('PhId'), NG3Refresh);
+            });
+
+            //取消送审
+            ngToolbar.get('uncheck').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+					if(data[0].get('FIfpurchase')=='1'){
+						Ext.MessageBox.alert('提示', "该单据已发生额度返还业务,无法取消送审！");
+						return;
+					}else{
+						if (data[0].get('FApprovestatus') == '1') {
+							Ext.MessageBox.alert('提示', "单据未送审！");
+							return;
+						}
+
+						Ext.MessageBox.confirm('提示', '取消送审会取消全部审批记录，是否继续？', callBack);
+
+						function callBack(callBackid) {
+							if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+								return;
+							} else {
+								if (data[0].get('FApprovestatus') == "3") {
+									Ext.Ajax.request({
+										params: { 'id': data[0].get('PhId') },
+										url: C_ROOT + 'GYS/YS/ExpenseMst/UnChecked',
+										success: function (response) {
+											var resp = Ext.JSON.decode(response.responseText);
+											if (resp.Status === "success") {
+
+												NG3Refresh();
+
+												NGMsg.Info('取消送审成功！');
+											} else {
+												NGMsg.Info('取消送审失败！');
+											}
+										}
+									});
+								} else if (data[0].get('FApprovestatus') == "2") {
+
+
+									var piid = "";
+									Ext.Ajax.request({
+										params: { 'approveCode': "GHExpense", 'userId': data[0].get('PhId') },
+										url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+										async: false, //同步请求
+										success: function (response) {
+											var resp = Ext.JSON.decode(response.responseText);
+											if (resp.Status === "success") {
+
+												piid = resp.Msg;
+												if (Ext.isEmpty(piid)) {
+													return;
+												}
+											}
+										}
+									});
+
+									if (piid == "") {
+										NGMsg.Info('取消送审失败，单据不在审批流程中！');
+									}
+									else {
+										Ext.Ajax.request({
+											params: { 'data': JSON.stringify({ "bizphid": data[0].get('PhId'), "biztype": "GHExpense", "compId": "GHExpense_edit", "remark: ": "取消送审", "piid": piid }) },
+											async: false,
+											url: C_ROOT + 'WorkFlow3/WorkFlow/FlowTerminate',
+											success: function (response) {
+												var resp = Ext.JSON.decode(response.responseText);
+												if (resp.success) {
+													NG3Refresh();
+													NGMsg.Info('取消送审成功！');
+
+												} else {
+													Ext.MessageBox.alert('取消送审失败', resp.errorMsg);
+												}
+											}
+										});
+									}
+
+								}
+
+
+							}
+						}
+					}
+                }
+
+            });
+            //送审追踪
+            ngToolbar.get('history').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要查看的单据！");
+                    return;
+                }
+
+                if (data[0].get('FApprovestatus') == '1') {
+                    Ext.MessageBox.alert('提示', "单据未送审！");
+                    return;
+                }
+
+                $WorkFlow.showFlowInfo('GHExpense', data[0].get('PhId')); //打开追踪信息窗口
+            });
+            //审批
+            ngToolbar.get('valid').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要审批的单据！");
+                    return;
+                }
+
+                if (data[0].get('FApprovestatus') == '1') {
+                    Ext.MessageBox.alert('提示', "单据未送审！");
+                    return;
+                }
+
+                if (data[0].get('FApprovestatus') == '3') {
+                    Ext.MessageBox.alert('提示', "单据已审批！");
+                    return;
+                }
+
+                var mst_id = data[0].get('PhId');
+
+                Ext.Ajax.request({
+
+                    url: C_ROOT + 'WorkFlow3/FlowManager/GetPendingTaskByUser',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length > 0) {
+                            for (var i = 0; i < resp.Record.length; i++) {
+                                if (resp.Record[i].pkstr == mst_id) {
+                                    if (Ext.isEmpty(resp.Record[i].uitype) || resp.Record[i].uitype != 4) {
+                                        $WorkFlow.openWinFromPage(resp.Record[i].url, resp.Record[i].urlparam + "@@@@**IsWFTaskList=true", true);
+                                    }
+                                    else {
+                                        $OpenTab('工作流任务', C_ROOT + resp.Record[i].url + '&iswftasklist=true');
+                                    }
+
+                                    return;
+
+                                }
+                            }
+                        } else {
+                            Ext.MessageBox.alert('提示', "未找到审批数据！");
+                            return;
+                        }
+
+                    }
+                });
+            });
+            //取消审批
+            ngToolbar.get('unvalid').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length <= 0) {
+                    Ext.MessageBox.alert('提示', "请您先选择要取消审批的单据！");
+                    return;
+                }
+
+                if (data[0].get('FApprovestatus') == '1') {
+                    Ext.MessageBox.alert('提示', "单据未送审！");
+                    return;
+                }
+
+
+                var mst_id = data[0].get('PhId');
+
+                Ext.Ajax.request({
+
+                    params: { 'approveCode': "GHExpense", 'userId': mst_id },
+                    url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp1 = Ext.JSON.decode(response.responseText);
+                        if (resp1.Status === "success") {
+                            var piid = resp1.Msg;
+                            if (Ext.isEmpty(piid)) {
+                                return;
+                            }
+                            Ext.Ajax.request({
+                                async: false, //同步请求
+                                params: { 'flowType': 'wf', 'piid': piid },
+                                url: C_ROOT + 'WorkFlow3/FlowManager/CanDrawback',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp && resp.candrawback) {
+                                        Ext.MessageBox.confirm('提示', '是否执行撤回操作', function (id) {
+                                            if (id.toString() == 'yes') {
+                                                Ext.Ajax.request({
+                                                    async: false, //同步请求
+                                                    params: { 'flowType': 'wf', 'piid': piid },
+                                                    url: C_ROOT + 'WorkFlow3/FlowManager/Drawback',
+                                                    success: function (response) {
+                                                        var result = Ext.JSON.decode(response.responseText);
+                                                        if (result.result) {
+                                                            Ext.MessageBox.alert('提示', "撤回操作成功！");
+                                                            store.load();
+                                                        }
+                                                        else {
+                                                            Ext.MessageBox.alert('提示', "撤回操作失败，原因：" + result.msg);
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        var errMsg = '当前流程不允许撤回！';
+                                        if (!Ext.isEmpty(resp.errorMsg)) {
+                                            errMsg += resp.errorMsg;
+                                        }
+                                        Ext.MessageBox.alert('提示', errMsg);
+                                        return;
+                                    }
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.alert('提示', "未找到审批数据！");
+                            return;
+                        }
+
+                    }
+                });
+            });
+
+            //额度核销
+            ngToolbar.get('AmountHX').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    if (data[0].get('FApprovestatus') == '3') {
+                        //if (data[0].get('FIfKeyEvaluation') == '1') {
+                        //    Ext.MessageBox.alert('提示', "该单据已额度核销！");
+                        //    return;
+                        //}
+						if(data[0].get('FIfpurchase')=='2' || data[0].get('FIfpurchase')=='1'){
+							Ext.MessageBox.alert('提示', "该单据已额度返还！");
+							return;
+						}
+                        var id = data[0].get('PhId');
+                        $OpenTab(pageName + '-额度核销', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=view&AmountHX=true&id=' + id);
+                    } else {
+                        Ext.MessageBox.alert('提示', "已审批单据才能额度核销！");
+                    }
+                }
+            });
+
+			//额度返还
+            ngToolbar.get('AmountReturn').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+					if(data[0].get('FApprovestatus')=='3'){
+						if (data[0].get('FIfKeyEvaluation') == '1') {
+							Ext.MessageBox.alert('提示', "该单据已额度核销！");
+							return;
+						}
+						var id = data[0].get('PhId');
+						if(data[0].get('FIfpurchase')=='2'){
+							$OpenTab(pageName + '-修改', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=edit&id=' + id);
+						}else if(data[0].get('FIfpurchase')=='1'){
+							Ext.MessageBox.alert('提示', "该单据已额度返回！");
+							return;
+						}else if(data[0].get('FIfpurchase')=='0'){
+							$OpenTab(pageName + '-额度返还', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=edit&id=' + id+'&Ifreturn=1');
+						}
+					}else{
+						Ext.MessageBox.alert('提示', "已审批单据才能额度返还！");
+					}
+                }
+            });
+
+			//刷新
+            ngToolbar.get('refresh').on('click', function () {
+                NG3Refresh();
+
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+					if(data[0].get('FApprovestatus')!='3'){
+
+						if(data[0].get('FIfpurchase')=='2'){
+							Ext.MessageBox.confirm('提示', '该单据已发生额度返还业务，是否取消额度返还？', callBack);
+							function callBack(callBackid) {
+								if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+									return;
+								} else {
+									Ext.Ajax.request({
+										params: { 'id': data[0].get('PhId') },
+										url: C_ROOT + 'GYS/YS/ExpenseMst/DeleteReturn',
+										success: function (response) {
+											var resp = Ext.JSON.decode(response.responseText);
+											if (resp.Status === "success") {
+
+												/*Ext.Array.each(data, function (record) {
+													store.remove(record); //前端删除
+												});*/
+												store.load();
+
+												NGMsg.Info('删除成功！');
+											} else {
+												NGMsg.Info('删除失败！');
+											}
+										}
+									});
+								}
+							}
+						}
+						else
+						{
+							recoderefresh(data);
+
+							Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+							function callBack(callBackid) {
+								if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+									return;
+								} else {
+									Ext.Ajax.request({
+										params: { 'id': data[0].get('PhId') },
+										url: C_ROOT + 'GYS/YS/ExpenseMst/Delete',
+										success: function (response) {
+											var resp = Ext.JSON.decode(response.responseText);
+											if (resp.Status === "success") {
+
+												Ext.Array.each(data, function (record) {
+													store.remove(record); //前端删除
+												});
+
+												NGMsg.Info('删除成功！');
+											} else {
+												NGMsg.Info('删除失败！');
+											}
+										}
+									});
+								}
+							}
+						}
+					}else{
+						Ext.MessageBox.alert('提示', "已审批单据无法删除！");
+						return;
+					}
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+					if(data[0].get('FIfpurchase')=='1'){
+						Ext.MessageBox.confirm('提示', '该单据已发生额度返还业务，是否跳转至对应单据？', callBack);
+						function callBack(callBackid) {
+							if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+								return;
+							} else {
+								var id = data[0].get('FBillno');
+								$OpenTab(pageName + '-查看', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=view&id=' + id);
+							}
+						}
+					}else{
+						var id = data[0].get('PhId');
+						$OpenTab(pageName + '-查看', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=view&id=' + id);
+					}
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+            //处理toolbar折叠，请在AllReady之后调用，
+            //确保实施挂载的toolbar事件在折叠下拉中也有效果
+            ngToolbar.dealOverFlowMenu();
+
+
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstList?userId=' + $appinfo.logid,
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+			var PageUrl = window.location.href;
+			//if(PageUrl.indexOf('GHExpense=true')>=0){
+				
+			//}
+            store.load(function(){
+				/*Ext.Ajax.request({
+					url: C_ROOT + 'WorkFlow3/FlowManager/GetPendingTaskByUser',
+					type: 'POST',
+					params: {
+						page: 0,
+						start: 0,
+						limit: 1,
+						ng3_logid: $appinfo.userID,
+						random: Math.random(),
+						queryfilter: '{ "act_ru_task.FORM_RESOURCE_KEY_*str*like*1": "GHExpense" }'
+					},
+					async: true,
+					success: function (response) {
+						if (response != null && response != undefined) {
+							var data = Ext.JSON.decode(response.responseText);
+							Ext.getCmp('ykjh_SP1254').setText('待我审批:'+data.totalRows);
+						}
+					}
+				});*/
+			});
+			window.parent.ykjhCount();
+        }
+
+    </script>
+}
+
+

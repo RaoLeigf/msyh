@@ -1,0 +1,485 @@
+﻿@{
+    ViewBag.Title = "基础设置";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{  
+    <script type="text/javascript">
+		var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo)? {} : Ext.decode(langInfo); //自定义
+
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        //var busno = '@ViewBag.No';
+
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    '->',
+                    'close'
+                ]
+            });
+            
+
+            Ext.define('operatorModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'Phid',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'Phid'
+					}, {
+					    name: 'LoginId',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'LoginId'
+					}
+                ]
+            });
+
+            var opergridstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'operatorModel',
+                pageSize: 100,
+                autoLoad: true,
+                url: 'GetAddinOperatorList'               
+            });
+
+            var opergrid = Ext.create('Ext.ng.GridPanel', {
+                minHeight: 400,
+                id:"opergrid",
+                stateful: true,
+                stateId: 'opergrid',
+               // forceFit:'true',
+                store: opergridstore,
+                buskey: 'Phid', //对应的业务表主键属性
+                columnLines: true,
+                tbar: [
+                       { text: '保存', itemId: "save", pid: 'opergrid', iconCls: "icon-save" },
+                       { text: '新增', itemId: "add", pid: 'opergrid', iconCls: "icon-New" },
+                       { text: '删除', itemId: 'del', pid: 'opergrid', iconCls: "delete" },
+
+                ],
+                selModel:{
+                    mode:'single'
+                },
+                selType:'cellmodel',
+
+                columns: [{
+                    xtype: 'rownumberer',
+                    text: '行号',
+                    width: 35
+                },
+					{
+					    header: Lang.Phid || 'phid',
+					    dataIndex: 'Phid',
+					    width: 100,
+					    sortable: false,
+					    hidden: true
+					},  {
+					    text: Lang.FromDs || '功能自定义管理员',
+					    dataIndex: 'LoginId',
+					    width: 150,
+					    sortable: false,
+					    hidden: false,
+					    editor:{
+					        xtype: 'ngRichHelp',
+					        id: 'LoginId',
+					        name: 'LoginId',
+					        readOnly: false,
+					        ORMMode: false,
+					        valueField: 'userno',
+					        displayField: 'userno',
+					        helpid: 'addinoper', //帮助标记
+					        matchFieldWidth: false,
+					        pickerWidth: 400,
+					        isInGrid: true,
+					        listeners: {
+					            helpselected: function (obj) {
+					                 var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+					                 data[0].set('LoginId', obj.code);
+					                 //data[0].set('LoginId', obj.name);
+					              
+					            }
+					        },
+					    }
+					}
+                ],
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+
+            });
+
+
+                  
+
+
+            Ext.define('systemVarModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'VarName',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'VarName'
+					}, {
+					    name: 'VarDesc',
+					    type: 'string',
+					    mapping: 'VarDesc'
+					}
+                ]
+            });
+
+            var systemvarstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'systemVarModel',
+                pageSize: 25,
+                autoLoad: true,
+                url: 'GetSystemVariables'
+            });
+
+            var systemvargrid = Ext.create('Ext.ng.GridPanel', {
+                //frame: true,
+                id: "systemvargrid",
+                stateful: true,
+                stateId: 'systemvargrid',
+                store: systemvarstore,
+                columnLines: true,
+                selModel: {
+                    mode: 'single'
+                },
+                selType: 'cellmodel',
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.FuncName || '内置系统参数',
+					    dataIndex: 'VarName',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+					}, {
+					    header: Lang.FuncDesc || '参数说明',
+					    dataIndex: 'VarDesc',
+					    flex: 2,
+					    sortable: false,
+					    hidden: false
+					}
+                ],
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+            });
+
+          
+            Ext.define('bizVarModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'VarName',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'VarName'
+					}, {
+					    name: 'VarDesc',
+					    type: 'string',
+					    mapping: 'VarDesc'
+					}
+                ]
+            });
+
+            var bizvarstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'bizVarModel',
+                pageSize: 25,
+                autoLoad: true,
+                url: 'GetBizVariables'
+            });
+
+            var bizvargrid = Ext.create('Ext.ng.GridPanel', {
+                //frame: true,
+                id: "bizvargrid",
+                stateful: true,
+                stateId: 'bizvargrid',
+                store: bizvarstore,
+                columnLines: true,
+                selModel: {
+                    mode: 'single'
+                },
+                selType: 'cellmodel',
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.FuncName || '内置系统参数',
+					    dataIndex: 'VarName',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+					}, {
+					    header: Lang.FuncDesc || '参数说明',
+					    dataIndex: 'VarDesc',
+					    flex: 2,
+					    sortable: false,
+					    hidden: false
+					}
+                ],
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+            });
+
+            
+            //服务的请求参数
+            Ext.define('bizUiParamModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+					{
+					    name: 'ClassName',
+					    type: 'string',//因为页面不支持int64，所以这里做特殊处理
+					    mapping: 'ClassName'
+					}, {
+					    name: 'MethodName',
+					    type: 'string',
+					    mapping: 'MethodName'
+					}, {
+					    name: 'ParamName',
+					    type: 'string',
+					    mapping: 'ParamName'
+					}, {
+					    name: 'ParamValue',
+					    type: 'string',
+					    mapping: 'ParamValue'
+					}
+                ]
+            });
+
+            var bizUiParamStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'bizUiParamModel',
+                pageSize: 25,
+                autoLoad: true,
+                url: 'GetServiceRequestParameters'
+            });
+
+
+           var editWin = Ext.create("Ext.window.Window", {
+                title: "参数值",
+                modal: true,
+                width: 600,
+                height: 400,
+                closeable: true,
+                resizable: false,
+                closeAction: "hide",
+                items: [{
+                    xtype: 'ngTextArea',                  
+                    name: 'paramValue',
+                    itemId: 'paramValue',
+                    readOnly: false,
+                    width: 600,
+                    height:400
+                    
+                }]
+              
+            });
+
+
+            var bizUiParamGrid = Ext.create('Ext.ng.GridPanel', {
+                //frame: true,
+                id: "bizUiParamGrid",
+                //stateful: true,
+                //stateId: 'bizUiParamGrid',
+                store: bizUiParamStore,
+                columnLines: true,
+                selModel: {
+                    mode: 'single'
+                },
+                selType: 'cellmodel',
+                columns: [Ext.create('Ext.grid.RowNumberer', { text: '行号', width: 35 }),
+					{
+					    header: Lang.FuncName || '类名',
+					    dataIndex: 'ClassName',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+					}, {
+					    header: Lang.FuncDesc || '方法名',
+					    dataIndex: 'MethodName',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+					},
+                    {
+					    header: Lang.FuncDesc || '参数名',
+					    dataIndex: 'ParamName',
+					    flex: 1,
+					    sortable: false,
+					    hidden: false
+                    }
+                    ,
+                    {
+                        header: Lang.FuncDesc || '参数值',
+                        dataIndex: 'ParamValue',
+                        flex: 3,
+                        sortable: false,
+                        hidden: false
+                    }
+                ],
+                plugins: [Ext.create("Ext.grid.plugin.CellEditing", { clicksToEdit: 1 })]
+            });
+
+            //弹出窗口
+            bizUiParamGrid.on('celldblclick', function (gridpanel, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+                if(cellIndex ===4)
+                {
+                    editWin.show();
+                    editWin.queryById('paramValue').setValue(record.data.ParamValue);
+                }
+
+            });
+
+
+
+            var tabItems = [
+              {
+                  id: 'tab1',
+                  //layout: 'border', //使grid填充
+                  title: '功能自定义管理员',
+                  autoScroll: true,
+                  layout:'fit',
+                  //autoScroll: true,
+                  //height:400,
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [opergrid]
+              },
+              {
+                  id: 'tab2',
+                  title: '内置系统参数',
+                  autoScroll: true,
+                  layout: 'fit',
+                  //contentEl: 'center1'
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [systemvargrid]
+              },
+              {
+                  id: 'tab3',
+                  title: '内置业务参数',
+                  autoScroll: true,
+                  layout:'fit',
+                  //contentEl: 'center1'
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [bizvargrid]
+              }
+              ,
+              {
+                  id: 'tab4',
+                  title: '服务请求参数',
+                  autoScroll: true,
+                  layout: 'fit',
+                  //contentEl: 'center1'
+                  //defaults: { width: 230 },
+                  //defaultType: 'textfield',
+                  items: [bizUiParamGrid]
+              }
+            ];
+
+
+            var tabPanel = Ext.create('Ext.tab.Panel', {
+                //renderTo: 'tabpanel',
+                //xtype: 'tabpanel',
+                //layout: 'border',
+                region: 'center',
+                deferredRender: false,
+                plain: true,
+                id:"tabs",
+                //activeTab: 0,
+                minHeight: 400,
+                minWidth: 600,
+                defaults: { bodyStyle: 'padding:3px' },
+                items: tabItems
+
+            });
+
+
+
+            //定义模型
+
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, {
+                    xtype: 'panel',
+                    region: 'center',
+                    autoScroll: true,
+                    overflowY: 'scroll',
+                    layout: 'border',
+                    bodyStyle: "padding-right:5px",
+                    items: [tabPanel]
+                }]
+            });
+
+
+        });
+
+        //事件绑定
+        Ext.onReady(function () { event.bindEvent(); });
+
+        var event = {
+            bindEvent: function () {
+                var obj;
+                obj = Ext.getCmp("opergrid");
+                obj.queryById("add").on('click', this.AddOper);
+                obj.queryById("del").on('click', this.DeleteOper);
+                obj.queryById("save").on('click', this.SaveOper);
+             
+            },
+
+            AddOper: function () {
+                var grid = Ext.getCmp('opergrid');
+                var row = [{
+                    'Phid':'',
+                    'LoginId':'',                    
+                }];
+
+                var store = grid.getStore();
+                store.insert(store.getCount(), row);
+            },
+            DeleteOper: function (btn) {
+
+
+                var grid = Ext.getCmp(btn.pid);
+                if (Ext.isEmpty(grid)) return;
+
+                var data = grid.getSelectionModel().getSelection();
+                if (Ext.isEmpty(data)) {
+                    Ext.Msg.alert("提示","请先选择行!");
+                    return;
+                }
+                Ext.MessageBox.confirm('提示', '是否确定删除该记录?', function (btn) {
+                    if(btn!='yes')
+                    {
+                        return;
+                    }
+                    var store = grid.getStore();
+                    store.remove(data);
+                });
+
+            },
+
+            SaveOper: function () {
+
+                var opergriddata = Ext.getCmp("opergrid").getChange();
+
+                Ext.Ajax.request({
+                    params: {
+                        'operdata': opergriddata
+                    },
+                    url: '@Url.Content("~/Addin/BasicSetting/SaveAddinOperator")', //先替换成log后续MVC area修改成addin
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示','保存成功');
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+            }
+        };
+
+    </script>
+}

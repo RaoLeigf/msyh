@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GGK3.GK.Facade.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GGK3.GK.Facade.Interface.IGKPaymentDtlFacade">
+            <summary>
+            GKPaymentDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GGK3.GK.Facade.Interface.IGKPaymentMstFacade">
+            <summary>
+            GKPaymentMst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GGK3.GK.Facade.Interface.IGKPaymentMstFacade.SaveGKPaymentMst(GGK3.GK.Model.Domain.GKPaymentMstModel,System.Collections.Generic.List{GGK3.GK.Model.Domain.GKPaymentDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="gKPaymentMstEntity"></param>
+            <param name="gKPaymentDtlEntities"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

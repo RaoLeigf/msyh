@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="ProjectDtlBudgetDtlModel" table="xm3_ProjectDtl_BudgetDtl">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="FDtlCode" column="f_DtlCode" type="System.String" length="255" not-null="false" />
+		<property name="FName" column="f_Name" type="System.String" length="500" not-null="false" />
+		<property name="FMeasUnit" column="f_MeasUnit" type="System.String" length="10" not-null="false" />
+		<property name="FQty" column="f_qty" type="System.Decimal" not-null="false" />
+    <property name="FQty2" column="f_qty2" type="System.Decimal" not-null="false" />
+		<property name="FPrice" column="f_Price" type="System.Decimal" not-null="false" />
+		<property name="FAmount" column="f_Amount" type="System.Decimal" not-null="false" />
+		<property name="FBudgetAmount" column="f_BudgetAmount" type="System.Decimal" not-null="false" />
+		<property name="FSourceOfFunds" column="f_SourceOfFunds" type="System.String" length="30" not-null="false" />
+		<property name="FBudgetAccounts" column="f_BudgetAccounts" type="System.String" length="20" not-null="false" />
+		<property name="FOtherInstructions" column="f_OtherInstructions" type="System.String" length="400" not-null="false" />
+		<property name="FPaymentMethod" column="f_PaymentMethod" type="System.String" length="10" not-null="false" />
+		<property name="FExpensesChannel" column="f_ExpensesChannel" type="System.String" length="200" not-null="false" />
+		<property name="FFeedback" column="f_Feedback" type="System.String" length="200" not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+    <property name="FMidEdit" column="f_midEdit" type="System.String" length="2" not-null="false" />
+    <property name="FIfPurchase" column="f_ifPurchase" type="GXM3.XM.Model.Enums.EnumYesNo, GXM3.XM.Model"  not-null="true" />
+    <property name="FQtZcgnfl" column="f_QtZcgnfl" type="System.String" length="20" not-null="false" />
+    <property name="FNum" column="f_num" type="System.Decimal" not-null="false" />
+    <property name="FAmountEdit" column="f_AmountEdit" type="System.Decimal" not-null="false" />
+    <property name="FAmountAfterEdit" column="f_AmountAfterEdit" type="System.Decimal" not-null="false" />
+    <property name="FLastYearAmount" column="f_LastYearAmount" type="System.Decimal" not-null="false" />
+    <property name="FSubitemId" column="F_SubitemId" type="System.Int64" not-null="false" />
+    <property name="FSubitemCode" column="F_SubitemCode" type="System.String" length="100" not-null="false" />
+    <property name="FSubitemName" column="F_SubitemName" type="System.String" length="100" not-null="false" />
+	</class>
+</hibernate-mapping>

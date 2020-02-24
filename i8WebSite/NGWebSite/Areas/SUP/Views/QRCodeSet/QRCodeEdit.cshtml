@@ -1,0 +1,712 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "二维码规则编辑";
+}
+@section script
+{
+       
+    <script type="text/javascript">
+
+        var products = '@ViewBag.Products';
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        var treeBusPhid = 0;
+        var detailGrid;
+        Ext.onReady(function () {
+            //Ext.define('Ext.metadataHelp.RichHelp', {
+            //    extend: 'Ext.ng.RichHelp',
+            //    alias: 'widget.metadataHelp',
+            //    helpid: 'metadata_uicontainer',
+            //    //outFilter: {},
+            //    ORMMode: true,
+            //    editable:false,
+            //    valueField: 'phid',
+            //    userCodeField: 'containerid',//用户代码
+            //    displayField: 'containertitle',
+            //    //listFields: '',
+            //    //listHeadTexts: '',
+            //    MaxLength: 100,
+            //    editable: true,
+            //    mustInput: false
+            //});            
+
+            var toolbar = Ext.create('Ext.Toolbar', {
+                region: 'north',
+                border: false,
+                //split: true,
+                height: 26,
+                minSize: 26,
+                maxSize: 26,
+                items: [
+                    { id: "save", text: "保存", iconCls: 'icon-save' },
+                    //{
+                    //    id: "addrow",
+                    //    //xtype: 'metadataHelp',
+                    //    text: "增行",
+                    //    iconCls: 'icon-AddRow',
+                    //    //xtype: 'ngCommonHelp',
+                    //    //fieldLabel: '业务类型',
+                    //    //name: 'containerid',
+                    //    //itemId: 'metadata_uicontainer',
+                    //    //helpid: 'metadata_uicontainer',
+                    //    //valueField: 'phid',
+                    //    //displayField: 'containertitle',
+                    //    //emptyText: ''
+                    //},
+                    //{ id: "deleterow", text: "删行", iconCls: 'icon-DeleteRow' },
+                    "->",
+                    { id: "close", text: "关闭", iconCls: 'icon-Exit' }
+                ]
+            });
+
+            var form = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                //minWidth: 400,
+                autoScroll: true,
+                buskey: 'phid', //对应的业务表主键
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 1,
+                padding: '0 5 0 5',
+                fieldDefaults: {
+                    labelWidth: 100,
+                    anchor: '100%',
+                    margin: '0 10 5 5',
+                    msgTarget: 'side',
+                },
+                items: [{
+                    xtype: 'container',
+                    region: 'north',
+                    layout: 'column',
+                    border: false,
+                    items: [{
+                        xtype: 'container',
+                        columnWidth: .5,
+                        border: false,
+                        layout: 'anchor',
+                        defaultType: 'textfield',
+                        items: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '主键',
+                        //id: 'phid',
+                        name: 'phid',
+                        mustInput: true,
+                        hidden: true,
+                        //width: 20,
+                        value: busid,
+                    }, {
+                        xtype: 'ngText',
+                        fieldLabel: '业务码',
+                        //id: 'code',
+                        name: 'code',
+                        mustInput: true,
+                        disabled:true,
+                        //width: 20,
+                    }, {
+                        xtype: 'ngText',
+                        fieldLabel: 'ControllerUrl',
+                        name: 'controllerurl',
+                        disabled: true,
+                        //mustInput: true
+                    }, {
+                        xtype: 'ngText',
+                        fieldLabel: 'ViewUrl',
+                        name: 'viewurl',
+                        disabled: true,
+                        //mustInput: true
+                    }, {
+                        xtype: 'ngText',
+                        id: 'content',
+                        fieldLabel: '描述',
+                        name: 'content',
+                        disabled: true,
+                        //emptyText: '可以支持left jion'
+                    }]
+                    }, {
+                        xtype: 'container',
+                        columnWidth: .5,
+                        border: false,
+                        layout: 'anchor',
+                        defaultType: 'textfield',
+                        items: [{
+                            xtype: 'container',
+                            columnWidth: 1,
+                            border: false,
+                            layout: 'column',
+                            columnsPerRow: 1,
+                            items: [{
+                                xtype: 'text',
+                                text: '代码组成规则：',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }, {
+                                xtype: 'text',
+                                text: '000   000      00',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }, {
+                                xtype: 'text',
+                                text: '产品 业务代码 技术代码（01动态码/02静态码/03URL）',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }, {
+                                xtype: 'text',
+                                text: '产品编码分配',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }, {
+                                xtype: 'text',
+                                text: 'W3团队500-524  GFI团队 525-549  GIT团队 550-574 ',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }, {
+                                xtype: 'text',
+                                text: 'PIS团队 575-599  PSOFT团队 600-649 PCO团队 650-699 ',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }, {
+                                xtype: 'text',
+                                text: 'SCM团队 600-624 PMS团队 625-649 UP团队 900-999',
+                                anchor: '95%',
+                                columnWidth: 1
+                            }]
+
+                        }]
+                    }]
+                }]
+            });
+
+            //定义模型
+            Ext.define('model', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    mapping: 'phid',
+                    type: 'int'
+                }, {
+                    name: 'bustype',
+                    mapping: 'bustype',
+                    type: 'string'
+                }, {
+                    name: 'tablename',
+                    mapping: 'tablename',
+                    type: 'string'
+                }, {
+                    name: 'name',
+                    mapping: 'name',
+                    type: 'string'
+                }, {
+                    name: 'enableflag',
+                    mapping: 'enableflag',
+                    type: 'string'
+                }]
+            });
+
+            //页面里grid
+            var detailStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                autoLoad: true,
+                pageSize: 50,                
+                url: '../QRCodeSet/GetDetailField?id=' + busid
+            });
+
+            var detailGrid_enableflag = Ext.create('Ext.ng.ComboBox', {
+                valueField: "mode",
+                displayField: 'name',
+                queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote     
+                name: 'mode',
+                data: [{
+                    //编辑状态下,状态列的下拉菜单的 data
+                    "mode": "0",
+                    "name": "否"
+                }, {
+                    "mode": "1",
+                    "name": "是"
+                }]
+            });
+
+            detailGrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                //frame: true,                  
+                width: 200,
+                stateful: true,
+                stateId: 'detailgrid',
+                store: detailStore,
+                otype: otype,
+                buskey: 'phid', //对应的业务表主键               
+                columnLines: true,
+                columns: [{
+                    header: '主键',
+                    flex: 1,
+                    sortable: false,
+                    dataIndex: 'phid',
+                    hidden: true
+                }, {
+                    header: '业务类型',
+                    flex: 1,
+                    sortable: false,
+                    dataIndex: 'bustype',
+                    editor: {}
+                }, {
+                    header: '对应表',
+                    flex: 1,
+                    sortable: false,
+                    dataIndex: 'tablename',
+                    editor: {}
+                }, {
+                    header: '名称',
+                    flex: 1,
+                    sortable: false,
+                    dataIndex: 'name',
+                    editor: {}
+                }, {
+                    header: '是否参与生成',
+                    flex: 1,
+                    sortable: false,
+                    dataIndex: 'enableflag',
+                    editor: detailGrid_enableflag,//showComb,
+                    renderer: function (val) {
+                        var ret = (val === '1') ? "是" : "否";
+                        return ret;
+                    }
+                }],
+                plugins: [
+                    Ext.create("Ext.grid.plugin.CellEditing",{
+                    clicksToEdit:1,
+                    })
+                  ]
+            });
+
+            //新增修改界面,产品选择CheckBoxGroup
+            var productCbg = Ext.create("Ext.form.CheckboxGroup", {
+                id: 'productCbg',
+                layout: 'hbox'
+            });
+
+            //根据ViewBag所传产品,动态生成产品Checkbox
+            seperateProduct();                      
+            
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [toolbar, form, detailGrid]
+            });
+
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid },
+                    url: '@Url.Content("~/SUP/QRCodeSet/GetMaster")',
+                    success: function (response) {
+                        if (response.responseText != "" && response.responseText != null){
+
+                            var resp = Ext.JSON.decode(response.responseText);
+                            var formobj = form.getForm();
+                            formobj.setValues(resp[0]);
+                        }
+                    }
+                });
+            }
+
+            //根据ViewBag所传产品,动态生成产品Checkbox
+            function seperateProduct() {
+                var arrayOfProduct = products.split(',');
+                for (var i = 0; i < arrayOfProduct.length; i++) {
+                    // var gridColumn = Ext.getCmp("columnId_"+arrayOfProduct[i].toLowerCase()).renderer = formatCheck;
+                    var chxOfProduct = new Ext.form.field.Checkbox({ boxLabel: arrayOfProduct[i], name: arrayOfProduct[i].toLowerCase(), inputValue: 1, flex: 1 });
+                    productCbg.add(chxOfProduct);
+
+                }
+            }
+
+
+            
+
+            //查找树节点
+            var findNodeByFuzzy = function (tree, value) {
+                if (value == "") { return; }
+                var me = this, index = -1, firstFind = tree.nodeIndex == -1;
+                var findNode = tree.getRootNode().findChildBy(function (node) {
+                    index++;
+                    if (!node.data.root && index > tree.nodeIndex && (node.data.text.indexOf(value) > -1)) {
+                        return true;
+                    }
+                }, null, true);
+                tree.nodeIndex = index;
+                if (findNode) {
+                    tree.selectPath(findNode.getPath());
+                }
+                else {
+                    if (firstFind) {
+                        Ext.MessageBox.alert('', '没有匹配的树节点.');
+                    }
+                    tree.nodeIndex = -1;
+                }
+            };
+
+            ////页面里grid
+            //Ext.define('winModel', {
+            //    extend: 'Ext.data.Model',
+            //    fields: [{
+            //        name: 'phid',
+            //        mapping: 'phid',
+            //        type: 'int'
+            //    }, {
+            //        name: 'bustype',
+            //        mapping: 'bustype',
+            //        type: 'string'
+            //    }, {
+            //        name: 'tablename',
+            //        mapping: 'tablename',
+            //        type: 'string'
+            //    }, {
+            //        name: 'name',
+            //        mapping: 'name',
+            //        type: 'string'
+            //    }, {
+            //        name: 'enableflag',
+            //        mapping: 'enableflag',
+            //        type: 'string'
+            //    }]
+            //});
+           
+            //var winStore = Ext.create('Ext.ng.JsonStore', {
+            //    model: 'winModel',
+            //    autoLoad: false,
+            //    pageSize: 50,
+            //    cachePageData: false,
+            //    url: '../QRCodeSet/GetGridByBusTree'
+            //    //url: '../QRCodeSet/GetGridByBusTree?busphid=' + treeBusPhid
+            //});
+
+            ////var infostore = Ext.create('Ext.ng.JsonStore', {
+            ////    model: 'Model',
+            ////    pageSize: 50,
+            ////    autoLoad: false,
+            ////    cachePageData: false,
+            ////    url: '../BusTableReg/GetListByBusId'
+            ////})
+
+            //var winGrid_enableflag = Ext.create('Ext.ng.ComboBox', {
+            //    valueField: "mode",
+            //    displayField: 'name',
+            //    queryMode: 'local',                           //local指定为本地数据  如果是后台传输  值为remote     
+            //    name: 'mode',
+            //    data: [{
+            //        //编辑状态下,状态列的下拉菜单的 data
+            //        "mode": "0",
+            //        "name": "否"
+            //    }, {
+            //        "mode": "1",
+            //        "name": "是"
+            //    }]
+            //});
+
+            //var winGrid = Ext.create('Ext.ng.GridPanel', {
+            //    region: 'center',
+            //    //frame: true,                  
+            //    width: 200,
+            //    stateful: true,
+            //    stateId: 'winGrid',
+            //    store: winStore,
+            //    buskey: 'phid', //对应的业务表主键               
+            //    columnLines: true,
+            //    columns: [{
+            //        header: '主键',
+            //        flex: 1,
+            //        sortable: false,
+            //        dataIndex: 'phid',
+            //        hidden: true
+            //    }, {
+            //        header: '业务类型',
+            //        flex: 1,
+            //        sortable: false,
+            //        dataIndex: 'bustype',
+            //        editor: {}
+            //    }, {
+            //        header: '对应表',
+            //        flex: 1,
+            //        sortable: false,
+            //        dataIndex: 'tablename',
+            //        editor: {}
+            //    }, {
+            //        header: '名称',
+            //        flex: 1,
+            //        sortable: false,
+            //        dataIndex: 'name',
+            //        editor: {}
+            //    }, {
+            //        header: '是否添加到明细表',
+            //        flex: 1,
+            //        sortable: false,
+            //        dataIndex: 'enableflag',
+            //        editor: detailGrid_enableflag,//showComb,
+            //        renderer: function (val) {
+            //            var ret = (val === '1') ? "是" : "否";
+            //            return ret;
+            //        }
+            //    }],
+            //    plugins: [
+            //        Ext.create("Ext.grid.plugin.CellEditing", {
+            //            clicksToEdit: 1,
+            //        })
+            //    ]
+            //});
+
+            //var store_middletree = Ext.create('Ext.data.TreeStore', {
+            //    autoLoad: true,
+            //    proxy: {
+            //        type: 'ajax',
+            //        url: '../langcenter/GetMenuMiddleData'
+            //    },
+            //    //folderSort: true,
+            //    sorters: [{
+            //        property: 'id',
+            //        direction: 'ASC'
+            //    }]
+            //});
+
+            //var busTree = new Ext.tree.TreePanel(
+            //  {
+            //      id: "tree1",
+            //      store: store_middletree,
+            //      title: "业务类型",
+            //      autoScroll: true,
+            //      enableTabScroll: true,
+            //      collapsible: false, //右上角上的那个收缩按钮，设为false则不显示
+            //      collapsed: false,
+            //      split: true,
+            //      rootVisible: false,
+            //      lines: true,
+            //      useArrows: true,
+            //      width: 180,
+            //      minSize: 180,
+            //      maxSize: 180,
+            //      region: 'west',
+            //      viewConfig: {
+            //      },
+            //      listeners: {                     
+            //              //itemclick: function (self, record, item, index, e, eOpts) {
+            //              //    var id = record.get('id');
+            //              //    var type = id.split('#');
+            //              //    busphid = type[1]; //当前节点phid
+            //              //    busname = record.get('text');//当前节点名称
+            //              //    var nodetype = record.get('qtitle'); //类型
+            //              //    if (nodetype == '2') {
+            //              //        //根据phid获取当前节点的业务类型
+            //              //        Ext.Ajax.request({
+            //          //            params: { 'nodeid': id },
+            //          //            url: '../IMP/GetMenuMiddleInfo',
+            //          //            success: function (response) {
+            //          //                var resp = Ext.JSON.decode(response.responseText);
+            //          //                if (resp.status === "ok") {
+            //          //                    var data = resp.data.code;
+            //          //                    bustype = data;
+            //          //                    Ext.apply(infostore.proxy.extraParams, { 'busphid': busphid });
+            //          //                    infostore.load();
+            //          //                } else {
+            //          //                    Ext.MessageBox.alert('修改失败', resp.status);
+            //          //                }
+            //          //            }
+            //          //        });
+            //          //    }
+            //          //    else {
+            //          //        bustype = '';
+            //          //    }
+            //          //}
+            //          itemclick: function (self, record, item, index, e, eOpts) {
+            //              if (record.data.leaf) {
+            //                  var id = record.get('id');
+            //                  var type = id.split('#');
+            //                  treeBusPhid = type[1]; //当前节点phid
+            //                  Ext.apply(winStore.proxy.extraParams, { 'busphid': treeBusPhid });
+            //                  winStore.load();
+            //                  //winStore.reload();
+            //              }
+            //          }
+            //      }
+            //  });
+            //var leftPanel = Ext.create('Ext.panel.Panel', {
+            //    title: "业务类型",
+            //    autoScroll: false,
+            //    collapsible: true,
+            //    split: true,
+            //    region: 'west',
+            //    weight: 10,
+            //    width: 180,
+            //    minSize: 180,
+            //    maxSize: 180,
+            //    border: true,
+            //    layout: 'border',
+            //    items: [{
+            //        region: 'north',
+            //        height: 26,
+            //        layout: 'border',
+            //        border: false,
+            //        items: [{
+            //            region: 'center',
+            //            xtype: "textfield",
+            //            allowBlank: true,
+            //            fieldLabel: '',
+            //            emptyText: '输入关键字，定位树节点',
+            //            margin: '2 0 2 2',
+            //            enableKeyEvents: true,
+            //            listeners: {
+            //                'keydown': function (el, e, eOpts) {
+            //                    if (e.getKey() == e.ENTER) {
+            //                        findNodeByFuzzy(busTree, el.getValue());
+            //                        el.focus();
+            //                        return false;
+            //                    }
+            //                    else {
+            //                        busTree.nodeIndex = -1;
+            //                    }
+            //                }
+            //            }
+            //        }, {
+            //            region: 'east', xtype: 'button', text: '', iconCls: 'icon-Location', width: 21, margin: '2 5 2 5',
+            //            handler: function () { var el = arguments[0].prev(); findNodeByFuzzy(busTree, el.getValue()); el.focus(); }
+            //        }]
+            //    }, busTree]
+            //});
+
+            //var editWin = Ext.create("Ext.window.Window", {
+            //    title: "编辑窗口",
+            //    modal: true,
+            //    width: 800,
+            //    height: 600,
+            //    closeable: true,
+            //    resizable: false,
+            //    closeAction: "hide",
+            //    layout: 'border',
+            //    items: [leftPanel, winGrid],
+            //    buttons: [
+            //            {
+            //                xtype: "checkbox", name: "cb_continue", boxLabel: "连续录入", align: "left", handler: function () { }
+            //            },
+            //            "->",
+            //            {
+            //                text: '确 定',
+            //                handler: function () {
+            //                    var vf = winGrid.isValid();
+            //                    if (!vf) {
+            //                        return;
+            //                    }
+            //                    var modifyRecords = winGrid.store.getUpdatedRecords();
+            //                    Ext.Array.each(modifyRecords, function (record) {
+            //                        var data = [{
+            //                            'phid': record.data.phid,
+            //                            'bustype': record.data.bustype,
+            //                            'enableflag': record.data.enableflag,
+            //                            'name': record.data.name,
+            //                            'tablename': record.data.tablename,
+            //                        }];
+            //                        detailGrid.store.insert(detailGrid.store.getCount(), data);
+            //                    })
+            //                    //detailGrid.store.add(modifyRecords);
+            //                    if (editWin.dockedItems.items[1].items.items[0].getValue().toString() == "true" && operateType == "add") {
+            //                        //连续新增-数据清空
+            //                        winGrid.removeAll();
+            //                    } else {
+            //                        winGrid.removeAll();
+            //                        editWin.hide();
+            //                    }                               
+            //                }
+            //            },
+            //            {
+            //                text: '关 闭',
+            //                handler: function () {
+            //                    editWin.hide();
+            //                }
+            //            }
+            //    ]
+            //});
+
+            ////修改
+            ////toolbar.items.get('addrow').on('click', function () {
+            ////    //metadataHelp.showHelp();
+            ////    editWin.setTitle("新增窗口");
+            ////    editWin.show();
+            ////    editWin.dockedItems.items[1].items.items[0].show();
+            ////});
+                      
+
+            toolbar.items.get('save').on('click', function () {
+                var vf = form.isValid();
+                if (!vf) {
+                    return;
+                };
+                if (!detailGrid.isValid()) {
+                    return;
+                };
+                var masterData = form.getFormData();
+                var detailData = detailGrid.getChange();
+                Ext.Ajax.request({
+                    params: {
+                        'masterData': masterData,
+                        'detailData': detailData,
+                        'productData': productData,
+                        'masterId': busid
+                    },
+                    url: '@Url.Content("~/SUP/QRCodeSet/Save")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {                          
+                            if (detailData.isChanged) {
+                                detailStore.commitChanges();
+                            };
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+                                $CloseTab();
+                            });
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+
+            });
+
+            //toolbar.items.get('deleterow').on('click', function () {
+            //    var data = detailGrid.getSelectionModel().getSelection();
+            //    if (data.length > 0) {
+            //        Ext.Array.each(data, function (record) {
+            //            detailStore.remove(record); //前端删除
+            //        });
+            //    }
+            //});
+
+            Ext.define('Ext.metadataHelp.CommonHelp', {
+                extend: 'Ext.ng.CommonHelp',
+                alias: 'widget.metadataHelp',
+                helpid: 'metadata_uicontainer',
+                fieldLabel: '业务类型',
+                name: 'containerid',
+                itemId: 'metadata_uicontainer',
+                valueField: 'phid',
+                displayField: 'containertitle',
+                emptyText: '',
+                listeners: {
+                    helpselected: function (obj) {
+                        //var data = detailGrid.getSelectionModel().getSelection();
+                        var data = [{
+                            'phid': obj.data["metadata_uictrlinfo.phid"],
+                            'bustype': obj.data["metadata_bustree.busname"],
+                            'tablename':obj.data["metadata_uicontainer.tablename"],
+                            'name': obj.data["metadata_uictrlinfo.ctl_label"],
+                            'enableflag': '1',                        
+                        }];
+                        detailStore.insert(detailStore.getCount(), data);
+                    }
+                }
+            });
+
+            var metadataHelp = Ext.create('Ext.metadataHelp.CommonHelp', {
+
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_quotton">
+      <Field Name="quotid" IsKey="true" />
+      <Field Name="lineid" IsKey="true" />
+      <Field Name="quotno"  />
+      <Field Name="ocode"/>
+      <Field Name="privcomp"/>
+      <Field Name="recordman"/>
+      <Field Name="recorddate"/>
+      <Field Name="appdate"/>
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="appflg"/>
+      <Field Name="appman"/>
+      <Field Name="scmacceptflg"/>
+      <Field Name="scmacceptman"/>
+      <Field Name="scmacceptdate"/>
+      <Field Name="relid"/>
+      <Field Name="relno"/>
+      <Field Name="relmxid"/>
+      <Field Name="remarks"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser1">
+      <Field Name="u_name" AsName="recordmanname"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser2">
+      <Field Name="u_name" AsName="appmanname"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser3">
+      <Field Name="u_name" AsName="scmacceptmanname"/>
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"/>
+      <Field Name="descript1"/>
+      <Field Name="descript"/>
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname" />
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname"/>
+    </Table>
+    <Table Name="enterprise">
+      <Field Name="compname" />
+    </Table>
+    <Table Name="ec_askpricemst">
+      <Field Name="askpriceno" />
+    </Table>
+    <Table Name="ec_askpricerel">
+      <Field Name="supcomp" AsName="asksupcomp" />
+    </Table>
+    <Table Name="ec_askpricedtlrel">
+      <Field Name="supcomp" />
+      <Field Name="uicaccflg"/>
+    </Table>
+    <Table Name="ec_askpricedtl">
+      <Field Name="qty" AsName="askqty"/>
+      <Field Name="price" AsName="askprice"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join ec_askpricemst on ec_askpricemst.askpriceid = [table].relid
+      inner join ec_askpricerel on ec_askpricemst.askpriceid = ec_askpricerel.askpriceid
+      left outer join ec_askpricedtlrel on ec_askpricedtlrel.askpriceid = [table].relid and ec_askpricedtlrel.lineid = [table].relmxid
+      and ec_askpricedtlrel.supcomp = ec_askpricerel.supcomp 
+      left join enterprise on enterprise.compno = ec_askpricerel.supcomp
+      left join itemdata on itemdata.itemno=[table].itemno
+      left join msunit on msunit.msunit = [table].msunit
+      left join secuser secuser1 on secuser1.logid=[table].recordman
+      left join secuser secuser2 on secuser2.logid=[table].appman
+      left join secuser secuser3 on secuser3.logid=[table].scmacceptman
+      left join ec_askpricedtl on ec_askpricedtl.askpriceid = [table].relid and ec_askpricedtl.lineid = [table].relmxid
+      [where] [orderby]
+    </Sql>
+    <Where >
+      <Exp Field="asksupcomp" Target="AppInfo" Value="LoginID" />
+      <Exp Field="supcomp" Target="AppInfo" Value="LoginID" ></Exp>
+      <Exp Field="privcomp" Target="AppInfo" Value="LoginID" ></Exp>
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+    </Where>
+    <Query>
+      <Exp Field="key" Target="Client" Value="askpriceid" Type="Array">
+        <Exp Field="wsp_supply_quotton.quotid" ParamName ="quotid"  TypeKey="0"/>
+        <Exp Field="wsp_supply_quotton.lineid" ParamName="lineid" TypeKey="1" />
+      </Exp>
+      <Exp Name="appflg1" format=" wsp_supply_quotton.appflg = '1' "></Exp>
+      <Exp Name="appflg2" format=" (wsp_supply_quotton.appflg = '0' or wsp_supply_quotton.appflg is null) "></Exp>
+      <Exp Field="itemdata.itemno" paramName="itemno" Target="Client" Value="itemno"></Exp>
+      <Exp Field="itemdata.itemname" paramName="itemname" Target="Client" Value="itemname"></Exp>
+      <Exp Field="wsp_supply_quotton.recorddate" paramName="recorddate1" Target="Client" Oper="GreaterThanOrEqual" Value="purdate1"/>
+      <Exp Field="wsp_supply_quotton.recorddate" paramName="recorddate2" Target="Client" Oper="LessThanOrEqual" Value="purdate2" />
+      <Exp Field="ec_askpricemst.askpriceno" paramName="askpriceno" Target="Client" Value="askpriceno"/>
+      <Exp Field="descript" paramName="descript" Target="Client" Value="descript"/>
+      <Exp Field="descript1" paramName="descript1" Target="Client" Value="descript1"/>
+      <!--<Exp Field="quotid"  Target="Client" Value="quotid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>-->
+    </Query>
+    <OrderBy format="{quotno}">
+      <Exp Field="quotno" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="wsp_supply_quotton">
+      <Values>
+
+      </Values>
+    </Table>
+    
+  </Create>
+  <Update>
+    
+  </Update>
+  <Delete>
+    
+  </Delete>
+  <Destroy>
+    <Table Name="wsp_supply_quotton">
+      <Values>
+
+      </Values>
+    </Table>
+  </Destroy>
+  <!--  -->
+  <SetAppStatus>          
+    <Sql>
+      update wsp_supply_quotton [values] [where]                    
+    </Sql>
+    <Values>
+      <Exp Field="appman" Target="AppInfo" Value="loginid" /> 
+      <Exp Field="appdate" Target="Express" Value="now" />
+      <Exp Field="appflg"  Value="1" />
+    </Values>
+    <Where format="({appflg1} or {appflg2})"> 
+      <Exp Field="quotid" Target="Field" Value="quotid" />
+      <Exp Field="lineid" Target="Field" Value="lineid" />
+      <Exp Field="appflg" ParamName="appflg1"  Oper="NotEqual" Value="1" />
+      <Exp Field="appflg" ParamName="appflg2" Oper="IsNull"/>
+    </Where>
+  </SetAppStatus>
+  <SetUnAppStatus>
+    <Sql>
+      update wsp_supply_quotton [values] [where]
+    </Sql>
+    <Values>
+      <Exp Field="appman" Value="{Null}" />
+      <Exp Field="appdate" Value="{Null}" />
+      <Exp Field="appflg"  Value="0" />
+    </Values>
+    <Where format="({scmacceptflg1} or {scmacceptflg2})">
+      <Exp Field="quotid" Target="Field" Value="quotid" />
+      <Exp Field="lineid" Target="Field" Value="lineid" />
+      <Exp Field="appflg" ParamName="appflg1"  Value="1" />
+      <Exp Field="scmacceptflg" ParamName="scmacceptflg1"  Oper="NotEqual" Value="1" />
+      <Exp Field="scmacceptflg" ParamName="scmacceptflg2" Oper="IsNull"/>
+    </Where>
+  </SetUnAppStatus>
+  <GetAskPriceKey>
+    <Sql>
+      select relid askpriceid, relmxid lineid from wsp_supply_quotton [where]
+    </Sql>
+    <Where>
+      <Exp Field="quotid" Target="Field" Value="quotid" />
+      <Exp Field="lineid" Target="Field" Value="lineid" />
+    </Where>
+   </GetAskPriceKey>
+</DataService>

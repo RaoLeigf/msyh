@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="ExpenseMstModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FYear" >
+			<length min="0" max="4" message ="长度不超过4！"/>
+		</property>
+		<property name="FProjcode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FProjname" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FDeclarationunit" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FDeclarationDept" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FBudgetDept" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FProjAttr" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FDuration" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FExpenseCategory" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FDeclarer" >
+			<length min="0" max="60" message ="长度不超过60！"/>
+		</property>
+		<property name="FMeetiingsummaryno" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FType" >
+			<length min="0" max="2" message ="长度不超过2！"/>
+		</property>
+		<property name="FApprovestatus" >
+			<length min="0" max="2" message ="长度不超过2！"/>
+		</property>
+		<property name="FVerno" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FBillno" >
+			<length min="0" max="50" message ="长度不超过50！"/>
+		</property>
+		<property name="FMidyearchange" >
+			<length min="0" max="2" message ="长度不超过2！"/>
+		</property>
+		<property name="FPerformtype" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FPerformevaltype" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FServiceDept" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FFundStandard" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="NgInsertDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="NgUpdateDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CurOrgId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Creator" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Editor" >
+			<not-null />
+			<not-Empty />
+		</property>
+	</class>
+</nhv-mapping>

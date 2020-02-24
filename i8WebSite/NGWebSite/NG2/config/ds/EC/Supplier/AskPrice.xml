@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_askpricemst">
+      <Field Name="askpriceid" IsKey="true" />
+      <Field Name="askpriceno"  />
+      <Field Name="recorddate" DataType="DateTime"/>
+      <Field Name="recordman" />
+      <Field Name="appflg"/>
+      <Field Name="appman"/>
+      <Field Name="appdate" DataType="DateTime"/>
+      <Field Name="hideflg" />
+      <Field Name="verdtm" />
+      <Field Name="cloflg" />
+      <Field Name="cloman" />
+      <Field Name="clodate" DataType="DateTime"/>
+      <Field Name="isimport" />
+      <Field Name="ocode" />
+      <Field Name="askdept" />
+      <Field Name="askemp" />
+      <Field Name="completedate" DataType="DateTime"/>
+      <Field Name="procode" />
+      <Field Name="relid" />
+      <Field Name="docfrom" />
+      <Field Name="purgroup" />
+      <Field Name="remarks" />
+    </Table>
+    <Table Name="secuser">
+      <Field Name="u_name" AsName="recordmanname"/>
+    </Table>
+    <Table Name="secuser" AsName="user2">
+      <Field Name="u_name" AsName="appmanname"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join secuser on secuser.logid=[table].recordman
+      left join secuser user2 on user2.logid=[table].appman
+      [where] [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <OrderBy format="{recorddate}">
+      <exp Field="recorddate" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+      <exp Field="abc" value="abc的值"/>
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+    <Values>
+      
+    </Values>
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

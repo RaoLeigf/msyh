@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5E19A536-9791-447E-AE16-3AC271C00496}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GGK3.GK.Facade</RootNamespace>
+    <AssemblyName>GGK3.GK.Facade</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GGK3.GK.Facade.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.BizBase">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.BizBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.ExceptionHandling">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Facade">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Facade.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.WebApi.Client, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.WebApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="NG3">
+      <HintPath>..\..\..\BusinessDlls\NG3.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Data.Service">
+      <HintPath>..\..\..\BusinessDlls\NG3.Data.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Exceptions">
+      <HintPath>..\..\..\BusinessDlls\NG3.Exceptions.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308" />
+    <Reference Include="SUP.Common.DataAccess">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GK3_BankVauitFacade.cs" />
+    <Compile Include="GKPaymentDtlFacade.cs" />
+    <Compile Include="GKPaymentMstFacade.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GBK\BK\GBK3.BK.Model\GBK3.BK.Model.csproj">
+      <Project>{A81C14E6-893F-42FF-8EBA-9B31FFBA73BD}</Project>
+      <Name>GBK3.BK.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GBK\BK\GBK3.BK.Rule.Interface\GBK3.BK.Rule.Interface.csproj">
+      <Project>{65C7EEC9-27A2-4B68-8431-A7EF134DCD4F}</Project>
+      <Name>GBK3.BK.Rule.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\Common\GData3.Common.Model\GData3.Common.Model.csproj">
+      <Project>{38F33231-5A70-4374-BEB3-5D77138E8D46}</Project>
+      <Name>GData3.Common.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GData\Common\GData3.Common.Utils\GData3.Common.Utils.csproj">
+      <Project>{A4DA9236-7F50-4C27-B4C7-2B3F051E0FC1}</Project>
+      <Name>GData3.Common.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Rule.Interface\GQT3.QT.Rule.Interface.csproj">
+      <Project>{52AEFFED-EF6E-4104-B7EF-953C47A96666}</Project>
+      <Name>GQT3.QT.Rule.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GGK3.GK.Facade.Interface\GGK3.GK.Facade.Interface.csproj">
+      <Project>{0947cd35-ea38-499f-b7df-7bc72f0e0885}</Project>
+      <Name>GGK3.GK.Facade.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GGK3.GK.Model\GGK3.GK.Model.csproj">
+      <Project>{8c7038ce-b766-414f-b5e1-d15710157e85}</Project>
+      <Name>GGK3.GK.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GGK3.GK.Rule.Interface\GGK3.GK.Rule.Interface.csproj">
+      <Project>{ead7fe2c-b638-41cb-b25a-4a7998241dc4}</Project>
+      <Name>GGK3.GK.Rule.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\i6Rules\ /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

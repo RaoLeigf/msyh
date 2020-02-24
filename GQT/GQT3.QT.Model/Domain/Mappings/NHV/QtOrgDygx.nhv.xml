@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="QtOrgDygxModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Xmorg" >
+			<length min="0" max="50" message ="长度不超过50！"/>
+		</property>
+		<property name="Oldorg" >
+			<length min="0" max="50" message ="长度不超过50！"/>
+		</property>
+    <property name="Oldbudget" >
+      <length min="0" max="50" message ="长度不超过50！"/>
+    </property>
+		<property name="NgInsertDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="NgUpdateDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CurOrgId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Creator" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Editor" >
+			<not-null />
+			<not-Empty />
+		</property>
+	</class>
+</nhv-mapping>

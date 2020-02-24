@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="AddinAssemblyModel" table="addin_assembly">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+    <property name="MstPhid" column="mstphid" type="System.Int64" not-null="false" />
+		<property name="AssemblyName" column="assemblyname" type="System.String" length="100" not-null="false" />
+		<property name="ClassName" column="classname" type="System.String" length="100" not-null="false" />
+    <property name="AssemblyCatalog" column="assemblycatalog" type="NG3.Addin.Model.Enums.EnumCatalog, NG3.Addin.Model" length="100" not-null="false" />
+	</class>
+</hibernate-mapping>

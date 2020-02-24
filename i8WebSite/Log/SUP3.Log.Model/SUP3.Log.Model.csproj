@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AEF9F7D6-B8AC-4D8C-8247-836CF163C274}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP3.Log.Model</RootNamespace>
+    <AssemblyName>SUP3.Log.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\SUP3.Log.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.0.4001, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BaseDlls\Enterprise3.Common.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\GenerateCodes\LogCfgModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogLogsModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogOtherCfgModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogPerfModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogSortingMethodModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogSortingSlowPerfModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogSortingSlowSqlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\LogSqlModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogCfg.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogLogs.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogPerf.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogSql.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogOtherCfg.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogSortingMethod.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogSortingSlowPerf.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\LogSortingSlowSql.hbm.xml" />
+    <Content Include="Domain\Mappings\NHV\LogCfg.nhv.xml" />
+    <Content Include="Domain\Mappings\NHV\LogLogs.nhv.xml" />
+    <Content Include="Domain\Mappings\NHV\LogOtherCfg.nhv.xml" />
+    <Content Include="Domain\Mappings\NHV\LogPerf.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\LogSortingMethod.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\LogSortingSlowPerf.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\LogSortingSlowSql.nhv.xml" />
+    <Content Include="Domain\Mappings\NHV\LogSql.nhv.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\bin</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

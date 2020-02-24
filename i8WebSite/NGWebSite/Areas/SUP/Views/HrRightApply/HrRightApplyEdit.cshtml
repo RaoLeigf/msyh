@@ -1,0 +1,714 @@
+﻿@{
+    Layout = "~/Views/Shared/_GCLayout.cshtml";
+}
+
+@section Script
+{
+    
+    <script>
+
+        var otype = Ext.htmlDecode('@ViewBag.OType');
+        var hrid = Ext.htmlDecode('@ViewBag.Hrid');
+        var phid = Ext.htmlDecode('@ViewBag.Phid');
+        var billno = Ext.htmlDecode('@ViewBag.BillNo');
+        var billname = Ext.htmlDecode('@ViewBag.BillName');
+        var fillpsnid = Ext.htmlDecode('@ViewBag.FillPsnId');
+        var fillpsnname = Ext.htmlDecode('@ViewBag.FillPsnName');
+        var filldate = Ext.htmlDecode('@ViewBag.FillDate');
+        var remark = Ext.htmlDecode('@ViewBag.Remark');
+        var wfotye = Ext.htmlDecode('@ViewBag.wfOType');
+
+        var applicantUserId;
+        var orgId;
+        var changed = false;
+        var orgChanged = false;
+        var roleChanged = false;
+        var orgObj = {};
+        var roleObj = {};
+        var removeApplicant = '';
+        var userSelected = false;
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: ['save',
+                    { itemId: "query", text: "员工选择", iconCls: "icon-Query" },
+                    { itemId: "delete", text: "删行", iconCls: "icon-delete" },
+                     '->', 'print', 'close']
+            });
+
+            var formPanel = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                buskey: '',
+                otype: otype,
+                columnsPerRow: 4,
+                labelWidth: 75,
+                fields: [
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: '申请单编码:',
+                        id: 'BillNo',
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: '申请单名称:',
+                        id: 'BillName',
+                        listeners: {
+                            'change': function (field, newValue, oldValue, eOpts) {
+                                if (newValue != oldValue) changed = true;
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: '录入人:',
+                        id: 'FillPsn',
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: '录入日期:',
+                        id: 'FillDate',
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'textfield',
+                        fieldLabel: '补充说明:',
+                        id: 'Remark',
+                        width: '100%',
+                        colspan: 4,
+                        listeners: {
+                            'change': function (field, newValue, oldValue, eOpts) {
+                                if (newValue != oldValue) changed = true;
+                            }
+                        }
+                    }
+                ]
+            });
+
+            Ext.define('applicantgridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'hrid', type: 'string', mapping: 'hrid' },
+                    { name: 'userid', type: 'string', mapping: 'userid' },
+                    { name: 'hrname', type: 'string', mapping: 'hrname' },
+                    { name: 'dept', type: 'string', mapping: 'dept' },
+                    { name: 'station', type: 'string', mapping: 'station' },
+                    { name: 'remark', type: 'string', mapping: 'remark' }
+                ]
+            });
+
+            var applicantGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'applicantgridmodel',
+                autoLoad: false,
+                url: '../HrRightApply/GetApplicantInfo'
+            });
+
+            var applicantCellEditing = new Ext.grid.plugin.CellEditing({
+                clicksToEdit: 1
+            });
+
+            var applicantGrid = Ext.create('Ext.ng.GridPanel', {
+                store: applicantGridStore,
+                plugins: [applicantCellEditing],
+                border: false,
+                columnLines: true,
+                height: 200,
+                columns: [
+                    {
+                        header: '员工名称',
+                        dataIndex: 'hrname',
+                        width: '18%',
+                        sortable: false
+                    },
+                    {
+                        header: '部门',
+                        dataIndex: 'dept',
+                        width: '24%',
+                        sortable: false
+                    },
+                    {
+                        header: '岗位',
+                        dataIndex: 'station',
+                        width: '23%',
+                        sortable: false
+                    },
+                    {
+                        header: '备注',
+                        dataIndex: 'remark',
+                        width: '34.6%',
+                        sortable: false,
+                        editor: new Ext.form.field.Text({})
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected.length == 0) return;
+                        else {
+                            if (orgChanged) {
+                                var arr = [];
+                                orgGridStore.each(function (record) {
+                                    arr.push(record.getData());
+                                })
+                                orgObj[applicantUserId] = arr;
+                            }
+                            if (roleChanged) {
+                                var arr = [];
+                                roleGridStore.each(function (record) {
+                                    arr.push(record.getData());
+                                })
+                                roleObj[applicantUserId + '|' + orgId] = arr;
+                            }
+
+                            var select = selected[0];
+                            applicantUserId = select.raw.userid;
+                            Ext.getCmp('orgPanel').el.down('span').dom.innerHTML = '组织信息  |  当前申请人:' + select.raw.hrname;
+                            if (orgObj[applicantUserId] != undefined) {
+                                orgGridStore.loadData(orgObj[applicantUserId]);
+                            } else {
+                                if (otype == 'add') {
+                                    orgGridStore.load({ params: { "userid": applicantUserId, 'billno': '' } });
+                                } else if (otype == 'edit' || otype == 'view') {
+                                    orgGridStore.load({ params: { "userid": applicantUserId, 'billno': billno } });
+                                }
+                            }
+                            roleGridStore.removeAll();
+                            Ext.getCmp('rolePanel').el.down('span').dom.innerHTML = '申请角色信息  |  当前所选组织:';
+                            orgChanged = false;
+                            roleChanged = false;
+                        }
+                    }
+                }
+            });
+
+            Ext.define('orggridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'orgid', type: 'string', mapping: 'orgid' },
+                    { name: 'select', type: 'bool', mapping: 'select' },
+                    { name: 'orgname', type: 'string', mapping: 'orgname' },
+                    { name: 'fillpsnorg', type: 'string', mapping: 'fillpsnorg' },
+                    { name: 'applicantorg', type: 'string', mapping: 'applicantorg' }
+                ]
+            });
+
+            var orgGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'orggridmodel',
+                autoLoad: false,
+                url: '../HrRightApply/GetOrgInfo'
+            });
+
+            var orgCellEditing = new Ext.grid.plugin.CellEditing({
+                clicksToEdit: 1
+            });
+
+            var orgCombox = Ext.create('Ext.ng.ComboBox', {
+                valueField: "code",
+                displayField: 'name',
+                queryMode: 'local',   //local指定为本地数据  如果是后台传输  值为remote
+                data: [{              //编辑状态下,状态列的下拉菜单的 data
+                    "code": '信息组织',
+                    "name": '信息组织'
+                }, {
+                    "code": '登录组织/信息组织',
+                    "name": '登录组织/信息组织'
+                }]
+            });
+
+            var orgGrid = Ext.create('Ext.ng.GridPanel', {
+                store: orgGridStore,
+                buskey: 'orgid', //对应的业务表主键属性
+                plugins: [orgCellEditing],
+                border: false,
+                columnLines: true,
+                height: 200,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'orgid',
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        xtype: 'checkcolumn',
+                        header: '选择',
+                        dataIndex: 'select',
+                        width: '10%',
+                        sortable: false,
+                        listeners: {
+                            'checkchange': function (checkcolumn, rowIndex, checked, eOpts) {
+                                if (!checked) {
+                                    orgGridStore.getAt(rowIndex).set('applicantorg', '');
+                                    for (var i = 0; i < roleGridStore.getCount() ; i++) {
+                                        roleGridStore.getAt(i).set('select', false);
+                                    }
+                                    roleChanged = true;
+                                } else {
+                                    orgGridStore.getAt(rowIndex).set('applicantorg', orgGridStore.getAt(rowIndex).get('fillpsnorg'));
+                                }
+                                orgChanged = true;
+                            }
+                        }
+                    },
+                    {
+                        header: '组织名称',
+                        dataIndex: 'orgname',
+                        width: '32%',
+                        sortable: false
+                    },
+                    {
+                        header: '录入人组织属性',
+                        dataIndex: 'fillpsnorg',
+                        width: '29%',
+                        sortable: false
+                    },
+                    {
+                        header: '申请人组织属性',
+                        dataIndex: 'applicantorg',
+                        width: '29%',
+                        sortable: false,
+                        editor: orgCombox
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected.length == 0) return;
+                        else {
+                            if (roleChanged) {
+                                var arr = [];
+                                roleGridStore.each(function (record) {
+                                    arr.push(record.getData());
+                                })
+                                roleObj[applicantUserId + '|' + orgId] = arr;
+                            }
+
+                            var select = selected[0];
+                            orgId = select.raw.orgid;
+                            Ext.getCmp('rolePanel').el.down('span').dom.innerHTML = '申请角色信息  |  当前所选组织:' + select.raw.orgname;
+                            if (roleObj[applicantUserId + '|' + orgId] != undefined) {
+                                roleGridStore.loadData(roleObj[applicantUserId + '|' + orgId]);
+                            } else {
+                                if (otype == 'add') {
+                                    roleGridStore.load({ params: { "fillpsnid": '', "userid": applicantUserId, "orgid": orgId, 'billno': '' } });
+                                } else if (otype == 'edit' || otype == 'view') {
+                                    roleGridStore.load({ params: { "fillpsnid": fillpsnid, "userid": applicantUserId, "orgid": orgId, 'billno': billno } });
+                                }
+                            }
+                            roleChanged = false;
+                        }
+                    }
+                }
+            });
+
+            orgGrid.on('itemclick', function (grid, record, item, index, e, eOpts) {
+                var select = record.data['select'];
+                if (!select) {
+                    orgCombox.getStore().loadData([{}]);
+                } else {
+                    var fillPsnOrg = record.data['fillpsnorg'];
+                    if (fillPsnOrg == '登录组织/信息组织') {
+                        orgCombox.getStore().loadData([{ "code": '信息组织', "name": '信息组织' },
+                            { "code": '登录组织/信息组织', "name": '登录组织/信息组织' }]);
+                    } else if (fillPsnOrg == '信息组织') {
+                        orgCombox.getStore().loadData([{ "code": '信息组织', "name": '信息组织' }]);
+                    }
+                    orgChanged = true;
+                }
+            });
+
+            Ext.define('rolegridmodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'roleid', type: 'string', mapping: 'roleid' },
+                    { name: 'rowno', type: 'string', mapping: 'rowno' },
+                    { name: 'select', type: 'bool', mapping: 'select' },
+                    { name: 'roleno', type: 'string', mapping: 'roleno' },
+                    { name: 'rolename', type: 'string', mapping: 'rolename' }
+                ]
+            });
+
+            var roleGridStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'rolegridmodel',
+                autoLoad: false,
+                url: '../HrRightApply/GetRoleInfo',
+                listeners: {
+                    'load': function (store, records, successful, eOpts) {
+                        if (records.length == 0) {
+                            Ext.getCmp('rolePanel').el.down('span').dom.innerHTML += '  |  录入人在所选组织未拥有角色';
+                        }
+                    }
+                }
+            });
+
+            var roleGrid = Ext.create('Ext.ng.GridPanel', {
+                store: roleGridStore,
+                buskey: 'roleid', //对应的业务表主键属性
+                border: false,
+                columnLines: true,
+                height: 450,
+                columns: [
+                    {
+                        header: '主键',
+                        dataIndex: 'roleid',
+                        sortable: false,
+                        hidden: true
+                    },
+                    {
+                        header: '行号',
+                        dataIndex: 'rowno',
+                        width: '10%',
+                        sortable: false
+                    },
+                    {
+                        xtype: 'checkcolumn',
+                        header: '选择',
+                        dataIndex: 'select',
+                        width: '15%',
+                        sortable: false,
+                        listeners: {
+                            'checkchange': function (checkcolumn, rowIndex, checked, eOpts) {
+                                roleChanged = true;
+                            }
+                        }
+                    },
+                    {
+                        header: '角色编码',
+                        dataIndex: 'roleno',
+                        width: '35%',
+                        sortable: false
+                    },
+                    {
+                        header: '角色名称',
+                        dataIndex: 'rolename',
+                        width: '40%',
+                        sortable: false
+                    }
+                ]
+            });
+
+            var gridPanel = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'center',
+                columnsPerRow: 2,
+                fields: [
+                    {
+                        title: '申请人信息',
+                        items: [applicantGrid]
+                    },
+                    {
+                        rowspan: 2,
+                        title: '申请角色信息  |  当前所选组织:',
+                        id: 'rolePanel',
+                        margin: '0 0 0 10',
+                        items: [roleGrid]
+                    },
+                    {
+                        title: '组织信息  |  当前申请人:',
+                        id: 'orgPanel',
+                        items: [orgGrid]
+                    }
+                ],
+                listeners: {
+                    'afterrender': function () {
+                        if (wfotye != '') {
+                            var height = document.body.scrollHeight;
+                            applicantGrid.height = height * 0.2;
+                            orgGrid.height = height * 0.2;
+                            Ext.getCmp('orgPanel').el.dom.style.margin = '-' + height * 0.26 + 'px 0 0 0';
+                            roleGrid.height = height * 0.48;
+                        } else {
+                            var height = document.body.scrollHeight;
+                            applicantGrid.height = height * 0.3;
+                            orgGrid.height = height * 0.3;
+                            Ext.getCmp('orgPanel').el.dom.style.margin = '-' + height * 0.36 + 'px 0 0 0';
+                            roleGrid.height = height * 0.72;
+                        }
+                    }
+                }
+            });
+
+            var multiRichHelp = Ext.create('Ext.ng.MultiRichHelp', {
+                valueField: 'EmpNo',
+                userCodeField: 'CNo',//用户代码
+                displayField: 'CName',
+                helpid: 'fg_underling_help',
+                outFilter: { 'fg_underling.hrno': hrid }
+            });
+
+            multiRichHelp.on('beforetriggerclick', function (helpCtl) {
+                var ids = [];
+                //循环store获取已选id
+                for (var i = 0; i < applicantGridStore.getCount() ; i++) {
+                    ids.push(applicantGridStore.getAt(i).get('hrid'));
+                }
+                helpCtl.selectedValue = ids.join(',');
+            });
+
+            multiRichHelp.on('helpselected', function (obj) {
+                var ids = [];
+                for (var i = 0; i < applicantGridStore.getCount() ; i++) {
+                    ids.push(applicantGridStore.getAt(i).get('hrid'));
+                }
+                if (ids.join(',') != obj.code) {
+                    userSelected = true;
+                }
+
+                applicantGridStore.load({ params: { "hrids": obj.code, 'billno': '' } });                
+            });
+
+            ngToolbar.get('save').on('click', function () {
+                var billname = Ext.getCmp('BillName').getValue();
+                if (billname == '') {
+                    Ext.MessageBox.alert('提示', '请输入申请单名称!');
+                    return;
+                }
+
+                if (orgChanged) {
+                    var arr = [];
+                    orgGridStore.each(function (record) {
+                        arr.push(record.getData());
+                    })
+                    orgObj[applicantUserId] = arr;
+                }
+                if (roleChanged) {
+                    var arr = [];
+                    roleGridStore.each(function (record) {
+                        arr.push(record.getData());
+                    })
+                    roleObj[applicantUserId + '|' + orgId] = arr;
+                }
+
+                if (Object.getOwnPropertyNames(orgObj) == 0 && Object.getOwnPropertyNames(roleObj) == 0 && !changed) {
+                    Ext.MessageBox.alert('提示', '没有任何修改');
+                    return;
+                }
+
+                var applicantObj = {};
+                var arr = [];
+                applicantGridStore.each(function (record) {
+                    arr.push(record.getData());
+                })
+                applicantObj['store'] = arr;
+
+                for (var i = 0; i < arr.length; i++) {
+                    if (orgObj.hasOwnProperty(arr[i].userid)) {
+                        var checked = false;
+                        for (var j = 0; j < orgObj[arr[i].userid].length; j++) {
+                            if (orgObj[arr[i].userid][j].select && orgObj[arr[i].userid][j].applicantorg == '登录组织/信息组织') {
+                                checked = true;
+                                break;
+                            }
+                        }
+                        if (!checked) {
+                            Ext.MessageBox.alert("提示", "申请人" + arr[i].hrname + "登录组织不能勾选为空，也不能只有信息组织，没有登录组织！");
+                            return;
+                        }
+                    }
+                }
+
+                ngToolbar.get('save').disable();//禁用按钮
+                var myMask = new Ext.LoadMask(document.body, { msg: "正在保存单据,请稍候..." });
+                myMask.show();//锁屏
+
+                Ext.Ajax.request({
+                    params: {
+                        'phid': phid, 'billno': billno, 'billname': billname, 'remark': Ext.getCmp('Remark').getValue(),
+                        'applicantObj': JSON.stringify(applicantObj), 'orgObj': JSON.stringify(orgObj), 'roleObj': JSON.stringify(roleObj),
+                        'otype': otype, 'removeApplicant': removeApplicant
+                    },
+                    url: '../HrRightApply/SaveHrRightApply',
+                    success: function (response) {
+                        myMask.hide();//停止锁屏
+                        ngToolbar.get('save').enable();//按钮设置为可用
+                        if (response.responseText == "True") {
+                            if (window.external.RefreshWebListPage != undefined) {
+                                window.external.RefreshWebListPage();
+                            } else {
+                                $NG3Refresh();
+                            }
+                            otype = 'edit';
+                            formPanel.setOriginValue(JSON.stringify(formPanel.getForm().getValues()));
+                            applicantGridStore.commitChanges();
+                            orgGridStore.commitChanges();
+                            roleGridStore.commitChanges();
+                            userSelected = false;
+                            Ext.MessageBox.alert("提示", "保存成功！");
+                        } else {
+                            Ext.MessageBox.alert("提示", "保存失败！");
+                        }
+                        orgChanged = false;
+                        roleChanged = false;
+                    },
+                    failure: function (response) {
+                        myMask.hide();//停止锁屏
+                        ngToolbar.get('save').enable();//按钮设置为可用
+                    }
+                });
+            });
+
+            ngToolbar.get('query').on('click', function () {
+                multiRichHelp.showHelp();
+            });
+
+            ngToolbar.get('delete').on('click', function () {
+                if (applicantGrid.getSelectionModel().getSelection().length > 0) {
+                    var select = applicantGrid.getSelectionModel().getSelection()[0];
+                    Ext.MessageBox.confirm('提示', '确定要删除' + select.raw.hrname + '申请人?', function (btn) {
+                        if (btn == 'yes') {
+                            if (removeApplicant.indexOf(select.raw.userid + ',') == -1) {
+                                removeApplicant += (select.raw.userid + ',');
+                            }
+                            applicantGridStore.remove(select);
+                            orgGridStore.removeAll();
+                            roleGridStore.removeAll();
+                            Ext.getCmp('orgPanel').el.down('span').dom.innerHTML = '组织信息  |  当前申请人:';
+                            Ext.getCmp('rolePanel').el.down('span').dom.innerHTML = '申请角色信息  |  当前所选组织:';
+                            changed = true;
+                        }
+                    });
+                } else {
+                    Ext.MessageBox.alert('提示', '请选择想要删除的申请人！');
+                }
+            });
+
+            ngToolbar.get('print').on('click', function () {
+                var formdata = {};
+                formdata.billno = billno;
+                formdata.billname = billname;
+                formdata.fillpsn = fillpsnname;
+                formdata.filldate = filldate;
+                formdata.remark = remark;
+                Ext.Ajax.request({
+                    params: { 'billno': billno },
+                    url: '../HrRightApply/GetHrRightApplyPrintInfo',
+                    success: function (response) {
+                        var result = Ext.JSON.decode(response.responseText);
+                        var griddatas = [];
+                        griddatas.push(result.Record);
+                        $PrintHelpData('HrRightApply', 'PUB_HrRightApply', formdata, griddatas, ['员工权限申请单'])
+                    }
+                });
+            });
+
+            ngToolbar.get('close').addListener('beforeclose', function () {
+                //查看窗口直接关闭
+                if (otype == $Otype.VIEW) {
+                    return true;
+                }
+
+                if (formPanel.hasModifyed() || applicantGrid.hasModifyed() || orgGrid.hasModifyed() || roleGrid.hasModifyed() || userSelected) {
+                    Ext.MessageBox.confirm('提示', '单据未保存，确定关闭？', function (e) {
+                        if (e == "yes") {
+                            $CloseTab();
+                        }
+                    });
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+
+            //工作流Panel
+            var WorkFlowPanel = Ext.create('Ext.ng.WorkFlowPanel', {
+                region: 'north',
+                toolbar: ngToolbar, //单据toolbar
+                otype: otype,  //单据otype
+                bizType: 'HrRightApply', //注册的表单id（原商业对象）
+                bizPhid: phid,   //单据phid
+                showToolBarItems: ['print','close'], //任务办理时可见toolbar按钮itemid数组
+                workFlowInfo: wfinfojson,  //ViewBag.WorkFlowInfo内容转成的JSON对象
+                bizSaveAsync: true, //开启异步保存回调
+                bizSaveFn: function (callback) {  //单据保存方法，方法需返回bool值，Ajax方法需使用同步模式
+                    if (callback) {
+                        callback();
+                    }
+                },
+                listeners: {
+                    taskComplete: function (compId, wfParam) {
+                        //在这里进行自定义组件任务处理，并把工作流参数传到服务端，并在服务端调用工作流api
+                    }
+                }
+            });
+
+            Ext.defer(function () {
+                if (otype == 'add') {
+                    Ext.getCmp('FillPsn').setValue($appinfo.username);
+                    var date = new Date();
+                    Ext.getCmp('FillDate').setValue(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate());
+                    ngToolbar.get('print').hide();
+                    Ext.getCmp('BillName').labelStyle = 'color:rgb(255,0,0);';
+                } else if (otype == 'edit' || otype == 'view') {
+                    Ext.getCmp('BillName').setValue(billname);
+                    Ext.getCmp('FillPsn').setValue(fillpsnname);
+                    if (filldate.indexOf(' ') > -1) {
+                        filldate = filldate.replace(filldate.substring(filldate.indexOf(' ')), '');
+                    }
+                    Ext.getCmp('FillDate').setValue(filldate);
+                    if (remark == 'null') remark = '';
+                    Ext.getCmp('Remark').setValue(remark);
+                    applicantGridStore.load({ params: { "hrids": '', "billno": billno } });
+                }
+
+                if (otype == 'view') {
+                    applicantGrid.getColumn('remark').readOnly = true;
+                    orgGrid.getColumn('select').on('beforecheckchange', function (chk, rowIndex, checked, eOpts) {
+                        return false;
+                    });
+                    orgCombox.on('beforeselect', function (combo, eOpts) {
+                        return false;
+                    });
+                    roleGrid.getColumn('select').on('beforecheckchange', function (chk, rowIndex, checked, eOpts) {
+                        return false;
+                    });
+                    ngToolbar.get('save').hide();
+                    ngToolbar.get('query').hide();
+                    ngToolbar.get('delete').hide();
+                } else {                   
+                    roleGrid.getColumn('select').on('beforecheckchange', function (chk, rowIndex, checked, eOpts) {
+                        if (!orgGrid.getSelectionModel().getSelection()[0].data.select) {
+                            return false;
+                        }
+                    });
+                    orgGrid.getColumn('select').on('beforecheckchange', function (chk, rowIndex, checked, eOpts) {
+                        if (orgGridStore.getAt(rowIndex).get('fillpsnorg') == '信息组织'
+                            && orgGridStore.getAt(rowIndex).get('applicantorg') == '登录组织/信息组织') {
+                            return false;
+                        }
+                    });
+                    orgCombox.on('beforeselect', function (combo, eOpts) {
+                        var select = orgGrid.getSelectionModel().getSelection()[0];
+                        if (select.data.fillpsnorg == '信息组织' && select.data.applicantorg == '登录组织/信息组织') {
+                            return false;
+                        }
+                    });
+                }
+                
+                Ext.getCmp('BillNo').setValue(billno);
+
+                formPanel.setOriginValue(JSON.stringify(formPanel.getForm().getValues()));
+                applicantGridStore.commitChanges();
+                orgGridStore.commitChanges();
+                roleGridStore.commitChanges();
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items:
+                [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        layout: 'border',
+                        items: [WorkFlowPanel, formPanel, gridPanel]
+                    }
+                ]
+            });
+
+        });
+
+    </script>
+
+}

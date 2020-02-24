@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="QTProjectDtlPerformTargetModel" table="qt3_projectdtl_performtar">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="FTargetCode" column="f_targetcode" type="System.String" length="30" not-null="false" />
+		<property name="FTargetName" column="f_targetname" type="System.String" length="255" not-null="false" />
+		<property name="FTargetContent" column="f_targetcontent" type="System.String" length="200" not-null="false" />
+		<property name="FTargetValue" column="f_targetvalue" type="System.String" length="100" not-null="false" />
+		<property name="FTargetWeight" column="f_targetweight" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="FTargetDescribe" column="f_targetdescribe" type="System.String" length="300" not-null="false" />
+		<property name="FTargetClassCode" column="f_targetclasscode" type="System.String" length="30" not-null="false" />
+		<property name="FTargetTypeCode" column="f_targettypecode" type="System.String" length="30" not-null="false" />
+		<property name="FIfCustom" column="f_ifcustom" type="System.Int32" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

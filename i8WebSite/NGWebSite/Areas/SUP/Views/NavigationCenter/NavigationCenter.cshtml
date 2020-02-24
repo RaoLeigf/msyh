@@ -1,0 +1,1006 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    ViewBag.Title = "导航中心";
+}
+
+
+
+
+@section script
+{
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    @*<script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>*@
+
+    @*<script src=@Url.Script("~/NG3Resource/raphael-master/raphael.js") type="text/javascript" charset="utf-8"></script>
+        <script src=@Url.Script("~/NG3Resource/raphael-master/node_modules/jquery/dist/jquery.js") type="text/javascript" charset="utf-8"></script>
+        <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/dragNode.js") type="text/javascript" charset="utf-8"></script>*@
+
+    <link href="~/NG3Resource/css/mainTreeTab.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+            /*按钮扁平化*/
+            .x-btn-default-small {
+                background-color: #F6F6F6;
+            }
+            /*.x-pressed{
+           background-color: #FFFFFF;
+        }
+         .x-btn-pressed{
+              background-color:#FFFFFF;
+         }*/
+
+            .x-btn-default-small-pressed {
+                background-color: #FFFFFF;
+            }
+
+               .nodeText
+            {
+                position: absolute;
+                width: 55px;
+                height: 35px;
+                top: 0px;
+                z-index: 0;
+                font-size: 5px;
+            }
+            .myList
+            {
+                overflow:auto
+            }
+            .myList>ul>li
+            {
+               list-style:none;
+            }
+            .myList>ul>li>a:hover
+           {
+                color:red;
+            }
+    </style>
+
+
+
+    <script type="text/javascript">
+
+        var frame1;
+        var frame2;
+        var isDrag = false;
+
+        var currentNode = '';//当前流程树聚焦节点
+        var WikiNode = '';//当前制度树聚焦节点
+        var procedureTree;//流程树
+        var insititutionTree;//制度树
+        var viewport;
+
+        Ext.onReady(function () {
+
+            var OrgWikiDiv = document.createElement('div');//某流程组织对应制度           
+            OrgWikiDiv.id = 'OrgWikiDiv';
+            OrgWikiDiv.className = "myList";
+
+            var AllWikiDiv = document.createElement('div');//某流程所有对应制度
+            AllWikiDiv.id = 'AllWikiDiv';
+            AllWikiDiv.className = "myList";
+
+            var upInstitutionDiv = document.createElement('div');
+            upInstitutionDiv.id = 'upInstitutionDiv';
+            upInstitutionDiv.className = "myList";
+
+            var downInstitutionDiv = document.createElement('div');
+            downInstitutionDiv.id = 'downInstitutionDiv';
+            downInstitutionDiv.className = "myList";
+
+            //svgText = 'a';
+            //切换tab按钮
+            Ext.define('Ext.ng.SwitchTap_1', {
+                extend: 'Ext.panel.Panel',
+                alias: 'widget.ngSwitchTap',
+                width: 220,
+                height: 40,
+                border: 0,
+                items: {
+                    layout: 'column',
+                    defaults: {
+                        xtype: 'button',
+                        columnWidth: .5,
+                        height: 40,
+                        border: 0,
+                    },
+                    items: [{
+                        text: '制度',
+                        pressed: false,
+                        //toggleGroup: 'btnGroup',
+                        itemId: 'procedureBtn',
+                        handler: function () {
+                           viewport.getLayout().setActiveItem(1);
+                        }
+                    }, {
+                        pressed: true,
+                        //toggleGroup: 'btnGroup',
+                        text: '流程',
+                        itemId: 'insititutionBtn',
+                    }]
+                }
+            });
+
+            Ext.define('Ext.ng.SwitchTap_2', {
+                extend: 'Ext.panel.Panel',
+                alias: 'widget.ngSwitchTap',
+                width: 220,
+                height: 40,
+                border: 0,
+                items: {
+                    layout: 'column',
+                    defaults: {
+                        //anchor: '100%',
+                        xtype: 'button',
+                        //toggleGroup: 'btnGroup',
+                        columnWidth: .5,
+                        height: 40,
+                        border: 0,
+                        //handler: function () {
+                        //    var switchTap = this.findParentByType('ngSwitchTap');
+                        //    if (switchTap.stateBtn == this.itemId) {
+                        //        this.pressed = true;
+                        //    } else {
+                        //        this.pressed = false;
+                        //        if (this.itemId == "procedureBtn") {
+                        //            viewport.getLayout().setActiveItem(0);
+                        //        } else {
+                        //            viewport.getLayout().setActiveItem(1);
+                        //        }
+                        //    }
+                        //}
+                    },
+                    items: [{
+                        text: '制度',
+                        pressed: true,
+                        //toggleGroup: 'btnGroup',
+                        itemId: 'procedureBtn',
+                    }, {
+                        pressed: false,
+                        //toggleGroup: 'btnGroup',
+                        text: '流程',
+                        itemId: 'insititutionBtn',
+                        handler: function () {
+                            viewport.getLayout().setActiveItem(0);
+                        }
+                    }]
+                }
+            });
+
+            var procedureSwitch = Ext.create('Ext.ng.SwitchTap_1', {
+                itemId: 'procedureSwitch',
+                stateBtn: 'procedureBtn',
+                panelItemId:'procedureContainer',
+                region: 'north',
+            });
+
+            var insititutionSwitch = Ext.create('Ext.ng.SwitchTap_2', {
+                itemId: 'insititutionSwitch',
+                stateBtn:'insititutionBtn',
+                panelItemId:'institutionContainer',
+                region: 'north',
+            });
+
+
+
+            //左侧流程与制度树
+            procedureTree = Ext.create('Ext.ng.TreePanel', {
+                itemId: 'procedureTree',
+                region: 'center',
+                collapsible: false,
+                autoLoad: false,
+                height: 600,
+                width:220,
+                split: true,
+                border: 0,
+                bodyStyle: 'border-left:0',//改为这个
+                layout: 'fit',
+                rootVisible: false,
+                //expand:false,
+                hideHeaders: true,
+                treeFields: [{ name: 'text', type: 'string' },
+                   { name: 'phid', type: 'int' },
+                   { name: 'name', type: 'string' },
+                   { name: 'mypid', type: 'string' },
+                   { name: 'userid', type: 'int' },
+                   { name: 'svgconfig', type: 'string' }],
+                url: C_ROOT + 'SUP/NavigationCenter/LoadTree',
+                //url: C_ROOT + 'SUP/MyFuncTree/LoadMyFuncTree',
+                refreshData: function () {
+                    var me = this;
+                    me.getRootNode().removeAll();
+                    me.getStore().setProxy(
+                        {
+                            type: 'ajax',
+                            url: C_ROOT + 'SUP/NavigationCenter/LoadTree',
+                        }
+                    );
+                    me.getStore().load();
+                    me.getView().refresh();
+                },
+                dockedItems: {
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    layout: 'border',
+                    minWidth: 100,
+                    height: 30,
+                    items: [{
+                        itemId: 'add',
+                        region: 'west',
+                        //width: 45,
+                        //text: '自定义',
+                        tooltip: '自定义',
+                        iconCls: 'add',
+                        handler: function () {
+                            var top = window.parent;
+                            $OpenTab("自定义", C_ROOT + 'SUP/NavigationCenter/IndividualNavigationTree');
+                        }
+                    }, {
+                        region: 'center',
+                        minWidth: 100,
+                        grow: true,
+                        xtype: 'textfield',
+                        itemId: 'queryKey',
+                        name: 'queryKey',
+                        emptyText: '定位节点',
+                        enableKeyEvents: true,
+                        listeners: {
+                            'keydown': function (el, e, eOpts) {
+                                if (e.getKey() == e.ENTER) {
+                                    var toolbar = this.findParentByType('toolbar');//找到根节点
+                                    var condition = toolbar.queryById('queryKey').value;
+                                    if (condition == '' || condition == null) {
+                                        //alert('请输入定位关键字');
+                                        return;
+                                    }
+                                    var ngProcedureTree = this.findParentByType('ngTreePanel');
+                                    findNodeByFuzzy(ngProcedureTree, condition);
+                                    return false;
+                                }
+                            }
+                        }
+                    },
+                {
+                    itemId: 'query',
+                    region: 'east',
+                    tooltip: '定位',
+                    iconCls: 'icon-Location',
+                    handler: function () {
+                        var toolbar = this.findParentByType('toolbar');//找到根节点
+                        var condition = toolbar.queryById('queryKey').value;
+                        if (condition == '' || condition == null) {
+                            return;
+                        }
+                        var ngProcedureTree = this.findParentByType('ngTreePanel');
+                        findNodeByFuzzy(ngProcedureTree, condition);
+                    }
+                }]
+                },
+                columns: [
+                    {
+                        //text: '组织名称',
+                        flex: 1,
+                        xtype: 'treecolumn',
+                        dataIndex: 'name',
+                        hidden: false,
+                        hideable: false,
+                        align: 'left',
+                        renderer: function (value, metaData, record) {
+                            if (currentNode != '' && currentNode != null & currentNode.raw.leaf && currentNode.raw.name == value) {
+                                var text = value + '<img height="13px" width="13px" src="' + C_ROOT + 'NG3Resource/icons/Location.gif"/>';
+                                return text;
+                            } else {
+                                var text = value;
+                                return text;
+                            }
+                        }
+                    }
+                ],
+                listeners: {
+                    'afterrender': function () {
+                        var me = this;
+                        Ext.apply(this.getStore().proxy.extraParams, {});
+                        //this.getRootNode().expand();
+                        this.expandAll();
+                    },
+                    'expand': function () {
+                        var me = this;
+                        Ext.apply(this.getStore().proxy.extraParams, {  });
+                        this.getRootNode().expand();
+                    },
+                    'activate': function () {
+                        var me = this;
+                        Ext.apply(this.getStore().proxy.extraParams, { });
+                        //this.getRootNode().expand();//有些电脑会全部出发这个事件，达不到懒加载目的
+                    },
+                    'itemclick': function (view, rcd, item, idx, event, eOpts) {
+                        if (rcd.raw.leaf ) {
+                            if (currentNode.data != undefined && currentNode.data.phid == rcd.data.phid) {
+                                return;
+                            }
+                            currentNode = rcd;
+                            frame1.contentWindow.myRefresh();
+                            this.getView().refresh(true);
+
+                            Ext.Ajax.request({
+                                url: C_ROOT + 'SUP/NavigationCenter/FindWikiByProcess',
+                                params: {
+                                    'phid': currentNode.raw.phid,
+                                },
+                                async: false,
+                                success: function (response) {
+                                    AllWikiDiv.innerHTML = '';
+                                    if (!Ext.isEmpty(response.responseText)) {
+                                        if (response.responseText == '' || response.responseText == null) {
+                                            return;
+                                        }
+                                        var obj = Ext.JSON.decode(response.responseText);
+                                        AllWikiDiv.innerHTML = obj.allWiki;
+                                       
+                                        var AllWikiDivA = document.querySelectorAll("#AllWikiDiv a");
+                                        for (var i = 0; i < AllWikiDivA.length; i++) {
+                                            AllWikiDivA[i].href = 'javascript:void(0)';
+                                            AllWikiDivA[i].onclick = function () {
+                                                locateInstitutionTree(this.id);
+                                            };
+                                        }
+
+                                        OrgWikiDiv.innerHTML = obj.orgWiki;
+                                        var OrgWikiDivA = document.querySelectorAll("#OrgWikiDiv a");
+                                        for (var i = 0; i < OrgWikiDivA.length; i++) {
+                                            OrgWikiDivA[i].href = 'javascript:void(0)';
+                                            OrgWikiDivA[i].onclick = function () {
+                                                locateInstitutionTree(this.id);
+                                            };
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //Ext.define('Ext.procedureTreeHelp.RichHelp', {
+            //    extend: 'Ext.ng.RichHelp',
+            //    alias: 'widget.procedureTreeHelp',
+            //    helpid: 'fg3_process_tree',
+            //    //outFilter: {},
+            //    ORMMode: true,
+            //    valueField: 'phid',
+            //    userCodeField: 'phid',//用户代码
+            //    displayField: 'name',
+            //    //listFields: '',
+            //    //listHeadTexts: '',
+            //    MaxLength: 100,
+            //    editable: true,
+            //    mustInput: false
+            //});
+            //var procedureTree = Ext.create('Ext.panel.Panel', {
+            //    itemId: 'procedureTree',
+            //    region: 'center',
+            //    autoLoad: false,
+            //    height: 600,
+            //    width: 220,
+            //    split: true,
+            //    border: 0,
+            //    bodyStyle: 'border-left:0',//改为这个
+            //    layout: 'fit',
+            //    items: [
+            //        {
+            //            xtype: 'procedureTreeHelp',
+            //        }
+            //    ]
+            //});
+
+            insititutionTree = Ext.create('Ext.ng.TreePanel', {
+                itemId: 'insititutionTree',
+                region: 'center',
+                autoLoad: false,
+                height: 600,
+                width: 220,
+                hideHeaders: true,
+                split: true,
+                border: 0,
+                bodyStyle: 'border-left:0',//改为这个
+                layout: 'fit',
+                rootVisible: false,
+                //expand:false,
+                treeFields: [{ name: 'text', type: 'string' },
+                   { name: 'phid', type: 'int' },
+                   { name: 'name', type: 'string' },
+                   { name: 'pid', type: 'string' },
+                   { name: 'userid', type: 'int' },
+                   { name: 'svgconfig', type: 'string' }],
+                url: C_ROOT + 'SUP/NavigationCenter/LoadWiKiCategory',
+                dockedItems: {
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    layout: 'border',
+                    minWidth: 100,
+                    height: 30,
+                    items: [{
+                        region: 'center',
+                        minWidth: 100,
+                        grow: true,
+                        xtype: 'textfield',
+                        itemId: 'queryKey',
+                        name: 'queryKey',
+                        emptyText: '定位节点',
+                        enableKeyEvents: true,
+                        listeners: {
+                            'keydown': function (el, e, eOpts) {
+                                if (e.getKey() == e.ENTER) {
+                                    var toolbar = this.findParentByType('toolbar');//找到根节点
+                                    var condition = toolbar.queryById('queryKey').value;
+                                    if (condition == '' || condition == null) {
+                                        //alert('请输入定位关键字');
+                                        return;
+                                    }
+                                    var ngProcedureTree = this.findParentByType('ngTreePanel');
+                                    findNodeByFuzzy(ngProcedureTree, condition);
+                                    return false;
+                                }
+                            }
+                        }
+                    },
+                {
+                    itemId: 'query',
+                    region: 'east',
+                    tooltip: '定位',
+                    iconCls: 'icon-Location',
+                    handler: function () {
+                        var toolbar = this.findParentByType('toolbar');//找到根节点
+                        var condition = toolbar.queryById('queryKey').value;
+                        if (condition == '' || condition == null) {
+                            return;
+                        }
+                        var ngProcedureTree = this.findParentByType('ngTreePanel');
+                        findNodeByFuzzy(ngProcedureTree, condition);
+                    }
+                }]
+                },
+                columns: [
+                    {
+                        flex: 1,
+                        xtype: 'treecolumn',
+                        dataIndex: 'text',
+                        hidden: false,
+                        hideable: false,
+                        align: 'left',
+                        renderer: function (value, metaData, record) {
+                            if (WikiNode != '' && WikiNode != null & WikiNode.raw.leaf && WikiNode.raw.text == value) {
+                                var text = value + '<img height="13px" width="13px" src="' + C_ROOT + 'NG3Resource/icons/Location.gif"/>';
+                                return text;
+                            } else {
+                                var text = value;
+                                return text;
+                            }
+                        }
+                    }
+                ],
+                listeners: {
+                    'afterrender': function () {
+                        var me = this;
+                        Ext.apply(this.getStore().proxy.extraParams, {});
+                        this.getRootNode().expand();
+                    },
+                    'expand': function () {
+                        var me = this;
+                        Ext.apply(this.getStore().proxy.extraParams, {});
+                        this.getRootNode().expand();
+                    },
+                    'activate': function () {
+                        var me = this;
+                        Ext.apply(this.getStore().proxy.extraParams, {});
+                        //this.getRootNode().expand();//有些电脑会全部出发这个事件，达不到懒加载目的
+                    },
+                    'itemclick': function (view, rcd, item, idx, event, eOpts) {
+                        downInstitutionDiv.innerHTML = '';
+                        if (rcd.raw.leaf ) {
+                            if (WikiNode.data != undefined && WikiNode.data.id == rcd.data.id) {
+                                return;
+                            }
+                            WikiNode = rcd;
+                            this.getView().refresh(true);
+                            Ext.Ajax.request({
+                                url: C_ROOT + 'SUP/NavigationCenter/FindWikiByCategoty',
+                                params: {
+                                    'phid': WikiNode.raw.id,
+                                },
+                                async: false,
+                                success: function (response) {
+                                    upInstitutionDiv.innerHTML = '';
+                                    if (!Ext.isEmpty(response.responseText)) {
+                                        upInstitutionDiv.innerHTML = response.responseText;
+
+                                        var upInstitutionDivLi = document.querySelectorAll("#upInstitutionDiv li");
+                                        var upInstitutionDivA = document.querySelectorAll("#upInstitutionDiv a");
+                                        for (var i = 0; i < upInstitutionDivA.length; i++) {
+                                            upInstitutionDivA[i].href = 'javascript:void(0)';
+                                            var Li = upInstitutionDivLi[i];
+                                            var A = upInstitutionDivA[i];
+                                            var id = Li.id;
+                                            //frame2.myRefresh(id);                                           
+                                            upInstitutionDivA[i].onclick = function () {
+                                                frame2.myRefresh(this.id);
+                                                Ext.Ajax.request({
+                                                    url: C_ROOT + 'SUP/NavigationCenter/FindProcessByWiki?phid='+id,
+                                                    params: {
+                                                        'phid': this.id,
+                                                    },
+                                                    async: false,
+                                                    success: function (response) {
+                                                        downInstitutionDiv.innerHTML = '';
+                                                        if (!Ext.isEmpty(response.responseText)) {
+                                                            downInstitutionDiv.innerHTML = response.responseText;
+
+                                                            var downInstitutionDivLi = document.querySelectorAll("#downInstitutionDiv li");
+                                                            var downInstitutionDivA = document.querySelectorAll("#downInstitutionDiv a");
+                                                            for (var i = 0; i < downInstitutionDivA.length; i++) {
+                                                                var Li = downInstitutionDivLi[i];
+                                                                var A = downInstitutionDivA[i];
+                                                                var id = Li.id;
+                                                                downInstitutionDivA[i].href = 'javascript:void(0)';
+                                                                downInstitutionDivA[i].onclick = function () {                                                                    
+                                                                    locateProcessTree(procedureTree, this.innerText);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            };
+                                            //upInstitutionDivA[i].onclick = function (id)
+                                            //{                                              
+                                            //    clickKnowledge(id)                                               
+                                            //};
+                                        }
+                                        if (upInstitutionDivA.length > 0) {
+                                            var Li = upInstitutionDivLi[0];
+                                            var A = upInstitutionDivA[0];
+                                            var id = Li.id;
+                                            frame2.myRefresh(id);
+                                            Ext.Ajax.request({
+                                                url: C_ROOT + 'SUP/NavigationCenter/FindProcessByWiki?phid=' + id,
+                                                params: {
+                                                    'phid': id,
+                                                },
+                                                async: false,
+                                                success: function (response) {
+                                                    downInstitutionDiv.innerHTML = '';
+                                                    if (!Ext.isEmpty(response.responseText)) {
+                                                        downInstitutionDiv.innerHTML = response.responseText;
+
+                                                        var downInstitutionDivLi = document.querySelectorAll("#downInstitutionDiv li");
+                                                        var downInstitutionDivA = document.querySelectorAll("#downInstitutionDiv a");
+                                                        for (var i = 0; i < downInstitutionDivA.length; i++) {
+                                                            var Li = downInstitutionDivLi[i];
+                                                            var A = downInstitutionDivA[i];
+                                                            var id = Li.id;
+                                                            downInstitutionDivA[i].href = 'javascript:void(0)';
+                                                            downInstitutionDivA[i].onclick = function () {
+                                                                locateProcessTree(procedureTree, this.innerText);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //function clickKnowledge(id) {
+            //    frame2.myRefresh(id);
+            //    Ext.Ajax.request({
+            //        url: C_ROOT + 'SUP/NavigationCenter/FindProcessByWiki',
+            //        params: {
+            //            'phid': id,
+            //        },
+            //        async: false,
+            //        success: function (response) {
+            //            downInstitutionDiv.innerHTML = '';
+            //            if (!Ext.isEmpty(response.responseText)) {
+            //                downInstitutionDiv.innerHTML = response.responseText;
+            //                var downInstitutionDivLi = document.querySelectorAll("#downInstitutionDiv li");
+            //                var downInstitutionDivA = document.querySelectorAll("#downInstitutionDiv a");
+            //                for (var i = 0; i < downInstitutionDivA.length; i++) {
+            //                    var Li = downInstitutionDivLi[i];
+            //                    var A = downInstitutionDivA[i];
+            //                    var id = Li.id;
+            //                    downInstitutionDivA[i].href = 'javascript:void(0)';
+            //                }
+            //            }
+            //        }
+            //    });
+            //}
+
+            //中间部分
+            frame1 = document.createElement("IFRAME");
+            frame1.frameBorder = 0;
+            frame1.name = 'frame1';
+            //frame1.src = C_ROOT + 'NG3Resource/maintree/viewNode.html?text=' + svgText;
+            frame1.src = C_ROOT + 'NG3Resource/maintree/viewNodeNew.html';
+            frame1.height = "100%";
+            frame1.width = "100%";
+            frame1.onload = function () {
+                frame1.contentWindow;
+            }
+
+            var naviPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                itemId: 'naviPanel',
+                layout: 'fit',
+                //items:[frame1]
+                contentEl: frame1,
+                listeners: {
+                    'afterrender': function (tabPanel, eOpts) {
+
+                    }
+                }
+            });
+
+
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                showArrowBtn: false,
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'edit',
+                    //'->', 'close'
+                ]
+            })
+
+
+            //右侧部分card布局
+           var rightPanel_mainProcedure = Ext.create('Ext.panel.Panel', {
+               title: '流程制度文件',
+               region: 'north',
+               itemId: 'rightPanel_mainProcedure',
+               //width: 200,
+               height: 400,
+               autoScroll: true,
+               html: '<div id="rightPanel_mainProcedure_div"></div>',
+               listeners: {
+                   'afterrender': function (tabPanel, eOpts) {
+                       document.getElementById('rightPanel_mainProcedure_div').appendChild(AllWikiDiv);
+                   }
+               }
+           });
+           var rightPanel_oProcedure = Ext.create('Ext.panel.Panel', {
+               title: '组织流程制度文件',
+               region: 'center',
+               itemId: 'rightPanel_oProcedure',
+               //width: 200
+               html: '<div id="rightPanel_oProcedure_div"></div>',
+               listeners: {
+                   'afterrender': function (tabPanel, eOpts) {
+                       document.getElementById('rightPanel_oProcedure_div').appendChild(OrgWikiDiv);
+                   }
+               }
+           });
+           
+           var rightPanel = Ext.create('Ext.panel.Panel', {
+               region: 'east',
+               itemId: 'rightPanel',
+               width: 200,
+               layout: 'border',
+               items:
+                   [
+                       rightPanel_mainProcedure,
+                       rightPanel_oProcedure
+                   ]
+           });
+
+           var procedureContainer = Ext.create('Ext.panel.Panel', {
+               layout: 'border',
+               region: 'center',
+               autoScroll: false,
+               border: false,
+               itemId: 'procedureContainer',
+               items: [
+                   {
+                       width:220,//外面的容器得有宽度，否则加载失败
+                       id:'procedure_left',
+                       xtype: 'panel',
+                       layout: 'border',
+                       region: 'west',
+                       items: [
+                           procedureSwitch,
+                           procedureTree
+                       ]
+                   },
+                    {
+                        id:'procedure_center',
+                        xtype: 'panel',
+                        layout: 'border',
+                        region: 'center',
+                        items: [
+                            ngToolbar,
+                            naviPanel
+                        ]
+                    },
+                    rightPanel
+               ]
+           });
+
+           frame2 = document.createElement("IFRAME");
+           frame2.frameBorder = 0;
+           frame2.name = 'frame2';
+            //frame2.src = C_ROOT + 'NG3Resource/maintree/viewNode.html?text=' + svgText;
+           frame2.src = '';
+           frame2.mySrc = C_ROOT + 'WM/KM/WikiMain/WikiMainView?otype=view&id=';
+           frame2.height = "100%";
+           frame2.width = "100%";
+           frame2.myRefresh = function (id) {
+               frame2.src = frame2.mySrc + id;
+               //frame2.contentWindow.window.location.reload();
+               //frame2.contentWindow.location.reload(true);
+               frame2.contentWindow.location.href = frame2.mySrc + id;
+           }
+
+            //制度显示中间的panel
+           var institutionPanel = Ext.create('Ext.panel.Panel', {
+               title: '制度查看',
+               region: 'center',
+               autoScroll: false,
+               border: false,
+               itemId: 'institutionPanel',
+               contentEl: frame2
+           });
+
+            //制度右侧panel
+            //右侧部分card布局
+           var rightPanel_upInstitution = Ext.create('Ext.panel.Panel', {
+               title: '相关百科',
+               region: 'north',
+               itemId: 'rightPanel_upInstitution',
+               //width: 200,
+               height: 400,
+               autoScroll: true,
+               html: '<div id="rightPanel_upInstitution_div"></div>',
+               listeners: {
+                   'afterrender': function (tabPanel, eOpts) {
+                       document.getElementById('rightPanel_upInstitution_div').appendChild(upInstitutionDiv);
+                   }
+               }
+           });
+           var rightPanel_downInstitution = Ext.create('Ext.panel.Panel', {
+               title: '相关流程',
+               region: 'center',
+               itemId: 'rightPanel_downInstitution',
+               //width: 200
+               html: '<div id="rightPanel_downInstitution_div"></div>',
+               listeners: {
+                   'afterrender': function (tabPanel, eOpts) {
+                       document.getElementById('rightPanel_downInstitution_div').appendChild(downInstitutionDiv);
+                   }
+               }
+           });
+
+           var rightInstitutionPanel = Ext.create('Ext.panel.Panel', {
+               region: 'east',
+               itemId: 'rightInstitutionPanel',
+               width: 200,
+               layout: 'border',
+               items:
+                   [
+                       rightPanel_upInstitution,
+                       rightPanel_downInstitution
+                   ]
+           }); 
+
+
+           //var rightInstitutionPanel = Ext.create('Ext.tree.Panel', {
+           //    title: '导航流程',
+           //    region: 'east',
+           //    itemId: 'rightPanel_oInstitution',
+           //    width: 200,
+           //    html: '<div id="rightInstitutionPanel_div"></div>',
+           //    listeners: {
+           //        'afterrender': function (tabPanel, eOpts) {
+           //            document.getElementById('rightInstitutionPanel_div').appendChild(ProcessDiv);
+           //        }
+           //    }
+           //});
+
+           var institutionContainer = Ext.create('Ext.panel.Panel', {
+               layout: 'border',
+               region: 'center',
+               autoScroll: false,
+               border: false,
+               itemId: 'institutionContainer',
+               items: [
+                   {
+                       xtype: 'panel',
+                       width: 220,
+                       layout: 'border',
+                       region: 'west',
+                       items: [
+                           insititutionSwitch,
+                           insititutionTree
+                       ]
+                   },
+                   institutionPanel,
+                   rightInstitutionPanel
+               ]
+           });
+
+
+
+            //布局
+            viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'card',
+                //activeItem: 'procedureContainer',
+                activeItem: 'institutionContainer',
+                border: false,
+                items: [
+                    procedureContainer,
+                    institutionContainer
+                ]
+            });
+
+            ngToolbar.get('edit').on('click', function () {
+                if (currentNode == '' || currentNode == null || !currentNode.raw.leaf) {
+                    Ext.MessageBox.alert('', '请选择流程节点');
+                    return;
+                }
+                $OpenTab(currentNode.raw.name, C_ROOT + 'SUP/NavigationCenter/IndividualNavigationChart?currentNodePhid=' + currentNode.raw.phid + '&text=' + currentNode.raw.name);
+                //C_ROOT + 'SUP/NavigationCenter/IndividualNavigationTree');
+                //$OpenTab('自定义功能导航', C_ROOT + 'SUP/MainTree/IndividualNavigation');
+            });
+       });
+
+        var load = function () {
+            //if (currentNode == '' || currentNode == null || currentNode.raw.svgconfig == null || currentNode.raw.svgconfig == '') {
+            //    return null;
+            //}
+            var nodes = procedureTree.getSelectionModel().getSelection();
+            if (nodes.length == 0 || !nodes[0].data.leaf) {
+                return null;
+            }
+            var param;
+            Ext.Ajax.request({
+                params: {
+                    'phid': currentNode.raw.phid
+                },
+                url: C_ROOT + 'SUP/NavigationCenter/LoadChart',
+                async: false, //同步
+                success: function (response) {
+                    if (response.responseText == '' || response.responseText == null) {
+                        return;
+                    }
+                    var resp = Ext.JSON.decode(response.responseText);
+                    param = resp;
+                }
+            });
+            return param;
+        }
+
+        var openProcess = function (phid,text) {
+            $OpenTab(currentNode.raw.name, C_ROOT + 'SUP/NavigationCenter/IndividualNavigationChart?currentNodePhid=' + phid + '&text=' + text);
+        }
+
+        function NG3Refresh(param) {
+            if (param == 'tree') {
+                //setTimeout(function () {
+                //    procedureTree.getView().refresh();
+                //},1000)
+                //procedureTree.getView().refreshPartner();
+                //console.log('aaa');
+                procedureTree.refreshData();
+            } else if (param == 'chart') {
+                frame1.contentWindow.myRefresh();
+            }
+        }
+
+
+        //定位节点函数
+        function findNodeByFuzzy(tree, value) {
+            if (value == "") { return; }
+            var me = tree, index = -1;
+            var firstFind = false;
+            if (isNaN(me.nodeIndex) || me.nodeIndex == null || me.value != value) {
+                me.nodeIndex = -1;
+                me.value = value;
+            }
+            var findNode = tree.getRootNode().findChildBy(function (node) {
+                index++;
+                //if (!node.data.root && index > me.nodeIndex && (node.data.text.indexOf(value) > -1 || node.data.bopomofo.indexOf(value.toUpperCase()) > -1)) {
+                if (!node.data.root && index > me.nodeIndex && (node.data.text.indexOf(value) > -1)) {
+                    return true;
+                }
+            }, null, true);
+            me.nodeIndex = index;
+            if (findNode) {
+                tree.selectPath(findNode.getPath());
+            }
+            else {
+                if (firstFind) {
+                    Ext.MessageBox.alert('', '没有匹配的树节点.');
+                }
+                me.nodeIndex = -1;
+            }
+        };
+        //根据名字定位节点
+        function getNodeByName(root, text, obj) {
+            for (var i = 0; i < root.childNodes.length; i++) {
+                getNodeByName(root.childNodes[i], text, obj);
+            }
+            if (root.data.text == text && root.data.leaf) {
+                obj.raw.phid = root.raw.phid;
+                obj.raw.name = root.raw.name;
+                obj.raw.leaf = true;
+            }
+        }
+
+        //div调用的定位流程
+        function locateProcessTree(tree, value) {
+            if (tree == '' || tree == null) {
+                tree = procedureTree;
+            }
+            viewport.getLayout().setActiveItem(0);
+            findNodeByFuzzy(tree, value);
+
+            var obj = new Object();
+            var raw = new Object();
+            obj.raw = raw;
+            getNodeByName(procedureTree.getRootNode(), value, obj);
+
+            currentNode = obj;
+            if (currentNode.raw.phid == undefined) {
+                Ext.MessageBox.alert('', '该流程已被删除');
+                return;
+            }
+            frame1.contentWindow.myRefresh();
+            procedureTree.getView().refresh(true);
+
+            Ext.Ajax.request({
+                url: C_ROOT + 'SUP/NavigationCenter/FindWikiByProcess',
+                params: {
+                    'phid': currentNode.raw.phid,
+                },
+                async: false,
+                success: function (response) {
+                    if (response.responseText == '' || response.responseText == null) {
+                        return;
+                    }
+                    var obj = Ext.JSON.decode(response.responseText);
+                    AllWikiDiv.innerHTML = obj.allWiki;
+
+                    var AllWikiDivA = document.querySelectorAll("#AllWikiDiv a");
+                    for (var i = 0; i < AllWikiDivA.length; i++) {
+                        AllWikiDivA[i].href = 'javascript:void(0)';
+                        AllWikiDivA[i].onclick = function () {
+                            locateInstitutionTree(this.id);
+                        };
+                    }
+
+                    OrgWikiDiv.innerHTML = obj.orgWiki;
+                    var OrgWikiDivA = document.querySelectorAll("#OrgWikiDiv a");
+                    for (var i = 0; i < OrgWikiDivA.length; i++) {
+                        OrgWikiDivA[i].href = 'javascript:void(0)';
+                        OrgWikiDivA[i].onclick = function () {
+                            locateInstitutionTree(this.id);
+                        };
+                    }
+                }
+            });
+        }
+        //div调用的显示百科
+        function locateInstitutionTree(id) {
+            viewport.getLayout().setActiveItem(1);
+            frame2.myRefresh(id);
+        }
+    </script>
+
+
+}

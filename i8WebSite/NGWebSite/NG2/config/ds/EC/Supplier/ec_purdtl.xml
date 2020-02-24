@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_purdtl">
+      <Field Name="purid" IsKey="true" />
+      <Field Name="purno" />
+      <Field Name="lineid"  />
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="pursum"/>
+      <Field Name="remarks"/>
+      <Field Name="reqdate"/>
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"/>
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname"></Field>
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left outer join itemdata on itemdata.itemno = [table].itemno
+      left outer join ranks on ranks.ranks = [table].ranks 
+      left outer join msunit on msunit.msunit = [table].msunit 
+      [where] [orderby]
+    </Sql>
+    <Where >
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+      <Values>
+
+      </Values>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+      <Values>
+
+      </Values>
+  </Destroy>
+  <selectDtl>
+    <Sql>
+      select * from ec_purdtl [where]
+    </Sql>
+    <Query>
+      <Exp Field="purid" Target="Client" Value="purid" Type="Array"/>
+    </Query>
+  </selectDtl>
+  
+</DataService>
+

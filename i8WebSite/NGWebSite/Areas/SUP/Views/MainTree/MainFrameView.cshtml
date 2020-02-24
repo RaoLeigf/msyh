@@ -1,0 +1,476 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="gb2312" />
+    <title>@ViewBag.Title</title>
+    <script type="text/javascript">
+        var $PageName = "",
+        C_ROOT = '@ViewBag.Root',
+        C_PATH = '@ViewBag.Path',
+        $user = { id: '@ViewBag.Logid', loginname: '@ViewBag.Logid' },
+        $appinfo = { logid: '@ViewBag.Logid', username: '@ViewBag.UserName', ocode: '@ViewBag.OCode', userID: '@ViewBag.userID', orgID: '@ViewBag.orgID' },
+        $sessionid = '@ViewBag.SessionID',
+        SupCanVersion = '@ViewBag.SupCanVersion';
+        FuncName = '@ViewBag.FuncName';
+        var $gridStateInfo = '@ViewBag.GridStateInfo';
+        var $queryPanelInfo = '@ViewBag.QueryPanelInfo';
+        var $toolbarRightInfo = '@ViewBag.ToolbarRightInfo';
+
+    </script>
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+
+    <link href=@Url.Script("~/NG3Resource/extjs/Resources/css/ext-all-neptune.css") rel="stylesheet" type="text/css" id="themestyle" />
+    <link href=@Url.Script("~/NG3Resource/icons/icon.css") rel="stylesheet" type="text/css" />
+    <link href=@Url.Script("~/NG3Resource/css/datetime.css") rel="stylesheet" type="text/css" />
+    @*<link href=@Url.Script("~/NG3Resource/css/NG3-neptune.css") rel="stylesheet" type="text/css" />*@
+    <link href=@Url.Script("~/NG3Resource/css/mainTreeTab.css") rel="stylesheet" type="text/css" />
+
+    <script src=@Url.Script("~/NG3Resource/extjs/ext-all.js") type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/extjs/locale/ext-lang-zh_CN.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/json2.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/datetime.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/ExtUx.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/NG3APPcommon.js") type="text/javascript" charset="gb2312"></script>
+
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>    
+    <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>
+   
+
+    <script>
+        Ext.tip.QuickTipManager.init();
+
+        var AllIdDT = Ext.htmlDecode('@ViewBag.DT');
+        var AllId = Ext.isEmpty(AllIdDT) ? [] : Ext.decode(AllIdDT); //自定义添加树的所有选项
+
+        var ExistIdDT = Ext.htmlDecode('@ViewBag.ExistId');//自定义添加树的用户已添加的选项
+        var ExistId = Ext.isEmpty(ExistIdDT) ? [] : Ext.decode(ExistIdDT);
+        if (ExistId.toString() == [].toString() || ExistId.toString() == ["hideTab"].toString()) {
+            ExistId = ["hideTab", "tabPageOrg"]
+        }
+
+        var productId = Ext.htmlDecode('@ViewBag.ProductId');
+
+        //i8 15.1 去掉合同 文档 功能导航
+        var index = ExistId.indexOf('TabPageContractManage');
+        if (index > -1) {
+            ExistId.splice(index, 1);
+        }
+        index = ExistId.indexOf('tabPageWmDocTree');
+        if (index > -1) {
+            ExistId.splice(index, 1);
+        }
+        index = ExistId.indexOf('tabPageNavigation');
+        if (index > -1) {
+            ExistId.splice(index, 1);
+        }
+        var UserType = Ext.htmlDecode('@ViewBag.UserType');
+        var menuTreeCardLayout;
+        var designContainer;
+        var bottomTabPanel;
+
+        var LoadEnFuncTreeRight = Ext.htmlDecode('@ViewBag.LoadEnFuncTreeRight');
+
+        var ViewBagIsDockControl = Ext.htmlDecode('@ViewBag.isDockControl');
+        var isDockControl = true;
+        if (ViewBagIsDockControl == '0') {
+            isDockControl = false;
+        }
+
+        var UITheme = Ext.htmlDecode('@ViewBag.UITheme');
+
+        var isSystemUser = (UserType == 'SYSTEM') ? true : false;
+        Ext.onReady(function () {
+            //$OpenTab("个性化设置", C_ROOT + 'SUP/MainTree/IndividualConfig');
+            //沉默页面的函数
+            //StoreloadMarsk = new Ext.LoadMask(document.body, {
+            //    msg: '加载中',
+            //    disabled: false
+            //});
+
+            function findNodeByFuzzy(tree, value) {
+                if (value == "") { return; }
+                var me = this, index = -1;
+                var firstFind = false;
+                if (me.nodeIndex == '' || me.nodeIndex == null) {
+                    me.nodeIndex = -1;
+                }
+                var findNode = tree.getRootNode().findChildBy(function (node) {
+                    index++;
+                    //if (!node.data.root && index > me.nodeIndex && (node.data.text.indexOf(value) > -1 || node.data.bopomofo.indexOf(value.toUpperCase()) > -1)) {
+                    if (!node.data.root && index > me.nodeIndex && (node.data.text.indexOf(value) > -1)) {
+                        return true;
+                    }
+                }, null, true);
+                me.nodeIndex = index;
+                if (findNode) {
+                    tree.selectPath(findNode.getPath());
+                }
+                else {
+                    if (firstFind) {
+                        Ext.MessageBox.alert('', '没有匹配的树节点.');
+                    }
+                    me.nodeIndex = -1;
+                }
+            };//定位我的功能树节点
+
+            var myFuncTree = Ext.create('Ext.ng.myFuncTree', {
+                region: 'west',
+                itemId: 'myFuncTree',
+                isSystemUser: isSystemUser,
+                hasRightClickMenu: true,
+                hasToolbar: true,
+                hasIndividualButton: true,
+                hasDbClickListener: true,
+                loaded: false
+            });//新建我的功能树
+
+            //构建card布局items
+            var containerItems = [];
+            containerItems.push(myFuncTree);
+            for (var i = 0; i < AllId.Record.length; i++) {
+                if (AllId.Record[i].TabPageIDVisible == 'True') {
+                    containerItems.push({
+                        //xtype: 'button',
+                        text: AllId.Record[i].TabPageText,
+                        title: AllId.Record[i].TabPageText,
+                        itemId: AllId.Record[i].TabPageID,
+                        html: '' + AllId.Record[i].TabPageText
+                    })
+                }
+            }
+
+            //左侧card布局
+            designContainer = Ext.create('Ext.panel.Panel', {
+                id: 'designContainer',
+                //anchor:'100%',
+                region: 'center',
+                layout: 'card',
+                activeItem: 'myFuncTree',
+                border: false,
+                items: containerItems
+
+            });
+
+            //构建第二行tab的默认items
+            var items = [];
+            for (var i = 0; i < AllId.Record.length; i++) {
+                if (AllId.Record[i].TabPageIDVisible == 'True') {
+                    items.push({
+                        //xtype: 'button',
+                        text: AllId.Record[i].TabPageText,
+                        title: AllId.Record[i].TabPageText,
+                        itemId: AllId.Record[i].TabPageID,
+                        html: '' + AllId.Record[i].TabPageText
+                    })
+                }
+            }
+
+            //根据权限控制第一行tabpanel的items
+            var topTabItems = [];
+            topTabItems.push({
+                title: '我的功能',
+                height: 30,
+                itemId: 'myFuncTree'
+            });
+            if (LoadEnFuncTreeRight.substr(0, 1) == 1) {
+                if (LoadEnFuncTreeRight.substr(1, 1) == 1) {
+                    topTabItems.push({
+                        title: '企业功能',
+                        height: 30,
+                        itemId: 'enFuncTree'
+                    })
+                };
+                if (LoadEnFuncTreeRight.substr(2, 1) == 1) {
+                    topTabItems.push({
+                        title: '系统功能',
+                        height: 30,
+                        itemId: 'sysFuncTree'
+                    })
+                }
+            }
+            else {
+                if (LoadEnFuncTreeRight.substr(1, 1) == 1) {
+                    topTabItems.push({
+                        title: '企业功能',
+                        height: 30,
+                        itemId: 'enFuncTreeFake'
+                    })
+                };
+                topTabItems.push({
+                    title: '系统功能',
+                    height: 30,
+                    itemId: 'sysFuncTree'
+                })
+            }
+            topTabItems.push({
+                title: 'hideTab',
+                height: 30,
+                hidden: true,
+                //isVisible:true,
+                itemId: 'hideTab'
+            })
+
+
+
+            //创建第一行tabpanel
+            var topTabPanel = Ext.create('Ext.ng.FuncTabPanel', {
+                region: 'north',
+                isSystemUser: isSystemUser,
+                //height: 25,
+                hasCtl: false,
+                outBar: '',
+                containerFather: designContainer,
+                optionItems: items,
+                activeTab: 'myFuncTree',
+                items: topTabItems,
+                //StoreloadMarsk: StoreloadMarsk //沉默页面的控件
+                //items: [{
+                //    title: '我的功能树',
+                //    height: 30,
+                //    itemId: 'myFuncTree'
+                //}, {
+                //    title: '企业功能树',
+                //    height: 30,
+                //    itemId: 'enFuncTree'
+                //}, {
+                //    title: '系统功能树',
+                //    height: 30,
+                //    itemId: 'sysFuncTree'
+                //}, {
+                //    title: 'hideTab',
+                //    height: 30,
+                //    hidden: true,
+                //    //isVisible:true,
+                //    itemId: 'hideTab'
+                //}
+                //]
+            });
+
+            bottomTabPanel = Ext.create('Ext.ng.FuncTabPanel', {
+                //region: 'west',
+                columnWidth: .95,
+                usertype: UserType,
+                brother: topTabPanel,
+                activeTab: 'hideTab',
+                hasCtl: true,
+                existItemsId: ExistId,
+                outBar: '',
+                containerFather: designContainer,
+                optionItems: items,
+                tabScrollArrow: true,
+                productId: productId
+            });
+
+            //第一个tabpanel用brother属性保存第二个tabpanel
+            topTabPanel.brother = bottomTabPanel;
+
+            //把两个tabpanel当做属性保存在designContainer中
+            designContainer.topTabPanel = topTabPanel;
+            designContainer.bottomTabPanel = bottomTabPanel;
+
+            var buttonVisible = false;
+            if (UserType == 'SYSTEM') {
+                buttonVisible = true;
+            }
+            //创建第二行tabpanel的添加按钮
+            var bottomButton = Ext.create('Ext.Button', {
+                height: 28,
+                iconCls: 'add',
+                xtype: 'button',
+                hidden: buttonVisible,
+                brotherPanel: bottomTabPanel,
+                //columnWidth: .10,
+                width: 24,
+                listeners: {
+                    'click': function (t, e, eOpts) {
+                        //tabMenu.showAt(149, 32, 2);
+                        e.stopEvent();
+                        bottomTabPanel.tabMenu.showAt(e.getXY());
+                        return false;
+                    }
+                }
+            });
+
+            //i6s隐藏左侧designContainer后显示另一个tabPanel
+            //var leftHiddenPanelItems = [];
+            //leftHiddenPanelItems.push({
+            //    title: '我的功能树',
+            //    height: 30,
+            //    itemId: 'myFuncTree'
+            //}, {
+            //    title: '企业功能树',
+            //    height: 30,
+            //    itemId: 'enFuncTree'
+            //}, {
+            //    title: '系统功能树',
+            //    height: 30,
+            //    itemId: 'sysFuncTree'
+            //}, {
+            //    title: '组织',
+            //    height: 30,
+            //    itemId: ''
+            //})
+            if (UserType == 'SYSTEM') {
+                ExistId = ["hideTab"]
+            }
+            var leftView = Ext.create('Ext.ng.leftHiddenPanel', {
+                width: 400,
+                height: 600,
+                itemId: 'leftView',
+                tabPosition: 'left',
+                LoadEnFuncTreeRight: LoadEnFuncTreeRight,
+                existItemsId: ExistId,
+                optionItems: items,
+                productId: productId,
+                isSystemUser: isSystemUser
+            });
+
+            //var leftView = Ext.create('Ext.container.Container', {
+            //    //title: 'Border Layout',
+            //    layout: 'fit',
+            //    items:leftHiddenPanel
+            //});//页面总布局
+
+            var topView = Ext.create('Ext.container.Container', {
+                //title: 'Border Layout',
+                layout: 'border',
+                itemId: 'topView',
+                items: [
+                    topTabPanel,
+                    {
+                        region: 'north',
+                        layout: 'column',
+                        items: [bottomTabPanel,
+                           bottomButton
+                        ]
+
+                    },
+                    designContainer
+                ]
+
+            });//页面总布局
+
+            //根据viewbag判断左侧功能树是否隐藏
+            if (isDockControl == true) {
+                var currentView = topView;
+            } else {
+                var currentView = leftView;
+            }
+
+            menuTreeCardLayout = Ext.create('Ext.container.Container', {
+                region: 'center',
+                layout: 'card',
+                activeItem: currentView,
+                border: false,
+                items: [leftView, topView],
+                listeners: {
+                    'afterrender': function (e, eOpts) {
+                        if (window.external.IsInWebBrowser == undefined && menuTreeCardLayout.getLayout().activeItem.itemId == 'leftView') {
+                            isDockControl = true;
+                            bottomTabPanel.isDockControl = true;
+                            menuTreeCardLayout.getLayout().setActiveItem(1);
+                        }
+                    }
+                }
+            })
+
+
+
+
+            //leftView.containerFather = menuTreeCardLayout;
+            //topView.containerFather = menuTreeCardLayout;
+
+            Ext.create('Ext.container.Viewport', {
+                //title: 'Border Layout',
+                layout: 'fit',
+                items: menuTreeCardLayout
+                //    {
+                //    layout: 'card',
+                //    activeItem: leftView,
+                //    border: false,
+                //    items: [leftView, topView]
+                //}
+            });//页面总布局
+
+            //页面加载完后，把第二行的tabpanel滚动到起始位置
+            if (designContainer.bottomTabPanel.tabBar.getLayout().overflowHandler != null) {
+                //designContainer.bottomTabPanel.tabBar.getLayout().overflowHandler.scrollBy(-500, false);
+                designContainer.bottomTabPanel.tabBar.getLayout().overflowHandler.scrollTo(0, false);
+            }
+
+        });
+
+        function changeView(isHidden) {
+            if (isHidden == 'True') {
+                //alert(isHidden);
+                //menuTreeCardLayout.getLayout().setActiveItem(menuTreeCardLayout.items[0]);
+                isDockControl = false;
+                bottomTabPanel.isDockControl = false;
+                menuTreeCardLayout.getLayout().setActiveItem(0);
+                menuTreeCardLayout.queryById('leftView').setActiveTab('hideTab');
+
+            }
+            else {
+                //alert(isHidden);
+                //menuTreeCardLayout.getLayout().setActiveItem(menuTreeCardLayout.items[1]);
+                isDockControl = true;
+                bottomTabPanel.isDockControl = true;
+                menuTreeCardLayout.getLayout().setActiveItem(1);
+
+            }
+        }
+
+        function changeUITheme() {
+            UITheme = (UITheme + 1) % 2;
+            return UITheme;
+        }
+
+        //切换组织时刷新系统、企业树
+        function refreshTree() {
+            designContainer.topTabPanel.queryById('sysFuncTree').loaded = false;
+            if (LoadEnFuncTreeRight.substr(1, 1) == 1 && LoadEnFuncTreeRight.substr(0, 1) == 1) {
+                designContainer.topTabPanel.queryById('enFuncTree').loaded = false;
+            }
+            designContainer.bottomTabPanel.queryById('TabPageContractManage').loaded = false;
+        }
+        //自定义我的功能树页面保存时，刷新我的功能树
+        function refreshMyFunctionTree() {
+            designContainer.topTabPanel.queryById('myFuncTree').loaded = false;
+            if (designContainer.topTabPanel.activeTab.itemId == 'myFuncTree') {
+                designContainer.topTabPanel.setActiveTab('hideTab');
+                designContainer.topTabPanel.setActiveTab('myFuncTree');
+            }
+            menuTreeCardLayout.queryById('leftView').queryById('myFuncTree').refreshData();
+        }
+        //左侧锚定，点击套件张开，点击外面套件收缩，左侧激活hideTab
+        function activationHideTab() {
+            menuTreeCardLayout.queryById('leftView').setActiveTab('hideTab');
+        }
+
+        //刷新功能导航树的函数
+        function RefreshNavigationTree(text) {
+            var tree = designContainer.queryById('tabPageNavigation');
+            var root = tree.getRootNode();
+            root.childNodes[0].appendChild({
+                text: text,
+                leaf: true,
+                expanded: true
+            });
+        }
+
+        function SetOcodeCallBack(istra, OCode, OrgId) {
+            if (istra) {
+                $appinfo.ocode = OCode;
+                $appinfo.orgID = OrgId;
+                designContainer.queryById('tabPageOrg').getView().refresh(true);
+                //designContainer.queryById(newCard.itemId)
+                refreshTree();
+                designContainer.queryById('tabPageOrg').StoreloadMarsk.hide();
+            }
+        }
+
+    </script>
+</head>
+</html>
+

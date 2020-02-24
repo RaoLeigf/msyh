@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GJX3.JX.Model.Domain" assembly="GJX3.JX.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="PerformanceMstModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FProjCode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FProjName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FExploitingEntity" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FProjectLeader" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FPhoneNumber" >
+			<length min="0" max="50" message ="长度不超过50！"/>
+		</property>
+		<property name="FContactAddress" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FDeclarationUnit" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FDeclarationDept" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FBudgetDept" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FProjAttr" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FDuration" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FMeetiingSummaryNo" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FAuditStatus" >
+			<length min="0" max="2" message ="长度不超过2！"/>
+		</property>
+		<property name="FEvaluationResult" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FInformantName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+	</class>
+</nhv-mapping>

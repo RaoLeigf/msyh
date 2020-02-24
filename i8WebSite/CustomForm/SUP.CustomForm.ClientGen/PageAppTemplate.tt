@@ -1,0 +1,274 @@
+﻿<#@ template language="C#" #>
+@{
+    ViewBag.Title = "<#= ClassName #>Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{  
+<#    if(Expressions.ContainsValue("Supcan") ) { #> 
+<script src="@Url.Content("~/Resource/supcan/dynaload.js?89.5")" type="text/javascript"></script>
+<#    } #>
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+
+<#    if(Expressions.ContainsValue("Supcan") ) { #> 
+        function OnReady(id) {
+<#        foreach (var item in Expressions){ #>
+<#            if(item.Value == "Supcan"){#>
+<#=                    item.Key#>
+<#            }} #>     
+        }
+<#    } #>
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    <#= Common.GetButtons(Toolbar)   #>
+                ]
+            });
+<#    if(tableLayouts.Fields.Count > 0 ) { #>
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                buskey: '<#= PkPropertyname #>', //对应的业务表主键
+                otype: otype,
+                columnsPerRow: <#= tableLayouts.ColumnsPerRow #>,
+                fields: [
+					 <#= Common.GetForm(tableLayouts)#>
+                ]
+            });
+<#    } #>
+           
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [<#= Common.GetViewPortItems(fieldSets,panels,tableLayouts)#>]
+            });
+<#    for (int i = 0; i < panels.Count; i++) { #>
+<#        if(panels[i].Height<=0){ #>
+               <#= panels[i].TableName #>grid.hide(); 
+<#        }#>
+<#    }#>
+
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid },
+                    url: '@Url.Content("~/<#=Area#>/<#= ClassName #>Edit/GetMasterInfo")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "OK") {
+                      <#    if(tableLayouts.Fields.Count > 0 & fieldSets.Count == 0) { #>
+                            var mstformobj = mstform.getForm();
+                            mstformobj.setValues(resp.Data); 
+                      <#= Common.BatchBindCombox(tableLayouts)#>                        
+                      <#    }#>
+
+                      <#    for (int i = 0; i < fieldSets.Count; i++) { #>   
+                            var formobj<#=i #> = fieldsetform<#=i #>.getForm();
+                            formobj<#=i #>.setValues(resp.Data);
+                      <#    }     #>
+
+                      <#= Common.BatchBindCombox(fieldSets)#>
+ 
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.status);
+                        }
+                    }
+                });
+<# for (int i = 0; i < PanelNames.Count; i++) { #>
+                //<#= PanelNames[i]#>明细
+                Ext.apply(<#= PanelNames[i]#>store.proxy.extraParams, { 'id': busid, 'tabtype': '<#= PanelNames[i]#>' });
+                <#= PanelNames[i]#>store.cachePageData = false;
+                <#= PanelNames[i]#>store.load();
+                <#= PanelNames[i]#>store.cachePageData = true;
+<# } #>
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+                //清空主键
+<#    if(Expressions.ContainsValue("AddInit") ) { #>
+<#        foreach (var item in Expressions){ #>
+<#            if(item.Value == "AddInit"){#>
+<#=                    item.Key#>
+<#            }}} #> 
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT) {
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').hide();
+            }
+
+            //当不存在grid时
+            //if (<#= PanelNames.Count #> == 0 ){
+                //ngToolbar.get('addrow').hide();
+                //ngToolbar.get('deleterow').hide();    
+            //}    
+        
+   
+<#    if(Expressions.ContainsValue("Normal") ) { #>
+<#        foreach (var item in Expressions){ #>
+<#            if(item.Value == "Normal"){#>
+<#=                    item.Key#>
+<#            }}} #>             
+
+<#    if(Toolbar.LNgButtons.Contains("addrow")||Toolbar.RNgButtons.Contains("addrow")) { #>
+            //增行
+            ngToolbar.items.get('addrow').on('click', function () {
+<#        for (int i = 0; i < PanelNames.Count; i++) { #>                
+                var data = <#=                PanelNames[0]#>grid.getSelectionModel();
+                <#=                PanelNames[i]#>store.insert(<#=                PanelNames[i]#>store.getCount(), data);
+
+                <#=                PanelNames[i]#>store.getAt(<#=                PanelNames[i]#>store.data.items.length - 1).set('<#=                PanelNames[i]#>order', <#=                PanelNames[i]#>store.data.items.length);
+<#        break;} #>
+            });
+<#    }#>
+
+<#    if(Toolbar.LNgButtons.Contains("deleterow")||Toolbar.RNgButtons.Contains("deleterow")) { #>
+            //删行
+            ngToolbar.items.get('deleterow').on('click', function () {
+<#        for (int i = 0; i < PanelNames.Count; i++) { #>   
+                var data = <#=                PanelNames[i]#>grid.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    Ext.Array.each(data, function (record) {
+                        <#=                PanelNames[i]#>store.remove(record); //前端删除
+                    });
+                    <#=                PanelNames[i]#>grid.getView().refresh(true);
+                }
+<#        break;} #>
+            });
+<#    }#>
+
+<#    if(Expressions.ContainsValue("BeforeSave") ) { #> 
+            <#        int count= 1; #>
+            <#        foreach (var item in Expressions){ #>
+            <#            if(item.Value == "BeforeSave"){#>
+function Validate<#=                    count#>() {
+            <#                count++;      #>
+<#=                    item.Key#>
+};
+            <#            }} #>              
+               
+<#    }#>
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+
+    <#    if(tableLayouts.Fields.Count > 0 ) { #>
+                var  vt = mstform.isValid();
+                if (!vt) {
+                    return;
+                }
+                var formData = mstform.getFormData();  //同时有mstform 和 fieldsetform 怎么办?
+    <#    } #>
+
+
+    <#    if(fieldSets.Count >0)  { #>
+                var vf = fieldsetform0.isValid();
+                if (!vf) {
+                    return;
+                }
+                var formData = fieldsetform0.getFormData();
+    <#    } #>
+
+<#    if(Expressions.ContainsValue("BeforeSave") ) { #> 
+<#        int count= 1; #>
+<#        foreach (var item in Expressions){ #>
+<#            if(item.Value == "BeforeSave"){#>
+if(!Validate<#=count #>())
+	return;
+<#                count++;      #>
+<#            }}} #>    
+
+          <#    for (int i = 0; i < PanelNames.Count; i++) { #>   
+                var <#= PanelNames[i]#>Data = <#= PanelNames[i]#>grid.getChange();
+          <#    } #>
+
+<#    if(Expressions.ContainsValue("SaveUpdate") ) { #> 
+                var sqlstr="";
+				var execstr="";
+            <#        foreach (var item in Expressions){ #>
+            <#            if(item.Value == "SaveUpdate"){#>
+            <#=                    item.Key#>
+            <#            }}} #>  
+
+                Ext.Ajax.request({
+                    params: {
+                        'formData': formData
+                    <#    for (int i = 0; i < PanelNames.Count; i++) { #>   
+                        ,'<#=PanelNames[i]#>Data':<#=PanelNames[i]#>Data
+                    <#    } #>
+                    <#    if(Expressions.ContainsValue("SaveUpdate") ) { #>
+                        ,'sql': sqlstr 
+						,'exec': execstr
+                    <#    } #>  
+                    },
+                    url: '@Url.Content("~/<#=Area#>/<#= ClassName #>Edit/save")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "OK") {
+                    <#    if(tableLayouts.Fields.Count > 0 ) { #>
+                            var formobj = mstform.getForm();
+                    <#    } #>
+                    <#    if(fieldSets.Count >0)  { #>
+                            var formobj = fieldsetform0.getForm();
+                    <#    } #>
+                            formobj.setValues(resp.Data);
+
+                            Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                var frame = $GetWFrame();
+                                if (frame) {
+                                    var listref = frame.ListObserver.get('<#= ClassName #>List');
+                              <#    if(tableLayouts.Fields.Count > 0 ) { #>
+                                    var data = mstform.getForm().getValues();
+                              <#    } #>
+                              <#    if(fieldSets.Count >0)  { #>
+                                    var data = fieldsetform0.getForm().getValues();
+                              <#    } #>
+                                    listref.fireEvent('refreshlist', data);
+                                }
+
+                                $CloseTab();
+                            });
+
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.status);
+                        }
+                    }
+                });
+            });
+
+<#    if(Toolbar.LNgButtons.Contains("print")||Toolbar.RNgButtons.Contains("print")) { #>
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                var froms = [<#if(tableLayouts.Fields.Count > 0 ) { #>mstform<#}#>
+<#        if( tableLayouts.Fields.Count > 0  && fieldSets.Count>0){#>,<#        }#>
+<#        else {#> ];<#        } #>
+
+        <#    for (int i = 0; i < fieldSets.Count; i++) { #>   
+        <#            if(i == fieldSets.Count-1){#>fieldsetform<#=i#>];<# }else{#>fieldsetform<#=i#>,<#}#>
+        <#    } #>
+        var grids = [<#    for (int i = 0; i < PanelNames.Count; i++) { #>   
+        <#            if(i == PanelNames.Count-1){#><#=PanelNames[i]#>grid];<#}else{#><#=PanelNames[i]#>grid,<#}#>
+        <#    } #>
+				$PrintForm(froms,grids);
+            });
+<#    }#>    
+        }); 
+    </script>
+}
+<#    if(Expressions.ContainsValue("Supcan") ) { #> 
+<div style="position:relative;width:800px;height:1px" >
+   <script>insertFreeForm('AF', '')</script>
+</div>
+<#    }#>

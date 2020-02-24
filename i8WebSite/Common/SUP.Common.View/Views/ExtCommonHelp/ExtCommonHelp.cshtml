@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "ExtCommonHelp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+ 
+ <script type="text/javascript">
+
+     var helpid = '@ViewBag.Flag';
+     var template = Ext.htmlDecode('@ViewBag.JsonTemplate');
+     
+     //alert(template);
+     
+
+     var obj = Ext.decode(template);
+
+     var queryItems = obj.Template.QueryItems;
+     var modelFields = obj.Template.Model.fields;
+     var gridColumns = obj.Template.GridColumns;
+
+     Ext.onReady(function () {
+
+         //debugger;
+
+         var toolbar = Ext.create('Ext.Toolbar',
+				{
+				    region: 'north',
+				    border: false,
+				    //split: true,
+				    height: 26,
+				    minSize: 26,
+				    maxSize: 26,
+				    items: [
+								{
+								    id: "query",
+								    text: "查询",
+								    iconCls: 'add'
+								},								
+								"->",
+							   {
+							       id: "close",
+							       text: "关闭",
+							       iconCls: 'cross'
+							   }
+							  ]
+						});
+
+         Ext.define('model', {
+             extend: 'Ext.data.Model',
+             fields: modelFields
+         });
+
+         var queryPanel = Ext.create('Ext.ng.TableLayoutForm', {
+             region: 'north',
+             items: queryItems
+         })
+
+         var store = Ext.create('Ext.data.Store', {
+             model: 'model',
+             pageSize: 20,
+             proxy: {
+                 type: 'ajax',
+                 url: 'GetHelpList?helpid=' + helpid,
+                 reader: {
+                     type: 'json',
+                     root: 'Record',
+                     totalProperty: 'totalRows'
+                 }
+             }
+         });
+         store.load();
+
+         var pagingbar = Ext.create('Ext.ng.PagingBar', {
+             store: store
+         });
+
+         var grid = Ext.create('Ext.ng.GridPanel', {
+             region: 'center',
+             frame: true,
+             border: false,
+             store: store,
+             columnLines: true,
+             //selType: 'cellmodel',
+             //selModel: Ext.create('Ext.selection.CheckboxModel'),
+             layout: {
+                 type: 'hbox',
+                 align: 'stretch'
+             },
+             columns: gridColumns,
+             viewConfig: {
+                 forceFit: true,
+                 scrollOffset: 0
+             },
+             //forceFit: true,
+             //plugins: [cellEditing],
+             bbar: pagingbar
+         });
+
+         //布局
+         Ext.create('Ext.container.Viewport', {
+             id: "viewPort",
+             layout: 'border',
+             items:
+			 [
+			   toolbar,queryPanel, grid
+			 ]
+         });
+
+         var win = this.frameElement.parentContainer;
+         var combox = this.frameElement.combox;
+
+         toolbar.items.get('close').on('click', function () {
+
+//            alert('ee');
+//            debugger;
+            
+            win.hide();
+            win.destroy();
+
+         })
+
+        toolbar.items.get('query').on('click', function () {
+
+            //debugger;
+            var formdata = queryPanel.getForm();
+            var data = formdata.getValues();
+
+            store.load({
+                params: { 'queryfilter': JSON.stringify(data) }
+            })
+
+        })
+
+        store.on('beforeload', function () {
+            var formdata = queryPanel.getForm();
+            var data = formdata.getValues();
+
+            store.proxy.extraParams = { 'queryfilter': JSON.stringify(data) };
+
+        })
+
+        grid.on('itemdblclick', function () {
+
+            //debugger;
+            var data = grid.getSelectionModel().getSelection();
+
+            if (data.length > 0) {
+                var code = data[0].get(combox.valueField);
+                var name = data[0].get(combox.displayField);
+
+                var obj = new Object();
+                obj[combox.valueField] = code;
+                obj[combox.displayField] = name;
+
+                var valuepair = Ext.ModelManager.create(obj, 'model');
+
+                combox.setValue(valuepair); //必须这么设置才能成功
+
+
+                win.hide();
+                win.destroy();
+
+                var pobj = new Object();
+                pobj.code = code;
+                pobj.name = name;
+                combox.fireEvent('helpselected', pobj);
+
+            }
+        }, this)
+
+
+     })
+
+</script>
+
+}

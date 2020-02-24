@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net">
+
+  <description></description>
+
+  <object id="aroundAdvice" type="Enterprise3.NHORM.Base.AspectsHandling.PerformanceLoggingAroundAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <object id="throwsAdvice" type="Enterprise3.NHORM.Base.AspectsHandling.ErrorHandlingThrowsAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <object id="beforeAdvice" type="Enterprise3.NHORM.Base.AspectsHandling.MethodLoggingBeforeAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+  <object id="afterAdvice"  type="Enterprise3.NHORM.Base.AspectsHandling.MethodLoggingAfterAdvice, Enterprise3.NHORM.Base" singleton="true"/>
+
+  <object id="transactionManager" type="Spring.Data.NHibernate.HibernateTransactionManager, Spring.Data.NHibernate4" singleton="true">
+    <property name="DbProvider" ref="DbProvider"/>
+    <property name="SessionFactory" ref="NHibernateSessionFactory"/>
+  </object>
+
+  <object id="transactionInterceptor" type="Spring.Transaction.Interceptor.TransactionInterceptor, Spring.Data" singleton="true">
+    <property name="TransactionManager" ref="transactionManager"/>
+    <property name="TransactionAttributeSource">
+      <object type="Spring.Transaction.Interceptor.AttributesTransactionAttributeSource, Spring.Data"/>
+    </property>
+  </object>
+
+  <!--事物管理器-->
+  <object id="BaseTransactionManager" type="Spring.Transaction.Interceptor.TransactionProxyFactoryObject, Spring.Data" abstract="true" singleton="true">
+    <property name="PlatformTransactionManager" ref="transactionManager"/>
+    <property name="TransactionAttributes">
+      <name-values>
+        <!--增加-->
+        <add key="Create*" value="PROPAGATION_REQUIRED"/>
+        <!--增加-->
+        <add key="Save*" value="PROPAGATION_REQUIRED"/>
+        <!--修改-->
+        <add key="Update*" value="PROPAGATION_REQUIRED"/>
+        <!--删除-->
+        <add key="Delete*" value="PROPAGATION_REQUIRED"/>
+        <!--获取-->
+        <add key="Get*" value="PROPAGATION_REQUIRED,readOnly"/>
+        <!--浏览-->
+        <add key="Find*" value="PROPAGATION_SUPPORTS,readOnly"/>
+        <!--检索-->
+        <add key="Search*" value="PROPAGATION_SUPPORTS,readOnly"/>
+        <!--报表-->
+        <add key="Query*" value="PROPAGATION_SUPPORTS,readOnly"/>
+        <!--载入-->
+        <add key="Load*" value="PROPAGATION_SUPPORTS,readOnly"/>
+        <!--报表-->
+        <add key="Report*" value="PROPAGATION_SUPPORTS,readOnly"/>
+        <!--其它-->
+        <add key="*" value="PROPAGATION_REQUIRED"/>
+      </name-values>
+    </property>
+  </object>
+
+  <!--<object name="logExceptionHandler" type="Spring.Aspects.Exceptions.LogExceptionHandler, Spring.Aop">
+    <property name="LogName" value="NG.SSO.ExceptionHandler" />
+    <property name="LogLevel" value="Debug"/>
+    <property name="LogMessageOnly" value="true"/>
+  </object>
+
+  <object name="exceptionHandlingAdvice" type="Spring.Aspects.Exceptions.ExceptionHandlerAdvice, Spring.Aop" singleton="true">
+    <property name="ExceptionHandlerDictionary">
+      <dictionary>
+        <entry key="log" value-ref="logExceptionHandler"/>
+      </dictionary>
+    </property>
+
+    <property name="ExceptionHandlers">
+      <list>
+        <value>on exception name ArithmeticException,ArgumentException log 'My Message, Method Name ' + #method.Name</value>
+      </list>
+    </property>
+  </object>-->
+
+</objects>

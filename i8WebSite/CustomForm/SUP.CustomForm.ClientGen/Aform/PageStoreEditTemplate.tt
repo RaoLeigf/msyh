@@ -1,0 +1,17 @@
+﻿Ext.define("Aform.store.Edit", {
+    extend: "Ext.data.Store",
+    xtype: 'storeedit',
+    config: {
+        model: "Aform.model.Edit",
+        proxy: {
+            type: 'ajax',
+            url: C_ROOT + "SUP/<#= ClassName #>Edit/GetMasterInfo",
+            reader: {
+                type: 'json',
+                rootProperty: 'Record',
+                totalProperty: 'totalRows'
+            }
+        },
+        autoLoad: false
+    }
+});

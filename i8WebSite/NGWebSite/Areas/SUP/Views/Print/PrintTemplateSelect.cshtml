@@ -1,0 +1,358 @@
+﻿@{
+    ViewBag.Title = "选择打印模板";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Script
+{
+  
+    <script type="text/javascript">
+
+        var typefile = '@ViewBag.TypeFile';
+        var templatename = '@ViewBag.TemplateName';
+        var datapath = '@ViewBag.DataPath';
+        var optMode = '@ViewBag.OptMode';
+
+        Ext.onReady(function () {
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                showArrowBtn: false,
+                ngbuttons: [
+                     'print','add', { itemId: "addpdf", text: "新增PDF模板", iconCls: "icon-New" }, 'edit', { itemId: "editNew", text: "修改(字段更新)", iconCls: "icon-Edit" }, 'delete', 'refresh',
+                     '->', 'close'
+                ]
+            });
+            Ext.define('TemplateModel', {  //定义模型
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'printid',
+                    type: 'string',
+                    mapping: 'printid'
+                }, {
+                    name: 'typefile',
+                    type: 'string',
+                    mapping: 'typefile'
+                }, {
+                    name: 'billname',
+                    type: 'string',
+                    mapping: 'billname'
+                }, {
+                    name: 'moduleno',
+                    type: 'string',
+                    mapping: 'moduleno'
+                }, {
+                    name: 'filename',
+                    mapping: 'filename',
+                    type: 'string'
+                }, {
+                    name: 'dateflg',
+                    mapping: 'dateflg',
+                    type: 'string'
+                }, {
+                    name: 'def_int2',
+                    mapping: 'def_int2',
+                    type: 'string'
+                }, {
+                    name: 'previeweditflg',
+                    mapping: 'previeweditflg',
+                    type: 'string'
+                }, {
+                    name: 'def_int1',
+                    mapping: 'def_int1',
+                    type: 'string'
+                }, {
+                    name: 'remarks',
+                    mapping: 'remarks',
+                    type: 'string'
+                }]
+            });
+
+            var store = Ext.create('Ext.ng.JsonStore', {
+                model: 'TemplateModel',
+                autoLoad: true,
+                url: C_ROOT + 'SUP/Print/GetFmtTemplateFromDb?typefile=' + typefile
+            });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: store,
+                columnLines: true,
+                autoScroll: true,
+                forceFit: true,
+                scroll: "vertical",
+                layout: {},
+                viewConfig: {
+                    scrollOffset: 0
+                },
+                columns: [{
+                    header: '编号',
+                    flex: 1,
+                    sortable: true,
+                    dataIndex: 'printid'
+                }, {
+                    header: '单据类型',
+                    flex: 1.5,
+                    sortable: true,
+                    dataIndex: 'typefile',
+                    renderer: function (val, meta) {
+                        if (meta) {
+                            meta.tdAttr = "title='" + val + "'";
+                        }
+                        return val;
+                    }
+                }, {
+                    header: '模板名称',
+                    flex: 1.5,
+                    sortable: true,
+                    dataIndex: 'billname',
+                    renderer: function (val, meta) {
+                        if (meta) {
+                            meta.tdAttr = "title='" + val + "'";
+                        }
+                        return val;
+                    }
+                }, {
+                    header: '文件名称',
+                    flex: 2,
+                    titleAlign: 'center',
+                    sortable: true,
+                    dataIndex: 'filename',
+                    renderer: function (val, meta) {
+                        if (meta) {
+                            meta.tdAttr = "title='" + val + "'";
+                        }
+                        return val;
+                    }
+                }, {
+                    header: '类型',
+                    flex: 1,
+                    sortable: true,
+                    dataIndex: 'def_int2',
+                    renderer: function (val) {
+                        switch (val) {
+                            case "0":
+                                return '用户';
+                            case "1":
+                                return '系统';
+                            case "3":
+                                return '系统_PDF';
+                            default:
+                                return '自定义';
+                        }
+                    }
+
+                },  {
+                    header: '预览编辑',
+                    flex: 1,
+                    sortable: true,
+                    dataIndex: 'previeweditflg',
+                    renderer: function (val) {
+                        switch (val) {
+                            case "0":
+                                return '否';
+                            case "1":
+                                return '是';
+                            default:
+                                return '否';
+                        }
+                    }
+                }, {
+                    header: '直接预览',
+                    flex: 1,
+                    sortable: true,
+                    dataIndex: 'def_int1',
+                    renderer: function (val) {
+                        switch (val) {
+                            case "0":
+                                return '否';
+                            case "1":
+                                return '是';
+                            default:
+                                return '是';
+                        }
+                    }
+                },{
+                    header: '备注',
+                    flex: 1.5,
+                    titleAlign: 'center',
+                    sortable: true,
+                    dataIndex: 'remarks',
+                    hidden: true
+                }]
+            });
+
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, grid]
+            });
+
+
+            if (optMode == 'templateprint') {
+                ngToolbar.get('add').hide();
+                ngToolbar.get('addpdf').hide();
+                ngToolbar.get('edit').hide();
+                ngToolbar.get('editNew').hide();
+                ngToolbar.get('refresh').hide();
+                ngToolbar.get('close').hide();
+            }
+            else {
+                ngToolbar.get('print').hide();              
+            }
+            function GetDateString(d1) {
+                var y = d1.getFullYear().toString();
+                var m = d1.getMonth() < 10 ? '0' + d1.getMonth() : d1.getMonth().toString();
+                var d = d1.getDate() ? '0' + d1.getDate() : d1.getDate().toString();
+                var h = d1.getHours() ? '0' + d1.getHours() : d1.getHours().toString();
+                var min = d1.getMinutes() ? '0' + d1.getMinutes() : d1.getMinutes().toString();
+                var s = d1.getSeconds() ? '0' + d1.getSeconds() : d1.getSeconds().toString();
+                return y + m + d + h + min + s;
+            }            
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    var printid = data[0].get('printid');
+                    var def_int1 = data[0].get('def_int1');  //直接打印
+                    var previeweditflg = data[0].get('previeweditflg');  //预览可编辑
+                    var filename = typefile + GetDateString(new Date());
+                    Ext.Ajax.request({
+                        params: { "printid": printid, "filename": filename },
+                        url: C_ROOT + 'SUP/Print/CreatePrintInfo',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.status === "ok") {
+                            } else {
+                            }
+                        }
+                    });
+                    var previeweditflg = previeweditflg || "0";
+                    var showpreview = def_int1 || "1";
+                    $OpenTab('打印', '@Url.Content("~/SUP/Print/PrintDetail")' + '?otype=edit&printId=' + printid + "&previeweditflg=" + previeweditflg + "&showpreview=" + showpreview + '&filename=' + filename + '&datapath=' + encodeURIComponent(datapath));
+                    window.external.CloseCurrentForm();
+                }
+                else {                
+                    MsgInfo("请先选择打印模板.");
+                }
+            });
+            //新增模板
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab('打印模板维护', '@Url.Content("~/SUP/Print/LformEdit")' + '?otype=add&templatetype=0&typefile=' + typefile + "&templatename=" + encodeURIComponent(templatename));
+            });
+            //新增pdf模板
+            ngToolbar.get('addpdf').on('click', function () {
+                var existspdf=CheckExistsPdfTemplate();
+                if (existspdf) {
+                    MsgInfo("已存在PDF模板.");
+                    return;
+                }
+                $OpenTab('打印模板维护', '@Url.Content("~/SUP/Print/LformEdit")' + '?otype=add&templatetype=3&typefile=' + typefile + "&templatename=" + encodeURIComponent(templatename));
+            });
+            //修改模板
+            ngToolbar.get('edit').on('click', function () {
+                var printid = GetSelectPrintId();
+                if (printid) {
+                    var data = grid.getSelectionModel().getSelection();
+                    var moudleType = data[0].get('def_int2');  //模板类型
+                    var issystem = moudleType == "1";
+                    if (issystem) {
+                        MsgInfo("系统模板不能修改.");
+                        return;
+                    }
+                    $OpenTab('打印模板维护', '@Url.Content("~/SUP/Print/LformEdit")' + '?otype=edit&printid=' + printid);
+                }
+                else {
+                    MsgInfo("请先选择数据行.");
+                }
+            });
+            //修改模板
+            ngToolbar.get('editNew').on('click', function () {
+                var printid = GetSelectPrintId();
+                if (printid) {
+                    var data = grid.getSelectionModel().getSelection();
+                    var moudleType = data[0].get('def_int2');  //模板类型
+                    var issystem = moudleType == "1";
+                    if (issystem) {
+                        MsgInfo("系统模板不能修改.");
+                        return;
+                    }
+                    $OpenTab('打印模板维护', '@Url.Content("~/SUP/Print/LformEdit")' + '?otype=edit&printid=' + printid+ "&templatename=" + encodeURIComponent(templatename));
+                }
+                else {
+                    MsgInfo("请先选择数据行.");
+                }
+            });
+            ngToolbar.get('refresh').on('click', function () {
+                store.cachePageData = false;
+                store.load();
+                store.cachePageData = true;
+
+            });
+            //模板删除
+            ngToolbar.get('delete').on('click', function () {
+                var printId = GetSelectPrintId();
+                if (printId) {
+                    var data = grid.getSelectionModel().getSelection();
+                    var moudleType = data[0].get('def_int2');  //模板类型
+                    var issystem = moudleType == "1" || moudleType == "3";
+                    if (issystem) {
+                        MsgInfo("系统模板不能删除.");
+                        return;
+                    }
+                    Ext.Msg.confirm("提示信息", "你确认删除 " + data[0].get("billname") + " 模板",
+                    function (btn) {
+                        if (btn == "yes") {
+                            Ext.Ajax.request({
+                                params: { printid: printId },
+                                url: '@Url.Content("~/SUP/Print/DeleteModule")',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.status === "ok") {
+                                        if (resp.count > 0) {
+                                            store.cachePageData = false;
+                                            store.load();
+                                            store.cachePageData = true;
+                                        }
+                                    } else {
+                                        MsgInfo(resp.msg);
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+
+                }
+                else {
+                    MsgInfo("请先选择数据行.");
+                }
+            });
+            //检测是否存在pdf模板
+            function CheckExistsPdfTemplate() {
+                var flag = false;
+                var all = grid.store.getRange();
+                Ext.Array.each(all, function (record) {
+                    var tmpd = record.data;
+                    if (tmpd['def_int2']=="3") {
+                        flag = true;
+                        return flag;
+                    }
+                });
+                return flag;
+            }
+            function GetSelectPrintId() {
+                var data = grid.getSelectionModel().getSelection();
+                if (data.length > 0) {
+                    return data[0].get('printid');
+                }
+                else {
+                    return null;
+                }
+            }
+            function MsgInfo(msg) {
+                Ext.MessageBox.alert("提示", msg);
+            }
+
+        });
+    </script>
+}
+

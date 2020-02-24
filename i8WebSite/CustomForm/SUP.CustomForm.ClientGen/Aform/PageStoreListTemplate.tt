@@ -1,0 +1,19 @@
+﻿Ext.define("Aform.store.List", {
+    extend: "Ext.data.Store",
+    xtype: 'storelist',
+    config: {
+        model: "Aform.model.List",
+        proxy: {
+            type: 'ajax',
+            url: C_ROOT + "SUP/<#= ClassName #>List/GetList",
+            reader: {
+                type: 'json',
+                rootProperty: 'Record',
+                totalProperty: 'totalRows'
+            }
+        },
+        autoLoad: false
+    }
+});
+
+

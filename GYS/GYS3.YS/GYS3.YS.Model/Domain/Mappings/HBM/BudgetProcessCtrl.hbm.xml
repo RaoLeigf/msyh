@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="BudgetProcessCtrlModel" table="ys3_BudgetProcessCtrl">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="FOcode" column="f_ocode" type="System.String" length="255" not-null="false" />
+		<property name="FOname" column="f_oname" type="System.String" length="100" not-null="false" />
+		<property name="FDeptCode" column="f_DeptCode" type="System.String" length="255" not-null="false" />
+		<property name="FDeptName" column="f_DeptName" type="System.String" length="100" not-null="false" />
+		<property name="FSetByDept" column="f_SetByDept" type="System.Int32" not-null="false" />
+		<property name="FProcessStatus" column="f_ProcessStatus" type="System.String" length="2" not-null="false" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="false" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="false" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="false" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="false" />
+    <property name="StartDt" column="start_dt" type="System.DateTime" not-null="false" />
+    <property name="EndDt" column="end_dt" type="System.DateTime" not-null="false" />
+    <property name="StartDt2" column="start_dt2" type="System.DateTime" not-null="false" />
+    <property name="EndDt2" column="end_dt2" type="System.DateTime" not-null="false" />
+    <property name="FYear" column="f_year" type="System.String" length="100" not-null="false" />
+    <property name="FDefstr1" column="f_defstr1" type="System.String" length="100" not-null="false" />
+    <property name="FDefstr2" column="f_defstr2" type="System.String" length="100" not-null="false" />
+	</class>
+</hibernate-mapping>

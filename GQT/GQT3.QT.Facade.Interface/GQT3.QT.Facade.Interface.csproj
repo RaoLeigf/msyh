@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C2328D95-250F-4968-8B7A-62CA2ECFB146}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GQT3.QT.Facade.Interface</RootNamespace>
+    <AssemblyName>GQT3.QT.Facade.Interface</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GQT3.QT.Facade.Interface.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\BaseDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IBankAccountFacade.cs" />
+    <Compile Include="IBudgetAccountsFacade.cs" />
+    <Compile Include="ICorrespondenceSettings2Facade.cs" />
+    <Compile Include="ICorrespondenceSettingsFacade.cs" />
+    <Compile Include="IExpenseCategoryFacade.cs" />
+    <Compile Include="IGHProjDtlShareFacade.cs" />
+    <Compile Include="IOrganizationFacade.cs" />
+    <Compile Include="IOrgRelatitem2Facade.cs" />
+    <Compile Include="IPaymentMethodFacade.cs" />
+    <Compile Include="IPerformEvalTargetClassFacade.cs" />
+    <Compile Include="IPerformEvalTargetFacade.cs" />
+    <Compile Include="IPerformEvalTargetTypeFacade.cs" />
+    <Compile Include="IPerformEvalTypeFacade.cs" />
+    <Compile Include="IProcurementCatalogFacade.cs" />
+    <Compile Include="IProcurementProceduresFacade.cs" />
+    <Compile Include="IProcurementTypeFacade.cs" />
+    <Compile Include="IProjectThresholdFacade.cs" />
+    <Compile Include="IProjLibProjFacade.cs" />
+    <Compile Include="IQtAccountFacade.cs" />
+    <Compile Include="IQtAttachmentFacade.cs" />
+    <Compile Include="IQtBaseProjectFacade.cs" />
+    <Compile Include="IQTControlSetFacade.cs" />
+    <Compile Include="IQtCoverUpDataFacade.cs" />
+    <Compile Include="IQtCoverUpForOrgFacade.cs" />
+    <Compile Include="IQtDtlStageFacade.cs" />
+    <Compile Include="IQTEditMemoFacade.cs" />
+    <Compile Include="IQTIfApproveFacade.cs" />
+    <Compile Include="IQTMemoFacade.cs" />
+    <Compile Include="IQTModifyFacade.cs" />
+    <Compile Include="IQTIndividualInfoFacade.cs" />
+    <Compile Include="IQtNaviGationFacade.cs" />
+    <Compile Include="IQtOrgDygxFacade.cs" />
+    <Compile Include="IQTProductFacade.cs" />
+    <Compile Include="IQTProductUserDygxFacade.cs" />
+    <Compile Include="IQTProductUserFacade.cs" />
+    <Compile Include="IQTProjectDtlBudgetDtlFacade.cs" />
+    <Compile Include="IQTProjectDtlFundApplFacade.cs" />
+    <Compile Include="IQTProjectDtlImplPlanFacade.cs" />
+    <Compile Include="IQTProjectDtlPerformTargetFacade.cs" />
+    <Compile Include="IQTProjectDtlPurchaseDtlFacade.cs" />
+    <Compile Include="IQTProjectDtlPurDtl4SOFFacade.cs" />
+    <Compile Include="IQTProjectDtlTextContentFacade.cs" />
+    <Compile Include="IQTProjectMstFacade.cs" />
+    <Compile Include="IQtSysCodeSeqFacade.cs" />
+    <Compile Include="IQTSysSetFacade.cs" />
+    <Compile Include="IQtTableCustomizeFacade.cs" />
+    <Compile Include="IQtVenueFacade.cs" />
+    <Compile Include="IQtXmDistributeFacade.cs" />
+    <Compile Include="IQtYJKFacade.cs" />
+    <Compile Include="IQtZcgnflFacade.cs" />
+    <Compile Include="IRWReportFacade.cs" />
+    <Compile Include="ISourceOfFundsFacade.cs" />
+    <Compile Include="IUserFacade.cs" />
+    <Compile Include="IUserOrgFacade.cs" />
+    <Compile Include="IVCorrespondenceSetting2Facade.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47ee9856-f415-4171-8609-b0531db86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\i6Rules\ /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

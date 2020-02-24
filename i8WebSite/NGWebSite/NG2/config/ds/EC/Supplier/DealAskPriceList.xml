@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_askpricedtl">
+      <Field Name="askpriceid" IsKey="true" />
+      <Field Name="lineid" IsKey="true" />
+      <Field Name="itemno"  />
+      <Field Name="ranks"/>
+      <Field Name="msunit" />
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="deliverycyc"/>
+      <Field Name="remarks"/>
+    </Table>
+    <Table Name="ec_askpricemst">
+      <Field Name="recorddate" />
+      <Field Name="askpriceno" />
+      <Field Name="ocode" />
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"/>
+      <Field Name="descript1"/>
+      <Field Name="descript"/>
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname"/>
+    </Table>
+    <Table Name="ec_askpricedtlrel">
+      <Field Name="uicaccflg"/>
+    </Table>
+    <Table Name="ec_askpricerel">
+      <Field Name="supcomp" AsName ="asksupcomp" />
+    </Table>
+    <Table Name="enterprise">
+      <Field Name="compname" />
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select distinct [fields] from [table]
+      inner join ec_askpricemst on ec_askpricemst.askpriceid = [table].askpriceid
+      left join itemdata on itemdata.itemno=[table].itemno
+      left join msunit on msunit.msunit = [table].msunit
+      left outer join ec_askpricerel on ec_askpricerel.askpriceid = [table].askpriceid
+      left outer join ec_askpricedtlrel on ec_askpricedtlrel.askpriceid = [table].askpriceid
+      and ec_askpricedtlrel.lineid = [table].lineid and ec_askpricedtlrel.supcomp = ec_askpricerel.supcomp
+      left outer join enterprise on enterprise.compno = ec_askpricerel.supcomp
+      left outer join ranks on ranks.ranks = [table].ranks
+      [where] [orderby]
+    </Sql>
+    <Where>
+      <Exp Field="asksupcomp" Target="AppInfo" Value="LoginID" />
+      <Exp Field="ocode" Target="AppInfo" Value="OCode" ></Exp>
+    </Where>
+    <Query>
+      <Exp Name="accept" format=" ec_askpricedtlrel.uicaccflg = '1' "></Exp>
+      <Exp Name="refuse" format=" ec_askpricedtlrel.uicaccflg = '2' "></Exp>
+      <Exp Name="unaccept" format="  ec_askpricedtlrel.uicaccflg is null "></Exp>
+      <Exp Field="itemdata.itemname" Target="Client" Value="itemname"></Exp>
+      <Exp Field="ec_askpricemst.recorddate" paramName="recorddate1" Target="Client" Oper="GreaterThanOrEqual" Value="purdate1"/>
+      <Exp Field="ec_askpricemst.recorddate" paramName="recorddate2" Target="Client" Oper="LessThanOrEqual" Value="purdate2" />
+      <Exp Field="ec_askpricemst.askpriceno" paramName="askpriceno" Target="Client" Value="askpriceno"/>
+      <Exp Field="descript" paramName="descript" Target="Client" Value="descript"/>
+      <Exp Field="descript1" paramName="descript1" Target="Client" Value="descript1"/>
+    </Query>
+    <OrderBy format="{uicaccflg},{askpriceid}">
+      <Exp Field="uicaccflg" value="asc"/>
+      <Exp Field="askpriceid" value="desc"/>
+    </OrderBy>
+    
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+    <Values>
+
+    </Values>
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

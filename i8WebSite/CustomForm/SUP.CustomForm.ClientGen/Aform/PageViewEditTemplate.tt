@@ -1,0 +1,50 @@
+﻿<#@ template language="C#" #>
+
+Ext.define('Aform.view.Edit', {
+    extend: "Touch.ng.FormPanel",
+    xtype: 'viewedit',
+    otype: 'edit',  //操作类型，放在config外面的配置项获得方式：组件.otype
+
+    config: {
+        title: '<#= ClassName #>Edit',
+        buskey: 'phid', //对应的业务表主键,放在config里面的配置项获得方式：组件.getBuskey()
+        id: 'viewportEdit', 
+
+        fullscreen: true,
+        defaults: {
+            labelWidth: 100
+        },
+
+        items: [
+            {
+                xtype: 'titlebar',
+                title: 'Detail',
+                docked: 'top',
+                items: [
+                    {
+                        xtype: 'button',
+                        ui: 'back',
+                        iconMask: false,
+                        align: 'left',
+                        itemId: 'back',
+                        width: 160,
+                        text: '返回'
+                    },
+                    {
+                        xtype: 'button',
+                        ui: 'action-white',
+                        iconMask: false,
+                        align: 'right',
+                        itemId: 'save',
+                        text: '保存',
+                        cls: 'button-no-radio tbr-btn'
+                    }
+                ]
+            },
+
+			<# if(tableLayouts.AllFields.Count > 0 ) { #>
+				<#= Common.GetFormApp(tableLayouts)#>
+			<# } #>	        		    
+        ]
+    }
+});

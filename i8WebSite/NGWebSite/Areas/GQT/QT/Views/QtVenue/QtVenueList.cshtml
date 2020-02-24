@@ -1,0 +1,367 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script type="text/javascript">
+		var store;
+		var grid;
+		var storeOrg;
+		var gridOrg;
+        var deletedata = [];
+		var selectOrg="";
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'addrow', 'deleterow', 'save',
+                    '->',  'close'
+                ]
+            });
+
+
+			
+			store = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 200,
+				fields: [
+				{
+					"name": "PhId",
+					"type": "string",
+					"mapping": "PhId"
+				},
+				{
+
+				
+					"name": "Dm",
+					"type": "string",
+					"mapping": "Dm"
+				},
+				{
+					"name": "Mc",
+					"type": "string",
+					"mapping": "Mc"
+				},
+				{
+					"name": "Bz",
+					"type": "string",
+					"mapping": "Bz"
+				},
+				{
+					"name": "Orgid",
+					"type": "string",
+					"mapping": "Orgid"
+				},
+				{
+					"name": "Orgcode",
+					"type": "string",
+					"mapping": "Orgcode"
+				}			
+				],
+				url: C_ROOT + 'GQT/QT/QtVenue/GetQtVenueList',
+				//params:{'id': data[0].get('PhId') }
+				
+				//url: C_ROOT + 'GQT/QT/SourceOfFunds/GetSourceOfFundsList',
+				autoLoad:false 
+			});
+			
+			store.on('beforeload',function(){
+				var data = gridOrg.getSelectionModel().getSelection();
+				var Orgcode=data[0].data.OCode;
+				Ext.apply(store.proxy.extraParams, { 'Orgcode': Orgcode });
+			});
+			
+			grid = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				// height: '100%',
+				height:document.documentElement.clientHeight-36,
+				store: store,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [ {
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Dm',
+                    maxLength: 30,
+					editor: {
+						xtype: "ngText"
+					}
+				}, {
+					header: '名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Mc',
+                    maxLength: 255,
+					editor: {
+						xtype: "ngText"
+					}
+				}, {
+					header: '备注',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'Bz',
+                    maxLength: 40,
+					editor: {
+						xtype: "ngText"
+					}
+				}],
+				listeners: {
+					
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+					}
+				
+					
+					
+				},
+				plugins:[
+					Ext.create('Ext.grid.plugin.CellEditing', {
+						clicksToEdit: 1,    //单击编辑，单元格修改
+						autoEncode:false  //不解析成html
+					})
+				]
+				/*viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				}*/
+			});
+			
+
+			storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+					"name": "PhId",
+					"type": "string",
+					"mapping": "PhId"
+				},
+				{
+					"name": "OCode",
+					"type": "string",
+					"mapping": "OCode"
+				},
+				{
+					"name": "OName",
+					"type": "string",
+					"mapping": "OName"
+
+				}],
+                url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+				autoLoad:true
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				//height: 390,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+					//renderer: function (value, parm, record) {
+					//    if (record.data.ctype == "1") {
+					//        return me.getEmpName(value, record.data.assigntype);
+					//    }
+					//    return value;
+					//}
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						
+					},
+					'beforeitemclick': function (item, record, it, index, e, eOpts) {
+						if(selectOrg==''){
+							selectOrg=record.data.OCode;
+							store.load();
+						}else{
+							if(selectOrg!=record.data.OCode){
+								if(store.getModifiedRecords().length>0||deletedata.length>0){
+									Ext.MessageBox.confirm('提示', '是否保存修改？', callBack);
+									function callBack(callBackid) {
+										if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+											selectOrg=record.data.OCode;
+											store.load();
+										} else {
+											ngToolbar.get('save').fireEvent('click');
+											selectOrg=record.data.OCode;
+											store.load();
+										}
+									}
+								}else{
+									selectOrg=record.data.OCode;
+									store.load();
+								}
+							}
+						}
+					}
+				},
+				/*viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				}*/
+			});
+			
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [
+					ngToolbar,
+					{
+						region:'west',
+						xtype:"panel",
+						items:[gridOrg],
+						width:400
+					},
+					{
+						region:'center',
+						xtype:"panel",
+						// autoScroll:true,
+						items:[grid],
+					}
+				]
+            });
+            //增行
+            ngToolbar.get('addrow').on('click', function () {
+				var data = gridOrg.getSelectionModel().getSelection();
+				if(data.length>0){
+					var model1 = grid.getSelectionModel();
+					var rowid = store.getCount();
+
+					store.insert(rowid, model1);
+					store.getAt(rowid).set('Orgcode', data[0].data.OCode);
+					store.getAt(rowid).set('Orgid', data[0].data.PhId);
+					// store.getAt(rowid).set('Dm', data[0].data.PhId);
+					// store.getAt(rowid).set('Mc', data[0].data.PhId);
+					// store.getAt(rowid).set('Bz', data[0].data.PhId);
+				}else{
+					Ext.MessageBox.alert('提示', '请先选择组织！');
+				}
+
+			});
+			//删行
+            ngToolbar.get('deleterow').on('click', function () {
+				var selection = grid.getSelectionModel().getSelection();
+				if(selection.length>0){
+					var phid = selection[0].data.PhId;
+					if (!phid || phid.length == 0) {
+
+					} else {
+						deletedata.push(selection[0].data.PhId);
+					}
+					store.remove(selection);
+				}
+
+            })
+			//保存
+            ngToolbar.items.get('save').on('click', function () {
+                var updatedata = [];
+                for (var i = 0; i < store.getModifiedRecords().length; i++) {
+                    var PhId = store.getModifiedRecords()[i].data.PhId;
+                    var Dm = store.getModifiedRecords()[i].data.Dm;
+                    var Mc = store.getModifiedRecords()[i].data.Mc;
+                    var Bz = store.getModifiedRecords()[i].data.Bz;
+                    var Orgid = store.getModifiedRecords()[i].data.Orgid;
+					var Orgcode = store.getModifiedRecords()[i].data.Orgcode;
+					if(Dm==''){
+						Ext.MessageBox.alert('提示', '代码不能为空！');
+						return;
+					}
+					if($GetLength(Dm)>grid.getColumn('Dm').maxLength){
+						Ext.MessageBox.alert('提示', '代码输入字符超过最大长度('+grid.getColumn('Dm').maxLength+')(中文算两个字符)！');
+						return;
+					}
+					if(Mc==''){
+						Ext.MessageBox.alert('提示', '名称不能为空！');
+						return;
+					}
+					if($GetLength(Mc)>grid.getColumn('Mc').maxLength){
+						Ext.MessageBox.alert('提示', '名称输入字符超过最大长度('+grid.getColumn('Mc').maxLength+')(中文算两个字符)！');
+						return;
+					}
+					if($GetLength(Bz)>grid.getColumn('Bz').maxLength){
+						Ext.MessageBox.alert('提示', '备注输入字符超过最大长度('+grid.getColumn('Bz').maxLength+')(中文算两个字符)！');
+						return;
+					}
+					if (!PhId || PhId.length == 0) {
+						updatedata.push({'Dm': Dm, 'Mc': Mc, 'Bz': Bz,'Orgid':Orgid,'Orgcode':Orgcode});
+					}else{
+						updatedata.push({ 'PhId': PhId, 'Dm': Dm, 'Mc': Mc, 'Bz': Bz,'Orgid':Orgid,'Orgcode':Orgcode});
+					}
+
+					
+				}
+				
+                Ext.Ajax.request({
+                    params: {"updatedata": updatedata,"deletedata":deletedata },
+                    url: C_ROOT + 'GQT/QT/QtVenue/Save2',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', '保存成功');
+                            store.load();
+                            deletedata = [];
+                        } else {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                });
+
+            })
+
+        });
+		
+		function NG3Refresh() {
+			store.load();
+		}
+
+
+    </script>
+}
+
+

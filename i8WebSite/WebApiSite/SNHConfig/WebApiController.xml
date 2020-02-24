@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net" default-lazy-init="true" >
+
+
+
+  <!--GQT3.QT-->
+  <!--<object type="Enterprise3.WebApi.GQT3.QT.Controller.BudgetAccountsApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="BudgetAccountsService" ref="GQT3.QT.Service.BudgetAccounts"/>
+  </object>-->
+
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.CorrespondenceSettings2ApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="CorrespondenceSettings2Service" ref="GQT3.QT.Service.CorrespondenceSettings2"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.CorrespondenceSettingsApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="YsAccountMstService" ref="GYS3.YS.Service.YsAccountMst"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.BankAccountApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="BankAccountService" ref="GQT3.QT.Service.BankAccount"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.QTSysSetApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+    <property name="BudgetAccountsService" ref="GQT3.QT.Service.BudgetAccounts"/>
+    <property name="SourceOfFundsService" ref="GQT3.QT.Service.SourceOfFunds"/>
+    <property name="ExpenseCategoryService" ref="GQT3.QT.Service.ExpenseCategory"/>
+    <property name="CorrespondenceSettings2Service" ref="GQT3.QT.Service.CorrespondenceSettings2"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="PerformEvalTargetTypeService" ref="GQT3.QT.Service.PerformEvalTargetType"/>
+    <property name="PerformEvalTargetService" ref="GQT3.QT.Service.PerformEvalTarget"/>
+    <property name="ProcurementCatalogService" ref="GQT3.QT.Service.ProcurementCatalog"/>
+    <property name="ProcurementProceduresService" ref="GQT3.QT.Service.ProcurementProcedures"/>
+    <property name="ProcurementTypeService" ref="GQT3.QT.Service.ProcurementType"/>
+    <property name="PerformEvalTargetClassService" ref="GQT3.QT.Service.PerformEvalTargetClass"/>
+    <property name="PerformEvalTypeService" ref="GQT3.QT.Service.PerformEvalType"/>
+    <property name="QtZcgnflService" ref="GQT3.QT.Service.QtZcgnfl"/>
+    <property name="QTIfApproveService" ref="GQT3.QT.Service.QTIfApprove"/>
+    <property name="GAppvalRecordService" ref="GSP3.SP.Service.GAppvalRecord"/>
+    <property name="ProjectMstService" ref="GXM3.XM.Service.ProjectMst"/>
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
+    <property name="ExpenseMstService" ref="GYS3.YS.Service.ExpenseMst"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.BudgetAccountsApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="BudgetAccountsService" ref="GQT3.QT.Service.BudgetAccounts"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.SysSettingApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="QTMemoService" ref="GQT3.QT.Service.QTMemo"/>
+    <property name="ExpenseCategoryService" ref="GQT3.QT.Service.ExpenseCategory"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.QtAttachmentApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.ProjectThresholdApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="ProjectThresholdService" ref="GQT3.QT.Service.ProjectThreshold"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.CoverUpForOrgApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="QtCoverUpForOrgService" ref="GQT3.QT.Service.QtCoverUpForOrg"/>
+    <property name="QtCoverUpDataService" ref="GQT3.QT.Service.QtCoverUpData"/>  
+    <property name="QtTableCustomizeService" ref="GQT3.QT.Service.QtTableCustomize"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.QtNaviGationapiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="QtNaviGationService" ref="GQT3.QT.Service.QtNaviGation"/>
+  </object>
+  <object type="Enterprise3.WebApi.GQT3.QT.Controller.QtXmDistributeApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
+    <property name="QtXmDistributeService" ref="GQT3.QT.Service.QtXmDistribute"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+  </object>
+  <!--GSP3.SP-->
+  <object type="Enterprise3.WebApi.GSP3.SP.Controller.GAppvalPostController, Enterprise3.WebApi.GSP3.SP.Controller" singleton="false">
+    <property name="GAppvalPostService" ref="GSP3.SP.Service.GAppvalPost"/>
+    <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+    <property name="GAppvalRecordService" ref="GSP3.SP.Service.GAppvalRecord"/>
+  </object>
+  <object type="Enterprise3.WebApi.GSP3.SP.Controller.GAppvalProcController, Enterprise3.WebApi.GSP3.SP.Controller" singleton="false">
+    <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
+  </object>
+  <object type="Enterprise3.WebApi.GSP3.SP.Controller.GAppvalRecordController, Enterprise3.WebApi.GSP3.SP.Controller" singleton="false">
+    <property name="GAppvalRecordService" ref="GSP3.SP.Service.GAppvalRecord"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>    
+    <property name="OrgRelatitem2Service" ref="GQT3.QT.Service.OrgRelatitem2"/>
+  </object>
+  
+  
+  <!--GBK3.BK-->
+  <object type="Enterprise3.WebApi.GBK3.BK.Controller.PaymentMstApiController, Enterprise3.WebApi.GBK3.BK.Controller" singleton="false">
+    <property name="PaymentMstService" ref="GBK3.BK.Service.PaymentMst"/>
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
+    <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>
+    <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+  </object>
+
+  
+  <!--GGK3.GK-->
+  <object type="Enterprise3.WebApi.GGK3.GK.Controller.GKPaymentMstApiController, Enterprise3.WebApi.GGK3.GK.Controller" singleton="false">
+    <property name="GKPaymentMstService" ref="GGK3.GK.Service.GKPaymentMst"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+  </object>
+  <object type="Enterprise3.WebApi.GGK3.GK.Controller.GK3_BankVauitApiController, Enterprise3.WebApi.GGK3.GK.Controller" singleton="false">
+    <property name="GK3_BankVauitService" ref="GGK3.GK.Service.GK3_BankVauit"/>
+  </object>
+  
+  <!--GYS3.YS-->
+  <object type="Enterprise3.WebApi.GYS3.YS.Controller.BudgetMstApiController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="CorrespondenceSettings2Service" ref="GQT3.QT.Service.CorrespondenceSettings2"/>
+    <property name="ProjectMstService" ref="GXM3.XM.Service.ProjectMst"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+    <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>
+    <property name="YsAccountMstService" ref="GYS3.YS.Service.YsAccountMst"/>
+    <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+    <property name="QtTableCustomizeService" ref="GQT3.QT.Service.QtTableCustomize"/>
+    <property name="BudgetProcessCtrlService" ref="GYS3.YS.Service.BudgetProcessCtrl"/>
+  </object>
+
+  <object type="Enterprise3.WebApi.GYS3.YS.Controller.GHSubjectController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
+    <property name="GHSubjectService" ref="GYS3.YS.Service.GHSubject"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+  </object>
+
+  <object type="Enterprise3.WebApi.GYS3.YS.Controller.BudgetProcessCtrlController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
+    <property name="BudgetProcessCtrlService" ref="GYS3.YS.Service.BudgetProcessCtrl"/>
+  </object>
+
+  <object type="Enterprise3.WebApi.GYS3.YS.Controller.ExpenseMstApiController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
+    <property name="ExpenseMstService" ref="GYS3.YS.Service.ExpenseMst"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>
+    <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+  </object>
+
+  <object type="Enterprise3.WebApi.GYS3.YS.Controller.YsAccountMstApiController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
+    <property name="YsAccountMstService" ref="GYS3.YS.Service.YsAccountMst"/>
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
+  </object>
+
+  <object type="Enterprise3.WebApi.GYS3.YS.Controller.YsIncomeMstApiController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
+    <property name="YsIncomeMstService" ref="GYS3.YS.Service.YsIncomeMst"/>
+    <property name="CorrespondenceSettings2Service" ref="GQT3.QT.Service.CorrespondenceSettings2"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="BudgetAccountsService" ref="GQT3.QT.Service.BudgetAccounts"/>
+    <property name="BudgetProcessCtrlService" ref="GYS3.YS.Service.BudgetProcessCtrl"/>
+  </object>
+  
+  <!--GXM3.XM-->
+  <object type="Enterprise3.WebApi.GXM3.XM.Controller.ProjectMstApiController, Enterprise3.WebApi.GXM3.XM.Controller" singleton="false">
+    <property name="ProjectMstService" ref="GXM3.XM.Service.ProjectMst"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="BudgetProcessCtrlService" ref="GYS3.YS.Service.BudgetProcessCtrl"/>
+    <property name="ProjLibService" ref="GQT3.QT.Service.ProjLibProj"/>
+    <property name="ProjDtlShareService" ref="GQT3.QT.Service.GHProjDtlShare"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
+    <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>
+    <property name="QtCoverUpDataService" ref="GQT3.QT.Service.QtCoverUpData"/>
+    <property name="QtCoverUpForOrgService" ref="GQT3.QT.Service.QtCoverUpForOrg"/>
+    <property name="PerformEvalTargetTypeService" ref="GQT3.QT.Service.PerformEvalTargetType"/>
+    <property name="GAppvalRecordService" ref="GSP3.SP.Service.GAppvalRecord"/>
+    <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+  </object>
+
+  <object type="Enterprise3.WebApi.GXM3.XM.Controller.ReportMstApiController, Enterprise3.WebApi.GXM3.XM.Controller" singleton="false">
+    <property name="XmReportMstService" ref="GXM3.XM.Service.XmReportMst"/>
+
+  </object>
+
+  <!--GJX3.JX-->
+  <object type="Enterprise3.WebApi.GJX3.JX.Controller.PerformanceMstApiController, Enterprise3.WebApi.GJX3.JX.Controller" singleton="false">
+    <property name="PerformanceMstService" ref="GJX3.JX.Service.PerformanceMst"/>  
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>  
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+    <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>
+    <property name="PerformEvalTargetTypeService" ref="GQT3.QT.Service.PerformEvalTargetType"/>
+  </object>
+</objects>

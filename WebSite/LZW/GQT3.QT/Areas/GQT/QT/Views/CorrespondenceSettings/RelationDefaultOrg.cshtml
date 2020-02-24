@@ -1,0 +1,707 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+	<script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/WorkFlowHelp_ZJLY.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript">
+		var checkedId;//记录被选中的checkbox的id
+		var clickUserCode;//记录被选中的操作员代码
+		var changeOrgcode=[];//记录有修改的组织代码
+        var IsChange;
+        var win;
+        var OrgIndex;
+        Ext.onReady(function () {
+			
+			
+			
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'save',
+                    '->',  'close'
+                ]
+            });
+			
+			
+			
+			var storeBM = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 14,
+				fields: [{
+					
+					"name": "OCode",
+					"type": "string",
+					"mapping": "OCode"
+				},
+				{
+  
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetBM',
+				
+			});
+			storeBM.load();
+			
+			var storeALLBM = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 14,
+				fields: [{
+					
+					"name": "OCode",
+					"type": "string",
+					"mapping": "OCode"
+				},
+				{
+  
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+
+
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetBM',
+				
+			});
+			storeALLBM.load();
+			
+			gridBM = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height: 350,
+				store: storeBM,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '部门代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode',
+					//hidden:true
+				},{
+					header: '部门名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName',
+					//hidden:true
+
+				
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+                        BMQueren(OrgIndex, storeOrg);
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});
+			
+			
+
+			var storeUser = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: true,
+				//pageSize: 14,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "UserNo",
+    "type": "string",
+    "mapping": "UserNo"
+  },
+  {
+    "name": "UserName",
+    "type": "string",
+    "mapping": "UserName"
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetRelationYSBMList',
+				
+			});
+			gridUser = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+                height: document.documentElement.clientHeight - 28,
+				store: storeUser,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '操作员代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'UserNo',
+					//hidden:true
+				}, {
+					header: '操作员名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'UserName'
+
+				
+				}],
+				listeners: {
+					'itemclick': function (item, record, it, index, e, eOpts) {
+						checkedId=undefined;
+						changeOrgcode=[];
+						if(clickUserCode==undefined){
+							clickUserCode=record.get('UserNo');
+								var params={'userid':record.get('PhId')};
+								Ext.apply(storeOrg.proxy.extraParams,params);
+								storeOrg.load(function(){
+									var params={'userCode':record.get('UserNo')};
+									Ext.apply(storeDYGX.proxy.extraParams,params);
+									storeDYGX.load(function(){
+										for(var i=0;i<storeDYGX.getCount();i++){
+											var OrgDM=storeDYGX.getAt(i).get('Dydm');
+											var DefaultOrg=storeDYGX.getAt(i).get('DefInt1');
+											var DefaultBMDM=storeDYGX.getAt(i).get('DefStr3');
+											
+											//var Orgindex=storeOrg.find('OCode',OrgDM);
+											var Orgindex=findStoreIndex(storeOrg,'OCode',OrgDM);
+											if(Orgindex>=0)
+											{
+												//var BMindex=storeALLBM.find('OCode',DefaultBMDM);
+												var BMindex=findStoreIndex(storeALLBM,'OCode',DefaultBMDM);
+												
+												if(BMindex>=0){
+													var DefaultBMMC=storeALLBM.getAt(BMindex).get('OName');
+													storeOrg.getAt(Orgindex).set('BM',DefaultBMMC);
+													storeOrg.getAt(Orgindex).set('BMcode',DefaultBMDM);
+												}
+												if(DefaultOrg=="1"){
+													document.getElementById(OrgDM).checked = true;
+													checkedId=OrgDM;
+												}
+											}
+										};
+									});
+								});
+							IsChange=false;
+						}else{
+							if(clickUserCode != record.get('UserNo')){
+								if(IsChange==true){
+									Ext.MessageBox.confirm('提示', '是否保存此修改？', callBack);
+									function callBack(callBackid){
+										if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+											clickUserCode=record.get('UserNo');
+											var params={'userid':record.get('PhId')};
+											Ext.apply(storeOrg.proxy.extraParams,params);
+											storeOrg.load(function(){
+												var params={'userCode':record.get('UserNo')};
+												Ext.apply(storeDYGX.proxy.extraParams,params);
+												storeDYGX.load(function(){
+													for(var i=0;i<storeDYGX.getCount();i++){
+														var OrgDM=storeDYGX.getAt(i).get('Dydm');
+														var DefaultOrg=storeDYGX.getAt(i).get('DefInt1');
+														var DefaultBMDM=storeDYGX.getAt(i).get('DefStr3');
+														
+														//var Orgindex=storeOrg.find('OCode',OrgDM);
+														var Orgindex=findStoreIndex(storeOrg,'OCode',OrgDM);
+														if(Orgindex>=0)
+														{
+															var BMindex=storeALLBM.find('OCode',DefaultBMDM);
+															
+															if(BMindex>=0){
+																var DefaultBMMC=storeALLBM.getAt(BMindex).get('OName');
+																storeOrg.getAt(Orgindex).set('BM',DefaultBMMC);
+																storeOrg.getAt(Orgindex).set('BMcode',DefaultBMDM);
+															}
+															if(DefaultOrg=="1"){
+																document.getElementById(OrgDM).checked = true;
+																checkedId=OrgDM;
+															}
+														}
+													};
+												});
+											});
+											IsChange=false;
+										}else{
+											ngToolbar.get('save').fireEvent('click');//触发保存
+											clickUserCode=record.get('UserNo');
+											var params={'userid':record.get('PhId')};
+											Ext.apply(storeOrg.proxy.extraParams,params);
+											storeOrg.load(function(){
+												var params={'userCode':record.get('UserNo')};
+												Ext.apply(storeDYGX.proxy.extraParams,params);
+												storeDYGX.load(function(){
+													for(var i=0;i<storeDYGX.getCount();i++){
+														var OrgDM=storeDYGX.getAt(i).get('Dydm');
+														var DefaultOrg=storeDYGX.getAt(i).get('DefInt1');
+														var DefaultBMDM=storeDYGX.getAt(i).get('DefStr3');
+														
+														//var Orgindex=storeOrg.find('OCode',OrgDM);
+														var Orgindex=findStoreIndex(storeOrg,'OCode',OrgDM);
+														if(Orgindex>=0)
+														{
+															//var BMindex=storeALLBM.find('OCode',DefaultBMDM);
+															var BMindex=findStoreIndex(storeALLBM,'OCode',DefaultBMDM);
+															if(BMindex>=0){
+																var DefaultBMMC=storeALLBM.getAt(BMindex).get('OName');
+																storeOrg.getAt(Orgindex).set('BM',DefaultBMMC);
+																storeOrg.getAt(Orgindex).set('BMcode',DefaultBMDM);
+															}
+															if(DefaultOrg=="1"){
+																document.getElementById(OrgDM).checked = true;
+																checkedId=OrgDM;
+															}
+														}
+													};
+												});
+											});
+										}
+									}
+								}else{
+									clickUserCode=record.get('UserNo');
+									var params={'userid':record.get('PhId')};
+									Ext.apply(storeOrg.proxy.extraParams,params);
+									storeOrg.load(function(){
+										var params={'userCode':record.get('UserNo')};
+										Ext.apply(storeDYGX.proxy.extraParams,params);
+										storeDYGX.load(function(){
+											for(var i=0;i<storeDYGX.getCount();i++){
+												var OrgDM=storeDYGX.getAt(i).get('Dydm');
+												var DefaultOrg=storeDYGX.getAt(i).get('DefInt1');
+												var DefaultBMDM=storeDYGX.getAt(i).get('DefStr3');
+												
+												//var Orgindex=storeOrg.find('OCode',OrgDM);
+												var Orgindex=findStoreIndex(storeOrg,'OCode',OrgDM);
+												if(Orgindex>=0)
+												{
+													//var BMindex=storeALLBM.find('OCode',DefaultBMDM);
+													var BMindex=findStoreIndex(storeALLBM,'OCode',DefaultBMDM);
+													if(BMindex>=0){
+														var DefaultBMMC=storeALLBM.getAt(BMindex).get('OName');
+														storeOrg.getAt(Orgindex).set('BM',DefaultBMMC);
+														storeOrg.getAt(Orgindex).set('BMcode',DefaultBMDM);
+													}
+													if(DefaultOrg=="1"){
+														document.getElementById(OrgDM).checked = true;
+														checkedId=OrgDM;
+													}
+												}
+											};
+										});
+									});
+								}
+							}
+						}
+						
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				}
+			});
+			
+			
+			
+			var storeDYGX = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				//pageSize: 200,
+				fields: [{
+
+  
+    "name": "Dwdm",
+    "type": "string",
+    "mapping": "Dwdm"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "Dydm",
+    "type": "string",
+    "mapping": "Dydm"
+  },
+  {
+    "name": "OrgName",
+    "type": "string",
+    "mapping": "OrgName"
+  },
+  {
+    "name": "Dylx",
+    "type": "string",
+    "mapping": "Dylx"
+	},
+  {
+    "name": "DefStr1",
+    "type": "string",
+    "mapping": "DefStr1"
+  },
+  {
+    "name": "DefStr2",
+    "type": "string",
+    "mapping": "DefStr2"
+  },
+  {
+    "name": "DefStr3",
+    "type": "string",
+    "mapping": "DefStr3"
+	  },
+  {
+    "name": "DefInt1",
+    "type": "string",
+    "mapping": "DefInt1"
+
+
+				}],
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetRelationUser_OrgList',
+
+				autoLoad:false 
+
+			});
+			
+			
+			
+
+			var storeOrg = Ext.create('Ext.ng.JsonStore', {
+				autoLoad: false,
+				fields: [{
+
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "OCode",
+    "type": "string",
+    "mapping": "OCode"
+  },
+  {
+    "name": "OName",
+    "type": "string",
+    "mapping": "OName"
+  },
+  {
+    "name": "ParentOrgId",
+    "type": "string",
+    "mapping": "ParentOrgId"
+  },
+  {
+    "name": "BM",
+    "type": "string",
+    "mapping": "BM"
+  },
+  {
+    "name": "ZZ",
+    "type": "string",
+    "mapping": "ZZ"
+  },
+  {
+    "name": "BMcode",
+    "type": "string",
+    "mapping": "BMcode"	
+				}],
+				//url: C_ROOT + 'GQT/QT/CorrespondenceSettings/GetOrg',
+				url: C_ROOT + 'GQT/QT/CorrespondenceSettings/OrgByUser',
+				autoLoad:false
+			});
+			gridOrg = Ext.create('Ext.ng.GridPanel', {
+				columnWidth: .5,
+				height:document.documentElement.clientHeight-28,
+				//height: 390,
+				store: storeOrg,
+				autoScroll: true,
+				columnLines: true,
+				border: false,
+				//selModel: { mode: "SIMPLE" },
+				columns: [{
+					header: '主键',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'PhId',
+					hidden:true
+				}, {
+					header: '组织代码',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OCode'
+				}, {
+					header: '组织名称',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'OName'
+				}, {
+					header: '默认组织',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					align:'center',
+					dataIndex: 'ZZ',
+					renderer:function(value, parm, record){
+						return '<input id="'+record.get('OCode')+'" type="checkbox" onclick="check('+record.get('OCode')+')" />';
+					}
+				}, {
+					header: '默认部门',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'BM',
+					
+				}, {
+					header: '默认部门code',
+					flex: 1,
+					sortable: false,
+					menuDisabled: true,
+					draggable: false,
+					dataIndex: 'BMcode',
+					hidden:true
+				}],
+				listeners: {
+					'itemdblclick': function (item, record, it, index, e, eOpts) {
+						
+                        OrgIndex = index;
+						var params={'OrgId':record.get('PhId')};
+						Ext.apply(storeBM.proxy.extraParams,params);
+						storeBM.load();
+						win=Ext.create('Ext.window.Window',{
+							title:'选择默认部门',
+                            height: 415,
+							width:200,
+							modal:true,
+							//closable:true,
+							closeAction:'hide',
+							items:[gridBM],
+							buttons:[
+							{
+								xtype:"button",
+								text:"确认",
+								handler:function(){
+									/*var selectBM = gridBM.getSelectionModel().getSelection();
+									if(selectBM.length>0){
+									var selectBMMC=selectBM[0].data.OName;
+									var selectBMcode=selectBM[0].data.OCode;
+									//checkbox
+									var selectOrgcode=record.get('OCode');
+									ifchecked=document.getElementById(selectOrgcode).checked;
+									
+									record.set("BM",selectBMMC);
+									record.set("BMcode",selectBMcode);
+									}
+									win.close();
+									document.getElementById(selectOrgcode).checked=ifchecked;
+									
+									IsChange=true;*/
+                                    BMQueren(OrgIndex, storeOrg);
+								}
+							},
+							{
+								xtype:"button",
+								text:"取消",
+								handler:function(){
+									win.close();
+								}
+							}
+							]
+							
+						});
+						win.show();
+					}
+				},
+				viewConfig: {
+					style: {
+						overflowX: 'hidden !important'
+					}
+				},
+				bodyStyle: {
+					top: '24px !important'
+				},
+			});
+			
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar,
+				{
+				region:'west',
+				xtype:"panel",
+				items:[gridUser],
+				width:400
+				},
+				{
+				region:'center',
+				xtype:"panel",
+				items:[gridOrg],
+				
+				}]
+            });
+           
+			//保存
+            ngToolbar.get('save').on('click', function () {
+				//alert(changeOrgcode.length);
+				
+				var DeleteData=[];
+				var InsertData=[];
+				
+				var usercode=clickUserCode;//Dwdm
+				//var userindex=storeUser.find('UserNo',usercode);
+				var userindex=findStoreIndex(storeUser,'UserNo',usercode);
+				if(userindex>=0)
+				{
+					var username=storeUser.getAt(userindex).get('UserName');//DefStr1
+					
+					var params={'userCode':usercode};
+					Ext.apply(storeDYGX.proxy.extraParams,params);
+					storeDYGX.load(function(){
+						for(var i=0;i<storeDYGX.getCount();i++){
+							var DYGXPhid=storeDYGX.getAt(i).get('PhId');
+							DeleteData.push({'PhId':DYGXPhid,'key':DYGXPhid});
+						}
+						var mydelete={"form":{"key":"PhId","modifiedRow":DeleteData}};
+						//alert(storeOrg.getCount());
+						for(var i=0;i<storeOrg.getCount();i++){
+							var record=storeOrg.getAt(i);
+							var user = gridUser.getSelectionModel().getSelection();
+							//var usercode=user[0].data.UserNo;//Dwdm
+							//var username=user[0].data.UserName;//DefStr1
+							var Orgcode=record.get('OCode');//Dydm
+							var OrgPhId=record.get('PhId');//DefStr2
+							var DefaultOrg;//DefInt1
+							if(document.getElementById(Orgcode).checked){
+								DefaultOrg='Y';
+							}else{
+								DefaultOrg='N';
+							}
+							var DefaultBMcode=record.get('BMcode');//DefStr3
+							
+							InsertData.push({'PhId':OrgPhId,'OCode':Orgcode,'OName':DefaultBMcode,'ForeignFn':DefaultOrg,'key':OrgPhId});
+						}
+						var myinsert={"form":{"key":"PhId","modifiedRow":InsertData}};
+						
+						Ext.Ajax.request({
+								params:{'usercode':usercode,'username':username,'mydelete':mydelete,'myinsert':myinsert},
+								url: C_ROOT + 'GQT/QT/CorrespondenceSettings/UpdateDefaultOrg',
+								success: function (response) {
+									var resp = Ext.JSON.decode(response.responseText);
+									if (resp.Status === "success"){
+										Ext.MessageBox.alert('设置成功', "设置成功！");
+									}else{
+										Ext.MessageBox.alert('设置失败', "请重新设置！");
+									}
+								}
+						});
+					});
+					
+					IsChange=false;
+				}
+				
+            });
+
+        });
+		
+		function check(id){
+			IsChange=true;
+			/*if(findIndex(changeOrgcode,id)<0){
+				changeOrgcode.push(id);
+			}*/
+			
+			if(checkedId==undefined){
+				checkedId=id;
+			}else{
+				/*if(findIndex(changeOrgcode,checkedId)<0){
+					changeOrgcode.push(checkedId);
+				}*/
+				
+			
+				if(document.getElementById(id).checked){
+					document.getElementById(checkedId).checked=false;
+					checkedId=id;
+				}else{
+					checkedId=undefined;
+				}
+			}
+		}
+		
+		function findIndex(listname,value){
+			for(var i=0;i<listname.length;i++){
+				if(listname[i]==value){
+					return i;
+				}
+			}
+			return -1;
+		}
+		
+		function findStoreIndex(store,name,value){
+			for(var i=0;i<store.getCount();i++){
+				if(store.getAt(i).get(name)==value){
+					return i;
+				}
+			}
+			return -1;
+        }
+
+        function BMQueren(index, storeOrg) {
+            var selectBM = gridBM.getSelectionModel().getSelection();
+            if (selectBM.length > 0) {
+                var selectBMMC = selectBM[0].data.OName;
+                var selectBMcode = selectBM[0].data.OCode;
+                //checkbox
+                //var selectOrgcode=record.get('OCode');
+                var selectOrg = gridOrg.getSelectionModel().getSelection();
+                var selectOrgcode = selectOrg[0].data.OCode;
+                ifchecked = document.getElementById(selectOrgcode).checked;
+
+                //selectOrg.set("BM",selectBMMC);
+                //selectOrg.set("BMcode",selectBMcode);
+                //selectOrg[0].data.BM=selectBMMC
+                //selectOrg[0].data.BMcode=selectBMcode
+                storeOrg.getAt(index).set('BM', selectBMMC);
+                storeOrg.getAt(index).set('BMcode', selectBMcode);
+            }
+            win.close();
+            document.getElementById(selectOrgcode).checked = ifchecked;
+
+            IsChange = true;
+        }
+    </script>
+}
+
+

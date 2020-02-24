@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<objects xmlns="http://www.springframework.net" xmlns:db="http://www.springframework.net/database">
+  <object id="DbProviderDictionary" type="Spring.Collections.SynchronizedHashtable, Spring.Core">
+    <property name="['DefaultDbProvider']" ref="DefaultDbProvider" />
+    <property name="['NG0001']" ref="NG0001DbProvider" />
+    <property name="['NGSoft']" ref="NGSoftDbProvider" />
+    <property name="['NGLog']" ref="NGLogDbProvider" />
+  </object>
+  <db:provider id="DefaultDbProvider" provider="${provider}" connectionString="${defaultConnection}" />
+  <db:provider id="NG0001DbProvider" provider="${provider}" connectionString="${NG0001Connection}" />
+  <db:provider id="NGSoftDbProvider" provider="${provider}" connectionString="${NGSoftConnection}" />
+  <db:provider id="NGLogDbProvider" provider="${provider}" connectionString="${NGLogConnection}" />
+</objects>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="RWReportModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="RepCode" >
+			<length min="0" max="80" message ="长度不超过80！"/>
+		</property>
+		<property name="RepName" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="RepKeys" >
+			<length min="0" max="250" message ="长度不超过250！"/>
+		</property>
+		<property name="RepSummary" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="RepCreater" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="RepUpdater" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="OCode" >
+			<length min="0" max="40" message ="长度不超过40！"/>
+		</property>
+		<property name="ExternalLink" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="AppMan" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FillYear" >
+			<length min="0" max="4" message ="长度不超过4！"/>
+		</property>
+		<property name="FillMonth" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="ProjectCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="rep_holder" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="RepOrderid" >
+			<length min="0" max="40" message ="长度不超过40！"/>
+		</property>
+	</class>
+</nhv-mapping>

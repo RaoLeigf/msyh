@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="OrgRelatitem2Model" table="fg_orgrelatitem">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="RelatId" column="relatid" type="System.String" length="40" not-null="false" />
+		<property name="OCode" column="ocode" type="System.String" length="20" not-null="false" />
+		<property name="ParentOrg" column="parentorg" type="System.String" length="20" not-null="false" />
+		<property name="RelaIndex" column="relatindex" type="System.String" length="128" not-null="false" />
+		<property name="RelId" column="relid" type="System.String" length="20" not-null="false" />
+		<property name="OrderType" column="ordertype" type="System.String" length="5" not-null="false" />
+		<property name="OrgId" column="org_id" type="System.Int64" not-null="false" />
+		<property name="ParentOrgId" column="parent_orgid" type="System.Int64" not-null="false" />
+		<property name="MainPhId" column="mainphid" type="System.Int64" not-null="false" />
+		<property name="AttrCode" column="attrcode" type="System.String" length="2" not-null="false" />
+	</class>
+</hibernate-mapping>

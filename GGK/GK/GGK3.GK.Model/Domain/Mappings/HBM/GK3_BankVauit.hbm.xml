@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GGK3.GK.Model.Domain" assembly="GGK3.GK.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GK3_BankVauitModel" table="gk3_bankvauit">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="Name" column="name" type="System.String" length="50" not-null="false" />
+		<property name="Address" column="address" type="System.String" length="100" not-null="false" />
+		<property name="Createtime" column="createtime" type="System.DateTime" not-null="false" />
+		<property name="Modifier" column="modifier" type="System.Int64" not-null="false" />
+		<property name="Modifiertime" column="modifiertime" type="System.DateTime" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+    <property name="OrgId" column="orgid" type="System.Int64" not-null="true" />
+    <property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EC67DDDE-5F0E-484D-97F8-00C1153E45A4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SUP.CustomForm.DataEntity</RootNamespace>
+    <AssemblyName>SUP.CustomForm.DataEntity</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppContainer\AppContainer.cs" />
+    <Compile Include="AppContainer\AppFieldSet.cs" />
+    <Compile Include="AppContainer\AppFormPanel.cs" />
+    <Compile Include="AppContainer\AppList.cs" />
+    <Compile Include="AppContainer\AppToolbar.cs" />
+    <Compile Include="AppControl\Button.cs" />
+    <Compile Include="AppControl\CustomHelpField.cs" />
+    <Compile Include="AppControl\DatePickerField.cs" />
+    <Compile Include="AppControl\HelpBase.cs" />
+    <Compile Include="AppControl\HelpField.cs" />
+    <Compile Include="BuildParameter.cs" />
+    <Compile Include="Container\GridPanel.cs" />
+    <Compile Include="Container\FieldSetForm.cs" />
+    <Compile Include="Container\FieldSet.cs" />
+    <Compile Include="Container\TableLayoutForm.cs" />
+    <Compile Include="Container\ExtContainer.cs" />
+    <Compile Include="Container\Toolbar.cs" />
+    <Compile Include="Control\ExtGridColumn.cs" />
+    <Compile Include="Control\ExtGridColumnEditor.cs" />
+    <Compile Include="Control\ExtControlBase.cs" />
+    <Compile Include="Control\NGButton.cs" />
+    <Compile Include="Control\NGCheckbox.cs" />
+    <Compile Include="Control\NGComboBox.cs" />
+    <Compile Include="Control\NGCommonHelp.cs" />
+    <Compile Include="Control\NGDate.cs" />
+    <Compile Include="Control\NGDateTime.cs" />
+    <Compile Include="Control\NGHelpBase.cs" />
+    <Compile Include="Control\NGNumber.cs" />
+    <Compile Include="Control\NGPictureBox.cs" />
+    <Compile Include="Control\NGRadio.cs" />
+    <Compile Include="Control\NGRichHelp.cs" />
+    <Compile Include="Control\NGText.cs" />
+    <Compile Include="Control\NGTextArea.cs" />
+    <Compile Include="Control\NGTextBase.cs" />
+    <Compile Include="Control\NGLabel.cs" />
+    <Compile Include="DetailInfo.cs" />
+    <Compile Include="HelpEntity.cs" />
+    <Compile Include="PbFormInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AppControl\CheckBoxField.cs" />
+    <Compile Include="AppControl\BaseField.cs" />
+    <Compile Include="AppControl\EmailField.cs" />
+    <Compile Include="AppControl\HiddenField.cs" />
+    <Compile Include="AppControl\NumberField.cs" />
+    <Compile Include="AppControl\RadioField.cs" />
+    <Compile Include="AppControl\SelectField.cs" />
+    <Compile Include="AppControl\TextField.cs" />
+    <Compile Include="AppControl\TextAreaField.cs" />
+    <Compile Include="AppControl\UrlField.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NG3.Metadata\NG3.Metadata.csproj">
+      <Project>{09b59914-7e10-4aad-8b61-375e819182e0}</Project>
+      <Name>NG3.Metadata</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(TargetDir)$(TargetFileName) $(SolutionDir)Out\bin
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

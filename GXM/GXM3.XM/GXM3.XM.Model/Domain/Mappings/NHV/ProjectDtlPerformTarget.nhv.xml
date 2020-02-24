@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="ProjectDtlPerformTargetModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FTargetCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FTargetName" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FTargetContent" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FTargetValue" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FTargetWeight" >
+			<length min="0" max="18" message ="长度不超过18！"/>
+		</property>
+		<property name="FTargetDescribe" >
+			<length min="0" max="300" message ="长度不超过300！"/>
+		</property>
+		<property name="FTargetClassCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FTargetTypeCode" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+	</class>
+</nhv-mapping>

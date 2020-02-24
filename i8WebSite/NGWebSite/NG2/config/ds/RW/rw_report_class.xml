@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="rw_report_class">
+      <Field Name="class_id" IsKey="true"/>
+      <Field Name="class_name" />
+      <Field Name="class_memo"  />
+      <Field Name="class_src"  />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [orderby]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{class_name}">
+      <Exp Field="class_name" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <RecordByRef>
+    <Sql>
+      select 1 from rw_report_main [where]
+    </Sql>
+    <Where >
+      <Exp Field="rep_classid" Target="Client" Value="class_id"/>
+    </Where>
+  </RecordByRef>
+
+  <SelectMaxID>
+    <Sql>
+      select max(class_id) from rw_report_class
+    </Sql>
+  </SelectMaxID>
+  
+</DataService>
+

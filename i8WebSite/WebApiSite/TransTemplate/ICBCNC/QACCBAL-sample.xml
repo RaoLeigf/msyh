@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding = "GBK"?>
+	<CMS>
+		<eb>
+			<pub>
+				<TransCode>QACCBAL</TransCode>
+				<CIS>集团CIS号</CIS>
+				<BankCode>归属银行编号</BankCode>
+				<ID>证书ID</ID>
+				<TranDate>交易日期</TranDate>
+				<TranTime>交易时间</TranTime>
+				<fSeqno>指令包序列号</fSeqno>
+			</pub>
+			<in>
+				<TotalNum>总笔数</TotalNum>
+				<ReqReserved1>请求包备用字段1</ReqReserved1>
+				<ReqReserved2>请求包备用字段2</ReqReserved2>
+				<rd>
+					<iSeqno>指令顺序号</iSeqno>
+					<AccNo>账号</AccNo>
+					<CurrType>币种</CurrType>
+					<ReqReserved3>请求包备用字段3</ReqReserved3>
+					<ReqReserved4>请求包备用字段4</ReqReserved4>
+				</rd>
+			</in>
+		</eb>
+	</CMS>
+<!--多账户余额查询-->

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="NG3.Addin.Model.Domain" assembly="NG3.Addin.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="AddinExpressionVarModel" table="addin_expression_var">
+		<id name="Phid" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="MstPhid" column="mstphid" type="System.Int64" not-null="false" />
+		<property name="VarName" column="varname" type="System.String" length="20" not-null="false" />
+		<property name="FromDs" column="fromds" type="System.String" length="50" not-null="false" />
+		<property name="RowsType" column="rowstype" type="NG3.Addin.Model.Enums.EnumUIDataSourceType, NG3.Addin.Model"  not-null="false" />
+		<property name="SqlOpType" column="sqloptype" type="NG3.Addin.Model.Enums.EnumSqlOpType, NG3.Addin.Model"  not-null="false" />
+		<property name="SqlText" column="sqltext" type="System.String" length="1000" not-null="false" />
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{229F2520-C7CA-4086-9DA9-CCCC9ABE0F75}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GXM3.XM.Model</RootNamespace>
+    <AssemblyName>GXM3.XM.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GXM3.XM.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\GenerateCodes\ProjectDtlPersonNameModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlPersonnelModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlBudgetDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlFundApplModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlImplPlanModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlPerformTargetModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlPurchaseDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlPurDtl4SOFModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectDtlTextContentModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ProjectMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\XmReportDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\XmReportMstModel.cs" />
+    <Compile Include="Enums\EnumApproveStatus.cs" />
+    <Compile Include="Enums\EnumCarryOver.cs" />
+    <Compile Include="Enums\EnumProjAttr.cs" />
+    <Compile Include="Enums\EnumProjBillType.cs" />
+    <Compile Include="Enums\EnumProjDuration.cs" />
+    <Compile Include="Enums\EnumProjStatus.cs" />
+    <Compile Include="Enums\EnumYesNo.cs" />
+    <Compile Include="Extra\ProjectAllDataModel.cs" />
+    <Compile Include="Extra\ProjectCountModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlBudgetDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlFundAppl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlImplPlan.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlPerformTarget.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlPurchaseDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlPurDtl4SOF.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlTextContent.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlBudgetDtl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlFundAppl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlImplPlan.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlPerformTarget.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlPurchaseDtl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlPurDtl4SOF.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectDtlTextContent.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ProjectMst.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlPersonName.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlPersonnel.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Domain\Mappings\HBM\XmReportDtl.hbm.xml" />
+    <Content Include="Domain\Mappings\HBM\XmReportMst.hbm.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,1895 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src="@Url.Script("~/NG3Resource/js/NG3APPcommon.js")" type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/ExpenseMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/YJK.js") type="text/javascript" charset="utf-8"></script>
+
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript"></script>
+
+    @*<script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>*@
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+		//var busno = '@ViewBag.No';
+		var NCmoney;//年初预算金额
+		var Ifreturn = '@ViewBag.IfReturn';//是否额度返还
+		var beforeSum=0;//本单据初始预计支出金额
+		var beforeFReturnamount=0;//本单据初始预计返还金额
+		var attachGuid = '';
+        var attachment;
+        var YskmList = [];//该项目的所有明细的预算科目集合
+        var AmountList = [];//该项目的所有明细的金额集合与YskmList的index一样
+        var SYAmountList = [];//该项目的所有明细的金额(剩余可用)集合与YskmList的index一样
+
+		var MstPhid;//选择的单据主键
+		var FBudgetDeptcode;//申报部门
+		var FDeclarationDeptcode;//预算部门
+
+		var AmountHX='@ViewBag.AmountHX';//是否通过额度核销按钮进来
+        Ext.onReady(function () {
+
+			//审批流控件
+			var wfinfojson = "";
+			var workflowPanel;
+			var wfinfo = Ext.htmlDecode('@ViewBag.WorkFlowInfo');
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                showArrowBtn: false,
+                layout: {
+                    overflowHandler: 'Menu'
+                },
+                ngbuttons: [
+                    'save',
+                    { id: "saveAndnew", text: "保存并新增", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "saveAndnew" },
+					'attachment', 'addrow', 'deleterow',
+                    { id: "returnAll", text: "全部返还", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "returnAll" },
+                    { id: "AmountHX", text: "额度核销", width: this.itemWidth, iconCls: "icon-Confirm", langkey: "AmountHX"},
+					'->', 'print', 'close'
+                ]
+            });
+
+			//工作流面板
+            if (wfinfo != "" && !Ext.isEmpty(wfinfo)) {
+                wfinfojson = Ext.decode(wfinfo);
+                //otype = "edit";
+                workflowPanel = Ext.create('Ext.panel.Panel', {
+                    region: 'north',
+                    border: 'fit',
+                    items: [
+                        {
+                            xtype: 'ngWorkFlowPanel',
+                            toolbar: ngToolbar, //单据toolbar
+                            otype: otype, //单据otype
+                            bizType: "GHExpense", //注册的表单id（原商业对象）
+                            bizPhid: busid, //单据phid
+                            showToolBarItems: ['attachment'], //任务办理时可见toolbar按钮itemid数组
+                            workFlowInfo: wfinfojson,
+                            bizSaveAsync: true,
+                            bizSaveFn: function (callback) { //单据保存方法，方法需返回bool值，Ajax方法需使用同步模式
+                                save(callback);
+                            },
+                            listeners: {
+                                taskComplete: function (compId, wfParam) {
+                                    //在这里进行自定义组件任务处理，并把工作流参数传到服务端，并在服务端调用工作流api
+
+                                    debugger;
+                                }
+                            }
+                        }
+                    ]
+                });
+            }
+
+
+			//定义mainPanel_form
+			var mainPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				buskey: 'phid', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var mainPanel_formConfig = mainPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(mainPanel_formConfig, individualInfo.form['mainPanel']);
+			}
+			var mainPanel_form = Ext.create('Ext.ng.TableLayoutForm', mainPanel_formConfig);
+
+			//获取ExpensedtlGrid_grid自带model
+			var ExpensedtlGrid_modelFields = [
+  {
+    "name": "MstPhid",
+    "type": "string",
+    "mapping": "MstPhid"
+  },
+  {
+    "name": "FDtlcode",
+    "type": "string",
+    "mapping": "FDtlcode"
+  },
+  {
+    "name": "FName",
+    "type": "string",
+    "mapping": "FName"
+  },
+  {
+    "name": "FDtlName",
+    "type": "string",
+    "mapping": "FDtlName"
+  },
+  {
+    "name": "FSourceoffunds",
+    "type": "string",
+    "mapping": "FSourceoffunds"
+  },
+  {
+    "name": "FSourceoffunds_EXName",
+    "type": "string",
+    "mapping": "FSourceoffunds_EXName"
+  },
+  {
+    "name": "FBudgetaccounts",
+    "type": "string",
+    "mapping": "FBudgetaccounts"
+  },
+  {
+    "name": "FBudgetaccounts_EXName",
+    "type": "string",
+    "mapping": "FBudgetaccounts_EXName"
+  },
+  {
+    "name": "FExpenseschannel",
+    "type": "string",
+    "mapping": "FExpenseschannel"
+  },
+  {
+    "name": "FExpenseschannel_EXName",
+    "type": "string",
+    "mapping": "FExpenseschannel_EXName"
+  },
+  /*{
+    "name": "FQty",
+    "type": "float",
+    "mapping": "FQty"
+  },
+  {
+    "name": "FPrice",
+    "type": "float",
+    "mapping": "FPrice"
+  },
+  {
+    "name": "FQty2",
+    "type": "float",
+    "mapping": "FQty2"
+  },*/
+  {
+    "name": "FAmount",
+    "type": "float",
+    "mapping": "FAmount"
+  },
+  {
+    "name": "FReturnamount",
+    "type": "float",
+    "mapping": "FReturnamount"
+  },
+  {
+    "name": "FOtherinstructions",
+    "type": "string",
+    "mapping": "FOtherinstructions"
+  },
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+]
+			//调用$MergIndividualModelCol合并grid的Model
+			var ExpensedtlGrid_allFields = $MergIndividualModelCol(ExpensedtlGrid_modelFields, individualInfo, 'ExpensedtlGrid');
+			//定义模型
+			Ext.define('ExpensedtlGrid_model', {
+				extend: 'Ext.data.Model',
+				fields: ExpensedtlGrid_allFields
+			});
+			//定义ExpensedtlGrid_store
+			var ExpensedtlGrid_store = Ext.create('Ext.ng.JsonStore', {
+				model: 'ExpensedtlGrid_model',
+				pageSize: 20
+			});
+			//定义ExpensedtlGrid_cellEditing
+			var  ExpensedtlGrid_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+				clicksToEdit: 1    //单击编辑，单元格修改
+			});
+			//从自定义信息中获取到grid的配置
+			var ExpensedtlGrid_indvidualGrid = individualInfo.grid['ExpensedtlGrid'];
+			//动态内容的配置不能写在插件中
+			var ExpensedtlGrid_gridInitialConfig = {
+				stateful: true,
+				region: 'center',
+				stateId: 'e74655a9-5fca-4145-91ba-df396dc85f0e', //这里请使用guid，防止冲突
+				store: ExpensedtlGrid_store,
+				otype: otype, //操作类型,add||edit
+				plugins: [ExpensedtlGrid_cellEditing]
+			}
+			//动态配置与静态配置合并
+			var ExpensedtlGrid_gridConfig = Ext.apply(ExpensedtlGrid_gridInitialConfig, ExpensedtlGrid_indvidualGrid);
+			//定义ExpensedtlGrid_grid
+			var ExpensedtlGrid_grid = Ext.create('Ext.ng.GridPanel', ExpensedtlGrid_gridConfig);
+
+			var tabItems = {
+				TabPage1:{
+					id: 'TabPage1',
+					layout: 'border',
+					title: '项目支出预算明细',
+					items: [ExpensedtlGrid_grid]
+				}
+			}
+
+			var tabArr = [];
+			var indTabItems = individualInfo.tabPanel['DtlPanel'].items;
+			for (var i = 0; i < indTabItems.length; i++) {
+				var tab = indTabItems[i];
+				if (!tab.hidden) {
+					tabArr.push(Ext.apply(tabItems[tab.id], tab));
+				}
+			}
+
+			var tabPanel = Ext.create('Ext.tab.Panel', {
+				layout: 'border',
+				region: 'center',
+				deferredRender: false,
+				plain: true,
+				activeTab: 0,
+				minHeight: 400,
+				minWidth: 600,
+				defaults: { bodyStyle: 'padding:3px' },
+				items: tabArr
+			});
+
+			var myViewport = Ext.create('Ext.container.Viewport', {
+				id: "viewPort",
+				layout: 'border',
+				items:
+				[
+					ngToolbar,
+					{
+						xtype: 'panel',
+						layout: 'border',
+						region: 'center',
+						autoScroll: true,
+						bodyStyle: 'padding-right:20px',
+						//style: 'overflow-y:scroll,padding-right:20px',
+						items: [ mainPanel_form, tabPanel]
+					}
+				]
+			});
+
+
+            //按当前操作员过滤申报单位
+			mainPanel_form.queryById("FDeclarationunit").setOutFilter({ userid: $appinfo.userID });
+			//申报部门
+			mainPanel_form.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+
+				FBudgetDeptcode=mainPanel_form.queryById("FBudgetDept").getValue();
+                var unitCode = mainPanel_form.queryById("FDeclarationunit").getValue();
+
+                var filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+
+				mainPanel_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+
+
+            });
+
+			mainPanel_form.queryById("FBudgetDept").on("helpselected", function (str) {
+
+				if(FBudgetDeptcode!=str.code){
+					mainPanel_form.queryById("FProjcode").setValue("");
+					mainPanel_form.queryById("FProjname").setValue("");
+					mainPanel_form.queryById("FExpenseCategory").setValue("");
+					mainPanel_form.queryById("FServiceDept").setValue("");
+					mainPanel_form.queryById("FFundStandard").setValue("");
+					mainPanel_form.queryById("FProjAmount").setValue("");
+					mainPanel_form.queryById("FPlayamount").setValue("");
+					mainPanel_form.queryById("FSurplusamount").setValue("");
+					mainPanel_form.queryById("FReturnamount").setValue("");
+
+
+					mainPanel_form.queryById("Useamount").setValue("");
+					mainPanel_form.queryById("CWamount").setValue("");
+
+					ExpensedtlGrid_store.removeAll();
+					//新增一行
+					var cbbudgetdtldata = ExpensedtlGrid_grid.getSelectionModel();
+					ExpensedtlGrid_store.insert(0, cbbudgetdtldata);
+				}
+			});
+			
+			//预算部门
+			mainPanel_form.queryById("FDeclarationDept").on("beforetriggerclick", function (str) {
+
+				FDeclarationDeptcode=mainPanel_form.queryById("FDeclarationDept").getValue();
+                var unitCode = mainPanel_form.queryById("FDeclarationunit").getValue();
+
+                var filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+
+				mainPanel_form.queryById("FDeclarationDept").setClientSqlFilter(filter);
+            });
+			mainPanel_form.queryById("FDeclarationDept").on("helpselected", function (str) {
+
+				if(FDeclarationDeptcode!=str.code){
+					mainPanel_form.queryById("FProjcode").setValue("");
+					mainPanel_form.queryById("FProjname").setValue("");
+					mainPanel_form.queryById("FExpenseCategory").setValue("");
+					mainPanel_form.queryById("FServiceDept").setValue("");
+					mainPanel_form.queryById("FFundStandard").setValue("");
+					mainPanel_form.queryById("FProjAmount").setValue("");
+					mainPanel_form.queryById("FPlayamount").setValue("");
+					mainPanel_form.queryById("FSurplusamount").setValue("");
+					mainPanel_form.queryById("FReturnamount").setValue("");
+
+
+					mainPanel_form.queryById("Useamount").setValue("");
+					mainPanel_form.queryById("CWamount").setValue("");
+
+					ExpensedtlGrid_store.removeAll();
+					//新增一行
+					var cbbudgetdtldata = ExpensedtlGrid_grid.getSelectionModel();
+					ExpensedtlGrid_store.insert(0, cbbudgetdtldata);
+				}
+			});
+
+			//项目名称
+			mainPanel_form.queryById("FProjname").on("beforetriggerclick", function (str) {
+
+				var SBOrg = mainPanel_form.queryById("FDeclarationunit").getValue();
+				var SBDept = mainPanel_form.queryById("FBudgetDept").getValue();
+				var SBDate = mainPanel_form.queryById("FDateofdeclaration").getValue().getFullYear();
+				var SBFDeclarationDept = mainPanel_form.queryById("FDeclarationDept").getValue();
+				var filter;
+				if (SBDept && SBFDeclarationDept){
+					Ext.Ajax.request({
+						params: { 'Dept': SBDept },
+						url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetXMbySBDept',
+						async:false,
+						success: function (response) {
+							var data=(response.text).replace(/\"/g,"'").replace('[','(').replace(']',')');
+							filter="(YS3_BUDGETMST.F_DECLARATIONUNIT='" + SBOrg + "' and YS3_BUDGETMST.F_BUDGETDEPT = '"+SBFDeclarationDept+ "' and YS3_BUDGETMST.F_YEAR = '"
+							+SBDate+"' and YS3_BUDGETMST.F_PROJCODE in "+data+" and YS3_BUDGETMST.F_LIFECYCLE = 0 and YS3_BUDGETMST.F_APPROVESTATUS = '3' and YS3_BUDGETMST.F_MIDYEARCHANGE = '0')";
+							mainPanel_form.queryById("FProjname").setClientSqlFilter(filter);
+						}
+					})
+					
+					
+					
+				}else{
+					Ext.MessageBox.alert("提示", '请先选择预算部门！');
+					return false;
+				}
+			});
+			mainPanel_form.queryById("FProjname").on("helpselected", function (str) {
+				if(mainPanel_form.queryById("FProjcode").getValue()!=str.code){
+					ExpensedtlGrid_store.removeAll();
+					//新增一行
+					var cbbudgetdtldata = ExpensedtlGrid_grid.getSelectionModel();
+					ExpensedtlGrid_store.insert(0, cbbudgetdtldata);
+					mainPanel_form.queryById("FProjcode").setValue(str.code);
+					mainPanel_form.queryById("FProjname").setValue(str.name);
+					mainPanel_form.queryById("FSurplusamount").setValue(0.00);
+					MstPhid=str.data.phid;
+
+					Ext.Ajax.request({
+						params: { 'FProjCode': str.code },
+						url: C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstByFProjCode',
+						async:false,
+						success: function (response) {
+							var data=JSON.parse(response.text);
+							var FExpenseCategory=data.FExpenseCategory;
+
+							NCmoney=data.FBudgetAmount;
+							mainPanel_form.queryById("FExpenseCategory").setValue(data.FExpenseCategory);
+							mainPanel_form.queryById("FProjAmount").setValue(data.FBudgetAmount);
+							var codectl = [mainPanel_form.queryById('FExpenseCategory')];
+							BatchBindCombox(codectl);
+
+							// 是否显示天数、人数、单价
+							/*Ext.Ajax.request({
+								params: { "Dylx": '08', "DefStr1": mainPanel_form.queryById("FDeclarationunit").getValue() },
+								url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetCorrespondenceSettings2ListbyRelation',
+								async:false,
+								success: function (response) {
+									var resp = Ext.JSON.decode(response.responseText);
+									if (resp != null && resp != undefined) {
+										for (var i = 0; i < resp.Record.length; i++) {
+											var recordData = resp.Record[i];
+											if (recordData.Dydm == FExpenseCategory) {
+												if (recordData.DefStr2 == "0") {
+													ExpensedtlGrid_grid.getColumn('FQty').hide();
+													ExpensedtlGrid_grid.getColumn('FQty2').hide();
+													ExpensedtlGrid_grid.getColumn('FPrice').hide();
+													ExpensedtlGrid_grid.getColumn('FAmount').readOnly = false;
+
+												}
+												if (recordData.DefStr2 == "1") {
+													ExpensedtlGrid_grid.getColumn('FQty').show();
+													ExpensedtlGrid_grid.getColumn('FQty2').show();
+													ExpensedtlGrid_grid.getColumn('FPrice').show();
+													ExpensedtlGrid_grid.getColumn('FAmount').readOnly = true;
+
+												}
+											}
+										}
+									}
+									//debugger;
+								}
+							});*/
+
+							YskmList = [];
+							AmountList = [];
+							SYAmountList = [];
+							Ext.Ajax.request({
+								params: { "id": data.PhId, "code": str.code  },
+								url: C_ROOT + 'GYS/YS/ExpenseMst/RestOfAmount',
+								async: false,
+								success: function (response) {
+									var resp = Ext.JSON.decode(response.responseText);
+									YskmList = resp.YskmList;
+									SYAmountList = resp.AmountList;
+									/*for (var a = 0; a < resp.totalRows; a++) {
+										var index = YskmList.indexOf(resp.Record[a].FBudgetAccounts);
+										if (index < 0) {
+											YskmList.push(resp.Record[a].FBudgetAccounts);
+											AmountList.push(resp.Record[a].FBudgetAmount);
+											SYAmountList.push(resp.Record[a].FBudgetAmount);
+										} else {
+											AmountList[index] += resp.Record[a].FBudgetAmount;
+											SYAmountList[index] += resp.Record[a].FBudgetAmount;
+										}
+									}*/
+									//debugger;
+								}
+							});
+
+
+						}
+					});
+					//获取账务实际发生数
+                    var CWamount = 0;
+					Ext.Ajax.request({
+						params: { 'userID': $user.id,'code':str.code},
+						url: C_ROOT + 'GYS/YS/ExpenseMst/GetSJFSSbyCode',
+						async:false,
+						success: function (response) {
+							CWamount=response.text;
+							mainPanel_form.queryById("CWamount").setValue(CWamount);
+						}
+					});
+					//根据项目代码取预计支出金额的和
+					Ext.Ajax.request({
+						params: { 'FProjCode': str.code},
+						url: C_ROOT + 'GYS/YS/ExpenseMst/SumFSurplusamount',
+						async:false,
+						success: function (response) {
+							var SumFSurplusamount=response.text;
+							var ZCMoney=mainPanel_form.queryById("FSurplusamount").getValue();
+							var FPlayamount=NCmoney-SumFSurplusamount-ZCMoney;
+							
+							mainPanel_form.queryById("FPlayamount").setValue(FPlayamount-CWamount);
+							mainPanel_form.queryById("Useamount").setValue(mainPanel_form.queryById("FProjAmount").getValue()-FPlayamount);
+							/*Ext.Ajax.request({
+								params: { 'code': str.code},
+								url: C_ROOT + 'GYS/YS/ExpenseMst/GetHXsumByCode',
+								async:false,
+								success: function (response) {
+									var HXsum=response.text;
+									mainPanel_form.queryById("FPlayamount").setValue(FPlayamount-CWamount+parseFloat(HXsum));
+									mainPanel_form.queryById("Useamount").setValue(mainPanel_form.queryById("FProjAmount").getValue()-FPlayamount);
+								}
+							});*/
+						}
+					});
+					
+				}else{
+
+				}
+			})
+
+
+			//明细项目名称
+			ExpensedtlGrid_grid.getColumn('FDtlName').getEditor().on("beforetriggerclick", function (str) {
+				var filter;
+				if (MstPhid){
+					filter="(YS3_BUDGETDTL_BUDGETDTL.MST_PHID='" + MstPhid +"')";
+					ExpensedtlGrid_grid.getColumn('FDtlName').getEditor().setClientSqlFilter(filter);
+				}else{
+					Ext.MessageBox.alert("提示", '请先选择项目！');
+					return false;
+				}
+			});
+			ExpensedtlGrid_grid.getColumn('FDtlName').getEditor().on("helpselected", function (str) {
+				var data = ExpensedtlGrid_grid.getSelectionModel().getSelection();
+				data[0].set('FDtlName', str.data.f_name);
+				Ext.Ajax.request({
+                    params: { "id": str.data.phid },
+                    url: C_ROOT + 'GYS/YS/BudgetMst/FindDtlByPhid',
+					async:false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+						if(resp.Status=="success"){
+							data[0].set('FSourceoffunds_EXName', resp.Data.FSourceOfFunds_EXName);
+							data[0].set('FBudgetaccounts_EXName', resp.Data.FBudgetAccounts_EXName);
+							data[0].set('FExpenseschannel_EXName', resp.Data.FExpensesChannel_EXName);
+							data[0].set('FSourceoffunds', resp.Data.FSourceOfFunds);
+							data[0].set('FBudgetaccounts', resp.Data.FBudgetAccounts);
+							data[0].set('FExpenseschannel', resp.Data.FExpensesChannel);
+						}
+                    }
+                });
+
+
+
+
+			});
+
+			//资金来源
+			ExpensedtlGrid_grid.getColumn('FSourceoffunds_EXName').getEditor().on('helpselected', function (obj) {
+				var data = ExpensedtlGrid_grid.getSelectionModel().getSelection();
+                //data[0].set('FSourceoffunds', obj.code);
+                //data[0].set('FSourceoffunds_EXName', obj.name);
+				//判断资金来源是否是末级组织
+
+                Ext.Ajax.request({
+                    params: { "Code": obj.code },
+                    url: C_ROOT + 'GQT/QT/SourceOfFunds/IfLastStage',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+
+                        if (resp != null && resp != undefined) {
+                            if (resp.Data.length > 0) {
+                                data[0].set('FSourceoffunds', '');
+								data[0].set('FSourceoffunds_EXName', '');
+                                Ext.MessageBox.alert("提示", '请选择末级资金来源！');
+                            }else{
+								data[0].set('FSourceoffunds', obj.code);
+								data[0].set('FSourceoffunds_EXName', obj.name);
+							}
+                        }
+                    }
+
+                });
+			});
+			ExpensedtlGrid_grid.getColumn('FSourceoffunds_EXName').getEditor().on("beforetriggerclick", function (str) {
+                var FDeclarationUnit = mainPanel_form.queryById("FDeclarationunit").getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空！');
+                    return false;
+                }
+                var filter = "(Z_QTDYGX.DEF_STR1='" + FDeclarationUnit + "')";
+                ExpensedtlGrid_grid.getColumn('FSourceoffunds_EXName').getEditor().setClientSqlFilter(filter);
+
+            });
+
+			//预算科目
+			ExpensedtlGrid_grid.getColumn('FBudgetaccounts_EXName').getEditor().on('helpselected', function (obj) {
+				var data = ExpensedtlGrid_grid.getSelectionModel().getSelection();
+                //data[0].set('FBudgetaccounts', obj.code);
+                //data[0].set('FBudgetaccounts_EXName', obj.name);
+				Ext.Ajax.request({
+                    params: { "budgetAccountsCode": obj.code },
+                    url: C_ROOT + 'GQT/QT/BudgetAccounts/IfLastStage',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+
+                        if (resp != null && resp != undefined) {
+                            if (resp.Data.length > 0) {
+                                data[0].set('FBudgetaccounts', '');
+								data[0].set('FBudgetaccounts_EXName', '');
+                                Ext.MessageBox.alert("提示", '请选择末级预算科目！');
+                            }else{
+								data[0].set('FBudgetaccounts', obj.code);
+								data[0].set('FBudgetaccounts_EXName', obj.name);
+							}
+                        }
+                    }
+
+                });
+			});
+			ExpensedtlGrid_grid.getColumn('FBudgetaccounts_EXName').getEditor().on("beforetriggerclick", function (str) {
+
+                var FDeclarationUnit = mainPanel_form.queryById("FDeclarationunit").getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空！');
+                    return false;
+                }
+                var FProjname = mainPanel_form.queryById("FProjname").getValue();
+                if (!FProjname) {
+                    Ext.MessageBox.alert("提示", '请先选择项目！');
+                    return false;
+                }
+                var a = "(";
+                for (var i = 0; i < YskmList.length; i++) {
+                    a += "Z_QTYSKM.KMDM='" + YskmList[i] + "' or ";
+                }
+                a = a.substring(0, a.length - 4);
+                a += ")";
+                var filter = "(Z_QTDYGX.DEF_STR1='" + FDeclarationUnit + "' and Z_QTYSKM.KMLB='1' and" + a + ")";
+                ExpensedtlGrid_grid.getColumn('FBudgetaccounts_EXName').getEditor().setClientSqlFilter(filter);
+
+            });
+			//支出渠道
+			ExpensedtlGrid_grid.getColumn('FExpenseschannel_EXName').getEditor().on('helpselected', function (obj) {
+				var data = ExpensedtlGrid_grid.getSelectionModel().getSelection();
+                data[0].set('FExpenseschannel', obj.code);
+                data[0].set('FExpenseschannel_EXName', obj.name);
+			});
+
+			ExpensedtlGrid_grid.getColumn('FExpenseschannel_EXName').getEditor().on("beforetriggerclick", function (str) {
+                var FDeclarationUnit = mainPanel_form.queryById("FDeclarationunit").getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空！');
+                    return false;
+                }
+                ExpensedtlGrid_grid.getColumn('FExpenseschannel_EXName').getEditor().setOutFilter({ DWDM: FDeclarationUnit });
+
+            });
+
+			//预计支出金额不允许输入
+			/*ExpensedtlGrid_grid.on('beforeedit', function (editor, context) {
+				if(context.field=="FAmount"){
+					return false;
+				}
+			});*/
+			//预计支出金额显示格式
+			ExpensedtlGrid_grid.getColumn('FAmount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+			//预计返还金额显示格式
+			ExpensedtlGrid_grid.getColumn('FReturnamount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+
+			ExpensedtlGrid_grid.on('edit', function (editor, context) {
+				if(context.field=="FReturnamount"){
+					if(context.value>context.record.data.FAmount){
+
+						context.record.data.FReturnamount=context.originalValue;
+						Ext.MessageBox.alert("提示", '返回金额不得超出项目的支出金额！');
+						//return;
+					}else{
+						var FReturnamountChange=context.value-context.originalValue;
+						if(FReturnamountChange!=0){
+							var FReturnamount=mainPanel_form.queryById("FReturnamount").getValue();
+							FReturnamount+=parseFloat(FReturnamountChange);
+							mainPanel_form.queryById("FReturnamount").setValue(FReturnamount);
+							var FPlayamount=mainPanel_form.queryById("FPlayamount").getValue();
+							FPlayamount+=parseFloat(FReturnamountChange);
+							mainPanel_form.queryById("FPlayamount").setValue(FPlayamount);
+							mainPanel_form.queryById("Useamount").setValue(mainPanel_form.queryById("Useamount").getValue()-FReturnamountChange);
+						}
+					}
+				}
+
+				/*if(context.field=="FQty"||context.field=="FPrice"||context.field=="FQty2")
+				{
+					var Sum=0;
+					var FAmount=context.record.data.FAmount;
+					context.record.data.FAmount = context.record.data.FQty * context.record.data.FPrice * context.record.data.FQty2;
+					var changeMoney=context.record.data.FAmount-FAmount;
+					if(changeMoney!=0){
+					//for(var i=0;i<ExpensedtlGrid_store.getCount();i++)
+					//	{
+					//		Sum+=ExpensedtlGrid_store.getAt(i).get('FAmount');
+					//	}
+					//	mainPanel_form.queryById("FSurplusamount").setValue(Sum);
+						var FSurplusamount=mainPanel_form.queryById("FSurplusamount").getValue();
+						mainPanel_form.queryById("FSurplusamount").setValue(FSurplusamount+changeMoney);
+
+						var FPlayamount=mainPanel_form.queryById("FPlayamount").getValue();
+						mainPanel_form.queryById("FPlayamount").setValue(FPlayamount-changeMoney);
+						//Ext.Ajax.request({
+						//	params: { 'FProjCode': mainPanel_form.queryById("FProjname").getValue()},
+						//	url: C_ROOT + 'GYS/YS/ExpenseMst/SumFSurplusamount',
+						//	async:false,
+						//	success: function (response) {
+						//		var SumFSurplusamount=response.text;
+
+						//		var FPlayamount=NCmoney-SumFSurplusamount-Sum;
+						//		mainPanel_form.queryById("FPlayamount").setValue(FPlayamount);
+						//	}
+						//});
+
+
+					}
+				}*/
+
+				if(context.field=="FAmount"){
+                    var FBudgetaccounts = context.record.data.FBudgetaccounts;
+                    var FBudgetaccounts_EXName = context.record.data.FBudgetaccounts_EXName;
+                    if (FBudgetaccounts == "") {
+                        context.record.data.FAmount = context.originalValue;
+                        Ext.MessageBox.alert("提示", '请先选择预算科目！');
+                    } else {
+
+                        var changeMoney = context.value - context.originalValue;
+                        if (changeMoney != 0) {
+                            var yskmIndex = YskmList.indexOf(FBudgetaccounts);
+                            if (changeMoney <= SYAmountList[yskmIndex]) {
+                                SYAmountList[yskmIndex] -= changeMoney;
+                                var FSurplusamount = mainPanel_form.queryById("FSurplusamount").getValue();
+                                mainPanel_form.queryById("FSurplusamount").setValue(parseFloat(FSurplusamount) + parseFloat(changeMoney));
+
+                                var FPlayamount = mainPanel_form.queryById("FPlayamount").getValue();
+                                mainPanel_form.queryById("FPlayamount").setValue(FPlayamount - changeMoney);
+								mainPanel_form.queryById("Useamount").setValue(parseFloat(mainPanel_form.queryById("Useamount").getValue())+parseFloat(changeMoney));
+                            } else {
+                                context.record.data.FAmount = context.originalValue;
+                                Ext.MessageBox.alert("提示", FBudgetaccounts + FBudgetaccounts_EXName + "科目剩余" + SYAmountList[yskmIndex] + "元可用！");
+                            }
+
+
+                        }
+                    }
+				}
+
+				if (context.field == "FOtherinstructions" && context.record.data.FOtherinstructions.length > 200) {
+
+                    Ext.MessageBox.alert("提示", '测算过程及其他需要说明的事项长度不能超过200字！');
+                    context.record.data.FOtherInstructions = context.originalValue;
+                }
+
+				if (context.field == "FName" && context.record.data.FName.length > 250) {
+
+                    Ext.MessageBox.alert("提示", '明细费用名称长度不能超过250字！');
+                    context.record.data.FOtherInstructions = context.originalValue;
+                }
+
+				this.getView().refresh(true);
+			})
+
+			
+			
+			//当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'expensemst' },
+                    url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstInfo',
+					async:false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mainPanel_form.getForm();
+                            mstformobj.setValues(resp.Data);
+
+							//mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstformobj.fireEvent('dataready', resp.Data);
+
+							//代码转名称
+                            var codectl = [mainPanel_form.queryById('FDeclarationunit'),mainPanel_form.queryById('FExpenseCategory'), mainPanel_form.queryById('FBudgetDept'),mainPanel_form.queryById('FDeclarationDept')];
+                            BatchBindCombox(codectl);
+
+							beforeSum=mainPanel_form.queryById("FSurplusamount").getValue();
+							if(beforeSum==""){
+								beforeSum=0;
+							}
+							beforeFReturnamount=mainPanel_form.queryById("FReturnamount").getValue();
+							if(beforeFReturnamount==""){
+								beforeFReturnamount=0;
+							}
+
+							//额度返还的新增或修改或查看
+							if(Ifreturn=='1'|| mainPanel_form.queryById("FIfpurchase").getValue()=='2'){
+
+							}else{
+								mainPanel_form.queryById("FReturnamount").hide();
+								ExpensedtlGrid_grid.getColumn('FReturnamount').hide();
+								ngToolbar.get('returnAll').hide();
+							}
+
+							// 是否显示天数、人数、单价
+							/*Ext.Ajax.request({
+								params: { "Dylx": '08', "DefStr1": mainPanel_form.queryById("FDeclarationunit").getValue() },
+								url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetCorrespondenceSettings2ListbyRelation',
+								async:false,
+								success: function (response) {
+									var resp = Ext.JSON.decode(response.responseText);
+									if (resp != null && resp != undefined) {
+										for (var i = 0; i < resp.Record.length; i++) {
+											var recordData = resp.Record[i];
+											if (recordData.Dydm == mainPanel_form.queryById("FExpenseCategory").getValue()) {
+												if (recordData.DefStr2 == "0") {
+													ExpensedtlGrid_grid.getColumn('FQty').hide();
+													ExpensedtlGrid_grid.getColumn('FQty2').hide();
+													ExpensedtlGrid_grid.getColumn('FPrice').hide();
+													ExpensedtlGrid_grid.getColumn('FAmount').readOnly = false;
+
+												}
+												if (recordData.DefStr2 == "1") {
+													ExpensedtlGrid_grid.getColumn('FQty').show();
+													ExpensedtlGrid_grid.getColumn('FQty2').show();
+													ExpensedtlGrid_grid.getColumn('FPrice').show();
+													ExpensedtlGrid_grid.getColumn('FAmount').readOnly = true;
+
+												}
+											}
+										}
+									}
+									//debugger;
+								}
+							});*/
+
+							//获取财务实际发生数
+							Ext.Ajax.request({
+								params: { 'userID': $user.id,'code':mainPanel_form.queryById("FProjcode").getValue()},
+								url: C_ROOT + 'GYS/YS/ExpenseMst/GetSJFSSbyCode',
+								async:false,
+								success: function (response) {
+									var CWamount=response.text;
+									mainPanel_form.queryById("CWamount").setValue(CWamount);
+									//根据项目代码取预计支出金额的和
+									Ext.Ajax.request({
+										params: { 'FProjCode': mainPanel_form.queryById("FProjcode").getValue()},
+										url: C_ROOT + 'GYS/YS/ExpenseMst/SumFSurplusamount',
+										async:false,
+										success: function (response) {
+											var SumFSurplusamount=response.text;
+											//设置已编报数
+											mainPanel_form.queryById("Useamount").setValue(SumFSurplusamount);
+											
+											mainPanel_form.queryById("FPlayamount").setValue(mainPanel_form.queryById("FProjAmount").getValue()-SumFSurplusamount-CWamount);
+											/*Ext.Ajax.request({
+												params: { 'code': mainPanel_form.queryById("FProjcode").getValue()},
+												url: C_ROOT + 'GYS/YS/ExpenseMst/GetHXsumByCode',
+												async:false,
+												success: function (response) {
+													var HXsum=response.text;
+													mainPanel_form.queryById("FPlayamount").setValue(mainPanel_form.queryById("FProjAmount").getValue()-SumFSurplusamount-CWamount+parseFloat(HXsum));
+												}
+											});*/
+										}
+									});
+								}
+							});
+							
+
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    }
+                });
+
+                //ExpensedtlGrid明细
+				Ext.apply(ExpensedtlGrid_store.proxy.url = C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstInfo');
+                Ext.apply(ExpensedtlGrid_store.proxy.extraParams, { 'id': busid, 'tabtype': 'expensedtl' });
+                ExpensedtlGrid_store.cachePageData = false;
+                ExpensedtlGrid_store.load();
+                ExpensedtlGrid_store.cachePageData = true;
+
+
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+				//if (busno != undefined && busno != "") {
+                //    Ext.getCmp("No").userSetReadOnly(true);
+                //    Ext.getCmp("No").setValue(busno);
+                //}
+				ngToolbar.get('returnAll').hide();
+
+				mainPanel_form.queryById("FDeclarer").setValue($appinfo.username);//申报人
+				mainPanel_form.queryById("FApprovestatus").setValue('1');//待上报
+				mainPanel_form.queryById("FDateofdeclaration").setValue(new Date());
+				mainPanel_form.queryById("FReturnamount").hide();
+				ExpensedtlGrid_grid.getColumn('FReturnamount').hide();
+
+				var orgCode = "";
+                var dept = "";
+				Ext.Ajax.request({
+                    params: { 'userID': $user.id },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var orgDept = resp.Msg;
+                            var orgDeptArray = orgDept.split(",");
+                            orgCode = orgDeptArray[0];
+                            dept = orgDeptArray[1];
+                        }
+                    }
+                });
+                mainPanel_form.queryById("FDeclarationunit").setValue(orgCode);
+                mainPanel_form.queryById("FBudgetDept").setValue(dept);
+				var codectl = [mainPanel_form.queryById('FDeclarationunit'), mainPanel_form.queryById('FBudgetDept')];
+                BatchBindCombox(codectl);
+				//新增一行
+				var cbbudgetdtldata = ExpensedtlGrid_grid.getSelectionModel();
+				ExpensedtlGrid_store.insert(ExpensedtlGrid_store.getCount(), cbbudgetdtldata);
+            }
+
+			if (workflowPanel) {
+                //SyncWorkFlowUI(wfinfojson);
+
+                //插入审批流控件
+                myViewport.insert(1, workflowPanel);
+
+
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT|| workflowPanel) {
+                mainPanel_form.queryById("FProjname").userSetReadOnly(true);
+				mainPanel_form.queryById("FDateofdeclaration").userSetReadOnly(true);
+				mainPanel_form.queryById("FBudgetDept").userSetReadOnly(true);
+				mainPanel_form.queryById("FDeclarationDept").userSetReadOnly(true);
+
+				FBudgetDeptcode=mainPanel_form.queryById("FBudgetDept").getValue();
+				FDeclarationDept=mainPanel_form.queryById("FDeclarationDept").getValue();
+                Ext.Ajax.request({
+                    params: { 'FProjCode': mainPanel_form.queryById("FProjcode").getValue() },
+                    url: C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstByFProjCode',
+                    async: false,
+                    success: function (response) {
+                        var data = JSON.parse(response.text);
+						MstPhid=data.PhId;
+                        YskmList = [];
+                        AmountList = [];
+                        SYAmountList = [];
+                        Ext.Ajax.request({
+                            params: { "id": data.PhId, "code": mainPanel_form.queryById("FProjcode").getValue() },
+                            url: C_ROOT + 'GYS/YS/ExpenseMst/RestOfAmount',
+                            async: false,
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                YskmList = resp.YskmList;
+                                SYAmountList = resp.AmountList;
+
+                            }
+                        });
+
+
+                    }
+                });
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+                ngToolbar.get('saveAndnew').hide();
+				ngToolbar.get('addrow').disable();
+				ngToolbar.get('deleterow').disable();
+				ngToolbar.get('returnAll').disable();
+            }else{
+                ngToolbar.get('AmountHX').disable();
+			}
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+				ngToolbar.get('save').disable();
+                save();
+                ngToolbar.get('save').setDisabled(false);
+            });
+
+			ngToolbar.get('saveAndnew').on('click', function () {
+				ngToolbar.get('save').disable();
+                var res = save('notclose');
+                ngToolbar.get('save').setDisabled(false);
+			});
+
+			ngToolbar.get('addrow').on('click', function () {
+				var cbbudgetdtldata = ExpensedtlGrid_grid.getSelectionModel();
+				ExpensedtlGrid_store.insert(ExpensedtlGrid_store.getCount(), cbbudgetdtldata);
+            });
+
+			ngToolbar.get('deleterow').on('click', function () {
+				var selection = ExpensedtlGrid_grid.getSelectionModel().getSelection();
+				if (selection) {
+					var Money=selection[0].data.FAmount;
+					var FPlayamount=mainPanel_form.queryById("FPlayamount").getValue();
+					var NowFPlayamount=parseFloat(FPlayamount)+parseFloat(Money);
+					mainPanel_form.queryById("FPlayamount").setValue(NowFPlayamount);
+					mainPanel_form.queryById("Useamount").setValue(mainPanel_form.queryById("Useamount").getValue()-Money);
+					var FSurplusamount=mainPanel_form.queryById("FSurplusamount").getValue();
+					var NowFSurplusamount=FSurplusamount-Money;
+					mainPanel_form.queryById("FSurplusamount").setValue(NowFSurplusamount);
+					ExpensedtlGrid_store.remove(selection);
+				}
+            });
+
+			ngToolbar.get('returnAll').on('click', function () {
+				for(var i=0;i<ExpensedtlGrid_store.getCount();i++){
+					ExpensedtlGrid_store.getAt(i).set('FReturnamount', ExpensedtlGrid_store.getAt(i).get('FAmount'));
+				}
+				mainPanel_form.queryById("FReturnamount").setValue(mainPanel_form.queryById("FSurplusamount").getValue());
+			});
+			
+			
+			
+			
+			//额度核销
+            ngToolbar.get('AmountHX').on('click', function () {
+				var deletedata=[];
+				var adddata = [];
+                var updatedata = [];
+				var storeHX = Ext.create('Ext.ng.JsonStore', {
+					autoLoad: false,
+					fields: [{
+
+				"name": "PhId",
+				"type": "string",
+				"mapping": "PhId"
+				},
+				{
+				"name": "FHxdateTime",
+				"type": "datetime",
+				"mapping": "FHxdateTime"
+				},
+				{
+				"name": "FAmount",
+				"type": "float",
+				"mapping": "FAmount"
+				},
+				{
+				"name": "FContentCode",
+				"type": "string",
+				"mapping": "FContentCode"
+				},
+				{
+				"name": "FRemark",
+				"type": "string",
+				"mapping": "FRemark"
+					}],
+					url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstInfo?id='+busid+'&tabtype=expensehx'
+				});
+				
+				var HXToolbar = Ext.create('Ext.ng.Toolbar', {
+					region: 'north',
+					ngbuttons: [
+						'addrow','deleterow','save', 
+						{ itemId: "OK1", text: "执行完毕确认", width: this.itemWidth, iconCls: "icon-Confirm" },
+						{ itemId: "OK2", text: "确认撤销", width: this.itemWidth, iconCls: "icon-Confirm" },
+						'->',
+						{ itemId: "close1", text: "关闭", width: this.itemWidth, iconCls: "icon-Close" }
+					]
+				});
+				var gridHX = Ext.create('Ext.ng.GridPanel', {
+					columnWidth: .5,
+					height:394,
+					//height: 390,
+					store: storeHX,
+					autoScroll: true,
+					columnLines: true,
+					border: false,
+					//selModel: { mode: "SIMPLE" },
+					columns: [{
+						header: '主键',
+						flex: 1,
+						sortable: false,
+						menuDisabled: true,
+						draggable: false,
+						dataIndex: 'PhId',
+						hidden:true
+					}, {
+						header: '行号',
+						xtype:'rownumberer',
+						width:50
+					}, {
+						header: '核销日期',
+						//flex: 1,
+						sortable: false,
+						menuDisabled: true,
+						draggable: false,
+						dataIndex: 'FHxdateTime',
+						format: "Y-m-d",
+						editor: {
+							xtype: "ngDate"
+						},
+						width:150
+					}, {
+						header: '核销金额',
+						//flex: 1,
+						sortable: false,
+						menuDisabled: true,
+						draggable: false,
+						dataIndex: 'FAmount',
+                        align: 'right',
+						editor: {
+							xtype: "ngNumber"
+						},
+						width:160,
+						mustInput: true
+					}, {
+						header: '关联业务单据号（请核对审批表）',
+						//flex: 1,
+						sortable: false,
+						menuDisabled: true,
+						draggable: false,
+						dataIndex: 'FContentCode',
+						editor: {
+							xtype: "textfield"
+						},
+						width:310
+					}, {
+						header: '备注及说明事项',
+						//flex: 1,
+						sortable: false,
+						menuDisabled: true,
+						draggable: false,
+						dataIndex: 'FRemark',
+						editor: {
+							xtype: "textfield"
+						},
+						width:400
+					}],
+					listeners: {
+						
+					},
+					viewConfig: {
+						style: {
+							overflowX: 'hidden !important'
+						}
+					},
+					plugins: [
+						Ext.create('Ext.grid.plugin.CellEditing', {
+							clicksToEdit: 1,    //单击编辑，单元格修改
+							autoEncode: false  //不解析成html
+						})
+					]
+				});
+
+				var HXwin = Ext.create('Ext.window.Window', {
+					title: '额度核销',
+					height: 500,
+					width: 800,
+					modal: true,
+					//closable:true,
+					//closeAction:'hide',
+					items: [
+						HXToolbar,
+						gridHX
+					],
+					buttons: [
+						{
+							xtype: "button",
+							text: "确认",
+							handler: function () {
+								HXwin.close();
+							}
+						},
+						{
+							xtype: "button",
+							text: "取消",
+							handler: function () {
+								HXwin.close();
+							}
+						}
+					]
+
+				});
+				storeHX.load();
+				HXwin.show();
+				
+				if (AmountHX != 'true') {
+					HXToolbar.get('addrow').disable();
+					HXToolbar.get('deleterow').disable();
+					HXToolbar.get('save').disable();
+					HXToolbar.get('OK1').disable();
+					HXToolbar.get('OK2').disable();
+				}
+				
+				if(mainPanel_form.queryById("FIfKeyEvaluation").getValue()=='0'){
+					HXToolbar.get('OK2').hide();
+				}else{
+					HXToolbar.get('OK1').hide();
+					HXToolbar.get('addrow').disable();
+					HXToolbar.get('deleterow').disable();
+					HXToolbar.get('save').disable();
+				}
+				//增行
+				HXToolbar.get('addrow').on('click', function () {
+					var adddata = gridHX.getSelectionModel();
+					storeHX.insert(storeHX.getCount(), adddata);
+					storeHX.getAt(storeHX.getCount()-1).set('FHxdateTime', new Date());
+					storeHX.getAt(storeHX.getCount()-1).set('FContentCode', mainPanel_form.queryById("FPerformevaltype").getValue());
+				});
+				//删行
+				HXToolbar.get('deleterow').on('click', function () {
+					var selection = gridHX.getSelectionModel().getSelection();
+					if (selection) {
+						var phid = selection[0].data.PhId;
+						if (!phid || phid.length == 0) {
+
+						} else {
+							deletedata.push(selection[0].data.PhId);
+						}
+						storeHX.remove(selection);
+					}
+				});
+				//保存
+				HXToolbar.get('save').on('click', function () {
+					var sum=0;
+					for(var i=0;i<storeHX.getCount();i++){
+						sum+=parseFloat(storeHX.getAt(i).get('FAmount'));
+					}
+					if(sum>mainPanel_form.queryById("FSurplusamount").getValue()){
+						Ext.MessageBox.alert('提示', "核销金额不能超过该单据预计支出金额！");
+						return null;
+					}
+					
+					for (var i = 0; i < storeHX.getModifiedRecords().length; i++) {
+						var phid = storeHX.getModifiedRecords()[i].data.PhId;
+						var FHxdateTime = storeHX.getModifiedRecords()[i].data.FHxdateTime;
+						var FAmount = storeHX.getModifiedRecords()[i].data.FAmount;
+						var FContentCode = storeHX.getModifiedRecords()[i].data.FContentCode;
+						var FRemark = storeHX.getModifiedRecords()[i].data.FRemark;
+						if (!phid || phid.length == 0) {
+							adddata.push({ 'MstPhid':busid,'FHxdateTime': FHxdateTime, 'FAmount': FAmount, 'FContentCode': FContentCode, 'FRemark': FRemark });
+						} else {
+							updatedata.push({ 'PhId': phid,'FHxdateTime': FHxdateTime, 'FAmount': FAmount, 'FContentCode': FContentCode, 'FRemark': FRemark });
+						}
+						
+					}
+					Ext.Ajax.request({
+						params: { "adddata": adddata, "updatedata": updatedata,"deletedata":deletedata },
+						url: C_ROOT + 'GYS/YS/ExpenseMst/SaveHX',
+						async: false,
+						success: function (response) {
+							var resp = Ext.JSON.decode(response.responseText);
+							if (resp.Status === "success") {
+								Ext.MessageBox.alert('提示', '保存成功！');
+								storeHX.load();
+								deletedata = [];
+								adddata = [];
+								updatedata = [];
+							} else {
+								Ext.MessageBox.alert('提示', '保存失败！');
+							}
+						}
+					});
+				});
+				//执行完毕确认
+				HXToolbar.get('OK1').on('click', function () {
+					Ext.MessageBox.confirm('提示', '是否确认该条单据已执行完毕？', callBack);
+					function callBack(callBackid) {
+						if (callBackid.toString() == "yes"){
+							var sum = 0;//额度核销总金额
+                            for (var i = 0; i < storeHX.getCount(); i++) {
+                                sum += parseFloat(storeHX.getAt(i).get('FAmount'));
+                            }
+                            if (sum > mainPanel_form.queryById("FSurplusamount").getValue()) {
+                                Ext.MessageBox.alert('提示', "核销金额不能超过该单据预计支出金额！");
+                                return null;
+                            }
+							var AllReturn=mainPanel_form.queryById("FSurplusamount").getValue()-sum;//额度核销返还总金额
+							var storeReturn = Ext.create('Ext.ng.JsonStore', {
+								autoLoad: false,
+								fields: [{
+
+							"name": "PhId",
+							"type": "string",
+							"mapping": "PhId"
+							},
+							{
+							"name": "FBudgetaccounts",
+							"type": "string",
+							"mapping": "FBudgetaccounts"
+							},
+							{
+							"name": "FBudgetaccounts_EXName",
+							"type": "string",
+							"mapping": "FBudgetaccounts_EXName"
+							},
+							{
+							"name": "FAmount",
+							"type": "float",
+							"mapping": "FAmount"
+							},
+							{
+							"name": "FReturnamount",
+							"type": "float",
+							"mapping": "FReturnamount"
+								}],
+								url: C_ROOT + 'GYS/YS/ExpenseMst/GetExpenseMstInfo?id='+busid+'&tabtype=expensedtl'
+							});
+							
+							var gridReturn = Ext.create('Ext.ng.GridPanel', {
+								columnWidth: .5,
+								height:394,
+								//height: 390,
+								store: storeReturn,//ExpensedtlGrid_store
+								autoScroll: true,
+								columnLines: true,
+								border: false,
+								//selModel: { mode: "SIMPLE" },
+								columns: [{
+									header: '主键',
+									flex: 1,
+									sortable: false,
+									menuDisabled: true,
+									draggable: false,
+									dataIndex: 'PhId',
+									hidden:true
+								}, {
+									header: '行号',
+									xtype:'rownumberer',
+									width:50
+								}, {
+									header: '预算科目',
+									flex: 1,
+									sortable: false,
+									menuDisabled: true,
+									draggable: false,
+									dataIndex: 'FBudgetaccounts_EXName'
+								}, {
+									header: '预计支出金额',
+									flex: 1,
+									sortable: false,
+									menuDisabled: true,
+									draggable: false,
+									dataIndex: 'FAmount',
+									align: 'right'
+								}, {
+									header: '返还金额',
+									flex: 1,
+									sortable: false,
+									menuDisabled: true,
+									draggable: false,
+									dataIndex: 'FReturnamount',
+									align: 'right',
+									editor: {
+										xtype: "ngNumber"
+									},
+									mustInput: true
+								}],
+								listeners: {
+									
+								},
+								viewConfig: {
+									style: {
+										overflowX: 'hidden !important'
+									}
+								},
+								plugins: [
+									Ext.create('Ext.grid.plugin.CellEditing', {
+										clicksToEdit: 1,    //单击编辑，单元格修改
+										autoEncode: false  //不解析成html
+									})
+								]
+							});
+							var Returnwin = Ext.create('Ext.window.Window', {
+								title: '返还额度分配',
+								height: 500,
+								width: 600,
+								modal: true,
+								//closable:true,
+								//closeAction:'hide',
+								items: [
+									{
+										xtype: "label",
+										text: "本次预计返还总额度："+Ext.util.Format.usMoney(AllReturn).replace('$', ''),
+										
+									},
+									gridReturn
+								],
+								buttons: [
+									{
+										xtype: "button",
+										text: "确认",
+										handler: function () {
+											var sumReturn=0
+											for(var i=0;i<storeReturn.getCount();i++){
+												if(storeReturn.getAt(i).get('FReturnamount')>storeReturn.getAt(i).get('FAmount')){
+													Ext.MessageBox.alert('提示', "返还金额不得超过预计支出金额！");
+													return;
+												}
+												sumReturn+=parseFloat(storeReturn.getAt(i).get('FReturnamount'));
+											}
+											if(sumReturn==AllReturn)
+											{
+												for (var i = 0; i < storeHX.getModifiedRecords().length; i++) {
+													var phid = storeHX.getModifiedRecords()[i].data.PhId;
+													var FHxdateTime = storeHX.getModifiedRecords()[i].data.FHxdateTime;
+													var FAmount = storeHX.getModifiedRecords()[i].data.FAmount;
+													var FContentCode = storeHX.getModifiedRecords()[i].data.FContentCode;
+													var FRemark = storeHX.getModifiedRecords()[i].data.FRemark;
+													if (!phid || phid.length == 0) {
+														adddata.push({ 'MstPhid': busid, 'FHxdateTime': FHxdateTime, 'FAmount': FAmount, 'FContentCode': FContentCode, 'FRemark': FRemark });
+													} else {
+														updatedata.push({ 'PhId': phid, 'FHxdateTime': FHxdateTime, 'FAmount': FAmount, 'FContentCode': FContentCode, 'FRemark': FRemark });
+													}
+
+												}
+												Ext.Ajax.request({
+													params: { "adddata": adddata, "updatedata": updatedata, "deletedata": deletedata },
+													url: C_ROOT + 'GYS/YS/ExpenseMst/SaveHX',
+													async: false,
+													success: function (response) {
+														var resp = Ext.JSON.decode(response.responseText);
+														if (resp.Status === "success") {
+															storeHX.load();
+															deletedata = [];
+															adddata = [];
+															updatedata = [];
+
+															var FPlayamount = parseFloat(mainPanel_form.queryById("FPlayamount").getValue())+AllReturn;
+															var MstFReturnamount=parseFloat(mainPanel_form.queryById("FReturnamount").getValue())+AllReturn;
+															var dtldata=[];
+															for(var i=0;i<storeReturn.getModifiedRecords().length;i++){
+																var phid = storeReturn.getModifiedRecords()[i].data.PhId;
+																var FReturnamount = storeReturn.getModifiedRecords()[i].data.FReturnamount;
+																dtldata.push({ 'PhId': phid, 'FReturnamount': FReturnamount });
+															}
+
+															Ext.Ajax.request({
+																params: { "id": busid, "FPlayamount": FPlayamount,"FReturnamount": MstFReturnamount,"dtldata":dtldata },
+																url: C_ROOT + 'GYS/YS/ExpenseMst/SaveHXgo',
+																async: false,
+																success: function (response) {
+																	var resp = Ext.JSON.decode(response.responseText);
+																	if (resp.Status === "success") {
+																		Ext.MessageBox.alert('提示', '执行完毕确认成功！');
+																		Returnwin.close();
+																		mainPanel_form.queryById("FPlayamount").setValue(FPlayamount);
+																		mainPanel_form.queryById("FReturnamount").setValue(MstFReturnamount);
+																		mainPanel_form.queryById("Useamount").setValue(mainPanel_form.queryById("Useamount").getValue()-AllReturn);
+																		HXToolbar.get('OK1').hide();
+																		HXToolbar.get('OK2').show();
+																		HXToolbar.get('addrow').disable();
+																		HXToolbar.get('deleterow').disable();
+																		HXToolbar.get('save').disable();
+																		mainPanel_form.queryById("FIfKeyEvaluation").setValue('1');
+																	} else {
+																		Ext.MessageBox.alert('提示', '执行完毕确认失败！');
+																	}
+																}
+															});
+
+														} else {
+															Ext.MessageBox.alert('提示', '保存失败！');
+														}
+													}
+												});
+											}
+											else{
+												Ext.MessageBox.alert('提示', "请正确地分配完所有的返还金额！");
+											}
+											
+											//Returnwin.close();
+										}
+									},
+									{
+										xtype: "button",
+										text: "取消",
+										handler: function () {
+											Returnwin.close();
+										}
+									}
+								]
+
+							});
+							storeReturn.load();
+							Returnwin.show();
+							
+							//预计支出金额格式
+							gridReturn.getColumn('FAmount').renderer = function (val) {
+								if (val) {
+									var moneyRend = Ext.util.Format.usMoney;
+									var newvalue = moneyRend(val);
+									return newvalue.replace('$', '');
+								} else {
+									return '';
+								}
+							};
+							
+							//返回金额格式
+							gridReturn.getColumn('FReturnamount').renderer = function (val) {
+								if (val) {
+									var moneyRend = Ext.util.Format.usMoney;
+									var newvalue = moneyRend(val);
+									return newvalue.replace('$', '');
+								} else {
+									return '';
+								}
+							};
+							
+							/*var FPlayamount=parseFloat(mainPanel_form.queryById("FPlayamount").getValue());
+							for(var i=0;i<storeHX.getCount();i++){
+								FPlayamount+=parseFloat(storeHX.getAt(i).get('FAmount'));
+							}
+							
+							Ext.Ajax.request({
+								params: { "id": busid, "FPlayamount": FPlayamount},
+								url: C_ROOT + 'GYS/YS/ExpenseMst/SaveHXgo',
+								async: false,
+								success: function (response) {
+									var resp = Ext.JSON.decode(response.responseText);
+									if (resp.Status === "success") {
+										Ext.MessageBox.alert('提示', '执行完毕确认成功');
+										mainPanel_form.queryById("FPlayamount").setValue(FPlayamount);
+										HXToolbar.get('OK1').hide();
+										HXToolbar.get('OK2').show();
+										HXToolbar.get('addrow').disable();
+										HXToolbar.get('deleterow').disable();
+										HXToolbar.get('save').disable();
+									} else {
+										Ext.MessageBox.alert('提示', '执行完毕确认失败');
+									}
+								}
+							});*/
+						}
+					}
+				});
+				//确认撤销
+				HXToolbar.get('OK2').on('click', function () {
+					Ext.MessageBox.confirm('提示', '是否确认该条单据进行撤销？', callBack);
+					function callBack(callBackid) {
+						if (callBackid.toString() == "yes"){
+							var sum = 0;//额度核销总金额
+                            for (var i = 0; i < storeHX.getCount(); i++) {
+                                sum += parseFloat(storeHX.getAt(i).get('FAmount'));
+                            }
+							var AllReturn=mainPanel_form.queryById("FSurplusamount").getValue()-sum;//额度核销返还总金额
+							var FPlayamount=parseFloat(mainPanel_form.queryById("FPlayamount").getValue())-AllReturn;
+							Ext.Ajax.request({
+								params: { "id": busid, "FPlayamount": FPlayamount},
+								url: C_ROOT + 'GYS/YS/ExpenseMst/SaveHXreturn',
+								async: false,
+								success: function (response) {
+									var resp = Ext.JSON.decode(response.responseText);
+									if (resp.Status === "success") {
+                                        Ext.MessageBox.alert('提示', '撤销成功！');
+										mainPanel_form.queryById("FPlayamount").setValue(FPlayamount);
+                                        mainPanel_form.queryById("Useamount").setValue(mainPanel_form.queryById("Useamount").getValue() + AllReturn);
+                                        mainPanel_form.queryById("FReturnamount").setValue(mainPanel_form.queryById("FReturnamount").getValue() - AllReturn);
+										HXToolbar.get('OK2').hide();
+										HXToolbar.get('OK1').show();
+										HXToolbar.get('addrow').setDisabled(false);
+										HXToolbar.get('deleterow').setDisabled(false);
+										HXToolbar.get('save').setDisabled(false);
+										mainPanel_form.queryById("FIfKeyEvaluation").setValue('0');
+									} else {
+                                        Ext.MessageBox.alert('提示', '撤销失败！');
+									}
+								}
+							});
+							
+						}
+					}
+				});
+				HXToolbar.get('close1').on('click', function () {
+					HXwin.close();
+				});
+				
+				//核销日期时间格式
+                gridHX.getColumn('FHxdateTime').renderer = function (val) {
+                    if (Ext.isString(val) && !Ext.isEmpty(val)) {
+                        var str = val.replace(/-/g, '/');
+                        val = new Date(str);
+                    }
+                    if (val) {
+                        //val = new Date(Date.parse(val.replace(/-/g, "/")));////yyyy-mm-dd强转datetime
+						var str = Ext.util.Format.date(val, 'Y-m-d');
+						return str;
+					} else {
+						return '';
+					}
+				};
+				//核销金额格式
+				gridHX.getColumn('FAmount').renderer = function (val) {
+					if (val) {
+						var moneyRend = Ext.util.Format.usMoney;
+						var newvalue = moneyRend(val);
+						return newvalue.replace('$', '');
+					} else {
+						return '';
+					}
+				};
+			});
+            //附件
+            ngToolbar.get('attachment').on('click', function () {
+				OpenAttachment();
+            });
+
+
+            var hisStore = Ext.create('Ext.data.Store', {
+                fields: ['taskid', 'task_des', 'username', 'task_des', 'actionname', 'msg', 'end_time', 'duration', 'signature', 'att_count'],
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    //async: false,
+                    //params: { "piid": mainPanel_form.queryById("PhId").getValue()},
+                    url: C_ROOT + 'WorkFlow3/WorkFlow/GetWorkFlowHis',
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            });
+            var hisGrid = Ext.create("Ext.ng.GridPanel", {
+                region: 'center',
+                store: hisStore,
+                stateId: 'grid_statid_ProcessTraceView',
+                columns: $WorkFlow.getHisGridColumns()
+                //,
+                //listeners: {
+                //    cellclick: function (view, cell, cellIndex, record, row, rowIndex, e) {
+                //        if (cellIndex == 7 && e.target.tagName == 'A') {
+                //            $WorkFlow.showTaskAttachment(record);
+                //        }
+                //    }
+                //}
+            });
+
+            if (otype == $Otype.VIEW || otype == $Otype.EDIT) {
+                var piid = "";
+                Ext.Ajax.request({
+                    params: { 'approveCode': "GHExpense", 'userId': mainPanel_form.queryById("PhId").getValue() },
+                    url: C_ROOT + 'GXM/XM/ProjectMst/FindUnvalidPiid',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp1 = Ext.JSON.decode(response.responseText);
+                        if (resp1.Status === "success") {
+                            piid = resp1.Msg;
+
+                        }
+
+                    }
+                });
+               
+                Ext.apply(hisStore.proxy.extraParams, { "piid": piid });
+                hisStore.load();
+            }
+
+            
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+
+                var hisStoreCount = hisStore.getCount();
+                var actionname = "";
+                var task_des = "";
+                var username = "";
+                for (var i = hisStoreCount - 1; i >= 0; i--) {
+                    if (hisGrid.getStore().data.items[i].data.msg.indexOf("【回退】") >= 0) {
+                        // i--;
+                        // hisStoreCount--;
+                        hisStore.removeAt(i);
+                        continue;
+                    }
+                    actionname = hisGrid.getStore().data.items[i].data.actionname;
+                    task_des = hisStore.data.items[i].data.task_des;
+                    username = hisStore.data.items[i].data.username;
+                    for (var j = i - 1; j >= 0; j--) {
+                        if (actionname == hisStore.data.items[j].data.actionname && task_des == hisStore.data.items[j].data.task_des && username == hisStore.data.items[j].data.username) {
+                            hisStore.removeAt(j);
+                            //j--;
+                            i--;
+                            //hisStoreCount--;
+                        }
+                    }
+                }
+
+                var titles = ['项目支出主表', '项目支出明细表'];
+                var forms = mainPanel_form;
+                var grids = [ExpensedtlGrid_grid, hisGrid, hisGrid, hisGrid, hisGrid];
+                $PrintHelp("BPM_GHExpenseInfo", 'BPM_GHExpenseInfo', forms, grids, titles);
+
+                //var grids = [ExpensedtlGrid_grid];
+                //$PrintHelp("BPM_GHExpenseInfo", 'BPM_GHExpenseInfo', forms, grids, titles, "GHExpense", mainPanel_form.queryById("PhId").getValue());
+                });
+
+
+
+			mainPanel_form.queryById("CWamount").renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '0.00';
+                }
+            };
+
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+            //处理toolbar折叠，请在AllReady之后调用，
+            //确保实施挂载的toolbar事件在折叠下拉中也有效果
+            ngToolbar.dealOverFlowMenu();
+
+			function save(callback)
+			{
+				var FPlayamount=mainPanel_form.queryById("FPlayamount").getValue();
+				if(FPlayamount<0){
+					Ext.MessageBox.alert("提示", '可编报数小于0，请检查！');
+					return;
+				}
+
+				var FSurplusamount=mainPanel_form.queryById("FSurplusamount").getValue();
+				var FReturnamount=mainPanel_form.queryById("FReturnamount").getValue();
+				if(FSurplusamount<FReturnamount){
+					Ext.MessageBox.alert("提示", '返回金额不得超出项目的支出金额！');
+					return;
+				}
+
+				var mainPanel_formvf = mainPanel_form.isValid();
+				var ExpensedtlGrid_gridvf = ExpensedtlGrid_grid.isValid();
+				if (!mainPanel_formvf || !ExpensedtlGrid_gridvf)
+				{
+					ngToolbar.get('save').setDisabled(false);
+					return;
+				}
+
+				var flg;
+				//调用二次开发脚本的校验方法
+				if (typeof beforeSaveEdit === "function") {
+					flg = beforeSaveEdit();
+					if(!flg)
+						ngToolbar.get('save').setDisabled(false);
+					return;
+				}
+
+				var mydata = {};
+				var expensemstformData = mainPanel_form.getFormData();
+				myData = Ext.apply(mydata, { 'expensemstformData': expensemstformData});
+				var expensedtlgridData = ExpensedtlGrid_grid.getChangeForEntity();
+				myData = Ext.apply(mydata, { 'expensedtlgridData': expensedtlgridData});
+
+				var extendData;
+				//调用二开代码获取二开需要保存的数据
+				if (typeof getExtendData === "function") {
+					extendData = getExtendData();
+					myData = Ext.apply(mydata, extendData);//合并
+				}
+
+                Ext.Ajax.request({
+                    params: mydata,
+                    url: C_ROOT + 'GYS/YS/ExpenseMst/save?NCmoney='+mainPanel_form.queryById("FProjAmount").getValue()+'&beforeSum='+beforeSum+'&beforeFReturnamount='+beforeFReturnamount+'&Ifreturn='+Ifreturn,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+							LoadAttach.Save("", attachGuid, resp.KeyCodes[0]);//保存附件
+
+							if (callback && callback != 'notclose') {
+								callback();
+							}else{
+								Ext.MessageBox.alert('提示', "保存成功！", function () {
+
+									if (window.external.RefreshWebListPage != undefined) {
+										window.external.RefreshWebListPage();
+									} else {
+										$NG3Refresh();
+									}
+									if (callback != 'notclose' ) {
+										$CloseTab();
+
+									} else {
+											//$CloseTab();
+
+										if(otype == $Otype.EDIT){
+											var f = $GetWFrame();
+											var tab = f.Center.getActiveTab();
+                                            $OpenTab('项目支出预算审批表-新增', C_ROOT + 'GYS/YS/ExpenseMst/ExpenseMstEdit?otype=add');
+											f.Center.remove(tab);
+										}else if(otype == $Otype.ADD){
+											location.reload();
+										}
+
+									}
+
+									//$CloseTab();
+								});
+							}
+                        } else {
+							ngToolbar.get('save').setDisabled(false);
+                            Ext.MessageBox.alert('保存失败！', resp.Msg);
+                        }
+                    }
+                });
+			}
+
+			//附件方法
+            function OpenAttachment(buscode) {
+                var param = {
+                    product: "", //传相应产品，i6、i6s、i6P、A3、GE，可为空
+                    attachguid: attachGuid, //会话guid,可传空生成方法cs代码:Guid.NewGuid().ToString()
+                    attachTName: "c_pfc_attachment",
+                    busTName: "ys3_Expense", //传相应业务表
+                    busid: busid, //传相应产品业务单据phid
+                    bustypecode: "GHExpenseInfo"//业务类型编码
+                };
+                var result = LoadAttach.InitBeforeOpen(param);
+                var obj = eval(result);
+                if (obj) {
+                    if (obj.status == "success") //初始化成功
+                    {
+                        attachGuid = obj.msg;
+                    } else {
+                        Ext.MessageBox.alert('提示', "附件初始化失败！");
+                        return;
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', "附件初始化失败！");
+                    return;
+                }
+                var opt = {
+                    product: "", //传相应产品，可为空
+                    mode: "NG3", //固定传NG3
+                    openbymianframe: "1", //通过主框架打开附件 0或空否  1 是固定传1
+                    oper: "winfrom", //web、pb、winfrom、progress（进度条模式）,固定传 winfrom
+                    asr_tbl: "c_pfc_attachment",
+                    tbl: "ys3_Expense", //传相应业务表
+                    fill: $appinfo.logid, //传相应操作员id
+                    fillname: $appinfo.username, //传相应操作员姓名
+                    chkSign: "0", //默认传0
+                    chkCheckIn: "0", //默认传0
+                    btnAdd: "1", //新增按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    addserverstuts: "0", //导入按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnScan: "1", //扫描按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnDelete: "1", //删除按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnEdit: "1", //编辑按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnView: "1", //查看按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnDownload: "1", //下载按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnCancel: "1", //取消按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnOk: "1", //确定按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnWebAdd: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                    btnWebOk: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                    archivestuts: "2", //归档按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    status: otype, //add 新增模式，view 查看模式， edit 编辑模式
+                    showlist: "1", //显示文件列表 0 不显示 1显示
+                    zip: "0", //附件压缩 0 不压缩 1 压缩
+                    filenum: "", //附件上传数量限制 0或空不限制附件上传数量
+                    filetype: "", //附件上传类型限制目前仅支持传入"image",如果传了"image"附件控件就只能上传图片
+                    guid: attachGuid //传第二步附件初始化获得的guid
+                };
+                LoadAttach.Init(opt);
+            }
+
+
+
+        });
+
+    </script>
+}

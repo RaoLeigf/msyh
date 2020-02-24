@@ -1,0 +1,353 @@
+﻿@{
+    //ViewBag.Title = "打印模板编辑";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section script
+{
+    <script src="@Url.Content("~/NG3/js/RWcommon.js")" type="text/javascript"></script>  
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var printId = '@ViewBag.PrintID';
+        var typefile = '@ViewBag.TypeFile';
+        var templatename = '@ViewBag.TemplateName';
+
+        var templatetype = '@ViewBag.TemplateType';
+        if (templatename)
+        {
+            templatename = decodeURIComponent(templatename);
+        }
+        //templatename = "C:\\i6s\\增值税预缴申请[PUB_VatTaxPreBill001].xml";
+
+        Ext.onReady(function () {
+            var t1 = "";
+            var SUPObject1 = Ext.getDom('SUPObject1');
+            SUPObject1.Template = t1;
+            SUPObject1.ObjConfig = { id: 'SUPObject1_AF', type: 'LuxForm', param: 'Border=0;', ver: SupCanVersion };
+            if (otype == 'view') {
+                SUPObject1.ObjConfig.param = 'WorkMode=DesignTime;Main = 1074, 105, 100, 189, 20, 32, 106, 107; TabScrollBar = show; CollapseToolbar = true; print = 11, 216, 18; TabScrollBar = outofsize; Form = 110, 162, 164';
+            }
+            else {
+                SUPObject1.ObjConfig.param = 'WorkMode=DesignTime;Border=single,3D;PagesTabPercent=50;Rebar=Main, Print, Form,,Font, Property,,Text;Main= 103,1074, 105, 100, 189, 0, 20, 32, 106, 107;'
+            }
+
+            //#region 1、初始化按钮工具条
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                showArrowBtn: false,
+                //                rightName: 'LFormList',
+                ngbuttons: ['save', '->',  'close']
+            });
+            //#endregion
+
+            //#region 2、初始化界面
+            var mtypecombo = Ext.create('Ext.ng.ComboBox', {
+                valueField: "def_int2",
+                displayField: 'name',
+                queryMode: 'local',
+                fieldLabel: '模板类型',
+                name: 'def_int2',
+                id: 'def_int2',
+                data: [{
+                    "def_int2": "0",
+                    "name": "用户"
+                }, {
+                    "def_int2": "1",
+                    "name": "系统"
+                }, {
+                    "def_int2": "2",
+                    "name": "自定义"
+                }, {
+                    "def_int2": "3",
+                    "name": "系统_PDF"
+                }
+                ]
+            });
+            //预览编辑
+            var mpreviewcombo = Ext.create('Ext.ng.ComboBox', {
+                valueField: "code",
+                displayField: 'name',
+                queryMode: 'local',
+                fieldLabel: '打印编辑',
+                name: 'previeweditflg',
+                id: 'previeweditflg',
+                data: [{
+                    "code": "0",
+                    "name": "否"
+                }, {
+                    "code": "1",
+                    "name": "是"
+                }
+                ]
+            });
+            //直接预览
+            var mdoprintcombo = Ext.create('Ext.ng.ComboBox', {
+                valueField: "code",
+                displayField: 'name',
+                queryMode: 'local',
+                fieldLabel: '直接预览',
+                name: 'def_int1',
+                id: 'def_int1',
+                data: [{
+                    "code": "0",
+                    "name": "否"
+                }, {
+                    "code": "1",
+                    "name": "是"
+                }
+                ]
+            });
+            //是否共享
+            var mpubcombo = Ext.create('Ext.ng.ComboBox', {
+                valueField: "code",
+                displayField: 'name',
+                queryMode: 'local',
+                fieldLabel: '共享',
+                name: 'ispub',
+                id: 'ispub',
+                data: [{
+                    "code": "0",
+                    "name": "私有"
+                }, {
+                    "code": "1",
+                    "name": "公有"
+                }
+                ]
+            });
+
+            var ngform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                buskey: 'printid', //对应的业务表主键
+                columnsPerRow:4,
+                minWidth: 400,
+                bodyPadding: "10 0 0 20px",
+                autoScroll: true,
+                //fieldDefaults: {
+                //    labelWidth: 100,
+                //    anchor: '100%',
+                //    margin: '0 10 5 0',
+                //    msgTarget: 'side'
+                //},
+                fields: [{
+                    xtype: 'ngText',
+                    fieldLabel: '单据类型',
+                    name: 'typefile',
+                    id: 'typefile',
+                    mustInput: true
+                }, {
+                    xtype: 'ngText',
+                    fieldLabel: '模块号',
+                    name: 'moduleno',
+                    id: 'moduleno',
+                    mustInput: true
+                }, {
+                    xtype: 'ngText',
+                    fieldLabel: '模版名称',
+                    name: 'billname',
+                    id: 'billname',
+                    mustInput: true
+                },mpreviewcombo, {
+                    xtype: 'filefield',
+                    fieldLabel: '模板文件',
+                    buttonText: '浏 览...',
+                    id: "filename",
+                    msgTarget: 'side',
+                    allowBlank: true,
+                    anchor: '100%',
+                    name: 'filename',
+                    colspan: 2,
+                    listeners: {
+                        change: function (me, value, eOpts) {
+                            if (value != "") {
+                                var arrtype = value.split('.');
+                                var doctype = arrtype[arrtype.length - 1].toLowerCase();
+                                if (doctype != 'xml' && doctype != 'xls' && doctype != 'xlsx') {                                  
+                                    Ext.MessageBox.alert('出错', '模板文件只支持xml,xls,xlsx格式');
+                                    Ext.getCmp("filename").value = "";
+                                    Ext.getCmp("filename").setValue("");
+                                    Ext.getCmp("filename").setRawValue("");
+                                    return;
+                                }
+                            }
+                            AFEX.Build(value);
+                        }
+                    }
+                }, mtypecombo,mdoprintcombo, {
+                    xtype: 'ngText',
+                    id: 'remarks',
+                    fieldLabel: '备注',
+                    name: 'remarks',
+                    colspan: 3
+                }, mpubcombo, {
+                    xtype: 'hiddenfield',
+                    fieldLabel: '编号',
+                    name: 'printid'
+                }]
+            });
+
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                rennderto: Ext.getBody(),
+                items: [ngToolbar, ngform, { id: 'bodypanel', region: 'center', xtype: 'panel', layout: 'fit'}]
+            });
+
+            Ext.getCmp('bodypanel').body.dom.appendChild(SUPObject1);
+            AFEX = $AF.create(SUPObject1);
+            //#endregion
+
+            //#region 3、回填数据到控件
+            var dataStore = new Object();
+
+            AllReady = function () {
+                AFEX.SetSource(C_ROOT + 'ESB/DataServiceCenter/DataCenter');
+                if (otype == "add" && printId == "") {
+                    AFEX.Build(templatename);
+                    if(templatetype=="")templatetype="0";
+                    var formobj = ngform.getForm();
+                    formobj.setValues({ typefile: typefile, def_int2: templatetype, moduleno: 'PUB', def_int1: "1", ispub: "0", previeweditflg:"0" });
+                    dataStore = {
+                        def_int1: "1",
+                        ispub: "0",
+                        previeweditflg: "0"
+                    }
+                    Ext.getCmp("filename").value = templatename;
+                    Ext.getCmp("typefile").setReadOnly(true);
+                    Ext.getCmp("moduleno").setReadOnly(true);
+                    Ext.getCmp("def_int2").setReadOnly(true);
+                    Ext.getCmp("ispub").setReadOnly(true);
+                }
+                else {
+                    var xml ="";
+                    if (templatename != '') {
+                        AFEX.Build(templatename);
+                        xml = AFEX.GetFileXML("");
+                    }
+                    Ext.Ajax.request({
+                        params: { printid: printId,xml:xml },
+                        url: '@Url.Content("~/SUP/Print/GetModuleByID")',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.status === "ok") {
+                                Ext.getCmp("typefile").setReadOnly(true);
+                                Ext.getCmp("moduleno").setReadOnly(true);
+                                Ext.getCmp("def_int2").setReadOnly(true);
+                                var formobj = ngform.getForm();
+                                dataStore = InitData(resp.data);
+                                formobj.setValues(dataStore);                                
+                                Ext.getCmp("filename").value = resp.xmlName.replace(/\//g, "\\");
+                                if (otype == "view" || resp.data.def_int2 == "3") {                                  
+                                    Ext.getCmp("filename").button.onDisable();
+                                    Ext.getCmp("billname").setReadOnly(true);                                  
+                                    if (otype == "view") {                                       
+                                        Ext.getCmp("remarks").setReadOnly(true);
+                                    }
+                                }                               
+                                AFEX.Build($path(resp.xmlName));
+
+                            } else {
+                                Ext.MessageBox.alert('取数失败', resp.status);
+                                //                            document.AFEX.func("MessageBoxFloat", "取数失败" + "\r\n title=Error; icon=Info; center=true");
+                            }
+                        }
+                    });
+                }
+                if (otype == "view") {
+                    ngToolbar.get('save').hide();
+
+                }
+
+            }
+            function InitData(data) {
+                if (otype == "add") {
+                    data.def_int2 = "0";
+                    data.billname = "";
+                    data.remarks = "";
+                    data.def_int1 = "1";
+                    data.ispub = "0";
+                    data.previeweditflg = "0";
+                }
+                else {
+                    data.def_int2 = data.def_int2.toString();
+                }
+                return data;
+            }
+            //#endregion
+
+            //#region 4、初始化按钮事件
+            var isSaving = false;
+            ngToolbar.get("save").on("click", function () {
+                 ngToolbar.disable();
+                if (otype == "view") {
+                    ngToolbar.enable();
+                    return false;
+                }
+                else {
+                    var f = ngform.getForm();
+                    ngform.focus();
+                    if (f.isValid()) {
+                        var fname = Ext.getCmp("filename").value.split("\\");
+                        fname = fname[fname.length - 1];  
+                        if (fname.indexOf(".xml") < 0 && fname.indexOf(".xls") < 0 && fname.indexOf(".xlsx") < 0) {
+                            ngToolbar.enable();
+                            return false;
+                        }
+                        if (fname.indexOf(".xls") < 0 || fname.indexOf(".xlsx") < 0) {
+                            fname = fname.replace(/.xls/g, '.xml').replace(/.xlsx/g, '.xml');
+                        }
+                        ngToolbar.enable();
+                        if (isSaving) return;
+                        isSaving = true;
+                        var values = f.getValues();
+                        dataStore["xmlDoc"] = AFEX.GetFileXML("");
+                        dataStore["oType"] = otype;
+                        dataStore["remarks"] = values["remarks"];
+                        dataStore["billname"] = values["billname"];
+                        dataStore["def_int2"] = values["def_int2"];
+                        dataStore["filename"] = fname;
+                        dataStore["moduleno"] = values["moduleno"];
+                        dataStore["typefile"] = values["typefile"];
+                        dataStore["printid"] = printId;
+                        dataStore["def_int1"] = values["def_int1"];
+                        dataStore["ispub"] = values["ispub"];
+                        dataStore["previeweditflg"] = values["previeweditflg"];
+                        NG3Ajaxrequest({
+                            params: dataStore,
+                            url: '@Url.Content("~/SUP/Print/UpdateLformTemplate")',
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.status === "ok") {
+                                    window.external.RefreshWebListPage();
+                                    printId = resp.printId;
+                                    if (otype == "add") {
+                                        otype = "edit";
+                                    }
+                                    //document.AFEX.func("MessageBoxFloat", resp.msg + "\r\n title=Success; icon=Success; center=true");
+                                    Ext.MessageBox.alert("提示", resp.msg); //这个提时会被Report组件遮住
+                                } else {
+                                    Ext.MessageBox.alert('出错', resp.msg);
+                                    //document.AFEX.func("MessageBoxFloat", resp.msg + "\r\n title=Error; icon=Info; center=true");
+                                }
+                                isSaving = false;
+                            }
+                        });
+                    }
+                    ngToolbar.enable();
+                }
+            });
+            //#endregion
+        });
+
+
+    </script>
+}
+
+<div id="SUPObject1" style="width: 100%; height: 100%">
+   @* <script type="text/javascript">
+        //     insertReport('AFEX', 'Main=105,100,189,20,32,106,107;TabScrollBar=show;CollapseToolbar=true;print=11,216,18;Form=110,162,164;');
+        insertReport('AFEX', 'WorkMode=DesignTime;Border=single,3D;PagesTabPercent=50;Rebar=Main, Print, Form,,Font, Property,,Text;Main= 103,1074, 105, 100, 189, 0, 20, 32, 106, 107;');
+    </script>*@
+</div>
+
+

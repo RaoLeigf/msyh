@@ -1,0 +1,2072 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="~/NG3Resource/New_Login/css/bootstrap.css">
+    <link rel="stylesheet" href="~/NG3Resource/New_Login/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/NG3Resource/New_Login/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="~/NG3Resource/New_Login/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="~/NG3Resource/New_Login/css/index1.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1.0">
+    @*<meta charset="utf-8" http-equiv="X-UA-Compatible" content="chrome=1" />*@
+    <meta charset="utf-8" http-equiv="X-UA-Compatible" content="IE=edge,IE=11,IE=10,IE=9" />
+    <meta name="renderer" content="ie-stand">
+    @*<meta name="renderer" content="webkit">*@
+    <link rel="shortcut icon" href="~/NG3Resource/Desk/img/bitbug_favicon.ico" />
+    <title>浙江省总工会财务综合管理平台</title>
+    <script>
+        var C_ROOT = '@ViewBag.Root';
+        var C_PATH = '@ViewBag.Path';
+        var $gridStateInfo = '@ViewBag.GridStateInfo';
+        var $queryPanelInfo = '@ViewBag.QueryPanelInfo';
+        var $toolbarRightInfo = '@ViewBag.ToolbarRightInfo';
+
+    </script>
+    <link href="@Url.Content("~/NG3Resource/extjs/resources/css/ext-all.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/NG3Resource/icons/icon.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/NG3Resource/css/weblogin.css")" rel="stylesheet" type="text/css" />
+    <!--<link href="@Url.Content("~/NG3Resource/Desk/css/login.css")" rel="stylesheet" type="text/css" />-->
+    <link href="@Url.Content("~/NG3Resource/Desk/EasyUi/easyui.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/NG3Resource/Desk/css/Share.css")" rel="stylesheet" type="text/css" />
+
+    <script src="@Url.Content("~/NG3Resource/New_Login/js/jquery-1.11.1.min.js")" type="text/javascript" charset="utf-8"></script>
+    @* <script src="@Url.Content("~/NG3Resource/Desk/js/jquery-1.9.1.min.js")" type="text/javascript" charset="utf-8"></script>*@
+    <script src="@Url.Content("~/NG3Resource/extjs/ext-all-debug.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/extjs/locale/ext-lang-zh_CN.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/js/json2.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/js/ExtUx.js")" type="text/javascript" charset="utf-8"></script>
+    @*<script src="@Url.Content("~/NG3Resource/EasyUi/jquery.min.js")" type="text/javascript" charset="utf-8"></script>*@
+    <script src="@Url.Content("~/NG3Resource/js/jquery.cookie.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/Desk/EasyUI/jquery.easyui.min.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/Desk/js/jquery-migrate-1.2.1.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/Desk/js/inputmail.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/Desk/js/respond.js")" type="text/javascript" charset="utf-8"></script>
+
+
+    <script src="@Url.Content("~/NG3Resource/New_Login/js/yundong2.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/New_Login/js/MD5.js")" type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Content("~/NG3Resource/New_Login/js/CallPB.js")" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        var IsLogin = 'false';
+        var G6HUserid = "";
+        var LoginEntity;
+        Ext.onReady(function () {
+            Ext.getBody().addListener('keydown', function (el) {
+                if (el.getKey() == el.BACKSPACE) {
+                    var jdHtml = Ext.get(Ext.Element.getActiveElement()).dom.nodeName;
+                    if (jdHtml != 'INPUT' && jdHtml != 'TEXTAREA') {
+                        el.stopEvent();
+
+                    }
+                }
+            });
+            //修改高级里面连接方式样式
+            //$(".validatebox-text").css('width', '180px');
+            //var obj = document.getElementsByClassName('validatebox-text');
+            //var result = obj;
+            $("input").keydown(function (e) {
+                if (e.keyCode == 13) {
+                    LoginIn();
+                }
+            })
+
+            //加密狗
+            $.ajax({
+                url: C_ROOT + "Portal.mvc/CanDownLoadClient",
+                type: 'POST',
+                async: false,
+                success: function (response) {
+                    if (response == '0') {
+                        Ext.MessageBox.alert('提示', "无法检测到加密狗，请插入加密狗！", callback);
+                        function callback() {
+                            window.location.href = 'about:blank';
+                            window.close();
+                        }
+                    }
+                }
+            })
+
+            //$("#UserNameText").changeTips({
+            //    divTip: ".on_changes"
+            //});
+
+        });
+    </script>
+    <script type="text/javascript">
+        //登录历史
+        var userCookie = {
+            cookieName: "NewGrandNG3Web",
+            AddUser: function (lognid) {
+                var lognids = $.cookie(this.cookieName);
+                if (lognids == null) {
+                    lognids = new Array();
+                }
+                else
+                    lognids = JSON.parse(lognids);
+                if ($.inArray(lognid, lognids) >= 0) {
+                    return;
+                }
+                else {
+                    lognids.push(lognid);
+                    $.cookie(this.cookieName, JSON.stringify(lognids), { expires: new Date("1/1/3018"), path: '/' });
+                }
+            },
+            GetUser: function () {
+                var lognids = $.cookie(this.cookieName);
+                if (lognids == null) {
+                    lognids = new Array();
+                }
+                else
+                    lognids = JSON.parse(lognids);
+                return lognids;
+            }
+        }
+        //最近一次登录的用户
+        var recentLogid = {
+            cookieName: "recentLogid",
+            cookieName2: "recentLogpsd",
+            AddUser: function (logid) {
+                $.cookie(this.cookieName, logid, { expires: new Date("1/1/3018"), path: '/' });
+            },
+            GetUser: function () {
+                return $.cookie(this.cookieName);
+            },
+            AddPsd: function (Logpsd) {
+                $.cookie(this.cookieName2, Logpsd, { expires: new Date("1/1/3018"), path: '/' });
+            },
+            GetPsd: function () {
+                return $.cookie(this.cookieName2);
+            }
+        }
+        //最近一次用户的登录方式(HTTP:TCP)
+        var recentConnectType = {
+            cookieName: "recentConnectType",
+            AddType: function (connectType) {
+                $.cookie(this.cookieName, connectType, { expires: new Date("1/1/3018"), path: '/' });
+            },
+            GetType: function () {
+                return $.cookie(this.cookieName);
+            }
+        }
+        //最近用户的登录账套
+        var recentAccount = {
+            cookieName: "recentAccount",
+            AddAccount: function (account) {
+                $.cookie(this.cookieName, account, { expires: new Date("1/1/3018"), path: '/' });
+            },
+            GetAccount: function () {
+                return $.cookie(this.cookieName);
+            }
+        }
+        Ext.onReady(function () {
+
+            Ext.Loader.setConfig({ enabled: true });
+            Ext.EventManager.onWindowResize(function () {
+                SetWindow();
+            });
+
+            SetWindow();
+
+            function SetWindow() {
+                var bodyheight = document.documentElement.clientHeight;
+                //console.log(bodyheight);
+                //document.getElementById("mainDiv").style.marginTop = (bodyheight - 402) / 2 - 402 / 6 + "px";
+                //document.getElementById("contentdiv").style.height = bodyheight - 200 + "px";
+
+               // console.log(bodyheight - 200);
+            }
+            FullOrExitFullScreen(false)
+            $(document).on("click", function () {
+                FullOrExitFullScreen(false);
+            });
+
+            var users = userCookie.GetUser();
+            //上次登录用户
+            var recentUser = recentLogid.GetUser();
+            if (recentUser != null) {
+                $("#UserNameText").val(recentUser);
+                $("#UserNameText").focus();
+            }
+            var recentUserPsd = recentLogid.GetPsd();
+            if (recentUserPsd != null) {
+                $("#PasswordText").val(recentUserPsd);
+                $("#PasswordText").focus();
+            }
+            //$("#UserNameText").on("click", function () {
+            //    if (users.length > 0)
+            //        $("#UserNameSelect").combobox("showPanel");
+            //});
+            $("#UserNameTextPSReset").on("click", function () {
+                if (users.length > 0)
+                    $("#UserNameTextPSReset").combobox("showPanel");
+            });
+            //$("#UserNameTextPSReset").combobox("loadData", users);
+            $.each(users.reverse(), function (index, val) {
+                //$("#UserNameSelect").append("<option value=" + val + ">" + val + "</option>");
+                $(".on_changes").append(" <li>" + val + "</li>");
+
+                $("#UserNameTextPSReset").append("<option value=" + val + ">" + val + "</option>");
+            });
+            //$("#UserNameSelect").combobox({
+            //    panelHeight: 21 * users.length,
+            //    onSelect: function (record) {
+            //        $("#UserNameText").val(record.value);
+            //        $("#UserNameText").focus();
+            //    }
+            //});
+
+            LoadLastInfo();
+
+            $("#UserNameTextPSReset").combobox({
+                onShowPanel: (function (et) {
+                    if (et == "comboclick") {
+                        var data = $.data(this, "combobox").data;
+
+                        if (data.length > 5) {
+                            $(this).combobox('panel').height(140);
+                        }
+                    }
+                    else {
+
+                        var q = $(this).combobox('getText')
+                        var userCount = GetComboboxItemCount(this, q);
+                        if (userCount > 5) {
+                            $(this).combobox('panel').height(140);
+                        }
+
+                    }
+                }),
+            })
+
+            function GetComboboxItemCount(target, q) {
+
+                var data = $.data(target, "combobox").data;
+                var opts = $(target).combobox("options");
+                var count = 0;
+                if (data != "" && data != null && data != undefined) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i][opts.textField].indexOf(q) == 0) {
+                            count += 1;
+                        }
+                    }
+                }
+
+                return count;
+            }
+
+        });
+
+        function LoadLastInfo() {
+            //上次登录账套
+            var lastAccount = recentAccount.GetAccount();
+            if (lastAccount) {
+               // $("#Enterprise").combobox('select', lastAccount);
+                $("#Enterprise").val(lastAccount);
+            }
+
+            //如果上次连接方式被记住，不取超管设置的连接方式
+            var recentType = recentConnectType.GetType();
+            if (recentType) {
+                $("#ConnectType").val(recentType);
+               // $("#ConnectType").combobox('select', recentType);
+                return;
+            }
+
+            var Enterprise = $("#Enterprise").val;
+            if (Enterprise != '') {
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/Login/GetConnectType?svrName=&account=' + Enterprise,
+                    success: function (response) {
+                        if (response.responseText == '1') {
+                            $("#ConnectType").val("HTTP");
+                        } else {
+                            $("#ConnectType").val("TCP");
+                        }
+                        //$("#ConnectType").combobox('select', response.responseText == '1' ? "HTTP" : "TCP");
+                    }
+                })
+            }
+
+        }
+
+        function FullOrExitFullScreen(exit) {
+            return
+            if (exit == null) exit = false;
+            //IE9
+            if (window.ActiveXObject != null && !exit && !isFullScreen()) {//全屏
+                wscript = new ActiveXObject("WScript.Shell");
+                if (wscript) {
+                    wscript.SendKeys("{F11}")
+                }
+            }
+            if (window.ActiveXObject != null && exit && isFullScreen()) {//退出全屏
+                wscript = new ActiveXObject("WScript.Shell");
+                if (wscript) {
+                    wscript.SendKeys("{F11}")
+                }
+            }
+            function isFullScreen() {
+                return (Math.abs(window.outerHeight - window.screen.height) <= 3 && Math.abs(window.outerWidth - window.screen.width) <= 3);
+            }
+            if (!exit) {
+                var el = document.documentElement;
+                if (el.requestFullscreen) {
+                    el.requestFullscreen();
+                }
+                else if (el.msRequestFullscreen) {
+                    el = document.body;
+                    el.msRequestFullscreen();
+                }
+                else if (el.mozRequestFullScreen) {
+                    el.mozRequestFullScreen();
+                }
+                else if (el.webkitRequestFullScreen) {
+                    el.webkitRequestFullScreen();
+                }
+            }
+            else {
+                var el = document;
+                if (el.exitFullscreen) {
+                    el.exitFullscreen();
+                }
+                else if (el.msExitFullscreen) {
+                    el.msExitFullscreen();
+                }
+                else if (el.mozCancelFullScreen) {
+                    el.mozCancelFullScreen();
+                }
+                else if (el.webkitCancelFullScreen) {
+                    el.webkitCancelFullScreen();
+                }
+            }
+        }
+        ////高级窗口
+        //var AdvanceWindow = function (comboxFnCall) {
+        //    var me = this;
+        //    $("#AdvanceDiv").window({
+        //        width: 300,
+        //        height: 165,
+        //        closed: true,
+        //        modal: true,
+        //        shadow: false,
+        //        closable: false,
+        //        minimizable: false,
+        //        maximizable: false,
+        //        collapsible: false,
+        //        resizable: false
+        //    });
+        //    $("#Enterprise").combobox({
+        //        url: C_ROOT + 'Portal.mvc/GetAccInfo?serverindex=0',
+        //        onLoadSuccess: function (data) {
+        //            if (data.length > 0) {
+        //                Ext.Ajax.request({
+
+        //                    url: C_ROOT + "SUP/Login/GetDefaultDB",
+        //                    success: function (res, opts) {
+        //                        $.each(data, function (index, val) {
+        //                            if (val.dbname == res.responseText) {
+        //                                $("#Enterprise").combobox('select', val.ucode);
+        //                                me.Enter = val.ucode;
+        //                                me.EnterText = val.uname;
+        //                                if (comboxFnCall) {
+        //                                    comboxFnCall.call(this, me.EnterText);
+        //                                }
+
+        //                                return false;
+        //                            }
+        //                        });
+        //                    }
+        //                });
+
+        //            }
+        //        }
+        //    });
+        //}
+        //AdvanceWindow.prototype = {
+        //    Show: function () {
+        //        $('#AdvanceDiv').css("display", "block");
+        //        $('#AdvanceDiv').css("border", "0px");
+        //        $('#AdvanceDiv').css("border-radius", "5px 5px 0px 0px");
+        //        setTimeout(function () {
+        //            $("#AdvanceDiv").window("open");
+        //            //加载上次连接方式和账套等信息
+        //            LoadLastInfo();
+        //        }, 300);
+        //    },
+        //    Close: function () {
+        //        $('#AdvanceDiv').css("display", "none");
+        //        $('#AdvanceDiv').window('close');
+        //    },
+        //    //用户选择取消，下拉值还原
+        //    CelEnter: function () {
+        //        $("#Enterprise").combobox('select', this.Enter);
+        //    },
+        //    //设置帐套 取当前Enterprise用户选择值
+        //    SetEnter: function () {
+        //        this.Enter = $("#Enterprise").combobox('getValue');
+        //        this.EnterText = $("#Enterprise").combobox('getText')
+        //    },
+        //    //获得帐套
+        //    GetEnter: function () {
+        //        return this.Enter;
+        //    },
+        //    //获得帐套
+        //    GetEnterText: function () {
+        //        return this.EnterText;
+        //    }
+        //}
+
+        ////忘记密码窗口
+        //var PassWordWindow = function () {
+        //    $('#PassWordResetDiv').window({
+        //        width: 320,
+        //        closed: true,
+        //        modal: true,
+        //        shadow: false,
+        //        closable: false,
+        //        minimizable: false,
+        //        maximizable: false,
+        //        collapsible: false,
+        //        resizable: false,
+        //        height: 250
+        //    });
+        //}
+        //PassWordWindow.prototype = {
+        //    Show: function () {
+        //        $('#PassWordResetDiv').css("display", "block");
+        //        $('#PassWordResetDiv').css("border", "0px");
+        //        $('#PassWordResetDiv').css("border-radius", "5px 5px 0px 0px");
+        //        $("#PassWordResetDiv").window("open");
+        //    },
+        //    Close: function () {
+        //        $('#PassWordResetDiv').css("display", "none");
+        //        $('#ResetingDiv').css("display", "none");
+        //        $('#PassWordResetDiv').window('close');
+        //    },
+        //    ResetDivShowErrMsg: function (message, noerr) {
+        //        noerr = noerr == null ? false : noerr;
+        //        var message = "<table style='font-size: 12px'><tr><td style='text-align: center;" + (noerr ? "" : 'color:Red') + "'>" + message + "</td></tr></table>";
+        //        $('#ResetingDiv').html(message);
+        //        $('#ResetingDiv').css("display", "block");
+        //    }
+        //}
+
+
+
+        ////重置密码
+        //var ResetPwdWindow = function () {
+        //    $('#ResetPwdDiv').window({
+        //        width: 340,
+        //        closed: true,
+        //        modal: true,
+        //        shadow: false,
+        //        closable: true,
+        //        minimizable: false,
+        //        maximizable: false,
+        //        collapsible: false,
+        //        resizable: false,
+        //        //draggable:false,
+        //        height: 240,
+        //    });
+        //}
+        //ResetPwdWindow.prototype = {
+        //    Show: function () {
+        //        $('#ResetPwdDiv').css("display", "block");
+        //        $('#ResetPwdDiv').css("border", "0px");
+        //        $('#ResetPwdDiv').css("border-radius", "5px 5px 0px 0px");
+        //        $('#ResetPwdDiv').window('open');
+        //    },
+        //    Close: function () {
+        //        $('#ResetPwdDiv').window('close');
+        //    }
+        //}
+        ////app登录
+        //var VerCode = function () {
+        //    var me = this;
+        //    me.imageTimer = null;
+        //    me.qRImageDate = null;
+        //}
+        //VerCode.prototype = {
+        //    ShowImage: function () {
+        //        var me = this;
+        //        clearTimeout(me.imageTimer);
+        //        document.getElementById("QRThumbnail").style.display = "none";
+        //        document.getElementById("QRLoginDiv").style.display = "block";
+        //        me.ShowQRImage();
+        //    },
+        //    HiddenImage: function () {
+        //        var me = this;
+        //        me.imageTimer = setTimeout(function () {
+        //            document.getElementById("QRThumbnail").style.display = "block";
+        //            document.getElementById("QRLoginDiv").style.display = "none";
+        //        }, 100);
+        //    },
+        //    ShowQRLogin: function () {
+        //        var me = this;
+        //        if (document.getElementById("QRThumbnail").style.width == "128px") {
+        //            document.getElementById("QRThumbnail").style.width = "27px";
+        //            document.getElementById("QRThumbnail").style.height = "27px";
+        //            document.getElementById("QRThumbnailImage").src = "~/..Resource/pic/QRImage_i8.png";
+        //        }
+        //        else {
+        //            me.ShowQRImage();
+        //            setTimeout(function () {
+        //                document.getElementById("QRThumbnail").style.width = "128px";
+        //                document.getElementById("QRThumbnail").style.height = "128px";
+
+        //            }, 100);
+        //        }
+        //    },
+        //    //生成二维码图片显示并向服务器发送监听
+        //    ShowQRImage: function () {
+        //        var me = this;
+        //        var now = new Date();
+        //        if (me.qRImageDate == null || (now.getTime() - me.qRImageDate.getTime()) > 10 * 60 * 1000) {
+        //            $.ajax({
+        //                url: C_ROOT + "Portal.mvc/GetQR",
+        //                type: 'POST',
+        //                async: false,
+        //                success: function (response) {
+        //                    $("#QRImage").attr("src", "~/../Resource/pic/" + response + ".bmp");
+        //                    me.qRImageDate = now;
+        //                    me.guid = response;
+        //                }
+        //            })
+        //        }
+        //    },
+        //    //扫码登录成功或者关闭登录窗口时删除二维码图片
+        //    DeleteQRImge: function () {
+        //        var me = this;
+        //        if (me.guid != null) {
+        //            $.ajax({
+        //                url: C_ROOT + "Portal.mvc/deleteQRImage?guid=" + me.guid + "",
+        //                type: 'POST',
+        //                success: function (response) {
+        //                }
+        //            })
+        //        }
+        //    }
+        //}
+        //var vercode = new VerCode();
+        ////app下载
+        //var App = function () {
+        //    var me = this;
+        //    me.loadTimer = null;
+        //}
+        //App.prototype = {
+        //    ShowQRPic: function (lanuage) {
+        //        $.ajax({
+        //            url: "Portal.mvc/GetProductName",
+        //            type: 'POST',
+        //            async: false,
+        //            success: function (data) {
+        //                if (data == "I6") {
+        //                    var $div = $("<div id='newTip'>i6移动客户端<br/><img style='width: 120px;height:120px;' src='~/../Resource/pic/i6.png?v=" + Math.random() + "'/></div>");
+        //                    $("body").append($div);
+        //                    $div.css({ "position": "absolute", "left": '570px', "top": '310px', "width": "124px", "height": "124px", "background": "white", "text-align": "center" }).show("fast");
+        //                }
+        //                else if (data == "I6P") {
+        //                    document.getElementById("AppDownload").style.display = "block";
+        //                    document.getElementById("QRPic").src = "~/../Resource/pic/I6P.png?v=" + Math.random();
+        //                }
+        //                else if (data == "I6S") {
+        //                    document.getElementById("AppDownload").style.display = "block";
+        //                    document.getElementById("QRPic").src = "~/../Resource/pic/I6S.png?v=" + Math.random();
+        //                }
+        //                else if (data == "A3") {
+        //                    var $div = $("<div id='newTip'>A3移动客户端<br/><img style='width: 120px;height:120px;' src='~/../Resource/pic/A3.png?v=" + Math.random() + "'/></div>");
+        //                    $("body").append($div);
+        //                    $div.css({ "position": "absolute", "left": '543px', "top": '310px', "width": "124px", "height": "124px", "background": "white", "text-align": "center" }).show("fast");
+        //                }
+        //                else if (data == "I6PMI1") {
+        //                    document.getElementById("AppDownload").style.display = "block";
+        //                    document.getElementById("QRPic").src = "~/../Resource/pic/I6PMI1.png?v=" + Math.random();
+        //                }
+        //                else if (data == "I6PMI2") {
+        //                    document.getElementById("AppDownload").style.display = "block";
+        //                    document.getElementById("QRPic").src = "~/../Resource/pic/I6PMI2.png?v=" + Math.random();
+        //                }
+        //                else if (data == "I6PMI3") {
+        //                    document.getElementById("AppDownload").style.display = "block";
+        //                    document.getElementById("QRPic").src = "~/../Resource/pic/I6PMI3.png?v=" + Math.random();
+        //                }
+        //                else if (data == "GE") {
+
+        //                    if (lanuage == "zhcn") {
+        //                        var $div = $("<div id='newTip'>GE移动客户端<br/><img style='width: 120px;height:120px;' src='~/../Resource/pic/GE.png?v=" + Math.random() + "'/></div>");
+        //                        $("body").append($div);
+        //                        $div.css({ "position": "absolute", "left": '518px', "top": '265px', "width": "124px", "height": "124px", "background": "white", "text-align": "center" }).show("fast");
+        //                    }
+        //                    else {
+        //                        var $div = $("<div id='newTip'>GE移动客户端<br/><img style='width: 120px;height:120px;' src='~/../Resource/pic/GE.png?v=" + Math.random() + "'/></div>");
+        //                        $("body").append($div);
+        //                        $div.css({ "position": "absolute", "left": '490px', "top": '265px', "width": "124px", "height": "124px", "background": "white", "text-align": "center" }).show("fast");
+        //                    }
+        //                }
+        //                else if (data == "I8") {
+        //                    document.getElementById("AppDownload").style.display = "block";
+        //                    document.getElementById("QRPic").src = "~/../Resource/pic/I8.png?v=" + Math.random();
+        //                }
+        //            },
+        //            error: function (errText) {
+        //                Ext.MessageBox.alert('提示', "获取产品名称失败！");
+        //            }
+        //        })
+        //    },
+        //    ShowAppDownload: function () {
+        //        var me = this;
+        //        clearTimeout(me.loadTimer);
+        //        me.ShowQRPic();
+        //    },
+        //    HiddenAppDownload: function () {
+        //        var me = this;
+        //        me.loadTimer = setTimeout(function () {
+        //            document.getElementById("AppDownload").style.display = "none";
+        //            document.getElementById("QRThumbnail").style.display = "block";
+        //            document.getElementById("QRLoginDiv").style.display = "none";
+        //        }, 100);
+        //    },
+        //    HideDownloadImage: function () {
+        //        if (document.getElementById("AppDownload").style.display == "block")
+        //            document.getElementById("AppDownload").style.display = "none"
+        //    }
+        //}
+        //var App = new App();
+        //function AlertMsg(msg) {
+        //    $.messager.alert("提示", msg, "info");
+        //}
+        //function ErrorMsg(msg) {
+        //    $.messager.alert("错误", msg, "error");
+        //}
+        //function CloseMouseOver() {
+        //    document.getElementById("CloseButton").src = "~/../Resource/pic/CloseButton_02.png";
+        //}
+        //function LoginFormClose() {
+        //    FullOrExitFullScreen(true);//退出全屏
+        //    setTimeout(function () {//可恶的ie
+        //        vercode.DeleteQRImge();
+        //        if (Ext.isIE || Ext.isChrome) {
+        //            window.close();
+        //        }
+        //        else {
+        //            window.open('about:blank', '_self');
+        //            window.close();
+        //        }
+        //    }, 1);
+        //}
+        //var adw;
+        ////展示高级窗口
+        //function ShowAdvance() {
+        //    if (adw == null)
+        //        adw = new AdvanceWindow();
+        //    adw.Show();
+        //}
+        ////关闭高级窗口
+        //function AdvanceCancel() {
+        //    adw.CelEnter();
+        //    adw.Close();
+        //}
+        ////确认高级窗口
+        //function AdvanceOk() {
+        //    adw.SetEnter();
+        //    adw.Close();
+        //}
+        //var pwwin;
+        ////展示忘记密码窗口
+        //function ShowPasswordReset() {
+        //    if (pwwin == null)
+        //        pwwin = new PassWordWindow();
+        //    pwwin.Show();
+        //    var setEnter = function (enter) {
+        //        $('#EnterprisePSReset').val(enter);
+        //    }
+        //    if (adw == null)
+        //        adw = new AdvanceWindow(setEnter);
+        //    else
+        //        setEnter(adw.GetEnterText());
+        //    var userName = $("#UserNameText").val();
+        //    $("#UserNameTextPSReset").combobox('setValue', userName);
+        //}
+        ////取消忘记密码
+        //function PassWordResetCancel() {
+        //    $("#ResetModeText").val("");
+        //    $('#ResetingDiv').html("");
+        //    //$("#UserNameTextPSReset").val("");
+        //    $("#UserNameTextPSReset").combobox('setValue', '');
+        //    pwwin.Close();
+        //}
+        ////确定忘记密码
+        //function PassWordResetOK() {
+        //    var ResetDivShowErrMsg = pwwin.ResetDivShowErrMsg;
+        //    ResetDivShowErrMsg("正在重置,请稍候...", true);
+        //    var dataBase = adw.GetEnter();
+        //    if (dataBase == null || dataBase == '') {
+        //        ErrorMsg("请选择企业");
+        //        return;
+        //    }
+        //    function ChenkPreSubmit(resetmode, logid, recvaccount) {
+        //        if (resetmode == null || resetmode == undefined || resetmode == "") {
+        //            ResetDivShowErrMsg("请先选择重置方式");
+        //            return false;
+        //        }
+
+        //        if (logid == null || logid == undefined || logid == "") {
+        //            ResetDivShowErrMsg("请先输入用户");
+        //            return false;
+        //        }
+
+        //        if (recvaccount == null || recvaccount == undefined || recvaccount == "") {
+        //            if (resetmode == "mobile") {
+        //                ResetDivShowErrMsg("请输入有效的手机号");
+        //            }
+        //            else {
+        //                ResetDivShowErrMsg("请输入有效的邮箱地址");
+        //            }
+
+        //            return false;
+        //        }
+
+        //        return true;
+        //    }
+        //    //var logid = $("#UserNameTextPSReset").val();
+        //    var logid = $("#UserNameTextPSReset").combobox('getValue');
+        //    var resetmode = $("#ResetMode").combobox('getValue');
+        //    var recvaccount = $("#ResetModeText").val();
+        //    if (!ChenkPreSubmit(resetmode, logid, recvaccount)) {
+        //        return;
+        //    }
+        //    var param = resetmode + "@@@@%23%23" + logid + "@@@@%23%23" + dataBase + "@@@@%23%23" + recvaccount + "@@@@%23%23" + 0;
+        //    $.ajax({
+        //        url: C_ROOT + "Portal.mvc/ResetPassWord?param=" + param,
+        //        type: 'Post',
+        //        success: function (data) {
+        //            if (data == "1") {
+        //                Ext.MessageBox.alert('提示', "重置密码成功");
+        //                pwwin.Close();
+        //            }
+        //            else {
+        //                ResetDivShowErrMsg(data);
+        //            }
+        //        },
+        //        error: function (errText) {
+        //            ResetDivShowErrMsg(errText.responseText);
+        //        }
+        //    })
+        //}
+
+
+        ////获取验证码方法
+        //var timer;
+        //var count = 60;
+        //var curCount;//当前剩余秒数
+        //var VerficationCode = '';//验证码
+        //var codeLength = 6;//验证码长度
+        //var isClick = false;
+
+        //function GetVerificationCode() {
+        //    isClick = true;
+
+        //    var resetUser = $("#UserNameTextPSReset").combobox('getValue');//用户名
+        //    var resetMode = $("#ResetMode").combobox('getValue');//手机重置还是邮箱重置
+
+        //    //var DBServer = $("#DBServer").combobox("getValue");
+        //    //if (DBServer == "")
+        //    //    Ext.MessageBox.alert('提示',"请您在高级里面选择服务器！");
+        //    var Enterprise = $("#Enterprise").combobox("getValue");
+        //    if (Enterprise == "")
+        //        Ext.MessageBox.alert('提示', "请您在高级里面选择企业！");
+        //    if (Enterprise != "") {
+        //        //检测UC平台是否启用短信或邮箱配置
+        //        $.ajax({
+        //            url: C_ROOT + "Portal.mvc/CheckUCConfig?svrName=&account=" + Enterprise + "&resetMode=" + resetMode,
+        //            type: 'POST',
+        //            async: true,
+        //            success: function (response) {
+        //                result = response.substring(1, 3);
+        //                if (resetMode == 'email' && result.substring(0, 1) == '0') {
+        //                    Ext.MessageBox.alert('提示', "邮件平台未配置，请先联系管理员进行配置后重试");
+        //                    return;
+        //                }
+        //                else if (resetMode == 'mobile' && result.substring(1, 2) == '0') {
+        //                    Ext.MessageBox.alert('提示', "短信平台未配置，请先联系管理员进行配置后重试");
+        //                    return;
+        //                }
+
+        //                curCount = count;
+
+        //                if (resetUser == '') {
+        //                    Ext.MessageBox.alert('提示', '用户名不能为空');
+        //                    return;
+        //                }
+        //                var resetText = $("#ResetModeText").val();//输入的手机号或者邮箱
+        //                if (resetText == '') {
+        //                    if (resetMode == 'mobile')
+        //                        Ext.MessageBox.alert('提示', '手机号码不能为空');
+        //                    else
+        //                        Ext.MessageBox.alert('提示', '邮箱不能为空');
+        //                    return;
+        //                }
+        //                else {
+        //                    //if (!ValidateUserInfo(resetUser, resetMode, resetText)) {
+        //                    //    return;
+        //                    //}
+        //                    //else {
+        //                    //    SendVerficationCode(resetUser, resetMode);
+
+        //                    //}
+        //                    ValidateUserInfo(resetUser, resetMode, resetText)
+        //                }
+        //            }
+        //        })
+        //    }
+        //}
+
+        ////验证手机号和邮箱是否正确
+        //function ValidateUserInfo(resetUser, resetMode, resetText) {
+        //    var isMobile = /^[1][0-9]{10}$/;
+        //    var isEmail = new RegExp("^[a-z0-9]+([._\\-])*@@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+
+        //    if (resetMode == 'mobile' && !isMobile.test(resetText)) {
+        //        Ext.MessageBox.alert('提示', '请输入正确格式的手机号');
+        //    }
+        //    else if (resetMode == 'email' && !isEmail.test(resetText)) {
+        //        Ext.MessageBox.alert('提示', '请输入正确格式的邮箱');
+        //    }
+        //    else {
+        //        //var DBServer = $("#DBServer").combobox("getValue");
+        //        //if (DBServer == "")
+        //        //    Ext.MessageBox.alert('提示',"请您在高级里面选择服务器！");
+        //        var Enterprise = $("#Enterprise").combobox("getValue");
+        //        if (Enterprise == "")
+        //            Ext.MessageBox.alert('提示', "请您在高级里面选择企业！");
+        //        if (Enterprise != "") {
+        //            $.ajax({
+        //                url: C_ROOT + "Portal.mvc/CheckMobileOrEmail?svrName=&account=" + Enterprise + "&resetUser=" + resetUser + "&resetMode=" + resetMode + "&resetText=" + resetText,
+        //                type: 'POST',
+        //                async: true,
+        //                success: function (response) {
+        //                    var result = eval('(' + response + ')');
+        //                    if (result.success == "true") {
+        //                        SendVerficationCode(resetUser, resetMode);
+        //                    } else {
+        //                        Ext.MessageBox.alert('提示', result.error);
+        //                    }
+        //                }
+        //            })
+        //        }
+        //    }
+        //}
+
+
+        //function SendVerficationCode(resetUser, resetMode) {
+        //    //var DBServer = $("#DBServer").combobox("getValue");
+        //    //if (DBServer == "")
+        //    //    Ext.MessageBox.alert('提示',"请您在高级里面选择服务器！");
+        //    var Enterprise = $("#Enterprise").combobox("getValue");
+        //    if (Enterprise == "")
+        //        Ext.MessageBox.alert('提示', "请您在高级里面选择企业！");
+        //    VerficationCode = GenerateVerficationCode();
+        //    if (DBServer != "" && Enterprise != "") {
+        //        $.ajax({
+        //            url: C_ROOT + "Portal.mvc/SendVerficationCode?svrName=&account=" + Enterprise + "&resetUser=" + resetUser + "&resetMode=" + resetMode + "&VerficationCode=" + VerficationCode,
+        //            type: 'POST',
+        //            async: true,
+        //            success: function (response) {
+        //                if (response.toLowerCase() == 'true') {
+        //                    //设置button效果，开始计时
+        //                    $("#GetVerificationCode").attr('disabled', true);
+        //                    $("#GetVerificationCode").val('请在' + curCount + '秒内输入');
+        //                    timer = setInterval(function () {
+        //                        if (curCount == 0) {
+        //                            clearInterval(timer);
+        //                            $("#GetVerificationCode").attr('disabled', false);
+        //                            $("#GetVerificationCode").val('重新获取');
+        //                            VerficationCode = '';
+        //                        }
+        //                        else {
+        //                            curCount--;
+        //                            $("#GetVerificationCode").val('请在' + curCount + '秒内输入');
+        //                        }
+        //                    }, 1000);
+        //                    //ValidateVerficationCode();
+        //                }
+        //                else {
+        //                    Ext.MessageBox.alert('提示', '验证码未成功发送');
+        //                }
+        //                //var result = eval('(' + response + ')');
+        //                //if (result.success == "true") {
+        //                //    check = true;
+        //                //} else {
+        //                //    check = false;
+        //                //    Ext.MessageBox.alert('提示',result.error);
+        //                //}
+        //            }
+        //        })
+        //    }
+        //}
+
+        ////验证用户输入的验证码和发送的是否一致
+        //function ValidateCodeOK() {
+        //    var resetUser = $("#UserNameTextPSReset").combobox('getValue');//用户名
+        //    if (!isClick) {
+        //        Ext.MessageBox.alert('提示', "请先获取验证码");
+        //        return;
+        //    }
+        //    var inputCode = $("#ResetCodeText").val();
+        //    if (inputCode == '') {
+        //        Ext.MessageBox.alert('提示', "验证码不能为空");
+        //        return;
+        //    }
+        //    if (inputCode.length != 6) {
+        //        Ext.MessageBox.alert('提示', "验证码的长度为六位");
+        //        return;
+        //    }
+        //    if (inputCode == VerficationCode) {
+        //        ShowResetPwd(resetUser);
+        //    }
+        //    else {
+        //        Ext.MessageBox.alert('提示', "验证码错误，请重新输入");
+        //    }
+        //}
+
+        //////重置密码
+        ////var resetPwdWin;
+        ////function ShowResetPwd() {
+        ////    if (resetPwdWin == null)
+        ////        resetPwdWin = new ResetPwdWindow();
+        ////    resetPwdWin.Show();
+        ////}
+
+        ////function ResetPwdCancel() {
+        ////    resetPwdWin.Close();
+        ////}
+
+        ////跳转到修改密码界面
+        //var resetPwdWin;
+        //function ShowResetPwd(resetUser) {
+        //    if (resetPwdWin == null)
+        //        resetPwdWin = new ResetPwdWindow();
+        //    resetPwdWin.Show();
+        //    $('#usertext').val(resetUser);
+        //    //$('#ResetPwdDiv').window('open');
+        //}
+
+        //function ResetPwdOK() {
+        //    var resetUser = $('#usertext').val();
+        //    var newPwd = $('#NewPwd').val();
+        //    var newPwdConfirm = $('#NewPwdConfirm').val();
+        //    if (newPwd == '') {
+        //        Ext.MessageBox.alert('提示', '密码不能为空');
+        //        return;
+        //    }
+        //    if (newPwd.length > 10) {
+        //        Ext.MessageBox.alert('提示', '密码的最大长度为十位');
+        //        return;
+        //    }
+        //    if (newPwd != newPwdConfirm) {
+        //        Ext.MessageBox.alert('提示', '新密码和旧密码不一致');
+        //        return;
+        //    }
+        //    //var DBServer = $("#DBServer").combobox("getValue");
+        //    //if (DBServer == "")
+        //    //    Ext.MessageBox.alert('提示',"请您在高级里面选择服务器！");
+        //    var Enterprise = $("#Enterprise").combobox("getValue");
+        //    if (Enterprise == "")
+        //        Ext.MessageBox.alert('提示', "请您在高级里面选择企业！");
+        //    if (Enterprise != "") {
+        //        $.ajax({
+        //            url: C_ROOT + "/Portal.mvc/ResetPwd?svrName=&account=" + Enterprise + "&resetUser=" + resetUser + "&newPwd=" + newPwd,
+        //            type: 'POST',
+        //            async: true,
+        //            success: function (response) {
+        //                var result = eval('(' + response + ')');
+        //                if (result.success == "true") {
+        //                    Ext.MessageBox.alert('提示', "密码修改成功，请使用新密码登录系统");
+        //                } else {
+        //                    Ext.MessageBox.alert('提示', result.error);
+        //                }
+        //            }
+        //        })
+        //    }
+        //}
+
+        //function ResetPwdCancel() {
+        //    $('#usertext').val('');
+        //    $('#NewPwd').val('');
+        //    $('#NewPwdConfirm').val('');
+        //    resetPwdWin.Close();
+        //    //$('#ResetPwdDiv').window('close');
+        //}
+
+        ////随机生成六位验证码
+        //function GenerateVerficationCode() {
+        //    var num = '';
+        //    for (var i = 0; i < 6; i++) {
+        //        num += Math.floor(Math.random() * 10);
+        //    }
+        //    return num;
+        //}
+
+        //取得默认账套
+        function GetDefaultDB() {
+            Ext.Ajax.request({
+                url: C_ROOT + 'Portal.mvc/GetAccInfo?serverindex=0',
+                sync: false,
+                success: function (res, opts) {
+                    data = Ext.decode(res.responseText);
+                    Ext.Ajax.request({
+                        url: C_ROOT + "SUP/Login/GetDefaultDB",
+                        sync: false,
+                        success: function (res, opts) {
+                            $.each(data, function (index, val) {
+                                if (val.dbname == res.responseText) {
+                                    defaultDb =  val.ucode
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        var defaultDb; //默认账套
+        GetDefaultDB(); //取得默认账套
+
+        function LoginIn(isOnlineCheck) {
+            if (IsLogin === 'true') {
+                ShowInfo("已登录!");
+                return;
+            }
+            function ShowInfo(msg) {
+                Ext.MessageBox.show({
+                    title: '提示',
+                    msg: msg,
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.MessageBox.INFO,
+                    animEl: "loginDiv",
+                    closable: false
+                });
+            }
+            var userid = $("#UserNameText").val();
+            G6HUserid = userid;
+            var pwd = $("#PasswordText").val();
+            var connectType = $("#ConnectType").val();// "TCP";//$("#ConnectType").combobox("getValue");
+            var account = $("#Enterprise").val();//"0001";//$("#Enterprise").combobox("getValue");
+
+            if (userid == "" || !userid) {
+                ShowInfo("请先输入用户名!");
+                return;
+            }
+            var myMask = new Ext.LoadMask(document.body, { msg: "登录中,请稍候..." });
+            myMask.show();
+
+           // if (adw != null)
+           //     LoginEntity = { UserID: userid, UserPwd: pwd, DataBase: adw.GetEnter(), IsOnlineCheck: isOnlineCheck };
+           // else {
+            var lastAccount = recentAccount.GetAccount();
+            if (!lastAccount) {
+                lastAccount = defaultDb; //取得默认账套
+            }
+            if (account) {
+                lastAccount = account;
+            }
+            LoginEntity = { UserID: userid, UserPwd: pwd, DataBase: lastAccount, IsOnlineCheck: isOnlineCheck };
+           // }
+            if (!account) {
+                account = LoginEntity.DataBase;
+            }
+            recentAccount.AddAccount(account); //无论登录是否成功，都记录，以便下次打开高级设置不会混乱
+
+            Ext.Ajax.request({
+                @*//url: '@Url.Content("~/web/NG3WebLogin/Login")',*@
+                url: '@Url.Content("~/SUP/Login/WebLogin")',
+                params: LoginEntity,
+                success: function (res, opts) {
+                    var json = Ext.decode(res.responseText);
+                    if (json.success == true) {
+                        userCookie.AddUser(userid);
+                        recentLogid.AddUser(userid);
+                        recentLogid.AddPsd(pwd);
+                        recentConnectType.AddType(connectType);
+                        //recentAccount.AddAccount(account); //无论登录是否成功，都记录，以便下次打开高级设置不会混乱
+                    }
+                    logAjaxSuccess(json, myMask)
+                },
+                failure: function () { myMask.hide(); }
+            });
+
+            function logAjaxSuccess(json, myMask) {
+                if (json.success == false) {
+                    myMask.hide();
+                    try {
+                        var result = Ext.JSON.decode(json.msg);
+                        Ext.MessageBox.confirm('提示', result.Message, function (btn) {
+                            if (btn == 'yes') {
+                                Ext.Ajax.request({
+                                    url: '@Url.Content("~/SUP/Login/KillOnlineUser")',
+                                    params: { 'IpAddress': result.IpAddress, 'Devicetype': result.Devicetype, 'UserId': result.UserId, 'SessionID': result.SessionID },
+                                    success: function () {
+                                        LoginIn("1");
+                                    }
+                                });
+                            }
+                        });
+
+                    } catch (e) {
+                        ShowInfo(json.msg);
+                    }
+                }
+                else if (json.msg == "UserNoHaveOrg") {
+                    myMask.hide();
+                    //展示组织选择
+                    var userid = $("#UserNameText").val();
+
+                    Ext.define('gridModel', {
+                        extend: 'Ext.data.Model',
+                        fields: [{
+                            name: 'ocode',
+                            type: 'string',
+                            mapping: 'ocode'
+                        }, {
+                            name: 'oname',
+                            type: 'string',
+                            mapping: 'oname'
+                        },
+                        {
+                            name: 'orgid',
+                            type: 'string',
+                            mapping: 'orgid'
+                        }
+                        ]
+                    });
+
+                    var gridStore = Ext.create('Ext.data.Store', {
+                        model: 'gridModel',
+                        autoLoad: true,
+                        sortOnLoad: true,
+                        pageSize: 10,
+                        proxy: {
+                            type: 'ajax',
+                            //url: C_ROOT + 'web/NG3WebLogin/GetLoginOrgList?userid=' + userid + '&dataBase=' + $("#Enterprise").combobox('getValue'),
+                            url: C_ROOT + 'SUP/Login/GetLoginOrgList?userid=' + userid + '&dataBase=' + account,
+                            reader: {
+                                type: 'json',
+                                root: 'Record',
+                                totalProperty: 'totalRows'
+                            }
+                        }
+                    });
+
+                    var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                        region: 'center',
+                        store: gridStore,
+                        buskey: 'orgid',
+                        columns: [
+                             { header: '组织phid', dataIndex: 'orgid', flex: 1, hidden: true, editable: false },
+                            { header: '组织编码', dataIndex: 'ocode', flex: 1, sortable: true, editable: false },
+                            { header: '组织名', dataIndex: 'oname', flex: 1, sortable: false, editable: false }
+                        ],
+                        dockedItems: [{
+                            xtype: 'pagingtoolbar',
+                            store: gridStore,   // same store GridPanel is using
+                            dock: 'bottom',
+                            displayInfo: true
+                        }]
+                    });
+
+                    function Login() {
+                        var data = gridPanel.getSelectionModel().getSelection();
+                        if (data.length > 0) {
+                            Ext.Ajax.request({
+                                params: { 'ocode': data[0].raw.ocode, 'orgid': data[0].raw.orgid, "ocodeName": data[0].raw.oname },
+                                //url: C_ROOT + 'web/NG3WebLogin/ChangeOrg',
+                                url: C_ROOT + 'SUP/Login/ChangeOrg',
+                                success: function (response) {
+                                    myMask.hide();
+                                    if (response.responseText) {
+                                        window.location.href = '@Url.Content("~/web/Home/Index")';
+                                    }
+                                },
+                                failure: function (response, opts) {
+                                    console.log('ChangeOrg Error' + response.status);
+                                }
+                            });
+                        }
+                        else {
+                            Ext.MessageBox.alert('提示', '请选中要登录的组织！');
+                            //Ext.MessageBox.alert('提示',"请选择您要登录的组织！")
+                        }
+                    }
+                    gridPanel.on('itemdblclick', function (record, item, index, e, eOpts) {
+                        Login();
+                    });
+
+                    var orgC = Ext.create('Ext.window.Window', {
+                        title: '组织初始化',
+                        height: 360,
+                        width: 380,
+                        layout: 'fit',
+                        items: gridPanel,
+                        buttons: [
+                            {
+                                text: '保 存',
+                                handler: function () {
+                                    Login();
+                                }
+                            },
+                            {
+                                text: '关 闭',
+                                handler: function () {
+                                    orgC.hide();
+                                }
+                            }
+                        ]
+                    }).show();
+                }
+                else {
+                    IsLogin = 'true';
+                    myMask.hide();
+                    var sk = document.getElementById('sk');
+                    sk.style.display = 'none';
+                    var loginImg = document.getElementById('loginImg');
+                    loginImg.src = "@Url.Content("~/NG3Resource/New_Login/img/6_04_03.png")";
+                    @*window.location.href = '@Url.Content("~/web/Home/Index")';*@
+                }
+            }
+        }
+
+        function findUrl(module) {
+            var url = "";
+            var ProductUserCode = "";
+            var verify = "";
+            Ext.Ajax.request({
+                params: { 'ProductBZ': module },
+                url: C_ROOT + 'GQT/QT/QTProduct/GetQTProductByBZ',
+                async: false,
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    url = resp.ProductUrl;
+                }
+            });
+
+
+            Ext.Ajax.request({
+                params: { 'ProductBZ': module, 'UserNo': G6HUserid },
+                url: C_ROOT + 'GQT/QT/QTProductUser/getUserByProduct',
+                async: false,
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+
+                    ProductUserCode = resp.ProductUserCode;
+                    verify = md5(ProductUserCode + "newgrand")
+
+                }
+            });
+            if (url != "" && ProductUserCode != "" && verify != "") {
+                url = url.replace("#username#", ProductUserCode).replace("#verify#", verify);
+                return url;
+            }
+            return "";
+
+        }
+
+        //var source = "";
+        //var productModule = "";
+
+
+        ////var appurl = "http://10.0.16.187:6666/gsoftserver";
+        //var appurl = "";
+        //var connect = "";//"MSSQL;10.0.2.101\\UPEPM;1433;USER66592018;sa;123456gj";  //(该串由如下组)
+        //var orgcode = "";// "101000001";
+        //var orgNo = "";//"6659";//账套代码(注：必须要有)
+        //var orgName = "";//账套名称(注：可为空)
+        //var year = "";//"2018";//年度(注：必须要有)
+        //var userName = "";//操作员名称
+        //var userNo = "";//"888888";//操作员代码
+        //var URL_Server = "";//appurl + "/servlet"; //(注：应用服务器地址(下载地址))
+        //var NSURL = "";// appurl + "/licenseserver/nsserver"; //(注：加密验证服务器，即狗的地址)
+        //var netcallserver = "";//"http://:36984/nsserver";//netcall服务器(注：可为空)
+        //var parameter = "";//具体传参数的集合,消息类型(注：“Query_Voucher;gia3_base_auditmethodcon.phid（条件表的主键）”为凭证查询)
+        //var connecting = connect;//数据库连接串(注：可为空)
+        //connecting = "";
+        //var userPwd = "";//用户密码注：可为空)
+        //var module = "";//调用的模块或是产品(注：固定为“Web_Gia”)
+        //var enterNo = "";//默认组织代码(注：必须要有，且必须是末级组织)
+        //var depno = "";//默认部门代码(注：可为空)
+        //var pid = "";//窗口打开父类的句柄(注：可为空)
+        //var url = "";
+        //var ProductUserCode = "";
+        //var verify = "";
+
+        //function loginToG6(module_prouct) {
+        //    url = "";
+        //    Ext.Ajax.request({
+        //        params: { 'ProductBZ': module_prouct },
+        //        url: C_ROOT + 'GQT/QT/QTProduct/GetQTProductByBZ',
+        //        async: false,
+        //        success: function (response) {
+        //            if (response.responseText == null || response.responseText == "") {
+        //                Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+        //                return;
+        //            }
+        //            var resp = Ext.JSON.decode(response.responseText);
+        //            url = resp.ProductUrl;
+        //        }
+        //    });
+        //    if (url != null && url.length > 0) {
+        //        var len = url.indexOf('year');
+        //        if (len <= 0) {
+        //            Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+        //            return;
+        //        }
+        //        appurl = url.substring(0, len - 1);
+        //        year = url.substring(len + 5, len + 9);
+        //        len = url.indexOf('account');
+        //        if (len <= 0) {
+        //            Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+        //            return;
+        //        }
+        //        orgNo = url.substring(len + 8, url.length);
+        //    } else {
+        //            Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+        //            return;
+        //    }
+        //     URL_Server = appurl + "/servlet"; //(注：应用服务器地址(下载地址))
+        //     NSURL = appurl + "/licenseserver/nsserver"; //(注：加密验证服务器，即狗的地址)
+        //    Ext.Ajax.request({
+        //        params: { 'ProductBZ': module_prouct, 'UserNo': G6HUserid },
+        //        url: C_ROOT + 'GQT/QT/QTProductUser/getUserByProduct',
+        //        async: false,
+        //        success: function (response) {
+        //            if (response.responseText == null || response.responseText == "") {
+        //                Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+        //                return;
+        //            }
+        //            var resp = Ext.JSON.decode(response.responseText);
+        //            ProductUserCode = resp.ProductUserCode;
+        //            userPwd =  resp.ProductUserPwd;
+        //            userName = resp.ProductUserName;
+        //        }
+        //    });
+        //    if (url != null && url.length > 0) {
+        //        userNo = ProductUserCode;
+        //    } else {
+        //        setTimeout(function () {
+        //            Ext.MessageBox.alert('提示', "打开集中财务失败，请先设置账号对应关系！");
+        //        }, 100);
+        //        return;
+        //    }
+        //    insertActiveX('ngdiv', appurl + "/nsserver/Newgrand.cab#Version=6,3,0,8", appurl + "/fileserver", appurl);
+
+        //}
+        //function insertActiveX(elm, downLoadCodebase, URL_NSServer, URL_Shortcut) {
+        //    var htmlstr = CallPBCommon.$insertActiveX(downLoadCodebase, URL_NSServer, URL_Shortcut);
+        //    document.getElementById(elm).innerHTML = htmlstr;
+        //    Run("login");
+        //}
+        //function Run(data) {
+        //    source = data;
+        //    window.open('GXM/XM/DefinedDesk/Index_DownLoadPB');
+        //    //window.open('http://10.0.20.50/g6h/web');
+        //    //window.open('http://10.0.16.187:6666/gsoftserver/nsserver/Newgrand.cab');
+        //    return;
+        //    $("#ngdiv").show();
+        //    var AF = document.all('AF');
+        //    if (source == "login") {
+        //        var params = CallPBCommon.$params(orgNo, orgName, year, userName, userNo, URL_Server, NSURL, netcallserver, parameter, connecting, userPwd, module, enterNo, depno, pid);
+        //        $("#ngdiv").show();
+        //        var AF = document.all('AF');
+        //        //AF.Run("zw", 1, params);
+        //        AF.Run(productModule, 1, params);
+
+        //    } else {
+        //        AF.Run(productModule, 1, params);
+        //        //AF.Run("zw", 0, "");
+        //    }
+
+        //}
+
+
+
+
+        function LoginToModule(index) {
+
+            if (index == "GHC") {
+
+                window.location.href = 'http://47.111.79.136/ghc/saas/index.html';
+                return;
+
+                //url = "";
+                //Ext.Ajax.request({
+                //    params: { 'ProductBZ': "GHC" },
+                //    url: C_ROOT + 'GQT/QT/QTProduct/GetQTProductByBZ',
+                //    async: false,
+                //    success: function (response) {
+                //        if (response.responseText != null && response.responseText.length > 0) {
+                //            var resp = Ext.JSON.decode(response.responseText);
+                //            url = resp.ProductUrl;
+                //        }
+
+                //    }
+                //});
+
+                //if (url != null && url.length > 0) {
+                //    window.location.href = url;
+                //} else {
+
+                //    Ext.MessageBox.alert('提示', '请先正确维护产品地址！');
+                //    return;
+
+                //}
+
+            }
+
+            if (IsLogin == 'false') {
+                //Ext.MessageBox.alert('提示', '请先登录！');
+                sk();
+                return;
+            }
+
+            var SetupPath = "";
+            Ext.Ajax.request({
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetSetupPath',
+                async: false,
+                success: function (response) {
+                    SetupPath = response.responseText;
+
+                }
+            });
+
+            var ZJBFaddress = 'bf/index.html';
+            switch (index) {
+				case "YKJH":
+                    //window.location.href = '@Url.Content("~/web/Home/Index")';
+                    window.open("web/Home/Index?GHExpense=true");
+
+
+                    break;
+                case "G6H":
+                    //window.location.href = '@Url.Content("~/web/Home/Index")';
+                    window.open("web/Home/Index");
+                    @*Ext.Ajax.request({
+
+                        url: '@Url.Content("~/SUP/Login/WebLogin")',
+                        params: LoginEntity,
+                        success: function (res, opts) {
+                            window.open("web/Home/Index");
+
+                        }
+                    })*@
+
+                    break;
+                case "G6":
+                    //showdiv();
+
+                    var orgUserCode = "";
+                    //产品标志加上用户对应的默认组织，以区分相同产品不同地址的问题
+                    Ext.Ajax.request({
+                        params: { 'userID': G6HUserid },
+                        url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                        async: false,
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                var orgDept = resp.Msg;
+                                var orgDeptArray = orgDept.split(",");
+                                orgUserCode = orgDeptArray[0];
+
+                            }
+                        }
+                    });
+                    //productModule = "zw";
+                    //loginToG6("G6" + orgUserCode + SetupPath);
+                    //localStorage.setItem("productModule", JSON.stringify("zw"));
+                    //sessionStorage.setItem("G6HUserid", JSON.stringify(G6HUserid));
+                    //sessionStorage.setItem("module_prouct", JSON.stringify("G6" + orgUserCode + SetupPath));
+
+                    var module_prouct = "G6" + orgUserCode + SetupPath;
+                    window.open('GXM/XM/DefinedDesk/Index_DownLoadPB?productModule=zw&G6HUserid=' + G6HUserid + "&module_prouct=" + module_prouct);
+
+                    //Ext.Ajax.request({
+                    //    params: { 'path':"C:/Windows/System32"},
+                    //    url: C_ROOT + 'GXM/XM/ProjectMst/StartExe',
+                    //    async: false,
+                    //    success: function (response) {
+                    //        var resp = Ext.JSON.decode(response.responseText);
+
+                    //    }
+                    //});
+
+                    //var url = findUrl("G6");
+                    //if (url != "" ) {
+                    //    window.location.href = url;
+                    //} else {
+                    //    setTimeout(function () {
+                    //        Ext.MessageBox.alert('提示', "打开集中财务失败，请先设置账号对应关系！");
+                    //    }, 100);
+                    //}
+
+                    break;
+                case "BB":
+                   // showdiv();
+
+                    var orgUserCode = "";
+                    //产品标志加上用户对应的默认组织，以区分相同产品不同地址的问题
+                    Ext.Ajax.request({
+                        params: { 'userID': G6HUserid },
+                        url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                        async: false,
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                var orgDept = resp.Msg;
+                                var orgDeptArray = orgDept.split(",");
+                                orgUserCode = orgDeptArray[0];
+
+                            }
+                        }
+                    });
+                    //productModule = "bb";
+                    //loginToG6("G6" + orgUserCode + SetupPath);
+                    var module_prouct = "G6" + orgUserCode + SetupPath;
+                    window.open('GXM/XM/DefinedDesk/Index_DownLoadPB?productModule=bb&G6HUserid=' + G6HUserid + "&module_prouct=" + module_prouct);
+
+                    break;
+                case "GZ":
+                    // showdiv();
+
+                    var orgUserCode = "";
+                    //产品标志加上用户对应的默认组织，以区分相同产品不同地址的问题
+                    Ext.Ajax.request({
+                        params: { 'userID': G6HUserid },
+                        url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                        async: false,
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                var orgDept = resp.Msg;
+                                var orgDeptArray = orgDept.split(",");
+                                orgUserCode = orgDeptArray[0];
+
+                            }
+                        }
+                    });
+                    //productModule = "bb";
+                    //loginToG6("G6" + orgUserCode + SetupPath);
+                    var module_prouct = "G6" + orgUserCode + SetupPath;
+                    window.open('GXM/XM/DefinedDesk/Index_DownLoadPB?productModule=df&G6HUserid=' + G6HUserid + "&module_prouct=" + module_prouct);
+
+                    break;
+                case "JX":
+                    window.open("web/Home/Index?PerformanceMst=true");
+                    break;
+                case "ZJBF":
+                    Ext.Ajax.request({
+                        url: C_ROOT + "GQT/QT/CorrespondenceSettings/GetLogin",
+                        async: false,
+                        success: function (response) {
+                            if (response.responseText != '' && response.responseText != null) {
+                                var item = Ext.JSON.decode(response.responseText);
+                                if (item.MenuButton.fund == 'True') {
+                                    //console.log(item);
+                                    window.open(ZJBFaddress + '?DbName=' + item.DbName + "&OrgId=" + item.OrgId + "&UserId=" + item.UserId + "#/fund");
+                                }
+                            } else {
+                                Ext.MessageBox.alert('提示', '无资金拨付权限！');
+                            }
+
+                        }
+                    });
+                    break;
+                default:
+                    break;
+            }
+
+
+
+
+        }
+
+        window.onbeforeunload = function () {
+            Ext.Ajax.request({
+                url: C_ROOT + 'SUP/Login/LoginOut'
+            });
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <div class="box" style="position:relative;">
+        <!-- 用户头像图标 -->
+        <div class="touxiang" style="cursor:pointer" onclick="sk()"><img id="loginImg" src="~/NG3Resource/New_Login/img/6_01.png" /></div>
+        <i class="kg"><img src="~/NG3Resource/New_Login/img/7.png" style="width: 100%;" onclick="loginOut()" /></i>
+
+        <!-- 登录窗口 -->
+        <div class="sk" id="sk">
+            <img class="ds23" src="~/NG3Resource/New_Login/img/ds23.png" />
+            <div style="margin-top:58px;">
+                <div class="tb1"><img src="~/NG3Resource/New_Login/img/zh.png" style="width: 38%;height: 85%; float: right; margin-top: 2px;" /></div>
+                <input id="UserNameText" type="text" placeholder="请输入账号" />
+            </div>
+            <div>
+                <div class="tb1"><img src="~/NG3Resource/New_Login/img/mm.png" style="width:38%;height:72%; margin-right:2px; float: right; margin-top:4px;" /></div>
+                <input id="PasswordText" type="password" placeholder="请输入密码" />
+            </div>
+            <div class="text1">
+                <p style="margin-left:31px;"><a href="/G6H/web/Downloadkuaijie/shortcut">快捷方式下载</a></p>
+                <p style="margin-left:100px;" onclick="gj()">高级</p>
+            </div>
+            <ul>
+                <li onclick="sk1()">取消</li>
+                <li onclick="LoginIn('1')">登录</li>
+            </ul>
+            <div class="sk1" id="gj">
+                <div style="margin-top:58px;">
+                    <div class="tb1" style="text-align:center; color: #fff;line-height: 38px;margin-left: -0px !important; width:63px !important;">账套</div>
+                    <input type="text" id="Enterprise" list="Enterprise1" name="00001" placeholder="请选择账套" style="font-weight: bold;width: 154px;" />
+                    <datalist id="Enterprise1"></datalist>
+                </div>
+                <div>
+                    <div class="tb1" style="text-align:center;color: #fff;line-height: 38px;margin-left: -0px !important; width:63px !important;">连接方式</div>
+                    <input type="text" id="ConnectType" list="ConnectType1" name="00001" placeholder="请选连接方式" style="font-weight: bold;width: 154px;" />
+                    <datalist id="ConnectType1">
+                        <option>TCP</option>
+                        <option>HTTP</option>
+                    </datalist>
+                </div>
+                <div class="text1">
+                    <p style="margin-left:218px;" onclick="gj()">高级</p>
+                </div>
+                <ul>
+                    <li onclick="gj1()">取消</li>
+                    <li onclick="gj1()">确认</li>
+                </ul>
+            </div>
+        </div>
+        <div class="top_box" style="height:55% !important;">
+            <img class="top_box_img" src="~/NG3Resource/New_Login/img/bt1.png" />
+            <div class="Hierarchy">
+                <div class="left_box">
+                    <img src="~/NG3Resource/New_Login/img/logo_1.png" style="width:85%;" />
+                </div>
+                <div class="right_box">
+                    <div class="min_Title"><img src="~/NG3Resource/New_Login/img/txt_03.png" /></div>
+                    <div class="max_Title"><img src="~/NG3Resource/New_Login/img/txt_06.png" /></div>
+                </div>
+            </div>
+            <div id="div" class="option">
+                <div class="an1" style="color:#b7302d;"><img src="~/NG3Resource/New_Login/img/1_03.png" />省本级财务管控</div>
+                <div class="an1"><img src="~/NG3Resource/New_Login/img/1_03.png" />上下级财务管控</div>
+            </div>
+        </div>
+
+        <div class="bottom_box">
+            <ul>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('G6H')"><a><img src="~/NG3Resource/New_Login/img/gh_03_xx.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('YKJH')"><a><img src="~/NG3Resource/New_Login/img/gh_05_1_xx.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/gh_07_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('ZJBF')"><a><img src="~/NG3Resource/New_Login/img/gh_19.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/gh_09_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/gh_23_xx.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('GZ')"><a><img src="~/NG3Resource/New_Login/img/gh_21.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('G6')"><a><img src="~/NG3Resource/New_Login/img/gh_11.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('BB')"><a><img src="~/NG3Resource/New_Login/img/gh_123.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/gh_15_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s" onclick="LoginToModule('JX')"><a><img src="~/NG3Resource/New_Login/img/gh_13.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/gh_17_x.png" /></a></li>
+            </ul>
+        </div>
+        <div class="bottom_box bottom_box1" style="display:none;">
+            <ul>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/t_06_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/t_08_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/t_10_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/t_12_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/t_03_x.png" /></a></li>
+                <li class="name" style="animation-delay:0.2s"><a><img src="~/NG3Resource/New_Login/img/gh_25_x.png" /></a></li>
+            </ul>
+        </div>
+    </div>
+    <table style="border: 0px; width: 100%">
+        <tr>
+            <td>
+                <div id="ngdiv" align="center" style="position: absolute; bottom: 0; left:10%; width: 80%; height: 100px;"></div>
+                <div id="bg"></div>
+                <div id="show">正在下载模块，请稍候...</div>
+                @* <input type="button" value="打开" onclick="Login()" />*@
+            </td>
+        </tr>
+    </table>
+    @*<script src="~/NG3Resource/New_Login/js/jquery-1.11.1.min.js"></script>
+        <script src="~/NG3Resource/New_Login/js/yundong2.js"></script>*@
+    <script>
+        $(".option div").click(function(){
+			var index = $(".option div").index(this);
+			$(".bottom_box").hide(0);
+			$(".bottom_box").eq(index).fadeIn(0);
+		})
+        var oDiv = document.getElementById('div');
+        var oLi = oDiv.getElementsByTagName('div');
+        for (var i = 0; i < oLi.length; i++) {
+            oLi[i].onclick = function () {
+                for (var i = 0; i < oLi.length; i++) {
+                    oLi[i].style.color = '#5d5d5d';
+                    this.style.color = '#b7302d';
+                }
+            }
+        }
+        function k() {
+            var t = document.getElementById('t');
+            var b = document.getElementById('b');
+            t.style.display = 'none';
+            b.style.display = 'block';
+        }
+        function sk() {
+            if (IsLogin === 'true') {
+                Ext.MessageBox.alert('提示', "已登录！");
+                return;
+            }
+            var sk = document.getElementById('sk');
+            sk.style.display = 'block';
+            sk.className += " an";
+        }
+        function sk1() {
+            var sk = document.getElementById('sk');
+            sk.style.display = 'none';
+        }
+
+        function loginOut() {
+            Ext.Msg.confirm('提示', '确定要注销吗?', function (btn) {
+                if (btn == 'yes') {
+                    //if (Ext.getCmp("mainHome") != null) {
+                    //    if (Ext.getCmp("mainHome").contentEl.contentWindow != null) {
+                    //        Ext.getCmp("mainHome").contentEl.contentWindow.savePortal();
+                    //    }
+                    //}
+                    //Ext.Ajax.abortAll();
+                    //WF.loadMarsk("正在注销, 请稍等...").show();
+                    Ext.Ajax.request({
+                        //url: C_ROOT + 'web/NG3WebLogin/LoginOut',
+                        url: C_ROOT + 'SUP/Login/LoginOut',
+                        success: function (res, opts) {
+                            var loginImg = document.getElementById('loginImg');
+                            loginImg.src = "@Url.Content("~/NG3Resource/New_Login/img/6_01.png")";
+                            location.href = C_ROOT + 'web';
+                            IsLogin = 'false';
+                        }
+                    });
+                } else {
+                    if ($SetSupcan) $SetSupcan(true);
+                }
+            });
+        }
+
+
+        function gj() {
+            var gj = document.getElementById('gj');
+            gj.style.display = 'block';
+            var EnterpriseList = document.getElementById('Enterprise1');
+            //EnterpriseList.options.length = 0;
+            EnterpriseList.innerHTML = "";
+            //EnterpriseList.options.remove(0);
+            Ext.Ajax.request({
+                url: C_ROOT + 'Portal.mvc/GetAccInfo?serverindex=0',
+                async: false,
+                success: function (res, opts) {
+                    $.each(data, function (index, val) {
+
+                        $("#Enterprise1").append('<option label="' + val.uname + '" value="' + val.ucode + '"></option>');
+
+                    });
+                }
+            });
+
+            //Ext.Ajax.request({
+            //    url: C_ROOT + "SUP/Login/GetDefaultDB",
+            //    async: false,
+            //    success: function (res, opts) {
+            //        $.each(data, function (index, val) {
+            //            if (val.dbname == res.responseText) {
+            //                $("#Enterprise").combobox('select', val.ucode);
+            //                me.Enter = val.ucode;
+            //                me.EnterText = val.uname;
+            //                if (comboxFnCall) {
+            //                    comboxFnCall.call(this, me.EnterText);
+            //                }
+
+            //                return false;
+            //            }
+            //        });
+            //    }
+            //});
+           // LoadLastInfo();
+
+        }
+
+        function gj1() {
+            var gj = document.getElementById('gj');
+            gj.style.display = 'none'
+
+        }
+
+
+        function showdiv() {
+            document.getElementById("bg").style.display = "block";
+            document.getElementById("show").style.display = "block";
+        }
+        hidediv();
+        function hidediv() {
+            document.getElementById("bg").style.display = 'none';
+            document.getElementById("show").style.display = 'none';
+        }
+
+
+
+    </script>
+
+    <script language="JavaScript" for="AF" event="OnCompleteRun(successful)">
+        if (successful == 1) {
+            //alert("已下载完毕");
+            $("#ngdiv").hide();
+            if (source == "login") {
+                hidediv();
+                //window.opener = null;
+                //window.open('', '_self');
+                // window.close();
+                $CloseTab();
+            }
+        }
+    </script>
+</body>
+
+@*<body style="min-height: 600px;">
+        <div class="logo_box">
+            <img src="~/NG3Resource/Desk/img/login_1.png" />
+        </div>
+        <div id="contentdiv" class="Content">
+            <img src="~/NG3Resource/Desk/img/back_4.jpg" />
+            <img src="~/NG3Resource/Desk/img/txt.png" class="zi"/>
+            <div id="loginDiv" class="Landing_box">
+                <img src="~/NG3Resource/Desk/img/back_3.png" style="width:100%; height:100%;" />
+
+                <div class="inp_box">
+                    <div class="img_box"><img src="~/NG3Resource/Desk/img/dl.png" style="width:100%; height:100%;" /></div>
+                    <input id="UserNameText" type="text" class="inp" placeholder="用户" curcapslockid="0" autocomplete="new-password" />
+                </div>
+                <div class="inp_box1">
+                    <div class="img_box"><img src="~/NG3Resource/Desk/img/ma.png" style="width:100%; height:100%;" /></div>
+                    <input id="PasswordText" type="password" class="inp" placeholder="密码" curcapslockid="0" autocomplete="new-password" />
+                </div>
+                <div id="QRThumbnail" onmouseover="vercode.ShowImage()"
+                     onmouseout="vercode.HiddenImage()" onclick="vercode.ShowQRLogin()">
+                    <img id="QRThumbnailImage" src="~/Resource/pic/QRImage_i8.png" style="width:100%; height: 100%;display:none;" />
+                </div>
+                <div id="QRLoginDiv" onmouseover="vercode.ShowImage()" onmouseout="vercode.HiddenImage()">
+                    <image id="QRImage" style="width: 100%; height: 100%;border-radius:2px 2px 2px 2px;"></image>
+                </div>
+                <div class="Choice">
+                    <a style="margin-right: 10%" href="#" onclick="ShowAdvance()">高级</a>
+                    <a href="#" onclick="ShowPasswordReset()">忘记密码？</a>
+                    <p class="kuaijie"><a href="/G6H/web/Downloadkuaijie/shortcut">快捷方式下载</a></p>
+                </div>
+                <button class="but" onclick="LoginIn()">登陆</button>
+
+            </div>
+            <div id="AdvanceDiv" style="display: none;" title='高级设置'>
+                <table>
+                    <tr valign="bottom">
+                        <td id="enterprise" style="width: 60px; height: 30px;" align="right">
+                            企业:
+                        </td>
+                        <td>
+                            <select id="Enterprise" class="easyui-combobox" name="state" style="width: 200px;"
+                                    valuefield='ucode' textfield='uname' panelheight="140px" editable="false" wrap="false"></select>
+                        </td>
+                    </tr>
+                    <tr valign="bottom">
+                        <td id="connectType" style="width: 60px; height: 30px;" align="right">
+                            连接方式:
+                        </td>
+                        <td>
+                            <select id="ConnectType" class="easyui-combobox" name="state" style="width: 202px;"
+                                    panelheight="auto" editable="false">
+                                <option value="TCP">TCP</option>
+                                <option value="HTTP">HTTP</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" align="right" style="height: 50px;width: 50px; "></td>
+                        <td colspan="1" align="right" style="height:50px">
+                            <input id="OkButton" type="button" style="width: 50px; font-size: 12px;" value="确认" onclick="AdvanceOk()" />
+                            <input id="CancelButton" type="button" style="width: 50px; font-size: 12px;" value="取消" onclick="AdvanceCancel()" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="OrgSelectDiv" style="display: none;" title='登录组织选择'>
+                <table id="OrgSelectTable" class="easyui-datagrid" fit="false" rownumbers="true"
+                       pagination="false" singleselect="true">
+                    <thead>
+                        <tr>
+                            <th field="ocode" width="80">
+                                代码
+                            </th>
+                            <th field="oname" width="295">
+                                名称
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                <div region="south" border="false" style="text-align: right; background-color: #EFEFEF; height: 30px;">
+                    <a class="easyui-linkbutton" style="margin-right: 10px; margin-top: 3px; font-size: 12px;" iconcls="icon-ok"
+                       href="javascript:void(0)" onclick="SelectOrg()">确定</a> <a class="easyui-linkbutton"
+                                                                                 style="margin-right: 10px; margin-top: 3px; font-size: 12px;" iconcls="icon-cancel" href="javascript:void(0)"
+                                                                                 onclick="OrgCancel()">取消</a>
+                </div>
+            </div>
+            <div id="ServerIPDiv" style="display: none;" title='应用服务器选择'>
+                <table id="ServerIPTable" class="easyui-datagrid" fit="false" rownumbers="true" pagination="false"
+                       singleselect="true">
+                    <thead>
+                        <tr>
+                            <th field="servername" width="110">
+                                应用服务器名称
+                            </th>
+                            <th field="serverip" width="100">
+                                IP地址
+                            </th>
+                            <th field="netstate" width="110">
+                                网络状态
+                            </th>
+                            <th field="delay" width="70">
+                                延时
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                <div region="south" border="false" style="text-align: right; background-color: #EFEFEF; height: 30px;">
+                    <a class="easyui-linkbutton" style="margin-right: 10px; margin-top: 3px; font-size: 12px;" iconcls="icon-ok"
+                       href="javascript:void(0)" onclick="SelectServerIp()">确定</a> <a class="easyui-linkbutton"
+                                                                                      style="margin-right: 10px; margin-top: 3px; font-size: 12px;" iconcls="icon-cancel" href="javascript:void(0)"
+                                                                                      onclick="CloseServerIpWindow()">取消</a>
+                </div>
+            </div>
+            <div id="PassWordResetDiv" style="display: none;" title='忘记密码'>
+                <table>
+                    <tr valign="bottom">
+                        <td style="width: 60px; height: 30px;" align="right">
+                            重置方式:
+                        </td>
+                        <td>
+                            <select id="ResetMode" class="easyui-combobox" name="state" style="width: 202px;"
+                                    panelheight="auto" editable="false">
+                                <option value="mobile">手机重置</option>
+                                <option value="email">邮箱重置</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr valign="bottom">
+                        <td style="width: 60px; height: 30px;" align="right">
+                            企&nbsp;&nbsp;&nbsp;&nbsp;业:
+                        </td>
+                        <td>
+                            <input id="EnterprisePSReset" type="text" style="width: 200px; font-size: 12px;" disabled="disabled" />
+
+                        </td>
+                    </tr>
+                    <tr valign="bottom">
+                        <td id="user" style="width: 60px; height: 30px;" align="right">
+                            用&nbsp;&nbsp;&nbsp;&nbsp;户:
+                        </td>
+                        <td>
+                            <select id="UserNameTextPSReset" name="state" style="width: 200px;"
+                                    panelheight="auto" editable="true" delay="2"></select>
+                        </td>
+                    </tr>
+                    <tr valign="bottom">
+                        <td style="width: 60px; height: 30px;" align="right">
+                            <div id="ResetModeExplainDiv">
+                                手机号码:
+                            </div>
+                        </td>
+                        <td>
+                            <input id="ResetModeText" type="text" style="width: 200px; font-size: 12px;" />
+                        </td>
+                    </tr>
+                    <tr valign="bottom">
+                        <td style="width: 60px; height: 30px;" align="right">
+                            <div id="ResetModeCodeDiv">
+                                验证码:
+                            </div>
+                        </td>
+                        <td>
+                            <input id="ResetCodeText" type="text" placeholder="请输入验证码" style="width: 90px; font-size: 12px;float:left" />
+                            <input id="GetVerificationCode" type="button" style="width: 100px; font-size: 12px;margin-left:10px;float:left;text-align:center;" value="获取验证码" onclick="GetVerificationCode()" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height: 50px;">
+                            <div id="ResetingDiv" style="display: none; width: 150px; float: left;"></div>
+                            <div style="width: 110px; float: right;">
+                                <input id="PassWordResetOK" type="button" style="width: 50px; font-size: 12px;" value="确认" onclick="ValidateCodeOK()" />
+                                <input id="PassWordResetCancel" type="button" style="width: 50px; font-size: 12px;" value="取消" onclick="PassWordResetCancel()" />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="ResetPwdDiv" style="display: none;height:250px;" title='重置密码'>
+                <table style="height:200px;">
+                    <tr valign="bottom" style="margin-top:0px;">
+                        <td id="userno" style="width: 80px; height: 20px;" align="right">
+                            当前操作员:
+                        </td>
+                        <td>
+                            <input id="usertext" type="text" style="width: 204px; font-size: 12px;" disabled="disabled" />
+                        </td>
+                    </tr>
+                    <tr valign="bottom" style="margin-top:0px;">
+                        <td style="width: 80px; height: 20px;" align="right">
+                            <div id="NewPwdDiv">
+                                新密码:
+                            </div>
+                        </td>
+                        <td>
+                            <input id="NewPwd" type="password" placeholder="请输入不多于10位英文字母、数字或常用符号" style="width: 204px; font-size: 12px;" />
+                        </td>
+                    </tr>
+                    <tr valign="bottom" style="margin-top:0px;">
+                        <td style="width: 80px; height: 20px;" align="right">
+                            <div id="PwdConfirmDiv">
+                                密码确认:
+                            </div>
+                        </td>
+                        <td>
+                            <input id="NewPwdConfirm" type="password" placeholder="请再次输入新密码" style="width: 204px; font-size: 12px;" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="height: 30px;">
+                            <div id="NewPwdButtonDiv" style="display: none; width: 150px; float: left;"></div>
+                            <div style="width: 110px; float: right;">
+                                <input id="NewPwdOK" type="button" style="width: 50px; font-size: 12px;" value="确认" onclick="ResetPwdOK()" />
+                                <input id="NewPwdCancel" type="button" style="width: 50px; font-size: 12px;" value="取消" onclick="ResetPwdCancel()" />
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="Notes">
+            <p style="margin-top:1.5%;">杭州政云数据技术有限公司 版权所有    总机：0571-88270588</p>
+            <p>地址:杭州市祥园路88号中国（杭州）智慧信息产业园N座9F</p>
+        </div>
+    </body>*@
+</html>

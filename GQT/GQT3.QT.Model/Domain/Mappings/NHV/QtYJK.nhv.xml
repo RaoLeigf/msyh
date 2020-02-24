@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="QtYJKModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Year" >
+			<length min="0" max="4" message ="长度不超过4！"/>
+		</property>
+		<property name="Text" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="Bz" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="Usercode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="Dept" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="Org" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="NgInsertDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="NgUpdateDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CurOrgId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Creator" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Editor" >
+			<not-null />
+			<not-Empty />
+		</property>
+	</class>
+</nhv-mapping>

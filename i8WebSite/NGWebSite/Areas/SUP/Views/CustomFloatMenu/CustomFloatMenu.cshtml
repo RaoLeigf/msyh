@@ -1,0 +1,1014 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{    
+    <link href=@Url.Script("~/NG3Resource/css/mainTreeTab.css") rel="stylesheet" type="text/css" />
+    <script src=@Url.Script("~/NG3Resource/js/SUP/MainTree/MainFrameTree.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    
+    <script>
+        var addedNodes = [];
+        var selectednode;
+        var busCode = "";
+        var floatMenuCode = "";
+        var checkfailcodes = [];
+        var selectchanging = false;
+        var floatMenuIn;
+        var floatMenuOut;
+        var incheckboxs;
+        var outcheckboxs;
+        var repcheckboxs;
+        var code = Ext.htmlDecode('@ViewBag.Code');
+        var insertReport = false;
+
+        Ext.onReady(function () {
+
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                { itemId: "refresh", text: "恢复出厂", iconCls: "icon-Refresh" },
+                 'save', '->', 'help', 'close'
+                ]
+            });
+
+            var funcSelect = Ext.create("Ext.ng.FieldSetForm", {
+                region: 'north',
+                layout: 'column',
+                height: 36,
+                fieldSets: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '对应功能:',
+                        id: 'funcName',
+                        margin: "0 0 0 10",
+                        labelWidth: 60,
+                        columnWidth: 0.94,
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'button',
+                        text: '...',
+                        height: 23,
+                        columnWidth: 0.06,
+                        handler: function () {
+                            selFuncWin.show();
+                        }
+                    }
+                ]
+            });
+
+            var busTreePanel = Ext.create('Ext.ng.BusTreePanel', {
+                region: 'center',
+                margin: '0 0 0 5',
+                collapsible: false
+            });
+            var busTree = busTreePanel.getTree();
+
+            var sysFuncTreePanel = Ext.create('Ext.panel.Panel', {
+                region: 'west',
+                layout: 'border',
+                width: '32%',
+                border: false,
+                items: [
+                    {
+                        region: 'north',
+                        layout: 'border',
+                        height: 38,
+                        border: false,
+                        items: [funcSelect]
+                    },
+                    busTreePanel
+                ]
+            });
+
+            var floatMenuStore = Ext.create('Ext.data.TreeStore', {
+                autoLoad: false,
+                fields: [
+                    { name: 'code', type: 'string', mapping: 'code' },
+                    { name: 'text', type: 'string', mapping: 'text' },
+                    { name: 'param', type: 'string', mapping: 'param' },
+                    { name: 'url', type: 'string', mapping: 'url' }
+                ],
+                proxy: {
+                    type: 'ajax',
+                    url: '../SUP/CustomFloatMenu/GetFloatMenuTree',
+                    reader: {
+                        type: 'json',
+                        root: 'items'
+                    }
+                },
+                root: {
+                    text: '灵动菜单条',
+                    expanded: true
+                }
+            });
+
+            var floatMenu = Ext.create('Ext.tree.Panel', {
+                store: floatMenuStore,
+                rootVisible: true,
+                autoScroll: true,
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected.length == 0) return;
+                        else {
+                            selectednode = selected[0];
+                            if (!selectednode.data.leaf) return;
+                            floatMenuCode = selectednode.data.code;
+
+                            var text = selectednode.raw.text;
+                            var customName = "";
+                            if (text.indexOf("[") > -1) {
+                                customName = text.substring(text.indexOf("[") + 1, text.indexOf("]"));
+                                text = text.substring(0, text.indexOf("["));
+                            }
+                            Ext.getCmp('functionName').setValue(text);
+                            Ext.getCmp('customName').setValue(customName);
+
+                            if (selectednode.raw.url != "" && selectednode.raw.url != undefined) {
+                                Ext.getCmp('managerOut').hide();
+                                Ext.getCmp('managerIn').hide();
+                                Ext.getCmp('tooltip').hide();
+                                Ext.getCmp('reportSet').show();
+                                Ext.getCmp('reportOut').show();
+
+                                selectchanging = true;
+                                var repcomboboxs = Ext.getCmp('reportOut').query('combobox');
+                                for (var i = 0; i < repcheckboxs.length; i++) {
+                                    repcomboboxs[i].clearValue();
+                                    repcheckboxs[i].setValue(false);
+                                    for (var name in floatMenuOut) {
+                                        if (floatMenuOut[name] != null && floatMenuOut[name] != "") {
+                                            if (repcheckboxs[i].id == "rep_" + name) {
+                                                repcheckboxs[i].enable();
+                                                repcomboboxs[i].enable();
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                selectchanging = false;
+
+                                Ext.getCmp('reportSheet').clearValue();
+                                Ext.getCmp('reportDsc').clearValue();
+                                sheetStore.removeAll();
+                                dscStore.removeAll();
+                                paraStore.removeAll();
+
+                                if (selectednode.raw.param != '' && selectednode.raw.param != null) {
+                                    var json = Ext.JSON.decode(selectednode.raw.param);
+                                    sheetStore.load({ params: { "phid": selectednode.raw.code } });
+                                    Ext.getCmp('reportSheet').setValue(json.sheetid);
+                                    dscStore.load({ params: { "phid": selectednode.raw.code, "sheetid": json.sheetid } });
+                                    Ext.getCmp('reportDsc').setValue(json.ds_no);
+                                    paraStore.load({ params: { "phid": selectednode.raw.code, "sheetid": json.sheetid, "ds_no": json.ds_no } });
+                                    for (var i = 0; i < repcheckboxs.length; i++) {
+                                        if (!repcheckboxs[i].disabled) {
+                                            for (var name in json) {
+                                                if (repcheckboxs[i].id == name) {
+                                                    repcheckboxs[i].setValue(true);
+                                                    repcomboboxs[i].setValue(json[name].substring(0, json[name].indexOf('||')));
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    sheetStore.load({ params: { "phid": selectednode.raw.code } });
+                                }
+                            } else {
+                                Ext.getCmp('managerOut').show();
+                                Ext.getCmp('managerIn').show();
+                                Ext.getCmp('tooltip').show();
+                                Ext.getCmp('reportSet').hide();
+                                Ext.getCmp('reportOut').hide();
+
+                                for (var i = 0; i < incheckboxs.length; i++) {
+                                    incheckboxs[i].disable();
+                                    incheckboxs[i].setValue(false);
+                                    outcheckboxs[i].setValue(false);
+                                }
+
+                                Ext.Ajax.request({
+                                    params: { 'code': floatMenuCode },
+                                    url: '../SUP/CustomFloatMenu/GetFloatMenuIn',
+                                    success: function (response) {
+                                        floatMenuIn = Ext.JSON.decode(response.responseText)[0];
+                                        for (var i = 0; i < incheckboxs.length; i++) {
+                                            for (var name in floatMenuIn) {
+                                                if (floatMenuIn[name] != null && floatMenuIn[name] != "") {
+                                                    if (incheckboxs[i].id == name) {
+                                                        incheckboxs[i].enable();
+                                                        if (!outcheckboxs[i].disabled) {
+                                                            incheckboxs[i].setValue(true);
+                                                            outcheckboxs[i].setValue(true);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (selectednode.data.param != "") {
+                                            var params = selectednode.data.param.split(',');
+                                            for (var i = 0; i < params.length; i++) {
+                                                for (var j = 0; j < incheckboxs.length; j++) {
+                                                    if (incheckboxs[j].id.indexOf(params[i].substring(0, params[i].indexOf("*int64*eq*1"))) > -1) {
+                                                        incheckboxs[j].setValue(true);
+                                                        outcheckboxs[j].setValue(true);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        for (var j = 0; j < incheckboxs.length; j++) {
+                                            if (!incheckboxs[j].disabled && !incheckboxs[j].checked) {
+                                                Ext.Array.include(checkfailcodes, floatMenuCode);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+
+            var selBusTreePanel = Ext.create('Ext.ng.BusTreePanel', {
+                region: 'center',
+                width: 400,
+                height: 515,
+                border: false,
+                tablename: 'fg_floatmenu_manager_out',
+                collapsible: false
+            });
+            var selBusTree = selBusTreePanel.getTree();
+
+            var selFuncButtons = Ext.create('Ext.panel.Panel', {
+                region: 'south',
+                height: 35,
+                border: false,
+                defaults: {
+                    width: 70,
+                    height: 25
+                },
+                buttons: [
+                    '->',
+                    {
+                        text: '确定',
+                        margin: '5 20 0 0',
+                        handler: function () {
+                            var nodes = selBusTree.getSelectionModel().getSelection();
+                            if (nodes.length != 0) {
+                                if (nodes[0].data.leaf) {
+                                    SelectBusTree(nodes[0]);
+                                } else {
+                                    Ext.MessageBox.alert("提示", "请选择菜单功能(叶子节点)!");
+                                }
+                            } else {
+                                Ext.MessageBox.alert("提示", "请选择对应功能!");
+                            }
+                        }
+                    },
+                    {
+                        text: '取消',
+                        margin: '5 10 0 0',
+                        handler: function () {
+                            selFuncWin.hide();
+                        }
+                    }
+                ]
+            });
+
+            var selFuncWin = Ext.create('Ext.window.Window', {
+                title: '选择对应功能',
+                height: 555,
+                width: 420,
+                modal: true,
+                closeAction: 'hide',
+                layout: 'border',
+                items: [selBusTreePanel, selFuncButtons]
+            });
+
+            var buttons = Ext.create("Ext.form.Panel", {
+                region: 'center',
+                border: false,
+                layout: 'border',
+                bodyStyle: "padding-right:3px",
+                defaults: {
+                    width: 35,
+                    height: 35
+                },
+                items: [
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        text: '>',
+                        margin: '180 0 0 8',
+                        handler: function () {
+                            var nodes = busTree.getSelectionModel().getSelection();
+                            if (nodes.length == 0) {
+                                Ext.MessageBox.alert("提示", "请选取想要添加到灵动菜单条中的菜单项");
+                            } else if (!nodes[0].raw.leaf) {
+                                Ext.MessageBox.alert("提示", "请选择菜单功能(叶子节点)!");
+                            } else if (nodes[0].raw.url == undefined && nodes[0].raw.bustype == "") {
+                                Ext.MessageBox.alert("提示", "业务对象与菜单未绑定，请联系相关开发!");
+                            } else {
+                                var rootnode = floatMenu.getRootNode();
+                                var newnode;
+                                if (addedNodes.length == 0) {
+                                    Ext.Array.each(rootnode.childNodes, function (node) {
+                                        Ext.Array.include(addedNodes, node.data.code);
+                                    });
+                                }
+
+                                if (!Ext.Array.contains(addedNodes, nodes[0].raw.bustype)) {
+                                    newnode = {
+                                        text: nodes[0].raw.text,
+                                        code: nodes[0].raw.url != undefined ? nodes[0].raw.phid : nodes[0].raw.bustype,
+                                        param: "",
+                                        url: nodes[0].raw.url != undefined ? nodes[0].raw.url : "",
+                                        leaf: true
+                                    };
+                                    Ext.Array.include(addedNodes, nodes[0].raw.bustype);
+                                    rootnode.appendChild(newnode);
+                                }
+                            }
+                        }
+                    },
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        text: '<',
+                        margin: '100 0 0 8',
+                        handler: function () {
+                            if (selectednode != undefined) {
+                                if (selectednode.raw.sysflg == '1') {
+                                    Ext.MessageBox.alert("提示", "系统内置的灵动菜单条不允许删除!");
+                                } else {
+                                    selectednode.remove();
+                                    Ext.Array.remove(addedNodes, selectednode.data.code);
+                                    selectednode = undefined;
+                                    if (Ext.Array.contains(checkfailcodes, floatMenuCode)) {
+                                        Ext.Array.remove(checkfailcodes, floatMenuCode);
+                                    }
+                                }
+                            } else {
+                                Ext.MessageBox.alert("提示","请选取想要从灵动菜单条中移除的菜单项");
+                            }
+                        }
+                    }
+                ]
+            });
+
+            var floatMenuPanel = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                layout: 'border',
+                border: false,
+                margin:'0 15 0 0',
+                items:
+                [
+                    {
+                        region: 'west',
+                        layout: 'border',
+                        width: 50,
+                        border: false,
+                        items: [buttons]
+                    },
+                    {
+                        region: 'center',
+                        layout: 'fit',
+                        title: '灵动菜单条',
+                        margin:'0 3 0 6',
+                        border: true,
+                        items: [floatMenu]
+                    }
+                ]
+            });
+
+            var sheetStore = Ext.create('Ext.data.Store', {
+                fields: ["sheetid", "sheetname"],
+                autoLoad: false,
+                proxy: {
+                    type: "ajax",
+                    url: '../SUP/CustomFloatMenu/GetSheet',
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            });
+
+            var dscStore = Ext.create('Ext.data.Store', {
+                fields: ["ds_no", "dsc_name"],
+                autoLoad: false,
+                proxy: {
+                    type: "ajax",
+                    url: '../SUP/CustomFloatMenu/GetDsc',
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            });
+
+            var paraStore = Ext.create('Ext.data.Store', {
+                fields: ["dsc_para", "displayname"],
+                autoLoad: false,
+                proxy: {
+                    type: "ajax",
+                    url: '../SUP/CustomFloatMenu/GetPara',
+                    reader: {
+                        type: 'json',
+                        root: 'data'
+                    }
+                }
+            });
+
+            Ext.define('ReadCheckbox', {
+                extend: 'Ext.form.field.Checkbox',
+                alias: 'widget.readCheckbox',
+                disabled: true,
+                readOnly: true
+            });
+
+            Ext.define('EditCheckbox', {
+                extend: 'Ext.form.field.Checkbox',
+                alias: 'widget.editCheckbox',
+                disabled: true
+            });
+
+            Ext.define('RepCombox', {
+                extend: 'Ext.form.field.ComboBox',
+                alias: 'widget.repCombox',
+                store: paraStore,
+                displayField: "displayname",
+                valueField: "dsc_para",
+                queryMode: 'local',
+                width: 85,
+                disabled: true,
+                listeners: {
+                    'select': function (combo) {
+                        var checkbox = Ext.getCmp('reportOut').query('checkbox[id="' + combo.id.replace('_cb','') + '"]')[0];
+                        if (checkbox.checked) {
+                            var json = Ext.JSON.decode(selectednode.raw.param);
+                            var str = combo.id.substring(4, combo.id.indexOf("_", 4));
+                            json[combo.id.replace('_cb', '')] = combo.getValue() + '||[' + floatMenuOut[str + "_id"] + ']';
+                            selectednode.raw.param = JSON.stringify(json);
+                        }
+                    }
+                }
+            });
+
+            var managerForm = Ext.create("Ext.ng.FieldSetForm", {
+                bodyStyle: "padding-right:3px",
+                border: false,
+                fieldDefaults: {
+                    margin: '0 0 5 0'
+                },
+                fieldSets: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '功能名称:',
+                        id: 'functionName',
+                        width: '96%',
+                        labelWidth: 70,
+                        readOnly: true
+                    },
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '自定义名称:',
+                        id: 'customName',
+                        width: '96%',
+                        labelWidth: 70,
+                        listeners: {
+                            change: function (field, newValue, oldValue) {
+                                if (newValue != "") {
+                                    var value = Ext.getCmp('functionName').getValue() + "[" + newValue + "]";
+                                    selectednode.set('text', value);
+                                    selectednode.raw.text = value;
+                                } else {
+                                    var value = Ext.getCmp('functionName').getValue();
+                                    selectednode.set('text', value);
+                                    selectednode.raw.text = value;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        xtype: 'fieldset',
+                        columnsPerRow: 2,
+                        title: '管理对象提供:',
+                        id: "managerOut",
+                        width: '97%',
+                        defaults: {
+                            margin: '0 0 3 5',
+                            width: 420
+                        },
+                        allfields: [
+                            { xtype: "readCheckbox", id: "ocode_id", boxLabel: "组织" },
+                            { xtype: "readCheckbox", id: "customer_id", boxLabel: "客户" },
+                            { xtype: "readCheckbox", id: "pc_id", boxLabel: "项目" },
+                            { xtype: "readCheckbox", id: "supplier_id", boxLabel: "供应商" },
+                            { xtype: "readCheckbox", id: "contract_id", boxLabel: "合同" },
+                            { xtype: "readCheckbox", id: "materiel_id", boxLabel: "物料" },
+                            { xtype: "readCheckbox", id: "order_id", boxLabel: "订单" },
+                            { xtype: "readCheckbox", id: "subject_id", boxLabel: "科目" },
+                            { xtype: "readCheckbox", id: "employee_id", boxLabel: "员工" },
+                            { xtype: "readCheckbox", id: "device_id", boxLabel: "设备" },
+                            { xtype: "readCheckbox", id: "sn_id", boxLabel: "序列号" },
+                            { xtype: "readCheckbox", id: "promanager_id", boxLabel: "项目经理" },
+                            { xtype: "readCheckbox", id: "batchno_id", boxLabel: "批号" },
+                            { xtype: "readCheckbox", id: "proleader_id", boxLabel: "项目负责人" },
+                            { xtype: "readCheckbox", id: "depot_id", boxLabel: "仓库" },
+                            { xtype: "readCheckbox", id: "phid_id", boxLabel: "phid" },
+                            { xtype: "readCheckbox", id: "dept_id", boxLabel: "职能机构" },
+                            { xtype: "readCheckbox", id: "contracttype_id", boxLabel: "合同类型" },
+                            { xtype: "readCheckbox", id: "budgettype_id", boxLabel: "预算分类" },
+                            { xtype: "readCheckbox", id: "operator_id", boxLabel: "操作员" },
+                            { xtype: "readCheckbox", id: "salesman_id", boxLabel: "业务员" }
+                        ]
+                    },
+                    {
+                        xtype: 'fieldset',
+                        columnsPerRow: 2,
+                        title: '管理对象需求:',
+                        id: "managerIn",
+                        width: '97%',
+                        defaults: {
+                            margin: '0 0 3 5',
+                            width: 420
+                        },
+                        allfields: [
+                            { xtype: "readCheckbox", id: "ocode_id_in", boxLabel: "组织" },
+                            { xtype: "readCheckbox", id: "customer_id_in", boxLabel: "客户" },
+                            { xtype: "readCheckbox", id: "pc_id_in", boxLabel: "项目" },
+                            { xtype: "readCheckbox", id: "supplier_id_in", boxLabel: "供应商" },
+                            { xtype: "readCheckbox", id: "contract_id_in", boxLabel: "合同" },
+                            { xtype: "readCheckbox", id: "materiel_id_in", boxLabel: "物料" },
+                            { xtype: "readCheckbox", id: "order_id_in", boxLabel: "订单" },
+                            { xtype: "readCheckbox", id: "subject_id_in", boxLabel: "科目" },
+                            { xtype: "readCheckbox", id: "employee_id_in", boxLabel: "员工" },
+                            { xtype: "readCheckbox", id: "device_id_in", boxLabel: "设备" },
+                            { xtype: "readCheckbox", id: "sn_id_in", boxLabel: "序列号" },
+                            { xtype: "readCheckbox", id: "promanager_id_in", boxLabel: "项目经理" },
+                            { xtype: "readCheckbox", id: "batchno_id_in", boxLabel: "批号" },
+                            { xtype: "readCheckbox", id: "proleader_id_in", boxLabel: "项目负责人" },
+                            { xtype: "readCheckbox", id: "depot_id_in", boxLabel: "仓库" },
+                            { xtype: "readCheckbox", id: "phid_id_in", boxLabel: "phid" },
+                            { xtype: "readCheckbox", id: "dept_id_in", boxLabel: "职能机构" },
+                            { xtype: "readCheckbox", id: "contracttype_id_in", boxLabel: "合同类型" },
+                            { xtype: "readCheckbox", id: "budgettype_id_in", boxLabel: "预算分类" },
+                            { xtype: "readCheckbox", id: "operator_id_in", boxLabel: "操作员" },
+                            { xtype: "readCheckbox", id: "salesman_id_in", boxLabel: "业务员" }
+                        ]
+                    },
+                    {
+                        xtype: 'label',
+                        margin: '0 0 0 10',
+                        id: 'tooltip',
+                        text: '所有管理对象需求均是必输项'
+                    },
+                    {
+                        xtype: 'fieldset',
+                        columnsPerRow: 1,
+                        title: '报表设置:',
+                        id: "reportSet",
+                        width: '98%',
+                        allfields: [
+                            {
+                                xtype: "combobox",
+                                id: "reportSheet",
+                                store: sheetStore,
+                                width: 360,
+                                fieldLabel: "默认打开工作表",
+                                displayField: "sheetname",
+                                valueField: "sheetid",
+                                queryMode: 'local',
+                                listeners: {
+                                    'select': function (combo) {
+                                        if (selectednode.raw.param != "" && selectednode.raw.param != null) {
+                                            var json = Ext.JSON.decode(selectednode.raw.param);
+                                            json.sheetid = combo.lastValue;
+                                            selectednode.raw.param = JSON.stringify(json);
+                                        } else {
+                                            var obj = {};
+                                            obj["sheetid"] = combo.lastValue;
+                                            selectednode.raw.param = JSON.stringify(obj);
+                                        }
+                                        dscStore.load({ params: { "phid": selectednode.raw.code, "sheetid": combo.lastValue } });
+                                    }
+                                }
+                            },
+                            {
+                                xtype: "combobox",
+                                id: "reportDsc",
+                                store: dscStore,
+                                width: 360,
+                                fieldLabel: "工作表函数",
+                                displayField: "dsc_name",
+                                valueField: "ds_no",
+                                queryMode: 'local',
+                                listeners: {
+                                    'select': function (combo) {
+                                        var json = Ext.JSON.decode(selectednode.raw.param);
+                                        json.ds_no = combo.lastValue;
+                                        selectednode.raw.param = JSON.stringify(json);
+                                        paraStore.load({ params: { "phid": selectednode.raw.code, "sheetid": Ext.getCmp('reportSheet').lastValue, "ds_no": combo.lastValue } });
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        xtype: 'fieldset',
+                        columnsPerRow: 4,
+                        title: '管理对象提供:',
+                        id: "reportOut",
+                        width: '98%',
+                        defaults: {
+                            margin: '0 0 3 3'
+                        },
+                        allfields: [
+                            { xtype: "editCheckbox", id: "rep_ocode_id", boxLabel: "组织" },
+                            { xtype: "repCombox", id: "rep_ocode_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_customer_id", boxLabel: "客户" },
+                            { xtype: "repCombox", id: "rep_customer_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_pc_id", boxLabel: "项目" },
+                            { xtype: "repCombox", id: "rep_pc_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_supplier_id", boxLabel: "供应商" },
+                            { xtype: "repCombox", id: "rep_supplier_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_contract_id", boxLabel: "合同" },
+                            { xtype: "repCombox", id: "rep_contract_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_materiel_id", boxLabel: "物料" },
+                            { xtype: "repCombox", id: "rep_materiel_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_order_id", boxLabel: "订单" },
+                            { xtype: "repCombox", id: "rep_order_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_subject_id", boxLabel: "科目" },
+                            { xtype: "repCombox", id: "rep_subject_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_employee_id", boxLabel: "员工" },
+                            { xtype: "repCombox", id: "rep_employee_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_device_id", boxLabel: "设备" },
+                            { xtype: "repCombox", id: "rep_device_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_sn_id", boxLabel: "序列号" },
+                            { xtype: "repCombox", id: "rep_sn_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_promanager_id", boxLabel: "项目经理" },
+                            { xtype: "repCombox", id: "rep_promanager_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_batchno_id", boxLabel: "批号" },
+                            { xtype: "repCombox", id: "rep_batchno_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_proleader_id", boxLabel: "项目负责人" },
+                            { xtype: "repCombox", id: "rep_proleader_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_depot_id", boxLabel: "仓库" },
+                            { xtype: "repCombox", id: "rep_depot_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_phid_id", boxLabel: "phid" },
+                            { xtype: "repCombox", id: "rep_phid_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_dept_id", boxLabel: "职能机构" },
+                            { xtype: "repCombox", id: "rep_dept_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_contracttype_id", boxLabel: "合同类型" },
+                            { xtype: "repCombox", id: "rep_contracttype_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_budgettype_id", boxLabel: "预算分类" },
+                            { xtype: "repCombox", id: "rep_budgettype_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_operator_id", boxLabel: "操作员" },
+                            { xtype: "repCombox", id: "rep_operator_id_cb" },
+                            { xtype: "editCheckbox", id: "rep_salesman_id", boxLabel: "业务员" },
+                            { xtype: "repCombox", id: "rep_salesman_id_cb" }
+                        ]
+                    }
+                ]
+            });
+
+            var funcDefine = Ext.create('Ext.panel.Panel', {
+                title: '功能定义',
+                region: 'east',
+                layout: 'border',
+                border: true,
+                bodyStyle: 'overflow-x:hidden;overflow-y:auto;',
+                width: '35%',
+                items: [managerForm]
+            });
+
+            Ext.defer(function () {
+                selBusTree.addListener('itemdblclick', function (tree, node) {
+                    if (node.data.leaf) {
+                        SelectBusTree(node);
+                    }
+                });
+
+                incheckboxs = Ext.getCmp('managerIn').query('checkbox');
+                outcheckboxs = Ext.getCmp('managerOut').query('checkbox');
+                for (var i = 0; i < incheckboxs.length; i++) {
+                    incheckboxs[i].on('change', function (obj) {
+                        var checkbox = Ext.getCmp('managerOut').query('checkbox[boxLabel="' + obj.boxLabel + '"]')[0];
+                        if (checkbox.disabled) {
+                            obj.setValue(false);
+                        } else {
+                            checkbox.setValue(obj.checked);
+                            var node = floatMenu.getSelectionModel().getSelection()[0];
+                            if (typeof (node) == "undefined") {
+                                return;
+                            }
+                            var param = node.data.param;
+                            var str = floatMenuIn[obj.id];
+                            var str2 = obj.id.substring(0, obj.id.indexOf("_"));
+                            var name = str + '*int64*eq*1';
+                            if (str == '1') { str = str2; }//临时处理未设置参数名的功能点
+                            if (obj.checked && param.indexOf(name) == -1) {
+                                if (param != "") {
+                                    param += ',';
+                                }
+                                var obj = {};
+                                obj[name] = '[' + floatMenuOut[str2 + "_id"] + ']';
+                                param += JSON.stringify(obj);
+                                node.data.param = param;
+                            }
+                        }
+                    });
+                }
+                for (var i = 0; i < outcheckboxs.length; i++) {
+                    outcheckboxs[i].on('change', function (obj) {
+                        var checkbox = Ext.getCmp('managerIn').query('checkbox[boxLabel="' + obj.boxLabel + '"]')[0];
+                        if (checkbox.disabled) {
+                            obj.setValue(false);
+                        } else {
+                            checkbox.setValue(obj.checked);
+                        }
+                    });
+                }
+
+                //报表仓库
+                busTree.addListener('load', function (tree, node, records, successful, eOpts) {
+                    if (!busTreePanel.isSearching) {
+                        if (!insertReport) {
+                            var reportStore = busTree.getStore();
+                            var sysReport = { id: 'sysReport', text: '系统内置报表', leaf: false };
+                            var cusReport = { id: 'cusReport', text: '自定义报表', leaf: false };
+                            var report = { id: 'root', text: '报表仓库', leaf: false };
+                            reportStore.getRootNode().appendChild(report);
+                            reportStore.getNodeById('root').appendChild(sysReport);
+                            reportStore.getNodeById('root').appendChild(cusReport);
+                            Ext.Ajax.request({
+                                url: '../SUP/CustomFloatMenu/GetReportList',
+                                success: function (response) {
+                                    var result = Ext.JSON.decode(response.responseText);
+                                    reportStore.getNodeById('sysReport').appendChild(result.sysReport);
+                                    reportStore.getNodeById('cusReport').appendChild(result.cusReport);
+                                    insertReport = true;
+                                }
+                            });
+                        }
+                    } else {
+                        Ext.Ajax.request({
+                            url: '../SUP/CustomFloatMenu/GetSearchReportList',
+                            params: { 'search': busTreePanel.searchCondition },
+                            success: function (response) {
+                                var result = Ext.JSON.decode(response.responseText);
+                                if (result.sysReport.length > 0 || result.cusReport.length > 0) {
+                                    var reportStore = busTree.getStore();
+                                    var report = { id: 'root', text: '报表仓库', leaf: false };
+                                    reportStore.getRootNode().appendChild(report);
+                                    if (result.sysReport.length > 0) {
+                                        var sysReport = { id: 'sysReport', text: '系统内置报表', leaf: false };
+                                        reportStore.getNodeById('root').appendChild(sysReport);
+                                        reportStore.getNodeById('sysReport').appendChild(result.sysReport);
+                                    }
+                                    if (result.cusReport.length > 0) {
+                                        var cusReport = { id: 'cusReport', text: '自定义报表', leaf: false };
+                                        reportStore.getNodeById('root').appendChild(cusReport);
+                                        reportStore.getNodeById('cusReport').appendChild(result.cusReport);
+                                    }
+                                }
+                                insertReport = false;
+                            }
+                        });
+                    }
+                });
+
+                Ext.getCmp('reportSet').hide();
+                Ext.getCmp('reportOut').hide();
+                repcheckboxs = Ext.getCmp('reportOut').query('checkbox');
+                for (var i = 0; i < repcheckboxs.length; i++) {
+                    repcheckboxs[i].on('change', function (obj) {
+                        if (!selectchanging) {
+                            var combobox = Ext.getCmp('reportOut').query('combobox[id="' + obj.id + '_cb"]')[0];
+                            if (obj.checked) {
+                                if (combobox.getValue() != '' && combobox.getValue() != null) {
+                                    var json = Ext.JSON.decode(selectednode.raw.param);
+                                    var str = obj.id.substring(4, obj.id.indexOf("_", 4));
+                                    json[obj.id] = combobox.getValue() + '||[' + floatMenuOut[str + "_id"] + ']';
+                                    selectednode.raw.param = JSON.stringify(json);
+                                }
+                            } else {
+                                if (selectednode.raw.param != "" && selectednode.raw.param != null) {
+                                    var json = Ext.JSON.decode(selectednode.raw.param);
+                                    delete json[obj.id];
+                                    selectednode.raw.param = JSON.stringify(json);
+                                }
+                            }
+                        }
+                    });
+                }
+
+                if (code != '') {
+                    Ext.Ajax.request({
+                        params: { 'code': code },
+                        url: '../SUP/CustomFloatMenu/GetFloatMenuOutBusName',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            Ext.getCmp('funcName').setValue(resp.busName);
+                            floatMenuOut = resp.floatMenuOut[0];
+                            for (var i = 0; i < outcheckboxs.length ; i++) {
+                                for (var name in floatMenuOut) {
+                                    if (floatMenuOut[name] != null && floatMenuOut[name] != "") {
+                                        if (outcheckboxs[i].id == name) {
+                                            outcheckboxs[i].enable();
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            floatMenuStore.load({ params: { "code": code } });
+                            busCode = code;
+                        }
+                    });
+                }
+            });
+
+            ngToolbar.get('refresh').on('click', function () {
+                if (busCode == "") {
+                    Ext.MessageBox.alert("提示", "请选择想要恢复出厂的功能点!");
+                } else {
+                    Ext.MessageBox.confirm('提示', '确定要删除此功能点对应的灵动菜单条设置(系统内置的灵动菜单条不会删除)?', function (btn) {
+                        if (btn == 'yes') {
+                            ngToolbar.get('refresh').disable();//禁用按钮
+                            var myMask = new Ext.LoadMask(document.body, { msg: "正在恢复出厂,请稍候..." });
+                            myMask.show();//锁屏
+                            var floatMenuNodes = floatMenu.getRootNode().childNodes;
+                            var floatMenus = "[";
+                            for (var i = 0; i < floatMenuNodes.length; i++) {
+                                if (floatMenuNodes[i].raw.sysflg == '1') {
+                                    var obj = {};
+                                    obj["code"] = floatMenuNodes[i].raw.code;
+                                    obj["name"] = floatMenuNodes[i].raw.text;
+                                    obj["param"] = floatMenuNodes[i].raw.param;
+                                    obj["url"] = floatMenuNodes[i].raw.url != undefined ? floatMenuNodes[i].raw.url : '';
+                                    floatMenus += JSON.stringify(obj);
+                                    if (i != floatMenuNodes.length - 1) {
+                                        floatMenus += ',';
+                                    }
+                                }
+                            }
+                            floatMenus += "]";
+                            Ext.Ajax.request({
+                                params: { 'code': busCode, 'floatMenus': floatMenus },
+                                url: '../SUP/CustomFloatMenu/SaveFloatMenu',
+                                success: function (response) {
+                                    myMask.hide();//停止锁屏
+                                    ngToolbar.get('refresh').enable();
+                                    ResetManagerFormEx();
+                                    Ext.MessageBox.alert("提示", "恢复出厂成功");
+                                    floatMenuStore.load({ params: { "code": busCode } });
+                                },
+                                failure: function (response) {
+                                    myMask.hide();//停止锁屏
+                                    ngToolbar.get('refresh').enable();//按钮设置为可用
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+            ngToolbar.get('save').on('click', function () {
+                if (busCode == "" || floatMenuCode == "") {
+                    Ext.MessageBox.alert("提示", "请设置想要保存的灵动菜单条!");
+                    return;
+                }
+                if (checkfailcodes.length == 0) {
+                    ngToolbar.get('save').disable();//禁用按钮
+                    var myMask = new Ext.LoadMask(document.body, { msg: "正在保存灵动菜单条,请稍候..." });
+                    myMask.show();//锁屏
+                    var floatMenuNodes = floatMenu.getRootNode().childNodes;
+                    var floatMenus = "[";
+                    for (var i = 0; i < floatMenuNodes.length; i++) {
+                        var obj = {};
+                        obj["code"] = floatMenuNodes[i].raw.code;
+                        obj["name"] = floatMenuNodes[i].raw.text;
+                        obj["param"] = floatMenuNodes[i].raw.param;
+                        obj["url"] = floatMenuNodes[i].raw.url != undefined ? floatMenuNodes[i].raw.url : '';
+                        floatMenus += JSON.stringify(obj);
+                        if (i != floatMenuNodes.length - 1) {
+                            floatMenus += ',';
+                        }
+                    }
+                    floatMenus += "]";
+
+                    Ext.Ajax.request({
+                        params: { 'code': busCode, 'floatMenus': floatMenus },
+                        url: '../SUP/CustomFloatMenu/SaveFloatMenu',
+                        success: function (response) {
+                            myMask.hide();//停止锁屏
+                            ngToolbar.get('save').enable();
+                            Ext.MessageBox.alert("提示", "保存成功");
+                            floatMenuStore.load({ params: { "code": busCode } });
+                        },
+                        failure: function (response) {
+                            myMask.hide();//停止锁屏
+                            ngToolbar.get('save').enable();//按钮设置为可用
+                        }
+                    });
+                } else {
+                    var checkfailnames = '';
+                    for (var i = 0; i < checkfailcodes.length; i++) {
+                        for (var j = 0; j < floatMenu.getRootNode().childNodes.length; j++) {
+                            if (checkfailcodes[i] == floatMenu.getRootNode().childNodes[j].raw.code) {
+                                if (checkfailnames != '') {
+                                    checkfailnames += ',';
+                                }
+                                checkfailnames += floatMenu.getRootNode().childNodes[j].raw.text;
+                                break;
+                            }
+                        }
+                    }
+                    Ext.MessageBox.alert("提示", checkfailnames + "需求的管理对象源功能点不能提供!");
+                }
+            });
+
+            ngToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('CustomFloatMenu.cshtml');
+            });
+
+            Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items:
+                [
+                    ngToolbar,
+                    {
+                        xtype: 'panel',
+                        region: 'center',
+                        layout: 'border',
+                        items: [sysFuncTreePanel, funcDefine, floatMenuPanel]
+                    }
+                ]
+            });
+
+            function SelectBusTree(node) {
+                ResetManagerForm();
+                checkfailcodes = [];
+                busCode = node.raw.bustype;
+                Ext.Ajax.request({
+                    params: { 'code': busCode },
+                    url: '../SUP/CustomFloatMenu/GetFloatMenuOutBusName',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        Ext.getCmp('funcName').setValue(resp.busName);
+                        Ext.getCmp('managerOut').show();
+                        Ext.getCmp('managerIn').show();
+                        Ext.getCmp('tooltip').show();
+                        Ext.getCmp('reportSet').hide();
+                        Ext.getCmp('reportOut').hide();
+                        floatMenuOut = resp.floatMenuOut[0];
+                        for (var i = 0; i < outcheckboxs.length ; i++) {
+                            for (var name in floatMenuOut) {
+                                if (floatMenuOut[name] != null && floatMenuOut[name] != "") {
+                                    if (outcheckboxs[i].id == name) {
+                                        outcheckboxs[i].enable();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        floatMenuStore.load({ params: { "code": busCode } });
+                        addedNodes = [];
+                        selFuncWin.hide();
+                    }
+                });
+            }
+
+        });
+
+        function ResetManagerForm() {
+            for (var i = 0; i < outcheckboxs.length ; i++) {
+                incheckboxs[i].setValue(false);
+                incheckboxs[i].disable();
+                outcheckboxs[i].setValue(false);
+                outcheckboxs[i].disable();
+            }
+            Ext.getCmp('functionName').setValue("");
+            Ext.getCmp('customName').setValue("");
+        }
+
+        function ResetManagerFormEx() {
+            for (var i = 0; i < outcheckboxs.length ; i++) {
+                incheckboxs[i].setValue(false);
+                incheckboxs[i].disable();
+                outcheckboxs[i].setValue(false);
+            }
+            Ext.getCmp('functionName').setValue("");
+            Ext.getCmp('customName').setValue("");
+        }
+
+    </script>
+}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GQT3.QT.Model.Domain" assembly="GQT3.QT.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="RWReportModel" table="rw_report_main">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="RepCode" column="rep_code" type="System.String" length="80" not-null="false" />
+		<property name="RepName" column="rep_name" type="System.String" length="200" not-null="false" />
+		<property name="RepFormat" column="rep_format" type="System.Int16" not-null="false" />
+		<property name="CatalogId" column="catalog_id" type="System.Int64" not-null="false" />
+		<property name="RepClassid" column="rep_classid" type="System.Int64" not-null="false" />
+		<property name="RepType" column="rep_type" type="System.Int16" not-null="false" />
+		<property name="RepKeys" column="rep_keys" type="System.String" length="250" not-null="false" />
+		<property name="RepSummary" column="rep_summary" type="System.String" length="255" not-null="false" />
+		<property name="RepCreater" column="rep_creater" type="System.String" length="255" not-null="false" />
+		<property name="RepCreatedate" column="rep_createdate" type="System.DateTime" not-null="false" />
+		<property name="RepUpdater" column="rep_updater" type="System.String" length="255" not-null="false" />
+		<property name="RepUpdatedate" column="rep_updatedate" type="System.DateTime" not-null="false" />
+		<property name="OCode" column="ocode" type="System.String" length="40" not-null="false" />
+		<property name="RepStatus" column="rep_status" type="System.Int16" not-null="false" />
+		<property name="RepSrc" column="rep_src" type="System.Int16" not-null="false" />
+		<property name="ExternalLink" column="externallink" type="System.String" length="255" not-null="false" />
+		<property name="NeedApp" column="needapp" type="System.Byte" not-null="false" />
+		<property name="AppMan" column="appman" type="System.String" length="255" not-null="false" />
+		<property name="AppDate" column="appdate" type="System.DateTime" not-null="false" />
+		<property name="RepGenre" column="rep_genre" type="System.Int16" not-null="false" />
+		<property name="IsTemplate" column="is_template" type="System.Int16" not-null="false" />
+		<property name="CycleType" column="cycle_type" type="System.Int16" not-null="false" />
+		<property name="FillYear" column="fill_year" type="System.String" length="4" not-null="false" />
+		<property name="FillMonth" column="fill_month" type="System.String" length="10" not-null="false" />
+		<property name="ProjectCode" column="project_code" type="System.String" length="30" not-null="false" />
+		<property name="RepTmpid" column="rep_tmpid" type="System.Int64" not-null="false" />
+		<property name="rep_holder" column="rep_holder" type="System.String" length="255" not-null="false" />
+		<property name="PlanStatus" column="plan_status" type="System.Int32" not-null="false" />
+		<property name="FillDay" column="fill_day" type="System.DateTime" not-null="false" />
+		<property name="RepOrderid" column="rep_orderid" type="System.String" length="40" not-null="false" />
+		<property name="ismobile" column="ismobile" type="System.Int16" not-null="false" />
+	</class>
+</hibernate-mapping>

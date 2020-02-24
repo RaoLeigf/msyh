@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GJX3.JX.Facade.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GJX3.JX.Facade.Interface.IPerformanceDtlBuDtlFacade">
+            <summary>
+            PerformanceDtlBuDtl业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GJX3.JX.Facade.Interface.IPerformanceDtlEvalFacade">
+            <summary>
+            PerformanceDtlEval业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GJX3.JX.Facade.Interface.IPerformanceDtlTarImplFacade">
+            <summary>
+            PerformanceDtlTarImpl业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GJX3.JX.Facade.Interface.IPerformanceDtlTarImplFacade.SavePerformanceDtlTarImpl(GJX3.JX.Model.Domain.PerformanceDtlTarImplModel,System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlEvalModel},System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlTextContModel},System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlTarImplModel},System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlBuDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="performanceDtlTarImplEntity"></param>
+            <param name="performanceDtlEvalEntities"></param>
+            <param name="performanceDtlTextContEntities"></param>
+            <param name="performanceDtlTarImplEntities"></param>
+            <param name="performanceDtlBuDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GJX3.JX.Facade.Interface.IPerformanceDtlTextContFacade">
+            <summary>
+            PerformanceDtlTextCont业务组装层接口
+            </summary>
+        </member>
+        <member name="T:GJX3.JX.Facade.Interface.IPerformanceMstFacade">
+            <summary>
+            PerformanceMst业务组装层接口
+            </summary>
+        </member>
+        <member name="M:GJX3.JX.Facade.Interface.IPerformanceMstFacade.SavePerformanceMst(GJX3.JX.Model.Domain.PerformanceMstModel,System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlTextContModel},System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlBuDtlModel},System.Collections.Generic.List{GJX3.JX.Model.Domain.PerformanceDtlTarImplModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="performanceMstEntity"></param>
+            <param name="performanceDtlTextContEntities"></param>
+            <param name="performanceDtlBuDtlEntities"></param>
+            <param name="performanceDtlTarImplEntities"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

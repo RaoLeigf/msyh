@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ctl_tbl">
+      <Field Name="tname" IsKey="true"/>
+      <Field Name="chn" />
+      <Field Name="eng"  />
+      <Field Name="recoverseq"  />
+      <Field Name="moduleid"  />
+      <Field Name="ver"/>     
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] where 1=1 [query]
+    </Sql>
+    <Where>
+    </Where>
+    <Query>      
+      <Exp Field="tname" Target="Client" Value="tname" />      
+    </Query>
+    <OrderBy format="{tname}">
+      <Exp Field="tname" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="tname"  Target="Client" Value="tname" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="tname" Target="Client" Value="tname"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="tname" Target="Client" Value="tname"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <GetCountByTname>
+    <Sql>
+      select count(*) from ctl_tbl
+      [where]
+    </Sql>
+    <Where>
+      <Exp Field="tname" Target="Client"  Value="tname"/>      
+    </Where>
+  </GetCountByTname>
+
+</DataService>
+
+

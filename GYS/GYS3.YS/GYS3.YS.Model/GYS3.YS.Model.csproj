@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DD639BB1-92FC-4DA9-A0A0-C5F1AC91B7F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GYS3.YS.Model</RootNamespace>
+    <AssemblyName>GYS3.YS.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GYS3.YS.Model.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Domain\GenerateCodes\BudgetDtlBudgetDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlFundApplModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlImplPlanModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlPerformTargetModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlPersonNameModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlPersonnelModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlPurchaseDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlPurDtl4SOFModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetDtlTextContentModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetTZModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\BudgetProcessCtrlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\EnumApproveStatus.cs" />
+    <Compile Include="Domain\GenerateCodes\EnumProjAttr.cs" />
+    <Compile Include="Domain\GenerateCodes\EnumProjBillType.cs" />
+    <Compile Include="Domain\GenerateCodes\EnumProjDuration.cs" />
+    <Compile Include="Domain\GenerateCodes\EnumProjStatus.cs" />
+    <Compile Include="Domain\GenerateCodes\EnumYesNo.cs" />
+    <Compile Include="Domain\GenerateCodes\ExpenseDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ExpenseHxModel.cs" />
+    <Compile Include="Domain\GenerateCodes\ExpenseMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GdBudgetAdjustModel.cs" />
+    <Compile Include="Domain\GenerateCodes\JxTrackingModel.cs" />
+    <Compile Include="Domain\GenerateCodes\KingGridTagModel.cs" />
+    <Compile Include="Domain\GenerateCodes\GHSubjectModel.cs" />
+    <Compile Include="Domain\GenerateCodes\SubjectMstBudgetDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\SubjectMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\YsAccountModel.cs" />
+    <Compile Include="Domain\GenerateCodes\YsAccountMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\YsIncomeDtlModel.cs" />
+    <Compile Include="Domain\GenerateCodes\YsIncomeMstModel.cs" />
+    <Compile Include="Enums\EnumApproveStatus.cs" />
+    <Compile Include="Enums\EnumCarryOver.cs" />
+    <Compile Include="Enums\EnumProjAttr.cs" />
+    <Compile Include="Enums\EnumProjBillType.cs" />
+    <Compile Include="Enums\EnumProjDuration.cs" />
+    <Compile Include="Enums\EnumProjStatus.cs" />
+    <Compile Include="Enums\EnumYesNo.cs" />
+    <Compile Include="ExamplesModel.cs" />
+    <Compile Include="Extend\BuDeptReportModel.cs" />
+    <Compile Include="Extend\BudgetMstAllDataModel.cs" />
+    <Compile Include="Extend\SubjectAccountModel.cs" />
+    <Compile Include="Extra\BudgetAllDataModel.cs" />
+    <Compile Include="Extra\BudgetExcelHead.cs" />
+    <Compile Include="Extra\ExpenseAllModel.cs" />
+    <Compile Include="Extra\GdBaseListModel.cs" />
+    <Compile Include="Extra\GdBudgetAdjustAnalyseModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlBudgetDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlFundAppl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlImplPlan.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlTextContent.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetMst.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlBudgetDtl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlFundAppl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlImplPlan.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlTextContent.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetMst.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetProcessCtrl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetProcessCtrl.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlPerformTarget.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlPerformTarget.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlPurchaseDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\BudgetDtlPurDtl4SOF.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlPurchaseDtl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\BudgetDtlPurDtl4SOF.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\SubjectMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\SubjectMstBudgetDtl.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\NHV\SubjectMst.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\SubjectMstBudgetDtl.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\GHSubject.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\NHV\GHSubject.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\ExpenseDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\ExpenseMst.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Mappings\NHV\ExpenseDtl.nhv.xml" />
+    <EmbeddedResource Include="Domain\Mappings\NHV\ExpenseMst.nhv.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\ExpenseHx.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\YsAccount.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\YsAccountMst.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Domain\Mappings\HBM\JxTracking.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Domain\Mappings\HBM\BudgetDtlPersonName.hbm.xml" />
+    <Content Include="Domain\Mappings\HBM\BudgetDtlPersonnel.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\YsIncomeDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\YsIncomeMst.hbm.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

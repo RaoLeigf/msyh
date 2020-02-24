@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="ExpenseDtlModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FDtlcode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FName" >
+			<length min="0" max="500" message ="长度不超过500！"/>
+		</property>
+    <property name="FDtlName" >
+      <length min="0" max="500" message ="长度不超过500！"/>
+    </property>
+		<property name="FMeasunit" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FSourceoffunds" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FBudgetaccounts" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FOtherinstructions" >
+			<length min="0" max="1200" message ="长度不超过1200！"/>
+		</property>
+		<property name="FPaymentmethod" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FExpenseschannel" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FFeedback" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+		<property name="FMidedit" >
+			<length min="0" max="2" message ="长度不超过2！"/>
+		</property>
+		<property name="NgInsertDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="NgUpdateDt" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="CurOrgId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Creator" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="Editor" >
+			<not-null />
+			<not-Empty />
+		</property>
+	</class>
+</nhv-mapping>

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="uic_supplier_prog_att">
+      <Field Name="attid" IsKey="true" />
+      <Field Name="filecontent" Datatype="Binary"/>
+      <Field Name="filename" />
+      <Field Name="purid" />
+      <Field Name="lined" />
+    </Table>
+  </Tables>
+  <Read>
+
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+    </Where>
+  </Record>
+  <Create>
+    
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+</DataService>

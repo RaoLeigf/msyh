@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZC3.QCHZ.Dac</name>
+    </assembly>
+    <members>
+        <member name="T:ZC3.QCHZ.Dac.Nqmx04DtlDac">
+            <summary>
+            Nqmx04Dtl数据访问处理类
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Dac.Nqmx04MstDac">
+            <summary>
+            Nqmx04Mst数据访问处理类
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Dac.UploadfileInfoDac">
+            <summary>
+            UploadfileInfo数据访问处理类
+            </summary>
+        </member>
+    </members>
+</doc>

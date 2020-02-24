@@ -1,0 +1,324 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section script
+{
+
+    <script type="text/javascript">
+        var id = '@ViewBag.ID';
+        var otype = '@ViewBag.OType';
+
+        Ext.onReady(function () {
+            Ext.QuickTips.init();
+            //创建toolbar
+            var toolBar = Ext.create('Ext.ng.Toolbar',
+            {
+                region: 'north',
+                border: false,
+                frame: true,
+                height: 26,
+                minSize: 26,
+                maxSize: 26,
+                ngbuttons: [
+                    { itemId: 'export', text: "模板导出", iconCls: 'icon-Export' },
+                    '->',
+                    { itemId: "close", text: "关闭", iconCls: "icon-Close" }
+                ],
+            });
+
+
+            //创建formPanel
+            var formConfig = {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 600,
+                buskey: 'id', //对应的业务表主键
+                otype: otype, //操作类型,add||edit
+                columnsPerRow: 4,
+                fields: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '数据名称',
+                        name: 'name',
+                        id: 'name',
+                        readOnly: true,
+                    },
+                    {
+                        xtype: 'ngCheckbox',
+                        boxLabel: '全选',
+                        name: 'selectAll',
+                        inputValue: '1',
+                        id: 'selectAll'
+                    },
+
+                  {
+                      xtype: 'radiogroup',
+                      fieldLabel: '类型',
+                      id: 'type',
+                      columns: 2,
+                      vertical: false,
+                      items: [
+                               {
+                                   xtype: 'ngRadio',
+                                   boxLabel: '单sheet页',
+                                   name: 'multipleSheet',
+                                   inputValue: "1",
+                                   id: 'singleRadio',
+                                   readOnly:true
+                               },
+                                {
+                                    xtype: 'ngRadio',
+                                    boxLabel: '多sheet页',
+                                    name: 'multipleSheet',
+                                    inputValue: "2",
+                                    id: 'multiRadio',
+                                    readOnly: true
+                                    //checked:true,
+                                }
+                      ]
+                  },
+                  {
+                      xtype: 'displayfield',
+                      id:'link',
+                  }
+                ]
+            };
+
+            var formPanel = Ext.create('Ext.ng.TableLayoutForm', formConfig);
+
+            var myModel = Ext.define('myModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    { name: 'id', type: 'string' },
+                    { name: 'name', type: 'string' },
+                    { name: 'type', type: 'string' },
+                    { name: 'remark', type: 'string' },
+                    { name: 'tablename', type: 'string' },
+                    { name: 'filedname', type: 'string' },
+                    { name: 'datatype', type: 'string' },
+                    { name: 'primarykey', type: 'string' },
+                    { name: 'mustinput', type: 'string' },
+                    { name: 'helptype', type: 'string' },
+                    { name: 'refer', type: 'string' },
+                    { name: 'tabledepiction', type: 'string' },
+                    { name: 'check', type: 'bool' },
+                ]
+            });
+
+            var myStore = Ext.create('Ext.data.Store', {
+                model: 'myModel',
+                proxy: {
+                    type: 'ajax',
+                    url: 'GetXmlStoreData',
+                    reader: {
+                        type: 'json',
+                        root: 'Record'
+                    },
+                },
+            });
+
+            myStore.load({
+                params: {
+                    id: id
+                },
+            });
+
+            var columns = [
+                { xtype: 'rownumberer', minWidth: 40 },
+                         {
+                             header: '列名称',
+                             flex: 1,
+                             dataIndex: 'name',
+                             sortable: true,
+                         }, {
+                             header: '表头/表体',
+                             flex: 1,
+                             sortable: true,
+                             dataIndex: 'type',
+                             renderer: function (value) { return value == 'title' ? '表头' : '表体' },
+                         }, {
+                             header: '导出列选择',
+                             xtype: 'checkcolumn',
+                             name: 'check',
+                             id: 'check',
+                             flex: 1,
+                             dataIndex: 'check',
+                         }, {
+                             header: '说明',
+                             flex: 1,
+                             dataIndex: 'remark'
+                         },
+                        {
+                            dataIndex: 'refer',
+                            hidden: true
+                        }, {
+                            dataIndex: 'helptype',
+                            hidden: true
+                        }, {
+                            dataIndex: 'id',
+                            hidden: true
+                        }, {
+                            dataIndex: 'tablename',
+                            hidden: true
+                        }, {
+                            dataIndex: 'filedname',
+                            hidden: true
+                        }, {
+                            dataIndex: 'datatype',
+                            hidden: true
+                        }, {
+                            dataIndex: 'primarykey',
+                            hidden: true
+                        },
+                        {
+                            dataIndex: 'mustinput',
+                            name: 'mustinput',
+                            id: 'mustinput',
+                            hidden: true
+                        },
+                      {
+                          dataIndex: 'tabledepiction',
+                          hidden: true
+                      }
+            ]
+
+            var celledit = Ext.create('Ext.grid.plugin.CellEditing', { clicksToEdit: 1 });
+            //grid
+            var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                id: 'gridPanel',
+                region: 'center',
+                title: '导出列选择',
+                store: myStore,
+                columnLines: true,
+                //frame: true,
+                //stateful: true,
+                //stateId: 'excelInfo',
+                selType: 'cellmodel',
+                plugins: [celledit],
+                layout: {
+                    type: 'hbox',
+                    align: 'stretch'
+                },
+                columns: columns,
+                viewConfig: {
+                    forceFit: true,
+                    scrollOffset: 0
+                },
+            });
+
+            //创建Viewport
+            Ext.create('Ext.container.Viewport', {
+                renderTo: Ext.getBody(),
+                layout: 'border',
+                items: [
+                    toolBar,
+                    formPanel,
+                    gridPanel,
+                ]
+            });
+
+            //form中数据填充
+            Ext.Ajax.request({
+                url: 'GetFormData',
+                method: 'post',
+                params: {
+                    id: id
+                },
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.status === "ok") {
+                        var formobj = formPanel.getForm();
+                        formobj.setValues(resp.data);
+                        var radioGroup = formobj.findField('type');
+                        var radiodata = resp.data.multiplesheet;
+                        if (radiodata === '0') {
+                            radioGroup.items.get(0).setValue(true);
+                        } else if (radiodata === '1') {
+                            radioGroup.items.get(1).setValue(true);
+                        }
+                    }
+                },
+                failure: function () {
+                    Ext.Msg.alert('系统提示', '系统出错！');
+                }
+            })
+
+            //checkcolumn事件
+            s = gridPanel.getStore();
+            Ext.getCmp('check').on('beforecheckchange', function (eOpts, rowIndex, checked) {
+                var x = s.getAt(rowIndex);
+                var mustinput = x.get('mustinput');
+                if (mustinput == '1') {
+                    return false;
+                }
+                return true;
+            });
+
+            //全选
+            Ext.getCmp('selectAll').on('change', function (newValue, oldValue, eOpts) {
+
+                var store = gridPanel.getStore();
+                for (var i = 0; i < store.data.items.length; i++) {
+
+                    var item = store.data.items[i];
+                    if (item.data.mustinput == '1') {
+                        item.data.check = true;
+                    }
+                    else {
+                        item.data.check = oldValue;
+                    }
+                }
+
+                gridPanel.getView().refresh();
+
+            });
+
+
+            //模板导出
+            toolBar.get('export').on('click', function () {
+                var formValues = formPanel.getForm().getValues();
+                name = formValues["name"];
+                multipleSheet = formValues["multipleSheet"];
+                griddata = gridPanel.getAllGridData();
+                Ext.get('link').dom.innerHTML = "";
+
+                Ext.Ajax.request({
+                    url: 'ExportTemplate',
+                    method: 'post',
+                    params: {
+                        'multipleSheet': multipleSheet,
+                        'name': name,
+                        'griddata': griddata,
+                    },
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.status === 'ok') {
+                            var filename = resp.fileName;
+                            Ext.get('link').dom.innerHTML = "<a href='"+"Download'>"+"下载文件："+filename+"</a>";
+                        } else {
+                            Ext.Msg.alert('系统提示', resp.status);
+                        }
+                    },
+                    failure: function () {
+                        Ext.Msg.alert('系统提示', '系统出错！');
+                    }
+                })
+            });
+
+            //监听链接点击事件
+
+            Ext.get("link").addListener('click', function () {
+                this.dom.innerHTML = "";
+            });
+
+        });
+
+    </script>
+
+}
+
+

@@ -1,0 +1,393 @@
+.icon-AddBrother {
+background:url('add-brother.png') no-repeat;
+}
+.icon-AddChild {
+background:url('add-child.png') no-repeat;
+}
+.icon-AddRow {
+background:url('insert-row.png') no-repeat;
+}
+.icon-Approve {
+background:url('Approve.gif') no-repeat;
+}
+.icon-Assign {
+background:url('Assign.gif') no-repeat;
+}
+.icon-Attachment {
+background:url('attach.png') no-repeat;
+}
+.icon-back {
+background:url('return.png') no-repeat;
+}
+.icon-Backbill {
+background:url('low-business.png') no-repeat;
+}
+.icon-Boo{
+background:url('organisation-select.png') no-repeat;
+}
+.icon-borrow-apply{
+background:url('borrow-apply.gif') no-repeat;
+}
+.icon-borrow-cancel{
+background:url('borrow-cancel.gif') no-repeat;
+}
+.icon-Cancel{
+background:url('cancel.png') no-repeat;
+}
+.icon-Check{
+background:url('examine-go.png') no-repeat;
+}
+.icon-CheckView{
+background:url('examine-view.png') no-repeat;
+}
+.icon-CheckHistory{
+background:url('examine-history.png') no-repeat;
+}
+.icon-Clear{
+background:url('Clear.gif') no-repeat;
+}
+.icon-CommentHS{
+background:url('CommentHS.gif') no-repeat;
+}
+.icon-Complete{
+background:url('Complete.gif') no-repeat;
+}
+.icon-Compute{
+background:url('calculator-cal.png') no-repeat;
+}
+.icon-confirm{
+background:url('confirm.gif') no-repeat;
+}
+.icon-connect{
+background:url('connect.gif') no-repeat;
+}
+.icon-Copy{
+background:url('copy.png') no-repeat;
+}
+.icon-create{
+background:url('create.png') no-repeat;
+}
+.icon-Clear{
+background:url('clear.png') no-repeat;
+}
+.icon-custom{
+background:url('custom.gif') no-repeat;
+}
+.icon-def{
+background:url('def.gif') no-repeat;
+}
+.icon-def1{
+background:url('def1.gif') no-repeat;
+}
+.icon-def2{
+background:url('def2.gif') no-repeat;
+}
+.icon-def3{
+background:url('def3.gif') no-repeat;
+}
+.icon-def4{
+background:url('def4.gif') no-repeat;
+}
+.icon-def5{
+background:url('def5.gif') no-repeat;
+}
+.icon-def6{
+background:url('def6.gif') no-repeat;
+}
+.icon-def7{
+background:url('def7.gif') no-repeat;
+}
+.icon-def8{
+background:url('def8.gif') no-repeat;
+}
+.icon-def9{
+background:url('def9.gif') no-repeat;
+}
+.icon-delete{
+background:url('delete.png') no-repeat;
+}
+.icon-DeleteRow{
+background:url('delete-row.png') no-repeat;
+}
+.icon-Edit{
+background:url('edit.png') no-repeat;
+}
+.icon-EditRow{
+background:url('editrow.png') no-repeat;
+}
+.icon-examine-view{
+background:url('examine-view.gif') no-repeat;
+}
+.icon-Edit{
+background:url('alter.png') no-repeat;
+}
+.icon-Export{
+background:url('export.png') no-repeat;
+}
+.icon-FeedBack{
+background:url('FeedBack.gif') no-repeat;
+}
+.icon-Firstrec{
+background:url('first.png') no-repeat;
+}
+.icon-fold{
+background:url('fold.gif') no-repeat;
+}
+.icon-get-quick{
+background:url('get-quick.gif') no-repeat;
+}
+.icon-Help{
+background:url('help.png') no-repeat;
+}
+.icon-Help1{
+background:url('Help1.gif') no-repeat;
+}
+.icon-Import{
+background:url('import.png') no-repeat;
+}
+.icon-LastRec{
+background:url('last.png') no-repeat;
+}
+.icon-Location{
+background:url('locate.png') no-repeat;
+}
+.icon-maccount{
+background:url('maccount.gif') no-repeat;
+}
+.icon-madda{
+background:url('madda.gif') no-repeat;
+}
+.icon-maddress{
+background:url('maddress.gif') no-repeat;
+}
+.icon-mrecieve{
+background:url('mrecieve.gif') no-repeat;
+}
+.icon-mreply{
+background:url('mreply.gif') no-repeat;
+}
+.icon-msend{
+background:url('msend.gif') no-repeat;
+}
+.icon-mtrans{
+background:url('mtrans.gif') no-repeat;
+}
+.icon-New{
+background:url('add-new.png') no-repeat;
+}
+.icon-NextRec{
+background:url('next.png') no-repeat;
+}
+.icon-Note{
+background:url('notepad.png') no-repeat;
+}
+.icon-occupy-mode{
+background:url('occupy-mode.gif') no-repeat;
+}
+.icon-operate{
+background:url('operate.gif') no-repeat;
+}
+.icon-Popedom{
+background:url('Popedom.gif') no-repeat;
+}
+.icon-Print{
+background:url('print.png') no-repeat;
+}
+.icon-PriorRec{
+background:url('previous.png') no-repeat;
+}
+.icon-Query{
+background:url('find.png') no-repeat;
+}
+.icon-Query1{
+background:url('Query1.gif') no-repeat;
+}
+.icon-reback{
+background:url('reback.gif') no-repeat;
+}
+.icon-Refresh{
+background:url('refresh.png') no-repeat;
+}
+.icon-Relabill{
+background:url('bills-relation.png') no-repeat;
+}
+.icon-RelTask{
+background:url('RelTask.gif') no-repeat;
+}
+.icon-role{
+background:url('role.gif') no-repeat;
+}
+.icon-save{
+background:url('save.png') no-repeat;
+}
+.icon-save2{
+background:url('save2.gif') no-repeat;
+}
+.icon-Scancode{
+background:url('Scancode.gif') no-repeat;
+}
+.icon-scheck{
+background:url('scheck.gif') no-repeat;
+}
+.icon-send_fax{
+background:url('send_fax.gif') no-repeat;
+}
+.icon-send_icon{
+background:url('send_icon.gif') no-repeat;
+}
+.icon-send_mail{
+background:url('send_mail.gif') no-repeat;
+}
+.icon-send_pic{
+background:url('send_pic.gif') no-repeat;
+}
+.icon-Setup{
+background:url('set.png') no-repeat;
+}
+.icon-ssyntax{
+background:url('ssyntax.gif') no-repeat;
+}
+.icon-Print{
+background:url('Print.gif') no-repeat;
+}
+.icon-status-out{
+background:url('status-out.gif') no-repeat;
+}
+.icon-stop{
+background:url('stop.gif') no-repeat;
+}
+.icon-submit{
+background:url('submit.gif') no-repeat;
+}
+.icon-assign{
+background:url('allot.png') no-repeat;
+}
+.icon-tbb_checkview{
+background:url('tbb_checkview.gif') no-repeat;
+}
+.icon-UI_bold{
+background:url('UI_bold.gif') no-repeat;
+}
+.icon-UI_fontcolor{
+background:url('UI_fontcolor.gif') no-repeat;
+}
+.icon-UI_italic{
+background:url('UI_italic.gif') no-repeat;
+}
+.icon-UI_underline{
+background:url('UI_underline.gif') no-repeat;
+}
+.icon-UnApprove{
+background:url('UnApprove.gif') no-repeat;
+}
+.icon-unfold{
+background:url('unfold.gif') no-repeat;
+}
+.icon-Unvalid{
+background:url('examine-approve-cancel.png') no-repeat;
+}
+.icon-Unverify{
+background:url('Unverify.gif') no-repeat;
+}
+.icon-use-mode{
+background:url('use-mode.gif') no-repeat;
+}
+.icon-user{
+background:url('user.gif') no-repeat;
+}
+.icon-Usergroup{
+background:url('Usergroup.gif') no-repeat;
+}
+.icon-Valid{
+background:url('examine-approve.png') no-repeat;
+}
+.icon-Verify{
+background:url('examine.png') no-repeat;
+}
+.icon-Verify2{
+background:url('Verify2.gif') no-repeat;
+}
+.icon-View{
+background:url('view.png') no-repeat;
+}
+.icon-ViewRelTask{
+background:url('ViewRelTask.gif') no-repeat;
+}
+.icon-ZoomIn{
+background:url('ZoomIn.gif') no-repeat;
+}
+.icon-ZoomOut{
+background:url('ZoomOut.gif') no-repeat;
+}
+.icon-Star {
+background:url('Star.png') no-repeat;
+}
+.icon-ArrowUp {
+background:url('ArrowUp.png') no-repeat;
+}
+.icon-ArrowDown {
+background:url('ArrowDown.png') no-repeat;
+}
+.icon-Key {
+background:url('Key.png') no-repeat;
+}
+.icon-Lock {
+background:url('Lock.png') no-repeat;
+}
+.icon-UserGo {
+background:url('UserGo.png') no-repeat;
+}
+.icon-Confirm {
+background:url('confirm.png') no-repeat;
+}
+.icon-Exit{
+background:url('exit.png') no-repeat;
+}
+.icon-Operate{
+background:url('operate.png') no-repeat;
+}
+.icon-Close{
+background:url('close.png') no-repeat;
+}
+.icon-LockGo
+{
+    background:url('LockGo.png') no-repeat;
+}
+.icon-ArrowUndo
+{
+    background:url('ArrowUndo.png') no-repeat;
+}
+.icon-memuitem
+{
+     background:url('memuitem.png') no-repeat;
+}
+
+.alert-error {
+background:url('alert-error.png') no-repeat;
+}
+.alert-fail {
+background:url('alert-fail.png') no-repeat;
+}
+.alert-help {
+background:url('alert-help.png') no-repeat;
+}
+.alert-information {
+background:url('alert-information.png') no-repeat;
+}
+.alert-refuse {
+background:url('alert-refuse.png') no-repeat;
+}
+.alert-success {
+background:url('alert-success.png') no-repeat;
+}
+.alert-warn {
+background:url('alert-warn.png') no-repeat;
+}
+.alert-up_load_new {
+background:url('alert-up_load_new.png') no-repeat;
+}
+
+
+
+
+

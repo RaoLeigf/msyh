@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GBK3.BK.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GBK3.BK.Rule.Interface.IPaymentDtlRule">
+            <summary>
+            PaymentDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GBK3.BK.Rule.Interface.IPaymentMstRule">
+            <summary>
+            PaymentMst业务逻辑层接口
+            </summary>
+        </member>
+        <member name="M:GBK3.BK.Rule.Interface.IPaymentMstRule.GetPaymentList(System.Int64)">
+            <summary>
+            获取资金拨付主列表
+            </summary>
+            <param name="fPhid"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

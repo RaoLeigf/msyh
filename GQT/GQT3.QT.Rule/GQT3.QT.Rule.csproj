@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DF79A03B-F754-4532-98E5-D9786EFC37B9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GQT3.QT.Rule</RootNamespace>
+    <AssemblyName>GQT3.QT.Rule</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\GQT3.QT.Rule.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.ExceptionHandling, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.ExceptionHandling.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Interface, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Rule, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\Enterprise3.NHORM.Rule.dll</HintPath>
+    </Reference>
+    <Reference Include="NG3.Exceptions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL" />
+    <Reference Include="SUP.Common.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5a24670f4547a308, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BankAccountRule.cs" />
+    <Compile Include="BudgetAccountsRule.cs" />
+    <Compile Include="CorrespondenceSettings2Rule.cs" />
+    <Compile Include="CorrespondenceSettingsRule.cs" />
+    <Compile Include="ExpenseCategoryRule.cs" />
+    <Compile Include="GHProjDtlShareRule.cs" />
+    <Compile Include="OrganizationRule.cs" />
+    <Compile Include="OrgRelatitem2Rule.cs" />
+    <Compile Include="PaymentMethodRule.cs" />
+    <Compile Include="PerformEvalTargetClassRule.cs" />
+    <Compile Include="PerformEvalTargetRule.cs" />
+    <Compile Include="PerformEvalTargetTypeRule.cs" />
+    <Compile Include="PerformEvalTypeRule.cs" />
+    <Compile Include="ProcurementCatalogRule.cs" />
+    <Compile Include="ProcurementProceduresRule.cs" />
+    <Compile Include="ProcurementTypeRule.cs" />
+    <Compile Include="ProjectThresholdRule.cs" />
+    <Compile Include="ProjLibProjRule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QtAccountRule.cs" />
+    <Compile Include="QtAttachmentRule.cs" />
+    <Compile Include="QtBaseProjectRule.cs" />
+    <Compile Include="QTControlSetRule.cs" />
+    <Compile Include="QtCoverUpDataRule.cs" />
+    <Compile Include="QtCoverUpForOrgRule.cs" />
+    <Compile Include="QtDtlStageRule.cs" />
+    <Compile Include="QTEditMemoRule.cs" />
+    <Compile Include="QTIfApproveRule.cs" />
+    <Compile Include="QTMemoRule.cs" />
+    <Compile Include="QTModifyRule.cs" />
+    <Compile Include="QTIndividualInfoRule.cs" />
+    <Compile Include="QtNaviGationRule.cs" />
+    <Compile Include="QtOrgDygxRule.cs" />
+    <Compile Include="QTProductRule.cs" />
+    <Compile Include="QTProductUserDygxRule.cs" />
+    <Compile Include="QTProductUserRule.cs" />
+    <Compile Include="QTProjectDtlBudgetDtlRule.cs" />
+    <Compile Include="QTProjectDtlFundApplRule.cs" />
+    <Compile Include="QTProjectDtlImplPlanRule.cs" />
+    <Compile Include="QTProjectDtlPerformTargetRule.cs" />
+    <Compile Include="QTProjectDtlPurchaseDtlRule.cs" />
+    <Compile Include="QTProjectDtlPurDtl4SOFRule.cs" />
+    <Compile Include="QTProjectDtlTextContentRule.cs" />
+    <Compile Include="QTProjectMstRule.cs" />
+    <Compile Include="QtSysCodeSeqRule.cs" />
+    <Compile Include="QTSysSetRule.cs" />
+    <Compile Include="QtTableCustomizeRule.cs" />
+    <Compile Include="QtVenueRule.cs" />
+    <Compile Include="QtXmDistributeRule.cs" />
+    <Compile Include="QtYJKRule.cs" />
+    <Compile Include="QtZcgnflRule.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RWReportRule.cs" />
+    <Compile Include="SourceOfFundsRule.cs" />
+    <Compile Include="UserOrgRule.cs" />
+    <Compile Include="UserRule.cs" />
+    <Compile Include="VCorrespondenceSetting2Rule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GQT3.QT.Dac.Interface\GQT3.QT.Dac.Interface.csproj">
+      <Project>{1ab1cea9-a5ab-451b-9b6b-ae635cf7dac5}</Project>
+      <Name>GQT3.QT.Dac.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47ee9856-f415-4171-8609-b0531db86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GQT3.QT.Rule.Interface\GQT3.QT.Rule.Interface.csproj">
+      <Project>{52aeffed-ef6e-4104-b7ef-953c47a96666}</Project>
+      <Name>GQT3.QT.Rule.Interface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\i6Rules\ /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Rules /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

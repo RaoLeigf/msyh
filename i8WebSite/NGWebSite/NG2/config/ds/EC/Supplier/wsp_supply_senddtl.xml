@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="wsp_supply_senddtl">
+      <Field Name="sendid" IsKey="true" />
+      <Field Name="sendno"  />
+      <Field Name="lineid" IsKey="true"/>
+      <Field Name="itemno"/>
+      <Field Name="ranks"/>
+      <Field Name="msunit"/>
+      <Field Name="qty"/>
+      <Field Name="price"/>
+      <Field Name="sendsum"/>
+      <Field Name="reqdate" />
+      <Field Name="batchno" />
+      <Field Name="remarks" />
+      <Field Name="scmacceptflg" />
+      <Field Name="scmacceptman" />
+      <Field Name="scmacceptdate" />
+      <Field Name="scmacceptqty" />
+      <Field Name="scmbackqty" />
+      <Field Name="checkqty" />
+      <Field Name="relid" />
+      <Field Name="relno" />
+      <Field Name="relmxid" />
+      <Field Name="purid" />
+      <Field Name="purmxid" />
+    </Table>
+    <Table Name="ranks">
+      <Field Name="ranksname" />
+    </Table>
+    <Table Name="msunit">
+      <Field Name="msname" />
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="descript"/>
+      <Field Name="itemname"/>
+    </Table>
+    <Table Name="secuser">
+      <Field Name="u_name" AsName="scmacceptmanname"></Field>
+    </Table>
+    <Table Name="wsp_supply_ordermst">
+      <Field Name="relno" AsName="purno"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join wsp_supply_ordermst on wsp_supply_ordermst.orderid = [table].relid 
+      left join itemdata on itemdata.itemno=[table].itemno
+      left join msunit on msunit.msunit = [table].msunit
+      left join ranks on ranks.ranks = [table].ranks
+      left join secuser on secuser.logid = [table].scmacceptman
+      [where] [orderby]
+    </Sql>
+    <Where>
+      <Exp Field="sendid"  Target="Client" Value="sendid"/>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy>
+      
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Table Name="wsp_supply_senddtl">
+      <Values>
+
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    <Table Name="wsp_supply_senddtl">
+      <Values>
+
+      </Values>
+      <Query>
+        <Exp Field="sendid"  Target="Client" Value="sendid" Type="Array">
+          <Exp Field="sendid" ParamName ="sendid"  TypeKey="0"/>
+        </Exp>
+      </Query>
+    </Table>
+  </Destroy>
+  <GetOrderDtlSchame>
+    <Sql>
+      select * from wsp_supply_senddtl where 1=2
+    </Sql>
+  </GetOrderDtlSchame>
+  <GetOrderDtl>
+    <Sql>
+      select * from wsp_supply_senddtl
+    </Sql>
+    <Query>
+      
+    </Query>
+  </GetOrderDtl>
+  <!-- 获取发货单来源订单号和订单行号信息-->
+  <GetRelBillInfo>
+    <Sql>
+      select wsp_supply_senddtl.relid,wsp_supply_senddtl.relmxid,wsp_supply_senddtl.itemno,
+      wsp_supply_senddtl.lineid,wsp_supply_senddtl.sendid,fg_supplyfile.uicsendrate
+      from wsp_supply_senddtl inner join wsp_supply_sendmst
+      on wsp_supply_senddtl.sendid = wsp_supply_sendmst.sendid
+      inner join fg_supplyfile on wsp_supply_sendmst.supcomp = fg_supplyfile.compno
+      and wsp_supply_sendmst.ocode = fg_supplyfile.ocode  [where]
+    </Sql>
+    <Query>
+      <Exp Field="sendid" Target="Client" Value="sendid"/>
+      <Exp Field="lineid" Target="Client" Value="lineid"/>
+    </Query>
+  </GetRelBillInfo>
+  <!-- 获取发货情况 -->
+  <GetSendInfo>
+    <Sql>
+      select qty,scmbackqty,scmacceptqty,relid,relmxid,wsp_supply_sendmst.scmacceptflg,fg_supplyfile.uicsendrate
+      from wsp_supply_senddtl inner join wsp_supply_sendmst
+      on wsp_supply_senddtl.sendid = wsp_supply_sendmst.sendid
+      inner join fg_supplyfile on wsp_supply_sendmst.supcomp = fg_supplyfile.compno
+      and wsp_supply_sendmst.ocode = fg_supplyfile.ocode   [where]
+    </Sql>
+    <Query>
+      <Exp Field="relid"  Target="Client"  Value="relid"/>
+      <Exp Field="relmxid"  Target="Client"   Value="relmxid" />
+    </Query>
+  </GetSendInfo>
+  <DeleteSend>
+    <Sql>
+      Delete wsp_supply_senddtl [where]
+    </Sql>
+    <Query>
+      <Exp Field="sendid" Target="Client" Value="sendid"/>
+    </Query>
+  </DeleteSend>
+  <GetSendDtlData>
+    <Sql>
+      select * from wsp_supply_senddtl [where]
+    </Sql>
+    <Query>
+      <Exp Field="sendid" Target="Client" Value="sendid"/>
+      <Exp Field="lineid" Target="Client" Value="lineid"/>
+    </Query>
+  </GetSendDtlData>
+  <!-- 根据采购订单号获取发货物单信息 -->
+  <GetSendDtlDataFromPur>
+    <Sql>
+      select * from wsp_supply_senddtl [where]
+    </Sql>
+    <Query>
+      <Exp Field="purid" Target="Client" Value="purid"/>
+      <Exp Field="purmxid" Target="Client" Value="purmxid"/>
+    </Query>
+  </GetSendDtlDataFromPur>
+</DataService>

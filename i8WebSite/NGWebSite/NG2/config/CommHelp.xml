@@ -1,0 +1,406 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 通用帮助配置文件 -->
+<CommonHelp>
+  <Help id="_demo">
+    <Remarks>注释,供通用帮助查询平台使用,用于解释该帮助的用途</Remarks>
+    <Title>演示帮助</Title>
+    <Icon></Icon>
+    <CodeField>itemno</CodeField>
+    <NameField>askitemname</NameField>
+    <SortField>c_no</SortField>
+    <DataService>EC.Supplier.Order</DataService>
+    <!--Default|Single表示单选, Multi表示多选, CrossPage表示跨页多选-->
+    <SelectMode>Default</SelectMode>
+    <!--rows 默认是两每列宽度为0.1,也可以使用数字或百分比作为列的宽度值,用","分隔-->
+    <Query cols="90,0.1,90,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="relno" type="Edit" align="left" width="4" leftText="订单编号:"/>
+      <Input id="itemno" type="Edit" align="left" leftText="物料编码:"/>
+      <Input id="ranks" type="Edit" align="left" leftText="等级:"/>
+    </Query>
+    <!--字段名的集合, 传入 字段名,[字段中文名],[类型],[宽度] 以 | 分割 如 id,编号|name 
+    注: AllField与TreeList只能二选一, 同时存在时TreeList优先级更高 -->
+    <AllField></AllField>
+    <!--与TreeList模板定义相同-->
+    <!--查询1:col中增加一个queryable属性,指示是否支持查询-->
+    <!--查询2:也可以利用TreeList的tbar传入一个查询模板,此时queryable属性无效-->
+    <List>
+      <Properties isShowRuler="true"/>
+      <Cols>
+        <Col queryable="true" name="itemno" width="70">编码</Col>
+        <Col name="askitemname" width="70">品名</Col>
+        <Col name="askitem" width="90">询价编码</Col>
+        <Col name="ranks" width="90">等级</Col>
+      </Cols>
+    </List>
+    <!--与TreeList模板定义相同-->
+    <!--lazy:是否懒加载  keyField:主键字段  pidField:父节点字段  nameField:名称字段 DataService:数据服务 -->  
+    <Tree lazy="true" keyField="" pidField="" nameField="" DataService=""/>
+  </Help>
+  <Help id="msunit">
+    <Remarks>计量单位帮助</Remarks>
+    <Title>计量单位帮助</Title>
+    <Icon></Icon>
+    <CodeField>msunit</CodeField>
+    <NameField>msname</NameField>
+    <DataService>EC.Supplier.Msunit</DataService>
+    <SelectMode>Default</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="msunit"  width="120" isKey="true">代码</Col>
+        <Col name="msname"  width="120"  >名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="Supplier_Order1">
+    <Remarks>[供应商门户]订单单选帮助(查询)</Remarks>
+    <Title>订单单选帮助(查询)</Title>
+    <Icon></Icon>
+    <CodeField>orderid</CodeField>
+    <NameField>itemname</NameField>
+    <DataService>EC.Supplier.OrderDtl</DataService>
+    <SelectMode>Default</SelectMode>    
+    <TreeList>
+      <Cols>
+        <Col name="orderid"  width="0" isKey="true">系统编号</Col>
+        <Col name="relno"  width="120"  >订单编号</Col>
+        <Col name="lineid"  width="90" isKey="true">行号</Col>
+        <Col name="itemno" width="90" >物料编码</Col>
+        <Col name="itemname"  width="90" >物料名称</Col>
+        <Col name="ranks"  width="0" >等级</Col>
+        <Col name="ranksname"  width="90" >等级</Col>
+        <Col name="msunit"  width="0" >计量单位</Col>
+        <Col name="msname"  width="90" >计量单位</Col>
+        <Col name="qty"  width="90" datatype="double" decimal="2">订单数量</Col>
+        <Col name="price"  width="90" datatype="double" decimal="2">单价</Col>
+        <Col name="sum"  width="90" datatype="double" decimal="2">金额</Col>
+        <Col name="sendqty"  width="90" datatype="double" decimal="2">发货数量</Col>
+        <Col name="remarks" width="150">备注</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="Supplier_Order2">
+    <Remarks>[供应商门户]订单多选帮助</Remarks>
+    <Title>订单多选帮助</Title>
+    <Icon></Icon>
+    <CodeField>orderid</CodeField>
+    <NameField>itemname</NameField>
+    <DataService>EC.Supplier.OrderDtl</DataService>
+    <SelectMode>Multi</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="orderid"  width="0" isKey="true">系统编号</Col>
+        <Col name="relno"  width="120"  >订单编号</Col>
+        <Col name="lineid"  width="90" isKey="true">行号</Col>
+        <Col name="itemno" width="90" >物料编码</Col>
+        <Col name="itemname"  width="90" >物料名称</Col>
+        <Col name="ranks"  width="0" >等级</Col>
+        <Col name="ranksname"  width="90" >等级</Col>
+        <Col name="msunit"  width="0" >计量单位</Col>
+        <Col name="msname"  width="90" >计量单位</Col>
+        <Col name="qty"  width="90" datatype="double" decimal="2">订单数量</Col>
+        <Col name="price"  width="90" datatype="double" decimal="2">单价</Col>
+        <Col name="sum"  width="90" datatype="double" decimal="2">金额</Col>
+        <Col name="sendqty"  width="90" datatype="double" decimal="2">发货数量</Col>
+        <Col name="remarks" width="150">备注</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="Supplier_Order3">
+    <Remarks>[供应商门户]订单单选帮助(auto)</Remarks>
+    <Title>订单单选帮助(auto)</Title>
+    <Icon></Icon>
+    <CodeField>orderid</CodeField>
+    <NameField>itemname</NameField>
+    <DataService>EC.Supplier.OrderDtl</DataService>
+    <SelectMode>Default</SelectMode>
+    <AllField>orderid|relno|lineid|itemno|itemname|ranks|qty|price|remarks</AllField>
+  </Help>
+  <Help id="Supplier_Order4">
+    <Remarks>[供应商门户]订单多选帮助(auto)</Remarks>
+    <Title>订单多选帮助(auto)</Title>
+    <Icon></Icon>
+    <CodeField>orderid</CodeField>
+    <NameField>itemname</NameField>
+    <DataService>EC.Supplier.OrderDtl</DataService>
+    <SelectMode>Multi</SelectMode>
+    <AllField key="orderid,lineid">orderid|relno|lineid|itemno|itemname|ranks|qty|price|remarks</AllField>
+  </Help>
+  <Help id="Supplier_Order5">
+    <Remarks>[供应商门户]订单单选帮助(树)</Remarks>
+    <Title>订单单选帮助(auto)</Title>
+    <Icon></Icon>
+    <CodeField>orderid</CodeField>
+    <NameField>itemname</NameField>
+    <DataService>EC.Supplier.OrderDtl</DataService>
+    <SelectMode>Default</SelectMode>
+    <AllField>orderid|relno|lineid|itemno|itemname|ranks|qty|price|remarks</AllField>
+    <Tree lazy="false" keyField="actorid" pidField="userid" nameField="memo" DataService="RW.ReportDesign.Actor"/>
+  </Help>
+  <Help id="Supplier_Order6">
+    <Remarks>[供应商门户]订单多选帮助(树)</Remarks>
+    <Title>订单多选帮助(auto)</Title>
+    <Icon></Icon>
+    <CodeField>orderid</CodeField>
+    <NameField>itemname</NameField>
+    <DataService>EC.Supplier.OrderDtl</DataService>
+    <SelectMode>Multi</SelectMode>
+    <AllField key="orderid,lineid">orderid|relno|lineid|itemno|itemname|ranks|qty|price|remarks</AllField>
+  </Help>
+  <Help id="Secuser">
+    <Remarks>操作员帮助</Remarks>
+    <Title>操作员帮助</Title>
+    <Icon></Icon>
+    <CodeField>logid</CodeField>
+    <NameField>u_name</NameField>
+    <DataService>EC.Supplier.Secuser</DataService>
+    <SelectMode>Default</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="logid"  width="0.4" isKey="true">操作员编号</Col>
+        <Col name="u_name"  width="0.6"  >操作员名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="Secuser_mulselect">
+    <Remarks>操作员帮助-多选</Remarks>
+    <Title>操作员帮助</Title>
+    <Icon></Icon>
+    <Query cols="90,0.1,90,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="logid_like" type="Edit" align="left" leftText="编号:"/>
+      <Input id="u_name_like" type="Edit" align="left" leftText="名称:"/>
+    </Query>
+    <CodeField>logid</CodeField>
+    <NameField>u_name</NameField>
+    <DataService>RW.ReportDesign.SecuserHelp</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="logid"  isKey="true" ishide="abstrue">编号</Col>        
+        <Col name="u_name" ishide="abstrue" >名称</Col>
+        <Col name="userid"  minwidth="100" width="0.4" isKey="true" displayMask="logid">编号</Col>
+        <Col name="username" minwidth="130" width="0.6" isKey="true" displayMask="u_name">名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="Actor_mulselect">
+    <Remarks>角色帮助-多选</Remarks>
+    <Title>角色帮助</Title>
+    <Icon></Icon>
+    <Query cols="90,0.1,90,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="actorid_like" type="Edit" align="left" leftText="编号:"/>
+      <Input id="memo_like" type="Edit" align="left" leftText="名称:"/>
+    </Query>
+    <CodeField>actorid</CodeField>
+    <NameField>memo</NameField>
+    <DataService>RW.ReportDesign.Actor</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="actorid"  width="0" isKey="true" ishide="abstrue">编号</Col>
+        <Col name="memo"  width="0" ishide="abstrue" >名称</Col>
+        <Col name="userid"  minwidth="100" width="0.4" isKey="true" displayMask="actorid">编号</Col>
+        <Col name="username" minwidth="130" width="0.6" isKey="true" displayMask="memo">名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="Actor">
+    <Remarks>角色帮助-单选</Remarks>
+    <Title>角色帮助</Title>
+    <Icon></Icon>
+    <Query cols="90,0.1,90,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="actorid_like" type="Edit" align="left" leftText="编号:"/>
+      <Input id="memo_like" type="Edit" align="left" leftText="名称:"/>
+    </Query>
+    <CodeField>actorid</CodeField>
+    <NameField>memo</NameField>
+    <DataService>RW.ReportDesign.Actor</DataService>
+    <SelectMode>Default</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="actorid"  width="0" isKey="true" ishide="abstrue">编号</Col>
+        <Col name="memo"  width="0" ishide="abstrue" >名称</Col>
+        <Col name="userid"  minwidth="100" width="0.4" isKey="true" displayMask="actorid">编号</Col>
+        <Col name="username" minwidth="130" width="0.6" isKey="true" displayMask="memo">名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="UserGroup_mulselect">
+    <Remarks>用户组帮助-多选</Remarks>
+    <Title>用户组帮助</Title>
+    <Icon></Icon>
+    <Query cols="90,0.1,90,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="g_code_like" type="Edit" align="left" leftText="编号:"/>
+      <Input id="g_name_like" type="Edit" align="left" leftText="名称:"/>
+    </Query>
+    <CodeField>actorid</CodeField>
+    <NameField>memo</NameField>
+    <DataService>RW.ReportDesign.UserGroup</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="g_code"  width="0" isKey="true" ishide="abstrue">编号</Col>
+        <Col name="g_name"  width="0" ishide="abstrue" >名称</Col>
+        <Col name="userid"  minwidth="100" width="0.4" isKey="true" displayMask="g_code">编号</Col>
+        <Col name="username" minwidth="130" width="0.6" isKey="true" displayMask="g_name">名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="ReportList_mulse">
+    <Remarks>报表仓库帮助-多选</Remarks>
+    <Title>报表帮助</Title>
+    <Icon></Icon>
+    <CodeField>rep_id</CodeField>
+    <NameField>rep_name</NameField>
+    <DataService>RW.ReportDesign.RepMain</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="rep_id" isKey="true" ishide="abstrue">报表id</Col>
+        <Col name="rep_code" minwidth="120" width="0.1" >编号</Col>
+        <Col name="rep_name" minwidth="150" width="0.2" >名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="IntfiReprot_mulselect">
+    <Remarks>财务报表中心报表帮助-多选</Remarks>
+    <Title>财务报表中心报表帮助</Title>
+    <Icon></Icon>
+    <Query cols="80,0.2,70,0.1,80,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="rep_name_like" type="Edit" align="left" leftText="报表名称:"/>
+      <Input id="g_name_like" type="Edit" align="left" leftText="报表组:"/>
+      <Input id="t_name_like" type="Edit" align="left" leftText="报表类别:"/>
+    </Query>
+    <CodeField>rep_code</CodeField>
+    <NameField>rep_name</NameField>
+    <DataService>RW.ReportDesign.IntfiReport</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="rep_code"  isKey="true" ishide="abstrue">编号</Col>
+        <Col name="rep_name" minwidth="120" width="0.5" >名称</Col>
+        <Col name="g_name" minwidth="120" width="0.5" >报表组</Col>
+        <Col name="t_name" minwidth="120" width="0.5" >报表类别</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="NG2Reprot_mulselect">
+    <Remarks>报表仓库报表帮助-多选</Remarks>
+    <Title>报表仓库报表帮助</Title>
+    <Icon></Icon>
+    <Query cols="80,0.1,80,0.2">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="rep_code" type="Edit" align="left" leftText="报表编号:"/>
+      <Input id="rep_name" type="Edit" align="left" leftText="报表名称:"/>      
+    </Query>
+    <CodeField>rep_id</CodeField>
+    <NameField>rep_name</NameField>
+    <DataService>RW.ReportDesign.NG2Report</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="rep_id"  isKey="true" ishide="abstrue">id</Col>
+        <Col name="rep_code" minwidth="100" width="0.2">编号</Col>
+        <Col name="rep_name" minwidth="120" width="0.5" >名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  <Help id="PsoftReprot_mulselect">
+    <Remarks>项目管理报表帮助-多选</Remarks>
+    <Title>项目管理报表帮助</Title>
+    <Icon></Icon>    
+    <Query cols="80,0.1,80,0.2">
+      <Input id="rep_code_like" type="Edit" align="left" leftText="报表编号:"/>
+      <Input id="rep_name_like" type="Edit" align="left" leftText="报表名称:"/>
+    </Query>
+    <CodeField>rep_id</CodeField>
+    <NameField>rep_name</NameField>
+    <DataService>RW.ReportDesign.PsoftReport</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="rep_id"  isKey="true" ishide="false">ID</Col>
+        <Col name="rep_code" minwidth="100" width="0.2">编号</Col>
+        <Col name="rep_name" minwidth="120" width="0.5" >名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+
+  <Help id="FgMenuReprot_mulselect">
+    <Remarks>业务固定报表帮助-多选(来自于fg_menu)</Remarks>
+    <Title>业务固定报表帮助</Title>
+    <Icon></Icon>
+    <Query cols="80,0.1">
+      <Input id="name_like" type="Edit" align="left" leftText="报表名称:"/>
+    </Query>
+    <CodeField>code</CodeField>
+    <NameField>name</NameField>
+    <DataService>RW.ReportDesign.FgMenu</DataService>
+    <SelectMode>CrossPage</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="code"  isKey="true" ishide="abstrue">Code</Col>        
+        <Col name="name" minwidth="120" width="0.5" >名称</Col>
+        <Col name="suite" ishide="false" >suite</Col>
+        <Col name="norightcontrol" ishide="abstrue" >Norightcontrol</Col>
+        <Col name="functionnode_flag" ishide="abstrue" >functionnode_flag</Col>
+        <Col name="url" ishide="abstrue" >url</Col>
+        <Col name="id" ishide="abstrue" >id</Col>
+        <Col name="pid" ishide="abstrue" >pid</Col>
+        <Col name="apptype" ishide="abstrue" >apptype</Col>
+        <Col name="rightname" ishide="abstrue" >rightname</Col>
+        <Col name="ebankflg" ishide="abstrue" >ebankflg</Col>
+        <Col name="functionname" ishide="abstrue" >functionname</Col>        
+      </Cols>
+    </TreeList>
+  </Help>
+  
+  <Help id="Secuser_onlyactive">
+    <Remarks>操作员帮助-未禁用的</Remarks>
+    <Title>操作员帮助</Title>
+    <Icon></Icon>
+    <Query cols="90,0.1,90,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="logid_like" type="Edit" align="left" leftText="用户编号:"/>
+      <Input id="u_name_like" type="Edit" align="left" leftText="用户名:"/>
+    </Query>    
+    <CodeField>logid</CodeField>
+    <NameField>u_name</NameField>
+    <DataService>RW.ReportDesign.SecuserHelp</DataService>
+    <SelectMode>Default</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="logid"  width="0.4" isKey="true">操作员编号</Col>
+        <Col name="u_name"  width="0.6"  >操作员名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+
+  <Help id="Secuser_all">
+    <Remarks>操作员帮助-含禁用的</Remarks>
+    <Title>操作员帮助</Title>
+    <Icon></Icon>
+    <Query cols="100,0.1,100,0.1,5,0.1">
+      <!--里面为控件集合,支持所有Input类型的内嵌控件 width 默认为2-->
+      <Input id="logid_like" type="Edit" align="left" leftText="用户编号:"/>
+      <Input id="u_name_like" type="Edit" align="left" leftText="用户名:"/>
+      <Input id="lg_sign" type="Checkbox" Text="显示禁用"/>
+    </Query>
+    <CodeField>logid</CodeField>
+    <NameField>u_name</NameField>
+    <DataService>RW.ReportDesign.SecuserHelp</DataService>
+    <SelectMode>Default</SelectMode>
+    <TreeList>
+      <Cols>
+        <Col name="logid"  width="0.4" isKey="true">操作员编号</Col>
+        <Col name="u_name"  width="0.6"  >操作员名称</Col>
+      </Cols>
+    </TreeList>
+  </Help>
+  
+</CommonHelp>

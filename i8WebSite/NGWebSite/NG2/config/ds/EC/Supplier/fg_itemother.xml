@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_itemother">
+      <Field Name="itemno" IsKey="true" />
+      <Field Name="ocode" IsKey="true"/>
+      <Field Name="primtdno"  />
+      <Field Name="planprc"/>
+      <Field Name="curmtrcost"/>
+      <Field Name="curmancost"/>
+      <Field Name="curmngcost"/>
+      <Field Name="cursumcost"/>
+      <Field Name="stdmtrcost"/>
+      <Field Name="stdmancost"/>
+      <Field Name="stdmngcost"/>
+      <Field Name="stdsumcost"/>
+      <Field Name="addmtrcost"/>
+      <Field Name="addmancost" />
+      <Field Name="addmngcost" />
+      <Field Name="addsumcost" />
+      <Field Name="stdupdate" />
+      <Field Name="perqty" />
+      <Field Name="itemsource" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+    </Where>
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      
+    </Sql>
+    <Where>
+    </Where>
+    <OrderBy>
+    </OrderBy>
+  </Record>
+  <Create>
+  </Create>
+  <Update>
+  </Update>
+  <Delete>
+  </Delete>
+  <Destroy>
+  </Destroy>
+  <GetItemSource>
+    <Sql>
+      select itemsource from [table] [where]
+    </Sql>
+    <Query>
+      <Exp Field="itemno"  Target="Client" Value="itemno"/>
+    </Query>
+  </GetItemSource>
+</DataService>

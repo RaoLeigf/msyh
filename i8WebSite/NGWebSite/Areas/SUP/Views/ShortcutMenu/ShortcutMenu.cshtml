@@ -1,0 +1,1757 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+    @*<script src="~/NG3Resource/js/DMC/DMCCommon.js" type="text/javascript" charset="utf-8"></script>*@
+    <script src=@Url.Script("~/NG3Resource/js/DMC/DMCCommon.js") type="text/javascript" charset="utf-8"></script>
+    <link href="~/NG3Resource/css/mainTreeTab.css" rel="stylesheet" type="text/css" />
+    <style>
+        #save-btnIconEl {
+            margin-left: 10px;
+        }
+
+        #save-btnInnerEl {
+            margin-left: 20px;
+        }
+
+        #cancel-btnIconEl {
+            margin-left: 10px;
+        }
+
+        #cancel-btnInnerEl {
+            margin-left: 20px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        var contextMenuOpType = ""; //右键菜单操作类型
+        var UserType = Ext.htmlDecode('@ViewBag.UserType');
+        var check = true;
+        //var para = '';
+        var isweb = Ext.htmlDecode('@ViewBag.isweb');
+        var LoadEnFuncTreeRight = Ext.htmlDecode('@ViewBag.LoadEnFuncTreeRight');
+        if (LoadEnFuncTreeRight.substr(0, 1) == 1 && UserType != 'SYSTEM') {//第一个字符为1，启用企业功能树
+            var MySuiteUrl = C_ROOT + 'SUP/EnFuncTree/GetSuiteList';
+            var MyMenuUrl = C_ROOT + 'SUP/EnFuncTree/LoadMenu'; //像系统功能树一样做一个不懒加载的开关，否则添加到我的功能树会加不进去
+            var MyQueryUrl = C_ROOT + 'SUP/EnFuncTree/Query';
+        } else {
+            var MySuiteUrl = C_ROOT + 'SUP/MainTree/GetSuiteList';
+            var MyMenuUrl = C_ROOT + 'SUP/MainTree/LoadMenu' + "?lazyLoadFlag=false";
+            var MyQueryUrl = C_ROOT + 'SUP/MainTree/Query';
+        }
+
+        var gridPanel;
+
+        Ext.onReady(function () {
+
+            var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+            var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+
+            //通过节点node找到树的根节点
+            function findRoot(node) {
+                while (!node.isRoot()) {
+                    node = node.parentNode;
+                }
+                return node;
+            }
+
+            //展开根为root的树的所有节点
+            function expandTree(root) {
+                if (root.hasChildNodes()) {
+                    root.expand();
+                    for (var i = 0; i < root.childNodes.length; i++) {
+                        expandTree(root.childNodes[i]);
+                    }
+                }
+
+            }
+
+            //折叠根为root的树的所有节点
+            function collapseTree(root) {
+                if (root.hasChildNodes()) {
+                    //root.collapse();
+                    for (var i = 0; i < root.childNodes.length; i++) {
+                        if (root.childNodes[i].hasChildNodes()) {
+                            root.childNodes[i].collapse();
+                            collapseTree(root.childNodes[i]);
+                        }
+                    }
+                }
+            }
+
+            var currentTree;
+            //系统功能树
+            Ext.define('Ext.ng.checkSysFuncTree', {
+                extend: 'Ext.tab.Panel',
+                alias: 'widget.ngCheckSysFuncTree',
+                tabPosition: 'left',
+                suites: [],
+                initComponent: function () {
+                    var me = this;
+                    this.callParent();
+                    me.menu = Ext.create('Ext.menu.Menu', {
+                        //selectedNode:null,
+                        items: [
+                            {
+                                text: '全部展开',
+                                handler: function () {
+                                    var node = me.menu.selectedNode;
+                                    var root = findRoot(node);
+                                    expandTree(root);
+                                }
+                            },
+                            {
+                                text: '全部折叠',
+                                handler: function () {
+                                    var node = me.menu.selectedNode;
+                                    var root = findRoot(node);
+                                    collapseTree(root);
+                                }
+                            }
+                        ]
+                    });
+                    me.loadData();
+                    me.tabBar.on('change', function (tabBar, tab, card, eOpts) {
+                        tabBar.needsScroll = false;//禁止tabBar乱滚动，抽风
+                    });
+                },
+                loadData: function () {
+                    var me = this;
+                    var arr = [];
+                    Ext.Ajax.request({
+                        url: MySuiteUrl,
+                        async: false,
+                        success: function (res, opts) {
+                            if (res.responseText.length > 0) {
+                                var suites = Ext.JSON.decode(res.responseText);
+                                for (var i = 0; i < suites.length; i++) {
+                                    var title = suites[i].Name.split('').join('<br>');
+                                    if (!Ext.isIE) {
+                                        var height = '15px';
+                                        var width = suites[i].Name.length * 15;
+                                        var left = suites[i].Name.length * 7.0 + 2;
+                                        //firefox
+                                        if (!Ext.isChrome) {
+                                            width = suites[i].Name.length * 17;
+                                            left = suites[i].Name.length * 7.5;
+                                        }
+                                        //if (isNeptune) {
+                                        //    height = '16px';
+                                        //}                                        //
+                                        title = "<div style='-webkit-transform: rotate(90deg);-moz-transform:rotate(90deg);filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=180);width:" + width + "px;height:" + height + ";left:" + left + "px !important;position: relative;padding: 8px 8px 8px 8px;'>"
+                                                    + suites[i].Name.split('').join('<br>') + "</div>";
+                                    }
+
+                                    var menu = Ext.create('Ext.ng.TreePanel', {
+                                        autoLoad: false,
+                                        height: 600,
+                                        split: true,
+                                        checked: false,
+                                        border: false,
+                                        //title: suites[i].Name,//title,
+                                        title: title,
+                                        suite: suites[i].Code,
+                                        layout: 'fit',
+                                        treeFields: [{ name: 'text', type: 'string' },
+                                            //{ name: 'my', type: 'string' }//我的自定义属性
+                                        ],
+                                        url: MyMenuUrl, //'HR/EmpInfoList/LoadMenu'
+                                        //params: { functiontree: 'myFuncTree'},
+                                        listeners: {
+                                            'afterrender': function () {
+                                                //this.expandAll();
+                                            },
+                                            'expand': function () {
+                                                var me = this;
+                                                Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                                this.getRootNode().expand();
+                                            },
+                                            'activate': function () {
+                                                var me = this;
+                                                Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                                //this.getRootNode().expand();//有些电脑会全部出发这个事件，达不到懒加载目的
+                                            },
+                                            //'itemdblclick': function (view, rcd, item, idx, event, eOpts) {
+                                            //    if (rcd.raw.leaf) {
+                                            //        WF.Center.openTab(rcd.raw.text, rcd.raw.url);
+                                            //    }
+                                            //},
+                                            'checkchange': function (node, checked) {
+                                                setChildNodeChecked(node, checked);
+                                            },
+                                            'itemcontextmenu': function (view, rec, node, index, e) {
+                                                e.stopEvent();
+                                                var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');
+                                                ngCheckSysFuncTree.menu.selectedNode = rec;
+                                                ngCheckSysFuncTree.menu.showAt(e.getXY());
+                                                return false;
+                                            },
+                                            'containercontextmenu': function (treeP, e, eOpts) {
+                                                e.stopEvent();
+                                                var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');
+                                                ngCheckSysFuncTree.menu.selectedNode = treeP.store.data.items[0];
+                                                ngCheckSysFuncTree.menu.showAt(e.getXY());
+                                                return false;
+                                            }
+                                            //'containercontextmenu': function (treeP, e, eOpts) {
+                                            //    e.stopEvent();
+                                            //    var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');
+                                            //    ngCheckSysFuncTree.menu.selectedNode = treeP.store.data.items[0];
+                                            //    ngCheckSysFuncTree.menu.showAt(e.getXY());
+                                            //    return false;
+                                            //}
+                                        }
+                                    });
+                                    arr.push(menu);
+                                }
+
+
+                                //在for循环外，添加报表仓库和文档库
+                                var myTitle = '报表仓库';
+                                var menu = Ext.create('Ext.ng.TreePanel', {
+                                    autoLoad: false,
+                                    height: 600,
+                                    split: true,
+                                    suiteName: '报表仓库',
+                                    border: false,
+                                    //title: suites[i].Name,//title,
+                                    title: "<div style='-webkit-transform: rotate(90deg);-moz-transform:rotate(90deg);filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=180);width:60px;height:15px;left:30px !important;position: relative;padding: 8px 8px 8px 8px;'>" + myTitle.split('').join('<br>') + "</div>",
+                                    //suite: suites[i].Code,
+                                    layout: 'fit',
+                                    treeFields: [{ name: 'text', type: 'string' },
+                                            //{ name: 'checked', type: 'boolean', values: false },
+                                            //{ name: 'my', type: 'string' }//我的自定义属性
+                                    ],
+                                    url: C_ROOT + 'SUP/ReportList/LoadReportList?page=shortcut', //'HR/EmpInfoList/LoadMenu'
+                                    listeners: {
+                                        'afterrender': function () {
+                                            //this.expandAll();
+                                        },
+                                        'expand': function () {
+                                            var me = this;
+                                            Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                            this.getRootNode().expand();
+                                        },
+                                        'activate': function () {
+                                            var me = this;
+                                            Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                            //this.getRootNode().expand();//有些电脑会全部出发这个事件，达不到懒加载目的
+                                        },
+                                        'checkchange': function (node, checked) {
+                                            setChildNodeChecked(node, checked);
+                                        },
+                                        'itemdblclick': function (view, rcd, item, idx, event, eOpts) {
+                                            if (rcd.raw.leaf) {
+                                                //WF.Center.openTab(rcd.raw.text, rcd.raw.url);
+                                                if (me.hasDbClickListener == true) {
+                                                    var param = { 'str': rcd.raw.text, 'rightname': '', 'managername': rcd.raw.managername, 'moduleno': rcd.raw.moduleno, 'id': rcd.raw.code, 'url': rcd.raw.url, 'suite': rcd.raw.suite, 'rightkey': rcd.raw.rightkey };
+                                                    window.external.OpenFunction(rcd.raw.url, JSON.stringify(param));
+                                                }
+                                            }
+                                        },
+                                        'itemcontextmenu': function (view, rec, node, index, e) {
+                                            e.stopEvent();
+                                            var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');
+                                            ngCheckSysFuncTree.menu.selectedNode = rec;
+                                            ngCheckSysFuncTree.menu.showAt(e.getXY());
+                                            return false;
+                                        },
+                                        'containercontextmenu': function (treeP, e, eOpts) {
+                                            e.stopEvent();
+                                            var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');
+                                            ngCheckSysFuncTree.menu.selectedNode = treeP.store.data.items[0];
+                                            ngCheckSysFuncTree.menu.showAt(e.getXY());
+                                            return false;
+                                        }
+                                    }
+                                });
+
+                                //在for循环外，添加报表仓库和文档库
+                                var wocTitle = '文档库';
+                                Ext.define('Ext.ng.WMDocTree', {
+                                    extend: 'Ext.tree.TreePanel',
+                                    alias: 'widget.ngDocTree',
+                                    animate: true,
+                                    collapsible: false,
+                                    useArrows: true,
+                                    rootVisible: false,
+                                    hideHeaders: true,
+                                    selectMode: 'Single',
+                                    nodeIndex: -1,
+                                    type: 'MY',
+                                    filter: '',
+
+                                    autoLoad: false,
+                                    height: 600,
+                                    split: true,
+                                    suiteName: '文档库',
+                                    border: false,
+                                    //title: suites[i].Name,//title,
+                                    title: "<div style='-webkit-transform: rotate(90deg);-moz-transform:rotate(90deg);filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=180);width:45px;height:15px;left:23px !important;position: relative;padding: 8px 8px 8px 8px;'>" + wocTitle.split('').join('<br>') + "</div>",
+                                    //suite: suites[i].Code,
+                                    layout: 'fit',
+                                    treeFields: [
+                                            { name: 'checked', type: 'boolean', values: false }
+                                    ],
+                                    columns: [
+                                        {
+                                            text: '物理主键',
+                                            flex: 0,
+                                            sortable: false,
+                                            dataIndex: 'PhId',
+                                            hideable: false,
+                                            hidden: true
+                                        }, {
+                                            text: '代码',
+                                            flex: 0,
+                                            dataIndex: 'CNo',
+                                            sortable: false,
+                                            hideable: false,
+                                            hidden: true
+                                        }, {
+                                            text: '名称',
+                                            flex: 1,
+                                            xtype: 'treecolumn',
+                                            dataIndex: 'Text',
+                                            hidden: false,
+                                            hideable: false,
+                                            align: 'left'
+                                        }, {
+                                            text: '名称',
+                                            flex: 0,
+                                            dataIndex: 'CName',
+                                            hidden: true,
+                                            hideable: false,
+                                            sortable: false,
+                                            align: 'left'
+                                        }
+                                    ],
+                                    initComponent: function () {
+                                        var me = this;
+                                        Ext.define('model', {
+                                            extend: 'Ext.data.Model',
+                                            fields: [
+                                                {
+                                                    name: 'PhId',
+                                                    type: 'string',
+                                                    mapping: 'PhId'
+                                                }, {
+                                                    name: 'CNo',
+                                                    type: 'string',
+                                                    mapping: 'CNo'
+                                                }, {
+                                                    name: 'CName',
+                                                    type: 'string',
+                                                    mapping: 'CName'
+                                                }, {
+                                                    name: 'Text',
+                                                    type: 'string',
+                                                    mapping: 'text'
+                                                }, {
+                                                    name: 'IsDoc',
+                                                    type: 'string',
+                                                    mapping: 'IsDoc'
+                                                }, {
+                                                    name: 'DocType',
+                                                    type: 'string',
+                                                    mapping: 'DocType'
+                                                }, {
+                                                    name: 'Doclibid',
+                                                    type: 'string',
+                                                    mapping: 'Doclibid'
+                                                }, {
+                                                    name: 'WbsId',
+                                                    type: 'string',
+                                                    mapping: 'WbsId'
+                                                }
+                                            ]
+                                        });
+                                        var store = Ext.create('Ext.data.TreeStore', {
+                                            model: 'model',
+                                            autoLoad: false,
+                                            proxy: {
+                                                type: 'ajax',
+                                                url: C_ROOT + 'WM/Doc/Document/GetDocumentForGuid'
+                                            }
+                                        });
+                                        store.on('beforeload', function (store) {
+                                            if (me.type) {
+                                                Ext.apply(store.proxy.extraParams, { 'type': me.type });
+                                            }
+                                            if (me.filter || me.filter == '') {
+                                                Ext.apply(store.proxy.extraParams, { 'filter': me.filter });
+                                            }
+                                        });
+                                        me.store = store;
+                                        me.callParent();
+                                    },
+                                });
+                                var menuWoc = Ext.create('Ext.ng.WMDocTree', {
+
+                                });
+
+
+
+
+                                if (me.hasRightClickMenu == true) {
+                                    menu.addListener('itemcontextmenu', function (view, rec, node, index, e) {
+                                        e.stopEvent();
+                                        var ngSysFuncTree = view.findParentByType('ngSysFuncTree');
+                                        if (rec.data.leaf == true) {
+                                            ngSysFuncTree.itemMenu.selectedNode = rec;
+                                            ngSysFuncTree.itemMenu.showAt(e.getXY());
+                                        } else {
+                                            ngSysFuncTree.containMenu.selectedNode = rec;
+                                            ngSysFuncTree.containMenu.showAt(e.getXY());
+                                        }
+                                        return false;
+                                    });
+                                    menu.addListener('containercontextmenu', function (treeP, e, eOpts) {
+                                        e.stopEvent();
+                                        var ngSysFuncTree = this.findParentByType('ngSysFuncTree');
+                                        ngSysFuncTree.containMenu.selectedNode = treeP.store.data.items[0];
+                                        ngSysFuncTree.containMenu.showAt(e.getXY());
+                                        return false;
+                                    })
+                                }
+                                arr.push(menu);
+                                arr.push(menuWoc);
+
+
+
+                                me.suites = arr; //第一次加载把arr存在suites中
+                                //me.items = arr;
+                                me.add(arr);
+                                Ext.apply(arr[0].getStore().proxy.extraParams, { suite: arr[0].suite });
+                                arr[0].getRootNode().expand();//加载第一个
+                                currentTree = arr[0];
+                            }
+                        }
+                    });// 画出左侧菜单树
+                },
+                height: 300,
+                width: 300,
+                itemId: 'ngCheckSysFuncTree',
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    width: 300,
+                    dock: 'top',
+                    //layout: 'border',
+                    //minWidth: 200,
+                    items: [
+                        {
+                            width: 180,
+                            //region: 'center',
+                            xtype: 'textfield',
+                            itemId: 'query',
+                            name: 'queryname',
+                            emptyText: '搜索内容',
+                            enableKeyEvents: true,
+                            listeners: {
+                                'keydown': function (el, e, eOpts) {
+                                    if (e.getKey() == e.ENTER) {
+                                        var condition = this.ownerCt.queryById('query').getValue();
+                                        //alert(condition);
+                                        if (condition == '' || condition == null) {
+                                            //alert('请输入搜索内容');
+                                            return;
+                                        };
+                                        var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');//找到根节点
+                                        ngCheckSysFuncTree.removeAll();
+                                        var orgtitle = "搜索结果";
+                                        title = "<div style='-webkit-transform: rotate(90deg);-moz-transform:rotate(90deg);filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=180);width:" + orgtitle.length * 15 + "px; height:15px; left:" + (orgtitle.length * 7 + 2) + "px !important;position: relative;position: relative;padding: 8px 8px 8px 8px;'>"
+                                                    + orgtitle.split('').join('<br>') + "</div>";
+                                        var qmenu = Ext.create('Ext.ng.TreePanel', {
+                                            autoLoad: false,
+                                            height: 600,
+                                            split: true,
+                                            border: false,
+                                            text: "员工",
+                                            title: title,
+                                            layout: 'fit',
+                                            treeFields: [{ name: 'text', type: 'string' },
+                                                { name: 'my', type: 'string' }//我的自定义属性
+                                            ],
+                                            url: MyQueryUrl,
+                                            listeners: {
+                                                'afterrender': function () {
+                                                },
+                                                'expand': function () {
+                                                    var me = this;
+                                                    Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                                    this.getRootNode().expand();
+                                                },
+                                                'activate': function () {
+                                                    var me = this;
+                                                    Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                                    //this.getRootNode().expand();//有些电脑会全部出发这个事件，达不到懒加载目的
+                                                },
+                                                'itemdblclick': function (view, rcd, item, idx, event, eOpts) {
+                                                    if (rcd.raw.leaf) {
+                                                        //WF.Center.openTab(rcd.raw.text, rcd.raw.url);
+                                                        var param = { 'str': rcd.raw.text, 'rightname': '', 'managername': rcd.raw.managername, 'moduleno': rcd.raw.moduleno, 'id': rcd.raw.code, 'url': rcd.raw.url, 'suite': rcd.raw.suite };
+                                                        window.external.OpenFunction(rcd.raw.url, JSON.stringify(param));
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        ngCheckSysFuncTree.add(qmenu);
+                                        Ext.apply(qmenu.getStore().proxy.extraParams, { condition: condition });
+                                        qmenu.getRootNode().expand();//加载第一个
+                                        return false;
+                                    }
+                                }
+                            }
+                        }, {
+                            //region: 'east',
+                            //width: 40,
+                            //text: '搜索',
+                            iconCls: 'icon-Query',
+                            handler: function () {
+                                //var s = this.up('toolbar');
+                                var condition = this.ownerCt.queryById('query').getValue();
+                                if (condition == '' || condition == null) {
+                                    //alert('请输入搜索内容');
+                                    return;
+                                };
+                                var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');//找到根节点
+                                ngCheckSysFuncTree.removeAll();
+                                var orgtitle = "搜索结果";
+                                title = "<div style='-webkit-transform: rotate(90deg);-moz-transform:rotate(90deg);filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=180);width:" + orgtitle.length * 15 + "px; height:15px; left:" + (orgtitle.length * 7 + 2) + "px !important;position: relative;padding: 8px 8px 8px 8px;'>"
+                                            + orgtitle.split('').join('<br>') + "</div>";
+                                var qmenu = Ext.create('Ext.ng.TreePanel', {
+                                    autoLoad: false,
+                                    height: 600,
+                                    split: true,
+                                    border: false,
+                                    text: "员工",
+                                    title: title,
+                                    layout: 'fit',
+                                    treeFields: [{ name: 'text', type: 'string' },
+                                        { name: 'checked', type: 'boolean', values: false },
+                                        { name: 'my', type: 'string' }//我的自定义属性
+                                    ],
+                                    //url: C_ROOT + 'SUP/MainTree/LoadMenu', //'HR/EmpInfoList/LoadMenu'
+                                    url: MyQueryUrl,
+                                    listeners: {
+                                        'afterrender': function () {
+                                            //this.expandAll();
+                                        },
+                                        'expand': function () {
+                                            var me = this;
+                                            Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                            this.getRootNode().expand();
+                                        },
+                                        'activate': function () {
+                                            var me = this;
+                                            Ext.apply(this.getStore().proxy.extraParams, { suite: me.suite });
+                                            //this.getRootNode().expand();//有些电脑会全部出发这个事件，达不到懒加载目的
+                                        },
+                                        'itemdblclick': function (view, rcd, item, idx, event, eOpts) {
+                                            if (rcd.raw.leaf) {
+                                                WF.Center.openTab(rcd.raw.text, rcd.raw.url);
+                                            }
+                                        },
+                                        'checkchange': function (node, checked) {
+                                            setChildNodeChecked(node, checked);
+                                        }
+                                    }
+                                });
+                                ngCheckSysFuncTree.add(qmenu);
+                                Ext.apply(qmenu.getStore().proxy.extraParams, { condition: condition });
+                                qmenu.getRootNode().expand();//加载第一个
+                                currentTree = qmenu;
+                            }
+                        }, {
+                            //region: 'east',
+                            //width: 40,
+                            //text: '刷新',
+                            iconCls: 'icon-Refresh',
+                            anchor: '100%',
+                            handler: function () {
+                                //alert('刷新');
+                                this.ownerCt.queryById('query').setValue('');
+                                var ngCheckSysFuncTree = this.findParentByType('ngCheckSysFuncTree');//找到根节点
+                                ngCheckSysFuncTree.removeAll();
+
+                                ngCheckSysFuncTree.loadData();
+                                //sysFuncTree.removeAll();
+                                //var arr = sysFuncTree.suites;
+                                //sysFuncTree.add(arr);
+                                //Ext.apply(arr[0].getStore().proxy.extraParams, { suite: arr[0].suite });
+                                //arr[0].getRootNode().expand();
+                            }
+                        }]
+                }],
+                listeners: {
+                    'tabchange': function (tabPanel, newCard, oldCard, eOpts) {
+                        currentTree = newCard;
+                        if (!newCard.loaded) {
+                            var me = newCard;
+                            Ext.apply(me.getStore().proxy.extraParams, { suite: me.suite });
+                            me.getRootNode().expand();
+                            newCard.loaded = true;//已经加载
+                        }
+                    }
+                }
+            })
+            var sysmenupnl = Ext.create('Ext.ng.checkSysFuncTree', {
+                region: 'west',
+                width: 330,
+                id: 'ngCheckSysFuncTree'
+            })
+
+            //左右移动节点的按钮区域
+            var choosecenterform = Ext.create('Ext.form.Panel', {
+                region: 'west',
+                style: 'margin-left:2px;margin-right:0px',
+                layout: 'border',
+                width: 70,
+                split: true,
+                autoScroll: true,
+                frame: false,
+                border: false,
+                columnsPerRow: 4,
+                fieldDefaults: {
+                    labelWidth: 60,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                items: [
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        id: 'rightmove',
+                        text: '>',
+                        margin: '170 0 0 0',
+                        width: 20,
+                        height: 20
+                    },
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        id: 'leftmove',
+                        text: '<',
+                        margin: '50 0 0 0',
+                        width: 20,
+                        height: 20
+                    }, {
+                        labelWidth: 50,
+                        region: 'north',
+                        xtype: 'button',
+                        margin: '50 0 0 0',
+                        id: 'save',
+                        text: '保存',
+                        iconCls: "icon-save",
+                        itemWidth: 40,
+                        height: 30,
+                        width: 50,
+                        left: 10
+                    }, {
+                        labelWidth: 50,
+                        region: 'north',
+                        xtype: 'button',
+                        margin: '50 0 0 0',
+                        id: 'cancel',
+                        text: '取消',
+                        iconCls: "icon-Cancel",
+                        itemWidth: 40,
+                        height: 30,
+                        width: 50
+                    }
+                ]
+            })
+
+            //上下移动节点的按钮区域
+            var changeSeqForm = Ext.create('Ext.form.Panel', {
+                region: 'east',
+                style: 'margin-left:2px;margin-right:0px',
+                layout: 'border',
+                width: 40,
+                split: true,
+                autoScroll: true,
+                frame: false,
+                border: false,
+                columnsPerRow: 4,
+                fieldDefaults: {
+                    labelWidth: 40,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                items: [
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        id: 'upmove',
+                        text: '∧',
+                        margin: '170 0 0 0',
+                        width: 20,
+                        height: 20
+                    },
+                    {
+                        region: 'north',
+                        xtype: 'button',
+                        id: 'downmove',
+                        text: '∨',
+                        margin: '50 0 0 0',
+                        width: 20,
+                        height: 20
+                    }
+                ]
+            })
+            Ext.define('editParmModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'name',
+                    type: 'string',
+                    mapping: 'Name'
+                }, {
+                    name: 'description',
+                    type: 'string',
+                    mapping: 'Description'
+                }, {
+                    name: 'currentValue',
+                    type: 'string',
+                    mapping: 'CurrentValue'
+                }]
+            });
+            var editParmStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'editParmModel',
+                autoLoad: true,
+                proxy: { //读取原始数据的途径
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/MainTree/LoadEditParm'
+                }
+            });
+
+            Ext.define('Ext.ng.editParmWin', {
+                extend: 'Ext.window.Window',
+                alias: 'widget.ngEditParmWin', //别名,可通过设置xtype构建,或者通过Ext.widget()方法构建
+                title: '参数编辑',
+                height: 500,
+                width: 400,
+                modal: true,
+                closeable: true,
+                resizable: false,
+                closeAction: "hide",
+                father: '',
+                fieldDefaults: {
+                    //labelAlign: 'top',
+                    msgTarget: 'side'
+                },
+                defaults: {
+                    anchor: '100%'
+                },
+                items: [{
+                    xtype: 'container',
+                    layout: 'auto',
+                    border: false,
+                    items: [{
+                        xtype: 'toolbar',
+                        anchor: '100%',
+                        items: [
+                            "->",
+                            {
+                                text: '保存',
+                                iconCls: 'icon-save',
+                                handler: function () {
+                                    var window = this.findParentByType('window');
+                                    var textArea = window.items.items[0].items.items[1];
+                                    var data = textArea.value;
+                                    window.father.items.items[0].items.items[2].items.items[0].items.items[0].items.items[0].setValue(data);
+                                    window.close();
+                                }
+                            },
+                            {
+                                text: '取消',
+                                iconCls: 'icon-Cancel',
+                                handler: function () {
+                                    var window = this.findParentByType('window');
+                                    window.close();
+                                }
+                            }
+                        ]
+                    }, {
+                        emptyText: '添加宏参数',
+                        height: 200,
+                        width: 390,
+                        itemId: 'parmArea',
+                        xtype: 'ngTextArea',
+                        grow: true,
+                        anchor: '100%'
+                    }, {
+                        xtype: 'grid',
+                        anchor: '100%',
+                        height: 200,
+                        isVisible: true,
+                        itemId: 'pramGrid',
+                        store: editParmStore,
+                        columns: [
+                            { text: '宏', dataIndex: 'name', flex: 1 },
+                            { text: '描述', dataIndex: 'description', flex: 1 },
+                            { text: '当前值', dataIndex: 'currentValue', flex: 1 }
+                        ]
+                    }]
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'bottom',
+                    ui: 'footer',
+                    items: [
+                         "->", {
+                             text: '插入',
+                             handler: function () {
+                                 var window = this.findParentByType('window');
+                                 var data = window.items.items[0].items.items[2].getSelectionModel().lastSelected.data.name;
+                                 data = '№*№' + data + '№*№';
+                                 var textArea = window.items.items[0].items.items[1];
+                                 var rawValue = textArea.rawValue;
+                                 textArea.setValue(rawValue + data);
+                             }
+                         },
+                {
+                    text: '宏',
+                    handler: function () {
+                        var window = this.findParentByType('window');
+                        if (window.height > 300) {
+                            window.setHeight(300);
+                        } else {
+                            window.setHeight(500);
+                        }
+                    }
+                }
+                    ]
+                }]
+            });
+
+            //var importEleWin =
+            Ext.define("Ext.ng.importDocWin", {
+                extend: 'Ext.window.Window',
+                alias: 'widget.ngImportDocWin',
+                title: "节点维护",
+                modal: true,
+                //width: 500,
+                //height: 160,
+                width: 600,
+                height: 180,
+                closeable: true,
+                resizable: false,
+                //closeAction: "hide",
+                winType: '',
+                editFileField: '',
+                items: [
+                {
+                    xtype: 'ngTableLayoutForm',
+                    //id: 'customMenuNodeTextForm',
+                    frame: true,
+                    split: true,
+                    columnsPerRow: 1,
+                    padding: '0 0 0 0',
+                    fieldDefaults: {
+                        labelWidth: 70,
+                        anchor: '100%',
+                        margin: '3 3 3 3',
+                        msgTarget: 'side'
+                    },
+                    fields: [
+					{
+					    xtype: 'ngText',
+					    fieldLabel: '文件名称',
+					    itemId: 'name',
+					    value: '',
+					    name: 'NodeText',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					},
+                    {
+                        xtype: 'filefield',
+                        buttonText: '...',
+                        itemId: 'addr',
+                        fieldLabel: '文件地址',
+                        name: 'NodeAddr',
+                        id: 'NodeAddr',
+                        labelStyle: 'color:OrangeRed',
+                        readOnly: false,
+                        emptyText: '可输入文件类型exe/doc/docx/xls/xlsx/ppt/pptx',
+                        mustInput: true,
+                        colspan: 1,
+                        validator: function (value) {
+                            var arr = value.split('.');
+                            var tp = false;
+                            switch (arr[arr.length - 1].toLowerCase()) {
+                                case 'exe':
+                                case 'doc':
+                                case 'docx':
+                                case 'xls':
+                                case 'xlsx':
+                                case 'ppt':
+                                case 'pptx': tp = true;
+                            }
+                            if (tp) {
+                                var importDocWin = this.findParentByType('ngImportDocWin');
+                                //if (importDocWin.queryById('name').value == '' || typeof (importDocWin.queryById('name').value) == 'undefined') {
+                                if (importDocWin.queryById('name').value == '') {
+                                    var a = value.lastIndexOf('\\');
+                                    if (a == -1) {
+                                        a = 0;
+                                    }
+                                    var b = value.lastIndexOf('.');
+                                    var defaultName = value.substring(a + 1, b);
+                                    importDocWin.queryById('name').setValue(defaultName);
+                                    //editWin.queryById('name').setValue(custommenutreenode[0].data.text);
+
+                                    //var f = document.getElementById('NodeAddr');
+                                    //var f = document.getElementById('NodeAddr-inputCell');
+                                    //var a = this.el.down('NodeAddr').dom;
+                                    //f.select();
+                                    //alert(document.selection.createRange().text);
+                                }
+                                return true;
+                            }
+                            var input = this.el.down('input').dom;
+                            input.value = '可输入文件类型exe/doc/docx/xls/xlsx/ppt/pptx';
+                            return "可输入文件类型exe/doc/docx/xls/xlsx/ppt/pptx";
+                        },
+                    }
+					, {
+					    xtype: 'fieldset',
+					    name: 'NodeEdit',
+					    itemId: 'editContainer',
+					    padding: '0,0,0,0',
+					    layout: 'column',
+					    border: false,
+					    //width:350,
+					    items: [{
+					        xtype: 'ngText',
+					        itemId: 'edit',
+					        fieldLabel: '文件编辑',
+					        width: 467,
+					        readOnly: true,
+					        mustInput: false,
+					        colspan: 1,
+					    }, {
+					        xtype: 'button',
+					        itemId: 'btn',
+					        colspan: 1,
+					        text: '...',
+					        handler: function () {
+					            var fatherWindow = this.findParentByType('window');
+					            var editWin = Ext.create('Ext.ng.editParmWin', {
+					                father: fatherWindow
+					            });
+
+
+					        }
+					    }]
+					}]
+                }],
+                buttons: [
+                    "->",
+                    {
+                        text: '保 存',
+                        itemId: 'save',
+                        handler: function () {
+                            //var win = this.findParentByType('window');
+                            //qurrybyid
+                            var nodetext = this.findParentByType('ngImportDocWin').items.items[0].items.items[0].items.items[0].items.items[0].lastValue;
+                            var nodeaddr = this.findParentByType('ngImportDocWin').queryById('addr').rawValue;
+                            var nodeedit = this.findParentByType('ngImportDocWin').items.items[0].items.items[2].items.items[0].items.items[0].items.items[0].lastValue;
+                            //nodeaddr = 'LocalSoft' + nodeaddr + '№,№';
+                            while (nodetext == '' || nodetext == null) {
+                                //alert('文件名称不能为空');
+                                Ext.MessageBox.alert('提示', '文件名称不能为空');
+                                return;
+                            };
+                            while (nodeaddr == '' || nodeaddr == null || nodeaddr == '可输入文件类型exe/doc/docx/xls/xlsx/ppt/pptx') {
+                                //alert('文件地址不能为空');
+                                Ext.MessageBox.alert('提示', '文件地址不能为空');
+                                return;
+                            };
+                            //企业功能树菜单选择项
+                            var selectedNode = custommenutree.getSelectionModel().getSelection()[0];
+
+                            if (this.findParentByType('ngImportDocWin').winType == 'add') {
+                                if (selectedNode == null)
+                                    selectedNode = custommenutree.getRootNode();
+                                if (selectedNode.data.leaf == true) {
+                                    selectedNode = selectedNode.parentNode;
+                                }
+                                //判断是否非按钮节点
+                                if (!selectedNode.data.leaf) {
+                                    var newChildNode = selectedNode.appendChild({
+                                        id: guid(), //获取唯一值,
+                                        //MenuType:2,
+                                        text: nodetext,
+                                        name: nodetext,
+                                        url: nodeaddr,
+                                        urlparm: nodeedit,
+                                        pid: selectedNode.data.id,
+                                        leaf: true,
+                                        checked: false,
+                                        originalcode: "",
+                                        expanded: true
+                                    });
+                                }
+                                else {
+                                    Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                };
+                            } else {
+                                selectedNode.set('text', nodetext);
+                                selectedNode.set('name', nodetext);
+                                selectedNode.set('url', nodeaddr);
+                                selectedNode.set('urlparm', nodeedit);
+                            }
+                            this.findParentByType('ngImportDocWin').close();
+                        }
+                    },
+                    {
+                        text: '关 闭',
+                        itemId: 'close',
+                        handler: function () {
+                            this.findParentByType('ngImportDocWin').close();
+                        }
+                    }
+                ]
+            });
+            Ext.define("Ext.ng.importUrlWin", {
+                extend: 'Ext.window.Window',
+                alias: 'widget.ngImportUrlWin',
+                title: "节点维护",
+                modal: true,
+                //width: 500,
+                //height: 160,
+                width: 600,
+                height: 180,
+                closeable: true,
+                resizable: false,
+                closeAction: "hide",
+                winType: '',
+                items: [
+                {
+                    xtype: 'ngTableLayoutForm',
+                    //id: 'customMenuNodeTextForm',
+                    frame: true,
+                    split: true,
+                    columnsPerRow: 1,
+                    padding: '0 0 0 0',
+                    fieldDefaults: {
+                        labelWidth: 70,
+                        anchor: '100%',
+                        margin: '3 3 3 3',
+                        msgTarget: 'side'
+                    },
+                    fields: [
+					{
+					    xtype: 'ngText',
+					    fieldLabel: '链接名称',
+					    itemId: 'name',
+					    name: 'NodeText',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    itemId: 'addr',
+					    fieldLabel: '链接地址',
+					    labelStyle: 'color:OrangeRed',
+					    name: 'NodeAddr',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'fieldset',
+					    name: 'NodeEdit',
+					    itemId: 'editContainer',
+					    padding: '0,0,0,0',
+					    layout: 'column',
+					    border: false,
+					    colspan: 1,
+					    items: [{
+					        xtype: 'ngText',
+					        itemId: 'edit',
+					        fieldLabel: '链接编辑',
+					        readOnly: true,
+					        //width:387,
+					        width: 467,
+					        mustInput: false
+					    }, {
+					        xtype: 'button',
+					        itemId: 'btn',
+					        text: '...',
+					        handler: function () {
+					            var fatherWindow = this.findParentByType('window');
+					            var editWin = Ext.create('Ext.ng.editParmWin', {
+					                father: fatherWindow
+					            });
+					            var parm = fatherWindow.queryById('edit').value;
+					            editWin.queryById('parmArea').setValue(parm);
+					            //editWin.queryById('parmArea').focus(true,true);
+					            editWin.show();
+					        }
+					    }]
+					}
+                    ]
+                }
+                ],
+                buttons: [
+                    "->",
+                    {
+                        text: '保 存',
+                        itemId: 'save',
+                        handler: function () {
+                            //var win = this.findParentByType('window');
+                            //qurrybyid
+                            var nodetext = this.findParentByType('ngImportUrlWin').items.items[0].items.items[0].items.items[0].items.items[0].lastValue;
+                            var nodeaddr = this.findParentByType('ngImportUrlWin').items.items[0].items.items[1].items.items[0].items.items[0].lastValue;
+                            var nodeedit = this.findParentByType('ngImportUrlWin').items.items[0].items.items[2].items.items[0].items.items[0].items.items[0].lastValue;
+                            //nodeaddr = 'WebBrowseIndividualManager№,№Caption№=№' + nodetext + '№,№Url№=№' + nodeaddr;
+                            while (nodetext == '' || nodetext == null) {
+                                Ext.MessageBox.alert('提示', '链接名称不能为空');
+                                //alert('链接名称不能为空');
+                                return;
+                            };
+                            while (nodeaddr == '' || nodeaddr == null) {
+                                Ext.MessageBox.alert('提示', '链接地址不能为空');
+                                //alert('链接地址不能为空');
+                                return;
+                            };
+                            //企业功能树菜单选择项
+                            var selectedNode = custommenutree.getSelectionModel().getSelection()[0];
+
+                            if (this.findParentByType('ngImportUrlWin').winType == 'add') {
+                                if (selectedNode == null)
+                                    selectedNode = custommenutree.getRootNode();
+                                if (selectedNode.data.leaf == true) {
+                                    selectedNode = selectedNode.parentNode;
+                                }
+                                //判断是否非按钮节点
+                                if (!selectedNode.data.leaf) {
+                                    var newChildNode = selectedNode.appendChild({
+                                        id: guid(), //获取唯一值,
+                                        //MenuType:2,
+                                        text: nodetext,
+                                        name: nodetext,
+                                        url: nodeaddr,
+                                        urlparm: nodeedit,
+                                        pid: selectedNode.data.id,
+                                        leaf: true,
+                                        checked: false,
+                                        originalcode: "",
+                                        expanded: true
+                                    });
+                                }
+                                else {
+                                    Ext.MessageBox.alert('提示', '请选择菜单节点！');
+                                };
+                            } else {
+                                selectedNode.set('text', nodetext);
+                                selectedNode.set('name', nodetext);
+                                selectedNode.set('url', nodeaddr);
+                                selectedNode.set('urlparm', nodeedit);
+                            }
+                            this.findParentByType('ngImportUrlWin').close();
+                        }
+                    },
+                    {
+                        text: '关 闭',
+                        itemId: 'close',
+                        handler: function () {
+                            this.findParentByType('ngImportUrlWin').close();
+                        }
+                    }
+                ]
+            });
+            //弹出winform时沉默页面
+            StoreloadMarsk = new Ext.LoadMask(document.body, {
+                msg: '导入文件',
+                disabled: false
+            });
+
+            var customEditToolbar = new Ext.panel.Panel({
+                region: 'north',
+                height: 38,
+                border: false,
+                style: 'margin-top:1px;margin-bottom:1px',
+                bodyStyle: "background-color:transparent",
+                ////#dfe8f6
+                items: [{
+                    layout: {
+                        type: 'hbox',
+                        padding: '0',
+                        pack: 'start',
+                        align: 'middle'
+                    },
+                    border: false,
+                    defaults: { margins: '0 5 0 0' },
+                    bodyStyle: "background-color:transparent", //#dfe8f6
+                    items: [
+
+                        {
+                            xtype: 'toolbar', text: '我的功能树',
+                            items: [
+                               {
+                                   text: '导入文件',
+                                   iconCls: 'icon-Import',
+                                   itemId: 'importTxt',
+                                   handler: function () {
+                                       //Ext.create("Ext.ng.importDocWin", {
+                                       //    title: '导入文件',
+                                       //    winType:'add'
+                                       //}).show();
+                                       //var e = window.event;
+                                       //e.stopEvent();
+                                       StoreloadMarsk.show();
+                                       window.external.UploadProgramme('', '', '', 'add');
+                                       //stopEvent();
+                                       //alert(s);
+                                   }
+                               }, {
+                                   text: '导入网址',
+                                   iconCls: 'icon-Import',
+                                   itemId: 'importUrl',
+                                   handler: function () {
+                                       //var importUrlWin = Ext.create("Ext.ng.importUrlWin", {
+                                       //    title: '导入网址',
+                                       //    winType: 'add'
+                                       //});
+                                       //importUrlWin.queryById('addr').setValue('http://');
+                                       //importUrlWin.show();
+                                       StoreloadMarsk.show();
+                                       window.external.UploadWebsite('', '', '', 'add');
+                                   }
+                               }, {
+                                   text: '编辑',
+                                   iconCls: 'cog_edit',
+                                   itemId: 'edit',
+                                   hidden: true,
+                                   handler: function () {
+                                       var select = gridPanel.getSelectionModel().getSelection();
+                                       //var custommenutreenode = custommenutree.getSelectionModel().getSelection();
+                                       var arr = select[0].raw.url.split('.');
+                                       var tp = arr[0].indexOf('LocalSoft') == -1 ? false : true;
+
+                                       //switch (arr[0].indexOf('LocalSoft') toLowerCase()) {
+                                       //    case 'exe':
+                                       //    case 'doc':
+                                       //    case 'docx':
+                                       //    case 'xls':
+                                       //    case 'xlsx':
+                                       //    case 'ppt':
+                                       //    case 'pptx': tp = true;
+                                       //}
+                                       if (tp) {
+                                           StoreloadMarsk.show();
+                                           window.external.UploadProgramme(select[0].data.name, select[0].data.url, select[0].data.urlparam, 'edit');
+                                       } else {
+                                           StoreloadMarsk.show();
+                                           window.external.UploadWebsite(select[0].data.name, select[0].data.url, select[0].data.urlparam, 'edit');
+                                       }
+                                   }
+                               }
+                            ]
+                        },
+                        {
+                            xtype: 'tbfill'
+                        }, {
+                            xtype: 'toolbar', text: '关闭',
+                            region: 'east',
+                            style: 'border:0px;',
+                            items: {
+                                itemId: "close", text: "关闭", width: this.itemWidth, iconCls: "icon-Close", langkey: "close",
+                                handler: function () {
+                                    window.close();
+                                }
+                            }
+
+                        }
+                    ]
+                }]
+            });
+
+            //右侧grid页面
+            var itemsPerPage = 20;
+            Ext.define('gridModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'userid',
+                    type: 'string',
+                    mapping: 'userid'
+                }, {
+                    name: 'originalcode',
+                    type: 'string',
+                    mapping: 'originalcode'
+                }, {
+                    name: 'seq',
+                    type: 'int',
+                    mapping: 'seq'
+                }, {
+                    name: 'name',
+                    mapping: 'name',
+                    type: 'string'
+                }, {
+                    name: 'displayname',
+                    mapping: 'displayname',
+                    type: 'string'
+                },
+                {
+                    name: 'shortcutkey',
+                    mapping: 'shortcutkey',
+                    type: 'string'
+                },
+
+                {
+                    name: 'iconid',
+                    mapping: 'iconid',
+                    type: 'string'
+                },
+                {
+                    name: 'url',
+                    mapping: 'url',
+                    type: 'string'
+                },
+                {
+                    name: 'urlparam',
+                    mapping: 'urlparam',
+                    type: 'string'
+                },
+                {
+                    name: 'usertype',
+                    mapping: 'usertype',
+                    type: 'int'
+                },
+                {
+                    name: 'busphid',
+                    mapping: 'busphid',
+                    type: 'string'
+                }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'gridModel',
+                autoLoad: true,
+                pageSize: itemsPerPage,
+                sortOnLoad: true,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/ShortcutMenu/GetShortcutMenuList',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            Ext.define('optionModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'shortcutkey',
+                    type: 'string',
+                    mapping: 'shortcutkey'
+                }]
+            });
+
+            var optionStore = Ext.create('Ext.data.Store', {
+                model: 'optionModel',
+                autoLoad: false,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/ShortcutMenu/GetShortcutKey',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            var dataView = Ext.create('Ext.view.View', {
+                store: Ext.data.StoreManager.lookup('iconsStore'),
+                tpl: new Ext.XTemplate(
+                    '<ul style="list-style-type:none;-webkit-padding-start: 3px">',
+                        '<tpl for=".">',
+                            '<li style="background-color:rgb(158,193,225);width:74px;height:74px;float:left;margin:2px" class="iconview" onclick=ClickIcon("{src}","{id}")>',
+                                '<img width="74" height="74" src="{src}" />',
+                            '</li>',
+                        '</tpl>',
+                    '</ul>'
+                ),
+                id: 'dataView',
+                itemSelector: 'li.iconview',
+                style: {
+                    'top': '-8px'
+                    //'overflow-x': 'hidden'
+                }
+            });
+
+
+            gridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: gridStore,
+                buskey: 'phid',
+                columns: [
+                    { header: '', dataIndex: 'phid', flex: 1, sortable: true, editable: false, hidden: true },
+                    { header: '已加项', dataIndex: 'name', flex: 1, sortable: true, editable: false },
+                    {
+                        header: '显示名', dataIndex: 'displayname', flex: 1, sortable: true, editable: true,
+                        editor: {
+                            xtype: 'ngText',
+                            displayField: 'displayname',
+                            valueField: 'displayname',
+                            isInGrid: true,
+                        }
+                    },
+                    {
+                        header: '快捷键', dataIndex: 'shortcutkey', flex: 1, sortable: true,
+                        editor: {
+                            xtype: 'ngComboBox',
+                            store: optionStore,
+                            displayField: 'shortcutkey',
+                            valueField: 'shortcutkey',
+                            editable: false,
+                            isInGrid: true,
+                            listeners: {
+                                helpselected: function (obj) {
+                                    var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+                                    data[0].set('shortcutkey', obj.code);
+                                    data[0].set('shortcutkey', obj.name);
+                                },
+                            },
+                        },
+                    },
+                    { header: '图标', dataIndex: 'iconid', flex: 1, sortable: true, hidden: true, },
+                    {
+                        header: '参数', dataIndex: 'urlparam', flex: 1, sortable: false, editable: false
+                    }
+                ],
+
+                dockedItems: [{
+                    xtype: 'pagingtoolbar',
+                    dock: 'bottom',
+                    displayInfo: true,
+                    store: gridStore,
+                }],
+                uniqueColumn: [{ col: 'shortcutkey' }],
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1,
+                        //listeners: {
+                        //    'beforeedit': function (editor, e, eOpts) {
+                        //        if (e.field == 'urlparam') {
+                        //            if (e.record.data.url.indexOf('LocalSoft') != -1 || e.record.data.url.indexOf('WebBrowseIndividualManager') != -1) {
+                        //                e.column.setEditor({
+                        //                    xtype: 'ngText',
+                        //                    displayField: 'urlparam',
+                        //                    valueField: 'urlparam',
+                        //                    isInGrid: true,
+                        //                    listeners: {
+                        //                        'blur': function (obj) {
+                        //                            var data = gridPanel.getSelectionModel().getSelection();
+                        //                            data[0].set('urlparam', obj.value);
+                        //                        },
+                        //                    },
+                        //                });
+                        //            }
+                        //            else {
+                        //                e.column.setEditor(null);
+                        //            }
+                        //        }
+                        //    },
+                        //},
+                    })
+                ],
+                listeners: {
+                    'itemclick': function (view, rcd, item, idx, event, eOpts) {
+                        var selectedNode = gridPanel.getSelectionModel().getSelection()[0];
+                        if (selectedNode.raw.url.indexOf('LocalSoft') != -1 || selectedNode.raw.url.indexOf('WebBrowseIndividualManager') != -1) {
+                            customEditToolbar.queryById('edit').show();
+                        } else {
+                            customEditToolbar.queryById('edit').hide();
+                        }
+                    },
+                }
+            });
+
+            //快捷功能grid列表
+            var custommenupnl = Ext.create('Ext.panel.Panel', {
+                region: 'center',
+                style: 'margin-left:2px;margin-right:2px',
+                //title: '企业功能树菜单',
+                layout: 'border',
+                border: 0,
+                items: [customEditToolbar, gridPanel]
+                //items: [
+                //    customEditToolbar,
+                //    custommenutree]
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [
+                  //ngToolbar,
+                 //  sysmenupnl,
+                 //   choosecenterform,
+                 //custommenupnl
+                {
+                    id: 'myPanel',
+                    xtype: 'panel',
+                    //height: 500,
+                    //width: 600,
+                    region: 'center',
+                    //autoScroll: true,
+                    layout: 'border',
+                    //style: 'overflow-y:scroll,padding-right:20px',
+                    bodyStyle: "padding-right:5px",
+                    items: [
+                        sysmenupnl,
+                        choosecenterform,
+                        custommenupnl,
+                        changeSeqForm
+                    ]
+                }
+                ]
+            });
+
+            //右移
+            choosecenterform.items.get('rightmove').on('click', function () {
+
+                var checkNode = currentTree.getSelectionModel().getSelection();
+                if (checkNode.length == 0) {
+                    Ext.MessageBox.alert('提示', '请选择你要添加的快捷功能！');
+                    return;
+                }
+                for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                    if (gridPanel.store.data.items[i].raw.originalcode == checkNode[0].raw.code) {
+                        Ext.MessageBox.alert('提示', '该节点已存在！');
+                        return;
+                    }
+                }
+                if (checkNode[0].data['leaf']) {
+                    var p = new Object({
+                        originalcode: checkNode[0].raw.code,
+                        name: checkNode[0].data['text'],
+                        url: checkNode[0].raw.url,
+                        seq: gridPanel.store.getCount() + 1,
+                        busphid: checkNode[0].raw.busphid
+                    });
+                    gridPanel.store.add(p);
+                    //gridPanel.getSelectionModel().select(gridPanel.store.getCount() - 1);
+                    check = false;
+                }
+                else {
+                    Ext.MessageBox.alert('提示', '只能选择根节点作为快捷功能！！');
+                }
+            });
+
+            //左移
+            choosecenterform.items.get('leftmove').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选中你要删除的快捷功能！');
+                }
+                else {
+                    var seq = gridPanel.getSelectionModel().getSelection()[0].data.seq - 1;
+                    //gridPanel.store.removeAt(seq, 1);
+                    gridPanel.store.remove(gridPanel.getSelectionModel().getSelection()[0]);
+                    check = false;
+                }
+            });
+
+            //保存
+            choosecenterform.items.get('save').on('click', function () {
+                var gridData = gridPanel.getAllGridData();
+                if (!gridPanel.isValid()) {
+                    Ext.MessageBox.alert('提示', '快捷键不能重复！');
+                    return false;
+                }
+                else {
+                    choosecenterform.items.get("save").disable();
+                    var myMask = new Ext.LoadMask(document.body, { msg: "快捷功能正在保存中,请稍候..." });
+                    myMask.show();
+
+                    Ext.Ajax.request({
+                        url: C_ROOT + 'SUP/ShortcutMenu/SaveShortcutMenu',
+                        params: {
+                            "gridData": gridData,
+                        },
+                        success: function (response) {
+                            myMask.hide();
+                            if (response.text != null && response.text != '') {
+                                gridPanel.store.reload();
+                                var param = JSON.stringify(eval('(' + response.text + ')').Record);
+                                if (isweb != 'true')
+                                    window.external.SaveShortCutMenu(param);
+                                else
+                                    window.top.ShortcutsRefrech();
+                                Ext.MessageBox.alert('提示', '快捷功能保存成功！');
+                                //gridPanel.getView().refresh();
+                                choosecenterform.items.get("save").enable();
+                                check = true;
+                            }
+                            else {
+                                Ext.MessageBox.alert('提示', '快捷功能数据没有更改！');
+                                choosecenterform.items.get("save").enable();
+                            }
+                        },
+                        failure: function (response) {
+                            myMask.hide();
+                            choosecenterform.items.get("save").enable();
+                        }
+                    });
+                }
+            });
+
+            //取消
+            choosecenterform.items.get('cancel').on('click', function () {
+                if (!check) {
+                    Ext.MessageBox.confirm('提示', '当前页面数据未保存，你确定要离开么？', callBack);
+                    function callBack(id) {
+                        if (id == 'yes') {
+                            window.close();
+                        }
+                    }
+                }
+                else {
+                    window.close();
+                }
+            });
+
+            //上移
+            changeSeqForm.items.get('upmove').on('click', function () {
+                var select = gridPanel.getSelectionModel().getSelection();
+                if (select.length == 0) {
+                    Ext.MessageBox.alert('提示', '请选择你要移动的快捷功能！');
+                    return false;
+                }
+                var index = select[0].data.seq - 1;
+                if (index == '0') {
+                    Ext.MessageBox.alert('提示', '快捷功能已经是第一个！');
+                }
+                else {
+                    var node1 = gridStore.getAt(index);
+                    var node2 = gridStore.getAt(parseInt(index) - 1);
+
+                    value1 = node1.get('seq');
+                    value2 = node2.get('seq');
+                    node1.set('seq', value2);
+                    node2.set('seq', value1);
+                    gridStore.sort('seq', 'asc');
+                    gridPanel.getSelectionModel().select(parseInt(index) - 1);
+                }
+            });
+
+            //下移
+            changeSeqForm.items.get('downmove').on('click', function () {
+                var select = gridPanel.getSelectionModel().getSelection();
+                if (select.length == 0) {
+                    Ext.MessageBox.alert('提示', '请选择你要移动的快捷功能！');
+                    return false;
+                }
+                var count = gridPanel.store.getCount();
+
+                var index = select[0].data.seq - 1;
+                if (index == count - 1) {
+                    Ext.MessageBox.alert('提示', '快捷功能已经是最后一个！');
+                }
+                else {
+                    var node1 = gridStore.getAt(index);
+                    var node2 = gridStore.getAt(parseInt(index) + 1);
+
+                    value1 = node1.get('seq');
+                    value2 = node2.get('seq');
+                    gridStore.getAt(index).set('seq', value2);
+                    gridStore.getAt(parseInt(index) + 1).set('seq', value1);
+                    gridStore.sort('seq', 'asc');
+                    gridPanel.getSelectionModel().select(parseInt(index) + 1);
+                }
+            });
+        });
+
+        function UploadProgrammeCallback(btnFlag, name, addr, pram, winType) {
+
+            if (btnFlag != 'True') {
+                StoreloadMarsk.hide();
+                return;
+            }
+
+            check = false;
+            var select = gridPanel.getSelectionModel().getSelection();
+            //para = pram;
+            var nodetext = name;
+            var nodeedit = pram;
+            var nodeaddr = decodeURIComponent(addr);
+            for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                if (gridPanel.store.data.items[i].raw.originalcode.indexOf(nodeaddr) != -1) {
+                    Ext.MessageBox.alert('提示', '该节点已存在！');
+                    return;
+                }
+            }
+
+            var itemurl = 'LocalSoft' + nodeaddr + '№,№' + nodeedit;
+            if (winType == 'add') {
+                var p = new Object({
+                    originalcode: name,
+                    name: nodetext,
+                    url: itemurl,
+                    seq: (gridPanel.store.getCount() + 1),
+                });
+                gridPanel.store.add(p);
+            }
+            else {
+                select[0].set('originalcode', nodetext);
+                select[0].set('name', nodetext);
+                select[0].set('url', itemurl);
+                select[0].set('urlparam', pram);
+            }
+        }
+
+        function UploadWebsiteCallback(btnFlag, name, addr, pram, winType) {
+            if (btnFlag != 'True') {
+                StoreloadMarsk.hide();
+                return;
+            }
+            check = false;
+            var select = gridPanel.getSelectionModel().getSelection();
+            //para = pram;
+            for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                if (gridPanel.store.data.items[i].raw.originalcode.indexOf(addr) != -1) {
+                    Ext.MessageBox.alert('提示', '该节点已存在！');
+                    return;
+                }
+            }
+            var itemurl = 'WebBrowseIndividualManager№,№Caption№=№' + name + '№,№Url№=№' + addr + pram;
+            if (winType == 'add') {
+
+                var p = new Object({
+                    originalcode: name,
+                    name: name,
+                    url: itemurl,
+                    seq: (gridPanel.store.getCount() + 1),
+                });
+                gridPanel.store.add(p);
+            }
+            else {
+                select[0].set('originalcode', name);
+                select[0].set('name', name);
+                select[0].set('url', itemurl);
+                select[0].set('urlparam', pram);
+            }
+        }
+    </script>
+
+
+}
+
+

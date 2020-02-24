@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding = "GBK"?>
+<CMS>
+  <eb>
+    <pub>
+      <TransCode>QPD</TransCode>
+      <CIS>集团CIS号</CIS>
+      <BankCode>归属银行编号</BankCode>
+      <ID>证书ID</ID>
+      <TranDate>交易日期</TranDate>
+      <TranTime>交易时间</TranTime>
+      <fSeqno>指令包序列号</fSeqno>
+    </pub>
+    <in>
+      <AccNo>查询账号</AccNo>
+      <AreaCode>地区代码</AreaCode>
+      <MinAmt>发生额下限</MinAmt>
+      <MaxAmt>发生额上限</MaxAmt>
+      <BeginTime>开始时间</BeginTime>
+      <EndTime>终止时间</EndTime>
+      <NextTag>查询下页标识</NextTag>
+      <ReqReserved1>请求包备用字段1</ReqReserved1>
+      <ReqReserved2>请求包备用字段2</ReqReserved2>
+    </in>
+  </eb>
+</CMS>
+<!--查询当日明细-->

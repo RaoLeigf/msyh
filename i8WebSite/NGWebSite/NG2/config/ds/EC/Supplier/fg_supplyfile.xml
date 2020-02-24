@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_supplyfile">
+      <Field Name="compno" IsKey="true" />
+      <Field Name="ocode" IsKey="true"/>
+      <Field Name="compname"  />
+      <Field Name="regionno"/>
+      <Field Name="suppclass"/>
+      <Field Name="deptno"/>
+      <Field Name="empno"/>
+      <Field Name="puracct"/>
+      <Field Name="payacct"/>
+      <Field Name="prepayacct"/>
+      <Field Name="creditnum"/>
+      <Field Name="creditno"/>
+      <Field Name="creditrank"/>
+      <Field Name="billto"/>
+      <Field Name="goodsto"/>
+      <Field Name="bal"/>
+      <Field Name="p_maxdays"/>
+      <Field Name="p_mindays"/>
+      <Field Name="fsttransdt"/>
+      <Field Name="back_total"/>
+      <Field Name="invo_total"/>
+      <Field Name="send_total"/>
+      <Field Name="fin_total"/>
+      <Field Name="fc_code"/>
+      <Field Name="disctype"/>
+      <Field Name="supitembarcodestart"/>
+      <Field Name="supitembarcodelength"/>
+      <Field Name="providenet"/>
+      <Field Name="backperiod"/>
+      <Field Name="backrate"/>
+      <Field Name="rate"/>
+      <Field Name="creditdays"/>
+      <Field Name="uicsendrate"/>
+      <Field Name="delday"/>
+      <Field Name="lastinvdt"/>
+      <Field Name="lastinv"/>
+      <Field Name="lastrecdt"/>
+      <Field Name="lastrec"/>
+      <Field Name="shiptype"/>
+    </Table>
+    <Table Name="uv_dept">
+      <Field Name="deptname" />
+    </Table>
+    <Table Name="employee">
+      <Field Name="lastname" AsName="employeename"/>
+    </Table>
+    <Table Name="fg_acco" AsName="fg_acco1">
+      <Field Name="ac_name" AsName="payacctname"/>
+    </Table>
+    <Table Name="fg_acco" AsName="fg_acco2">
+      <Field Name="ac_name" AsName="prepayacctname"/>
+    </Table>
+    <Table Name="fg_acco" AsName="fg_acco3">
+      <Field Name="ac_name" AsName="puracctname"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join uv_dept on uv_dept.deptno=[table].deptno
+      left join employee on ( employee.deptno=[table].deptno and employee.empno=[table].empno)
+      left join fg_acco fg_acco1 on fg_acco1.ac_code=[table].payacct
+      left join fg_acco fg_acco2 on fg_acco2.ac_code=[table].prepayacct
+      left join fg_acco fg_acco3 on fg_acco3.ac_code=[table].puracct
+      [where]
+    </Sql>
+    <Where>
+      <Exp Field="compno"  Target="AppInfo" Value="LoginID"/>
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy>
+
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where >
+      <Exp Field="compno"  Target="AppInfo" Value="LoginID"/>
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+    </Where>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+    <Values>
+
+    </Values>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+    <Values>
+
+    </Values>
+  </Destroy>
+  <selectFromec_paymst>
+    <Sql>
+      select top 1 recorddate,paysum from ec_paymst  [where] [OrderBy]
+    </Sql>
+    <Where >
+      <Exp Field="ec_paymst.reccomp"   ParamName="reccomp1" Target="AppInfo" Value="LoginID"/>
+      <Exp Field="ec_paymst.ocode" ParamName="ocode1" Target="AppInfo" Value="OCode"/>
+      <Exp Field="ec_paymst.appflg"  ParamName="appflg1" Value="1"/>
+    </Where>
+    <OrderBy>
+      <Exp Field="recorddate" value="desc"/>
+    </OrderBy>
+    <Query>
+
+    </Query>
+  </selectFromec_paymst>
+  <selectFromec_purmst>
+    <Sql>
+      select top 1 recorddate,pursum from ec_purmst  [where] [OrderBy]
+    </Sql>
+    <Where >
+      <Exp Field="ec_purmst.supcomp"   ParamName="supcomp1" Target="AppInfo" Value="LoginID"/>
+      <Exp Field="ec_purmst.ocode"     ParamName="ocode1" Target="AppInfo" Value="OCode"/>
+      <Exp Field="ec_purmst.confflg"   ParamName="appflg1" Value="1"/>
+    </Where>
+    <OrderBy>
+      <Exp Field="recorddate" value="desc"/>
+    </OrderBy>
+    <Query>
+
+    </Query>
+  </selectFromec_purmst>
+  <SelectALlSupplyFile>
+    <Sql>
+      select compno,ocode,compname from fg_supplyfile [where]
+    </Sql>
+    <Where >
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+    </Where>
+  </SelectALlSupplyFile> 
+</DataService>
+

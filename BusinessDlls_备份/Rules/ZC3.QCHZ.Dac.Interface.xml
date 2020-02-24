@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ZC3.QCHZ.Dac.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:ZC3.QCHZ.Dac.Interface.INqmx04DtlDac">
+            <summary>
+            Nqmx04Dtl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Dac.Interface.INqmx04MstDac">
+            <summary>
+            Nqmx04Mst数据访问层接口
+            </summary>
+        </member>
+        <member name="T:ZC3.QCHZ.Dac.Interface.IUploadfileInfoDac">
+            <summary>
+            UploadfileInfo数据访问层接口
+            </summary>
+        </member>
+    </members>
+</doc>

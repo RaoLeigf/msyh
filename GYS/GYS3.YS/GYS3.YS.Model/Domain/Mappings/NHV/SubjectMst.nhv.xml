@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+  <class name="SubjectMstModel">
+    <property name="PhId" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="Mstphid" >
+      <not-null />
+      <not-Empty />
+     
+    </property>
+    <property name="FYear" >
+      <length min="0" max="4" message ="长度不超过4！"/>
+    </property>
+    <property name="FProjCode" >
+      <length min="0" max="40" message ="长度不超过40！"/>
+    </property>
+    <property name="FProjName" >
+      <length min="0" max="100" message ="长度不超过100！"/>
+    </property>
+    <property name="FDeclarationUnit" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FDeclarationDept" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FBudgetDept" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FDeclarer" >
+      <length min="0" max="20" message ="长度不超过20！"/>
+    </property>
+    <property name="FApproveStatus" >
+      <length min="0" max="2" message ="长度不超过2！"/>
+    </property>
+    <property name="FBillNo" >
+      <length min="0" max="50" message ="长度不超过50！"/>
+    </property>
+    <property name="FSubjectCode" >
+      <length min="0" max="50" message ="长度不超过50！"/>
+    </property>
+    <property name="FSubjectName" >
+      <length min="0" max="100" message ="长度不超过100！"/>
+    </property>
+    <property name="FFillDept" >
+      <length min="0" max="200" message ="长度不超过200！"/>
+    </property>
+    <property name="FBudgetApproveState" >
+      <length min="0" max="2" message ="长度不超过2！"/>
+    </property>
+    <property name="FBudgetApprover" >
+      <length min="0" max="20" message ="长度不超过20！"/>
+    </property>
+    <property name="NgInsertDt" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="NgUpdateDt" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="CurOrgId" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="Creator" >
+      <not-null />
+      <not-Empty />
+    </property>
+    <property name="Editor" >
+      <not-null />
+      <not-Empty />
+    </property>
+  </class>
+</nhv-mapping>

@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+
+    <script>
+        var fid = '@ViewBag.fid';
+        var extention = '@ViewBag.extention';
+
+        Ext.onReady(function () {
+
+            var picpanel = Ext.create('Ext.panel.Panel', {
+                autoScroll: true,
+                items: [
+                    {
+                        xtype: 'component',
+                        id: 'picview',
+                        autoEl: {
+                            tag: 'img',
+                            src: ''
+                        }
+                    }
+                ]
+            });
+
+            //布局
+            Ext.create('Ext.container.Viewport', {
+                layout: 'fit',
+                items: [picpanel]
+            });
+
+            //第一次打开时调用
+            Ext.defer(function () {
+                Ext.Ajax.request({
+                    url: C_ROOT + 'SUP/MypicturePreView/GetPicSrc?fid=' + fid + '&extention=' + extention,
+                    success: function (fp, o) {
+                        if (fp.responseText.length > 0) {
+                            var result = Ext.JSON.decode(fp.responseText);
+
+                            if (result.success) {
+                                Ext.getCmp("picview").getEl().dom.src = C_ROOT + 'NG3Resource/MyPicPortalView/' + result.filename;
+                            }
+                        }
+                    }
+                });
+            });
+
+        });
+
+    </script>
+
+}

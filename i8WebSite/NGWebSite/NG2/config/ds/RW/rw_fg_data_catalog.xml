@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="fg_data_catalog">
+      <Field Name="id" IsKey="true"/>
+      <Field Name="data_type" />
+      <Field Name="catalog_code"  />
+      <Field Name="catalog_index"  />
+      <Field Name="catalog_name"  />
+      <Field Name="update_datetime"  />
+      <Field Name="isloaded" format="0" asname="isloaded" />
+      <Field Name="isrep" format="0" asname="isrep" />
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Where>
+      <Exp Field="data_type" Value="RW" />
+    </Where>
+    <Query>
+    </Query>
+    <OrderBy format="{data_type},{catalog_index}">
+      <Exp Field="data_type" value="asc"/>
+      <Exp Field="catalog_index" value="asc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+    </Sql>
+    <Values>
+      <Exp Field="data_type" Value="RW" />
+    </Values>
+  </Record>
+  <Create>
+    <Table>
+      <Values>
+        <Exp Field="update_datetime" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      </Values>
+    </Table>
+  </Create>
+  <Update>
+    <Table>
+      <sql></sql>
+      <Values>
+        <Exp Field="update_datetime" Target="Express" Value="now|yyyy-MM-dd HH:mm:ss"/>
+      </Values>
+    </Table>
+  </Update>
+  <Destroy>
+    <Values>
+    </Values>
+  </Destroy>
+
+  <!--自定义sql区域-->
+  <SelectMaxRWIndex>
+    <Sql>
+      select max(catalog_index) from fg_data_catalog [where]
+    </Sql>
+    <Where>
+      <Exp Field="data_type" Value="RW"/>
+      <Exp Field="catalog_index" Target="Client" Oper="LikeRight" Value="catalog_index" />
+    </Where>
+  </SelectMaxRWIndex>
+
+  <SelectMaxID>
+    <Sql>
+      select max(id) from fg_data_catalog
+    </Sql>
+  </SelectMaxID>
+
+  <DeleteCat>
+    <Sql>
+      delete from fg_data_catalog [where]
+    </Sql>
+    <Where>
+      <Exp Field="id" Target ="client" Value="id"/>
+    </Where>
+  </DeleteCat>
+
+  <RecordByRef>
+    <Sql>
+      select 1 from rw_report_main [where]
+    </Sql>
+    <Where >
+      <Exp Field="catalog_id" Target="Client" Value="id"/>
+    </Where>
+  </RecordByRef>
+  
+</DataService>
+
+

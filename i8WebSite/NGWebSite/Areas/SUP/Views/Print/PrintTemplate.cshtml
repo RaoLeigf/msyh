@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "模板定义";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Script
+{
+    <script type="text/javascript">
+        var otype = 'add';
+        var moudleNos = '@ViewBag.moudleNos',
+               moudleNames = '@ViewBag.moudleNames';
+
+        moudleNos = moudleNos.split(",");
+        moudleNames = moudleNames.split(",");
+        var moduleJson = new Object();
+        var moduleData = (function () {
+            var tmp = [];
+            for (var i = 0; i < moudleNos.length; i++) {
+                moduleJson[moudleNos[i]] = moudleNames[i];
+                tmp.push({ "moduleno": moudleNos[i], "modulename": moudleNames[i] });
+            }
+            return tmp;
+        })();
+        Ext.onReady(function () {
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                showArrowBtn: false,
+                ngbuttons: [
+                     'addrow', 'deleterow',
+                      { itemId: 'design', id: "design", text: "设计", iconCls: 'icon-Import' },
+                     '->', 'close'
+                ]
+            });
+
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 400,
+                autoScroll: true,
+                buskey: 'busflag', //对应的业务表主键属性
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 4,
+                border: false,
+                fieldDefaults: {
+                    labelWidth: 87,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                fields: [
+					{
+					    xtype: 'ngComboBox',
+					    valueField: "moduleno",
+					    displayField: 'modulename',
+					    queryMode: 'local', //local指定为本地数据  如果是后台传输  值为remote
+					    fieldLabel: '模块',
+					    name: 'moduleno',
+					    data: moduleData,
+					    readOnly: false,
+                        mustInput: true,
+                        colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '业务标识',
+					    name: 'busflag',
+					    id: 'busflag',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '名称',
+					    name: 'billname',
+					    id: 'billname',
+					    readOnly: false,
+					    mustInput: true,
+					    colspan: 1
+					}, {
+					    xtype: 'ngComboBox',
+					    valueField: "def_int2",
+					    displayField: 'name',
+					    queryMode: 'local', //local指定为本地数据  如果是后台传输  值为remote
+					    fieldLabel: '模板类型',
+					    name: 'def_int2',
+					    data: [{
+					        "def_int2": "0",
+					        "name": "用户"
+					    }, {
+					        "def_int2": "1",
+					        "name": "系统"
+					    }, {
+					        "def_int2": "2",
+					        "name": "自定义"
+					    }, {
+					        "def_int2": "3",
+					        "name": "系统_PDF"
+					    }]
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '主信息名',
+					    name: 'main',
+					    id: 'main',
+					    readOnly: false,
+					    mustInput: false,
+					    colspan: 1
+					}, {
+					    xtype: 'ngText',
+					    fieldLabel: '主信息字段',
+					    name: 'maincol',
+					    id: 'maincol',
+					    readOnly: false,
+					    mustInput: false,
+					    colspan: 3
+					} , {
+                        xtype: 'ngText',
+                        fieldLabel: '主信息字段名',
+                        name: 'maincolname',
+                        id: 'maincolname',
+                        readOnly: false,
+                        mustInput: false,
+                        colspan: 4
+                    }
+				]
+            });
+
+            //ir3basedtl 定义模型
+	        Ext.define('model', {
+	            extend: 'Ext.data.Model',
+                fields: [
+					 {
+					    name: 'tname',
+					    type: 'System.String',
+					    mapping: 'tname'
+					}, {
+					    name: 'fieldname',
+					    type: 'System.String',
+					    mapping: 'fieldname'
+					}, {
+					    name: 'chn',
+					    type: 'System.String',
+					    mapping: 'chn'
+					}
+                ]
+            });
+
+	        var ir3basedtlstore = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                autoLoad: false,
+                url: 'GetTestData'
+	        });
+
+            //ir3basedtl 单元格编辑
+	        var ir3basedtlcellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+	            clicksToEdit: 1    //单击编辑，单元格修改
+	        });
+
+            //ir3basedtl grid
+            var ir3basedtlgrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                border: false,
+                frame: true,
+                store: ir3basedtlstore,
+                columnLines: true,
+                buskey: '', //对应的子表主键属性
+                columns: [
+					 {
+					    header: '表名',
+					    dataIndex: 'tname',
+					    width: 100,
+					    sortable: false,
+					    editor: { allowBlank: true }
+					}, {
+					    header: '字段',
+					    dataIndex: 'fieldname',
+					    width: 200,
+					    sortable: false,
+					    editor: { allowBlank: true }
+					}, {
+					    header: '字段名',
+					    dataIndex: 'chn',
+					    width: 400,
+					    sortable: false,
+					    editor: { allowBlank: true }
+					}
+                ],
+                plugins: [ir3basedtlcellEditing]  //绑定编辑对象
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, {
+                    id: 'myPanel',
+                    xtype: 'panel',
+                    region: 'center',
+                    autoScroll: true,
+                    overflowY: 'scroll',
+                    layout: 'border',
+                    border: true,
+                    items: [mstform, ir3basedtlgrid]
+                }]
+            });
+
+            //增行
+            ngToolbar.get('addrow').on('click', function () {
+                var ir3basedtldata = ir3basedtlgrid.getSelectionModel();
+                var ins = ir3basedtlstore.getCount();
+                ir3basedtlstore.insert(ins, ir3basedtldata);
+                ir3basedtlstore.getAt(ins).set('tname', '222');
+
+            });
+            //删行
+            ngToolbar.get('deleterow').on('click', function () {
+                var ir3basedtldata = ir3basedtlgrid.getSelectionModel().getSelection();
+                if (ir3basedtldata.length > 0) {
+                    if (ir3basedtlgrid.plugins.length > 0 && ir3basedtlgrid.plugins[0]) {
+                        ir3basedtlgrid.plugins[0].completeEdit(); //GRID单元格失去焦点
+                    }
+
+                    Ext.Array.each(ir3basedtldata, function (record) {
+                        ir3basedtlstore.remove(record); //前端删除
+                    });
+                }
+            });
+            ngToolbar.get('design').on('click', function () {
+                var mstformData = mstform.getFormData();
+                var ir3basedtlgridData = ir3basedtlgrid.getChangeForEntity();               
+                Ext.Ajax.request({
+                    params: {
+                       'mstformData': mstformData, 'ir3basedtlgridData': ir3basedtlgridData
+                    },
+                    url:'@Url.Content("~/SUP/Print/BuildTemplate")',
+                    success: function (response) {                     
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.status === "ok") {
+                            $OpenTab('打印模板维护', '@Url.Content("~/SUP/Print/PrintTemplateDesign")' + '?otype=edit&fileName=' +encodeURIComponent(resp.data));
+                        } else {
+                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+}

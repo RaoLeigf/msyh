@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="ec_purmst">
+      <Field Name="purid" IsKey="true" />
+      <Field Name="purno" />
+      <Field Name="supcomp"  />
+      <Field Name="ocode"/>
+      <Field Name="purdept"/>
+      <Field Name="purwh"/>
+      <Field Name="puremp"/>
+      <Field Name="recorddate"/>
+      <Field Name="recordman"/>
+      <Field Name="pursum"/>
+      <Field Name="purstatus"/>
+      <Field Name="appflg"/>
+      <Field Name="appman"/>
+      <Field Name="appdate"/>
+      <Field Name="confman"/>
+      <Field Name="confflg"/>
+      <Field Name="confdate"/>
+      <Field Name="deliverdate" />
+      <Field Name="remarks"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser1">
+      <Field Name="u_name" AsName="recordmanname"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser2">
+      <Field Name="u_name" AsName="appmanname"/>
+    </Table>
+    <Table Name="secuser" AsName="secuser3">
+      <Field Name="u_name" AsName="confmanname"/>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      left join secuser secuser1 on secuser1.logid=[table].recordman
+      left join secuser secuser2 on secuser2.logid=[table].appman
+      left join secuser secuser3 on secuser3.logid=[table].confman
+      [where] [orderby]
+    </Sql>
+    <Where format="({uicacpflg1} or {uicacpflg2})">
+      <Exp Field="supcomp" Target="AppInfo" Value="LoginID" />
+      <Exp Field="ocode"  Target="AppInfo" Value="OCode"/>
+      <Exp Field="uicacpflg" ParamName="uicacpflg1"  Oper="NotEqual" Value="1" />
+      <Exp Field="uicacpflg" ParamName="uicacpflg2" Oper="IsNull"/>
+    </Where>
+    <Query>
+      <!--<Exp Field="key" Target="Client" Value="askpriceid" Type="Array">
+        <Exp Field="wsp_supply_quotton.quotid" ParamName ="quotid"  TypeKey="0"/>
+        <Exp Field="wsp_supply_quotton.lineid" ParamName="lineid" TypeKey="1" />
+      </Exp>-->
+      <Exp Field="purid"  Target="Client" Value="purid" Type="Array">
+        <Exp Field="ec_purmst.purid" ParamName ="purid"  TypeKey="0"/>
+      </Exp>
+      <Exp Field="ec_purmst.deliverdate" paramName="deliverdate1" Target="Client" Oper="GreaterThanOrEqual" Value="deliverdate1"/>
+      <Exp Field="ec_purmst.deliverdate" paramName="deliverdate2" Target="Client" Oper="LessThanOrEqual" Value="deliverdate2" />
+      <Exp Field="ec_purmst.purno" paramName="purno" Target="Client" Value="purno"/>
+      <Exp Field="ec_purmst.remarks" paramName="remarks" Target="Client" Value="remarks" Oper="Like"/>
+    </Query>
+    <OrderBy format="{purid},{recorddate}">
+      <Exp Field="purid" value="desc" />
+      <Exp Field="recorddate" value="desc"/>
+    </OrderBy>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table] [where]
+    </Sql>
+    <Values>
+    </Values>
+  </Record>
+  <Create>
+      <Values>
+
+      </Values>
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+      <Values>
+
+      </Values>
+  </Destroy>
+  <UpdateUICAcpFlg>
+    <Sql>
+      update ec_purmst [values] [where]
+    </Sql>
+    <Values>
+      <Exp Field="uicacpflg"  Value="1" />
+    </Values>
+    <Where>
+      <Exp Field="purid" Target="Field" Value="purid" />
+    </Where>
+  </UpdateUICAcpFlg>
+  <UpdateConfFlg>
+    <Sql>
+      update ec_purmst [values] [where]
+    </Sql>
+    <Values>
+      <Exp Field="purstatus"  Value="2" />
+      <Exp Field="confflg"  Value="1" />
+      <Exp Field="confman"   Target="AppInfo" Value="LoginID"/>
+      <Exp Field="confdate"  Target="Express" Value="now|yyyy-MM-dd" />
+      <Exp Field="appflg"  Value="1" />
+      <Exp Field="appman"  Target="AppInfo" Value="LoginID" />
+      <Exp Field="appdate"  Target="Express" Value="now|yyyy-MM-dd" />
+    </Values>
+    <Where>
+      <Exp Field="purid" Target="Field" Value="purid" />
+    </Where>
+  </UpdateConfFlg>
+  <SelectMst>
+    <Sql>
+      select [fields] from ec_purmst [where]
+    </Sql>
+    <Where>
+      <Exp Field="purid" Target="Field" Value="purid" />
+    </Where>
+  </SelectMst>
+</DataService>

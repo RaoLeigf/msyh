@@ -1,0 +1,418 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects xmlns="http://www.springframework.net" default-lazy-init="true" >
+
+
+  <!--<object id="GCW3.CW.Facade.SysUser" type="GCW3.CW.Facade.SysUserFacade, GCW3.CW.Facade" >
+    <property name="CurrentRule" ref="GCW3.CW.Rule.SysUser"/>
+    <property name="SysOrganizeRule" ref="GCW3.CW.Rule.SysOrganize"/>
+    <property name="SysUserOrganizeRoleRecordRule" ref="GCW3.CW.Rule.SysUserOrganizeRoleRecord" />
+    <property name="SysUserTransferRecordRule" ref="GCW3.CW.Rule.SysUserTransferRecord" />
+  </object>-->
+  <!--GXM3.XM-->
+  <object id="GXM3.XM.Facade.ProjectMst" type="GXM3.XM.Facade.ProjectMstFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectMst"/>
+    <property name="ProjectDtlTextContentRule" ref="GXM3.XM.Rule.ProjectDtlTextContent" />
+    <property name="ProjectDtlPurchaseDtlRule" ref="GXM3.XM.Rule.ProjectDtlPurchaseDtl" />
+    <property name="ProjectDtlPurDtl4SOFRule" ref="GXM3.XM.Rule.ProjectDtlPurDtl4SOF" />
+    <property name="ProjectDtlPerformTargetRule" ref="GXM3.XM.Rule.ProjectDtlPerformTarget" />
+    <property name="ProjectDtlFundApplRule" ref="GXM3.XM.Rule.ProjectDtlFundAppl" />
+    <property name="ProjectDtlBudgetDtlRule" ref="GXM3.XM.Rule.ProjectDtlBudgetDtl" />
+    <property name="ProjectDtlImplPlanRule" ref="GXM3.XM.Rule.ProjectDtlImplPlan" />
+    <property name="BudgetMstRule" ref="GYS3.YS.Rule.BudgetMst"/>
+    <property name="QtOrgDygxRule" ref="GQT3.QT.Rule.QtOrgDygx" />
+    <property name="CorrespondenceSettings2Rule" ref="GQT3.QT.Rule.CorrespondenceSettings2" />
+    <property name="BudgetAccountsRule" ref="GQT3.QT.Rule.BudgetAccounts" />
+
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlTextContent" type="GXM3.XM.Facade.ProjectDtlTextContentFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlTextContent"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlPurchaseDtl" type="GXM3.XM.Facade.ProjectDtlPurchaseDtlFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlPurchaseDtl"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlPurDtl4SOF" type="GXM3.XM.Facade.ProjectDtlPurDtl4SOFFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlPurDtl4SOF"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlPerformTarget" type="GXM3.XM.Facade.ProjectDtlPerformTargetFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlPerformTarget"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlFundAppl" type="GXM3.XM.Facade.ProjectDtlFundApplFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlFundAppl"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlBudgetDtl" type="GXM3.XM.Facade.ProjectDtlBudgetDtlFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlBudgetDtl"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlImplPlan" type="GXM3.XM.Facade.ProjectDtlImplPlanFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlImplPlan"/>
+  </object>
+  <object id="GXM3.XM.Facade.ProjectDtlPersonnel" type="GXM3.XM.Facade.ProjectDtlPersonnelFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlPersonnel"/>
+  </object>
+
+  <object id="GXM3.XM.Facade.ProjectDtlPersonName" type="GXM3.XM.Facade.ProjectDtlPersonNameFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.ProjectDtlPersonName"/>
+  </object>
+
+  <object id="GXM3.XM.Facade.XmReportMst" type="GXM3.XM.Facade.XmReportMstFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.XmReportMst"/>
+    <property name="XmReportDtlRule" ref="GXM3.XM.Rule.XmReportDtl" />
+  </object>
+  <object id="GXM3.XM.Facade.XmReportDtl" type="GXM3.XM.Facade.XmReportDtlFacade, GXM3.XM.Facade" >
+    <property name="CurrentRule" ref="GXM3.XM.Rule.XmReportDtl"/>
+  </object>
+
+
+  <!--GQT3.QT-->
+  <object id="GQT3.QT.Facade.BudgetAccounts" type="GQT3.QT.Facade.BudgetAccountsFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.BudgetAccounts"/>
+  </object>
+  <object id="GQT3.QT.Facade.ExpenseCategory" type="GQT3.QT.Facade.ExpenseCategoryFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.ExpenseCategory"/>
+  </object>
+  <object id="GQT3.QT.Facade.CorrespondenceSettings" type="GQT3.QT.Facade.CorrespondenceSettingsFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.CorrespondenceSettings"/>
+    <property name="UserRule" ref="GQT3.QT.Rule.User" />
+    <property name="OrganizationRule" ref="GQT3.QT.Rule.Organization" />
+  </object>
+  <object id="GQT3.QT.Facade.SourceOfFunds" type="GQT3.QT.Facade.SourceOfFundsFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.SourceOfFunds"/>
+  </object>
+  <object id="GQT3.QT.Facade.CorrespondenceSettings2" type="GQT3.QT.Facade.CorrespondenceSettings2Facade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.CorrespondenceSettings2"/>
+  </object>
+  <object id="GQT3.QT.Facade.PaymentMethod" type="GQT3.QT.Facade.PaymentMethodFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.PaymentMethod"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtSysCodeSeq" type="GQT3.QT.Facade.QtSysCodeSeqFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtSysCodeSeq"/>
+  </object>
+  <object id="GQT3.QT.Facade.ProjLibProj" type="GQT3.QT.Facade.ProjLibProjFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.ProjLibProj"/>
+  </object>
+  <object id="GQT3.QT.Facade.GHProjDtlShare" type="GQT3.QT.Facade.GHProjDtlShareFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.GHProjDtlShare"/>
+  </object>
+  <object id="GQT3.QT.Facade.User" type="GQT3.QT.Facade.UserFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.User"/>
+  </object>
+  <object id="GQT3.QT.Facade.Organization" type="GQT3.QT.Facade.OrganizationFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.Organization"/>
+    <property name="UserOrgRule" ref="GQT3.QT.Rule.UserOrg" />
+    <property name="CorrespondenceSettings2Rule" ref="GQT3.QT.Rule.CorrespondenceSettings2" />
+    <property name="CorrespondenceSettingsRule" ref="GQT3.QT.Rule.CorrespondenceSettings" />
+    <property name="OrgRelatitem2Rule" ref="GQT3.QT.Rule.OrgRelatitem2" />
+  </object>
+  <object id="GQT3.QT.Facade.VCorrespondenceSetting2" type="GQT3.QT.Facade.VCorrespondenceSetting2Facade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.VCorrespondenceSetting2"/>
+  </object>
+  <object id="GQT3.QT.Facade.UserOrg" type="GQT3.QT.Facade.UserOrgFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.UserOrg"/>
+  </object>
+
+  <object id="GQT3.QT.Facade.OrgRelatitem2" type="GQT3.QT.Facade.OrgRelatitem2Facade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.OrgRelatitem2"/>
+  </object>
+  <object id="GQT3.QT.Facade.RWReport" type="GQT3.QT.Facade.RWReportFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.RWReport"/>
+  </object>
+  <object id="GQT3.QT.Facade.ProcurementType" type="GQT3.QT.Facade.ProcurementTypeFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.ProcurementType"/>
+  </object>
+  <object id="GQT3.QT.Facade.ProcurementProcedures" type="GQT3.QT.Facade.ProcurementProceduresFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.ProcurementProcedures"/>
+  </object>
+  <object id="GQT3.QT.Facade.PerformEvalTargetType" type="GQT3.QT.Facade.PerformEvalTargetTypeFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.PerformEvalTargetType"/>
+  </object>
+  <object id="GQT3.QT.Facade.PerformEvalTarget" type="GQT3.QT.Facade.PerformEvalTargetFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.PerformEvalTarget"/>
+  </object>
+  <object id="GQT3.QT.Facade.PerformEvalTargetClass" type="GQT3.QT.Facade.PerformEvalTargetClassFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.PerformEvalTargetClass"/>
+  </object>
+  <object id="GQT3.QT.Facade.ProcurementCatalog" type="GQT3.QT.Facade.ProcurementCatalogFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.ProcurementCatalog"/>
+  </object>
+  <object id="GQT3.QT.Facade.PerformEvalType" type="GQT3.QT.Facade.PerformEvalTypeFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.PerformEvalType"/>
+  </object>
+  <object id="GQT3.QT.Facade.ProjectThreshold" type="GQT3.QT.Facade.ProjectThresholdFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.ProjectThreshold"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtBaseProject" type="GQT3.QT.Facade.QtBaseProjectFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtBaseProject"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtZcgnfl" type="GQT3.QT.Facade.QtZcgnflFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtZcgnfl"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtOrgDygx" type="GQT3.QT.Facade.QtOrgDygxFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtOrgDygx"/>
+  </object>
+  <object id="GQT3.QT.Facade.BankAccount" type="GQT3.QT.Facade.BankAccountFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.BankAccount"/>
+  </object>
+  <object id="GQT3.QT.Facade.QTSysSet" type="GQT3.QT.Facade.QTSysSetFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QTSysSet"/>
+  </object>
+  <object id="GQT3.QT.Facade.QTMemo" type="GQT3.QT.Facade.QTMemoFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QTMemo"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtAttachment" type="GQT3.QT.Facade.QtAttachmentFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtAttachment"/>
+  </object>
+  <object id="GQT3.QT.Facade.QTIfApprove" type="GQT3.QT.Facade.QTIfApproveFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QTIfApprove"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtCoverUpData" type="GQT3.QT.Facade.QtCoverUpDataFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtCoverUpData"/>
+  </object>
+  <object id="GQT3.QT.Facade.QtCoverUpForOrg" type="GQT3.QT.Facade.QtCoverUpForOrgFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtCoverUpForOrg"/>
+  </object>
+
+  <object id="GQT3.QT.Facade.QtNaviGation" type="GQT3.QT.Facade.QtNaviGationFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtNaviGation"/>
+  </object>
+
+  <object id="GQT3.QT.Facade.QtTableCustomize" type="GQT3.QT.Facade.QtTableCustomizeFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtTableCustomize"/>
+  </object>
+
+  <object id="GQT3.QT.Facade.QtAccount" type="GQT3.QT.Facade.QtAccountFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtAccount"/>
+  </object>
+
+  <object id="GQT3.QT.Facade.QtXmDistribute" type="GQT3.QT.Facade.QtXmDistributeFacade, GQT3.QT.Facade" >
+    <property name="CurrentRule" ref="GQT3.QT.Rule.QtXmDistribute"/>
+  </object>
+
+
+
+
+  <!--GYS3.YS-->
+  <object id="GYS3.YS.Facade.BudgetMst" type="GYS3.YS.Facade.BudgetMstFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetMst"/>
+    <property name="BudgetDtlImplPlanRule" ref="GYS3.YS.Rule.BudgetDtlImplPlan" />
+    <property name="BudgetDtlTextContentRule" ref="GYS3.YS.Rule.BudgetDtlTextContent" />
+    <property name="BudgetDtlFundApplRule" ref="GYS3.YS.Rule.BudgetDtlFundAppl" />
+    <property name="BudgetDtlBudgetDtlRule" ref="GYS3.YS.Rule.BudgetDtlBudgetDtl" />
+    <property name="BudgetDtlPerformTargetRule" ref="GYS3.YS.Rule.BudgetDtlPerformTarget" />
+    <property name="BudgetDtlPurchaseDtlRule" ref="GYS3.YS.Rule.BudgetDtlPurchaseDtl" />
+    <property name="BudgetDtlPurDtl4SOFRule" ref="GYS3.YS.Rule.BudgetDtlPurDtl4SOF" />
+    <property name="QtOrgDygxRule" ref="GQT3.QT.Rule.QtOrgDygx" />
+    <property name="QTControlSetRule" ref="GQT3.QT.Rule.QTControlSet" /> 
+    <property name="CorrespondenceSettingsRule" ref="GQT3.QT.Rule.CorrespondenceSettings" /> 
+    <property name="CorrespondenceSettings2Rule" ref="GQT3.QT.Rule.CorrespondenceSettings2" />
+    <property name="ExpenseMstRule" ref="GYS3.YS.Rule.ExpenseMst" />
+    <property name="JxTrackingRule" ref="GYS3.YS.Rule.JxTracking" />  
+    <property name="QtAccountRule" ref="GQT3.QT.Rule.QtAccount" />
+    <property name="BudgetDtlPersonnelRule" ref="GYS3.YS.Rule.BudgetDtlPersonnel" />
+    <property name="BudgetDtlPersonNameRule" ref="GYS3.YS.Rule.BudgetDtlPersonName" />
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlImplPlan" type="GYS3.YS.Facade.BudgetDtlImplPlanFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlImplPlan"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlTextContent" type="GYS3.YS.Facade.BudgetDtlTextContentFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlTextContent"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlFundAppl" type="GYS3.YS.Facade.BudgetDtlFundApplFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlFundAppl"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlBudgetDtl" type="GYS3.YS.Facade.BudgetDtlBudgetDtlFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlBudgetDtl"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetProcessCtrl" type="GYS3.YS.Facade.BudgetProcessCtrlFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetProcessCtrl"/>
+  </object>
+  <object id="GYS3.YS.Facade.BuDeptReport" type="GYS3.YS.Facade.BuDeptReportFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BuDeptReport"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlPerformTarget" type="GYS3.YS.Facade.BudgetDtlPerformTargetFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlPerformTarget"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlPurchaseDtl" type="GYS3.YS.Facade.BudgetDtlPurchaseDtlFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlPurchaseDtl"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlPurDtl4SOF" type="GYS3.YS.Facade.BudgetDtlPurDtl4SOFFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlPurDtl4SOF"/>
+  </object>
+
+
+  <object id="GYS3.YS.Facade.GHSubject" type="GYS3.YS.Facade.GHSubjectFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.GHSubject"/>
+    <property name="SubjectMstRule" ref="GYS3.YS.Rule.SubjectMst" />
+    <property name="SubjectMstBudgetDtlRule" ref="GYS3.YS.Rule.SubjectMstBudgetDtl" />
+    <property name="BudgetMstRule" ref="GYS3.YS.Rule.BudgetMst"/>
+    <property name="QtOrgDygxRule" ref="GQT3.QT.Rule.QtOrgDygx" />
+  </object>
+  <object id="GYS3.YS.Facade.SubjectMst" type="GYS3.YS.Facade.SubjectMstFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.SubjectMst"/>
+  </object>
+  <object id="GYS3.YS.Facade.SubjectMstBudgetDtl" type="GYS3.YS.Facade.SubjectMstBudgetDtlFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.SubjectMstBudgetDtl"/>
+  </object>
+
+  <object id="GYS3.YS.Facade.ExpenseMst" type="GYS3.YS.Facade.ExpenseMstFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.ExpenseMst"/>
+    <property name="ExpenseDtlRule" ref="GYS3.YS.Rule.ExpenseDtl" />  
+    <property name="ExpenseHxRule" ref="GYS3.YS.Rule.ExpenseHx" />
+    <property name="CorrespondenceSettings2Rule" ref="GQT3.QT.Rule.CorrespondenceSettings2" />
+    <property name="CorrespondenceSettingsRule" ref="GQT3.QT.Rule.CorrespondenceSettings" />
+    <property name="QTControlSetRule" ref="GQT3.QT.Rule.QTControlSet" />
+  </object>
+  
+  <object id="GYS3.YS.Facade.ExpenseDtl" type="GYS3.YS.Facade.ExpenseDtlFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.ExpenseDtl"/>
+  </object>
+  <object id="GYS3.YS.Facade.ExpenseHx" type="GYS3.YS.Facade.ExpenseHxFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.ExpenseHx"/>
+  </object>
+
+  <object id="GYS3.YS.Facade.YsAccount" type="GYS3.YS.Facade.YsAccountFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.YsAccount"/>
+    <property name="CorrespondenceSettings2Rule" ref="GQT3.QT.Rule.CorrespondenceSettings2" />
+    <property name="QtOrgDygxRule" ref="GQT3.QT.Rule.QtOrgDygx" />
+    <property name="BudgetAccountsRule" ref="GQT3.QT.Rule.BudgetAccounts" />
+    <property name="CorrespondenceSettingsRule" ref="GQT3.QT.Rule.CorrespondenceSettings" /> 
+    <property name="BudgetMstRule" ref="GYS3.YS.Rule.BudgetMst"/>
+    <property name="BudgetDtlBudgetDtlRule" ref="GYS3.YS.Rule.BudgetDtlBudgetDtl" />
+    <property name="YsAccountMstRule" ref="GYS3.YS.Rule.YsAccountMst" />
+  </object>
+  <object id="GYS3.YS.Facade.YsAccountMst" type="GYS3.YS.Facade.YsAccountMstFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.YsAccountMst"/>
+    <property name="YsAccountRule" ref="GYS3.YS.Rule.YsAccount" />
+    <property name="UserRule" ref="GQT3.QT.Rule.User" />
+    <property name="OrganizationRule" ref="GQT3.QT.Rule.Organization" />
+    <property name="BudgetAccountsRule" ref="GQT3.QT.Rule.BudgetAccounts" />
+    <property name="CorrespondenceSettingsRule" ref="GQT3.QT.Rule.CorrespondenceSettings" />
+  </object>
+
+  <object id="GYS3.YS.Facade.JxTracking" type="GYS3.YS.Facade.JxTrackingFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.JxTracking"/>
+  </object>
+  <object id="GYS3.YS.Facade.YsIncomeMst" type="GYS3.YS.Facade.YsIncomeMstFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.YsIncomeMst"/>
+    <property name="YsIncomeDtlRule" ref="GYS3.YS.Rule.YsIncomeDtl" />
+  </object>
+  <object id="GYS3.YS.Facade.YsIncomeDtl" type="GYS3.YS.Facade.YsIncomeDtlFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.YsIncomeDtl"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlPersonnel" type="GYS3.YS.Facade.BudgetDtlPersonnelFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlPersonnel"/>
+  </object>
+  <object id="GYS3.YS.Facade.BudgetDtlPersonName" type="GYS3.YS.Facade.BudgetDtlPersonNameFacade, GYS3.YS.Facade" >
+    <property name="CurrentRule" ref="GYS3.YS.Rule.BudgetDtlPersonName"/>
+  </object>
+
+  <!--GJX3.JX-->
+  <object id="GJX3.JX.Facade.PerformanceMst" type="GJX3.JX.Facade.PerformanceMstFacade, GJX3.JX.Facade" >
+    <property name="CurrentRule" ref="GJX3.JX.Rule.PerformanceMst"/>
+    <property name="PerformanceDtlEvalRule" ref="GJX3.JX.Rule.PerformanceDtlEval" />
+    <property name="PerformanceDtlTextContRule" ref="GJX3.JX.Rule.PerformanceDtlTextCont" />
+    <property name="PerformanceDtlBuDtlRule" ref="GJX3.JX.Rule.PerformanceDtlBuDtl" />
+    <property name="PerformanceDtlTarImplRule" ref="GJX3.JX.Rule.PerformanceDtlTarImpl"/>
+    <property name="ThirdAttachmentRule" ref="GJX3.JX.Rule.ThirdAttachment"/>
+    <property name="PerformEvalTargetTypeRule" ref="GQT3.QT.Rule.PerformEvalTargetType"/>
+  </object>
+  <object id="GJX3.JX.Facade.PerformanceDtlEval" type="GJX3.JX.Facade.PerformanceDtlEvalFacade, GJX3.JX.Facade" >
+    <property name="CurrentRule" ref="GJX3.JX.Rule.PerformanceDtlEval"/>
+  </object>
+  <object id="GJX3.JX.Facade.PerformanceDtlTextCont" type="GJX3.JX.Facade.PerformanceDtlTextContFacade, GJX3.JX.Facade" >
+    <property name="CurrentRule" ref="GJX3.JX.Rule.PerformanceDtlTextCont"/>
+  </object>
+  <object id="GJX3.JX.Facade.PerformanceDtlBuDtl" type="GJX3.JX.Facade.PerformanceDtlBuDtlFacade, GJX3.JX.Facade" >
+    <property name="CurrentRule" ref="GJX3.JX.Rule.PerformanceDtlBuDtl"/>
+  </object>
+  <object id="GJX3.JX.Facade.PerformanceDtlTarImpl" type="GJX3.JX.Facade.PerformanceDtlTarImplFacade, GJX3.JX.Facade" >
+    <property name="CurrentRule" ref="GJX3.JX.Rule.PerformanceDtlTarImpl"/>
+  </object>
+  <object id="GJX3.JX.Facade.ThirdAttachment" type="GJX3.JX.Facade.ThirdAttachmentFacade, GJX3.JX.Facade" >
+    <property name="CurrentRule" ref="GJX3.JX.Rule.ThirdAttachment"/>
+  </object>
+
+  <!--GSP3.SP-->
+  <object id="GSP3.SP.Facade.GAppvalPost" type="GSP3.SP.Facade.GAppvalPostFacade, GSP3.SP.Facade" >
+    <property name="CurrentRule" ref="GSP3.SP.Rule.GAppvalPost"/>
+    <property name="GAppvalPost4OperRule" ref="GSP3.SP.Rule.GAppvalPost4Oper" />
+  </object>
+  <object id="GSP3.SP.Facade.GAppvalPost4Oper" type="GSP3.SP.Facade.GAppvalPost4OperFacade, GSP3.SP.Facade" >
+    <property name="CurrentRule" ref="GSP3.SP.Rule.GAppvalPost4Oper"/>
+  </object>
+  <object id="GSP3.SP.Facade.GAppvalProc" type="GSP3.SP.Facade.GAppvalProcFacade, GSP3.SP.Facade" >
+    <property name="CurrentRule" ref="GSP3.SP.Rule.GAppvalProc"/>
+    <property name="GAppvalProcCondsRule" ref="GSP3.SP.Rule.GAppvalProcConds" />
+    <property name="GAppvalProc4PostRule" ref="GSP3.SP.Rule.GAppvalProc4Post" />
+    <property name="GKPaymentMstRule" ref="GGK3.GK.Rule.GKPaymentMst"/>
+    <property name="PaymentMstRule" ref="GBK3.BK.Rule.PaymentMst"/>
+    <property name="GAppvalRecordRule" ref="GSP3.SP.Rule.GAppvalRecord"/>
+  </object>
+  <object id="GSP3.SP.Facade.GAppvalProcConds" type="GSP3.SP.Facade.GAppvalProcCondsFacade, GSP3.SP.Facade" >
+    <property name="CurrentRule" ref="GSP3.SP.Rule.GAppvalProcConds"/>
+  </object>
+  <object id="GSP3.SP.Facade.GAppvalProc4Post" type="GSP3.SP.Facade.GAppvalProc4PostFacade, GSP3.SP.Facade" >
+    <property name="CurrentRule" ref="GSP3.SP.Rule.GAppvalProc4Post"/>
+  </object>
+  <object id="GSP3.SP.Facade.GAppvalRecord" type="GSP3.SP.Facade.GAppvalRecordFacade, GSP3.SP.Facade" >
+    <property name="CurrentRule" ref="GSP3.SP.Rule.GAppvalRecord"/>
+    <property name="GKPaymentMstRule" ref="GGK3.GK.Rule.GKPaymentMst"/>
+    <property name="GKPaymentDtlRule" ref="GGK3.GK.Rule.GKPaymentDtl"/>    
+    <property name="PaymentMstRule" ref="GBK3.BK.Rule.PaymentMst"/>
+    <property name="PaymentDtlRule" ref="GBK3.BK.Rule.PaymentDtl"/>
+    <property name="GAppvalPost4OperRule" ref="GSP3.SP.Rule.GAppvalPost4Oper"/>
+    <property name="GAppvalProc4PostRule" ref="GSP3.SP.Rule.GAppvalProc4Post"/>
+    <property name="GAppvalPostRule" ref="GSP3.SP.Rule.GAppvalPost"/>
+    <property name="UserRule" ref="GQT3.QT.Rule.User" />
+    <property name="QtAttachmentRule" ref="GQT3.QT.Rule.QtAttachment" />
+    <property name="BudgetMstRule" ref="GYS3.YS.Rule.BudgetMst" />
+    <property name="ProjectMstRule" ref="GXM3.XM.Rule.ProjectMst" />
+    <property name="OrganizationRule" ref="GQT3.QT.Rule.Organization" />
+    <property name="ExpenseMstRule" ref="GYS3.YS.Rule.ExpenseMst" />
+    <property name="YsIncomeMstRule" ref="GYS3.YS.Rule.YsIncomeMst"/>
+  </object>
+  
+
+  <!--GBK3.BK-->
+  <object id="GBK3.BK.Facade.PaymentDtl" type="GBK3.BK.Facade.PaymentDtlFacade, GBK3.BK.Facade" >
+    <property name="CurrentRule" ref="GBK3.BK.Rule.PaymentDtl"/>
+  </object>
+  <object id="GBK3.BK.Facade.PaymentMst" type="GBK3.BK.Facade.PaymentMstFacade, GBK3.BK.Facade" >
+    <property name="CurrentRule" ref="GBK3.BK.Rule.PaymentMst"/>
+    <property name="PaymentXmRule" ref="GBK3.BK.Rule.PaymentXm" />
+    <property name="PaymentDtlRule" ref="GBK3.BK.Rule.PaymentDtl" />
+    <property name="QtAttachmentRule" ref="GQT3.QT.Rule.QtAttachment" />
+    <property name="QTSysSetRule" ref="GQT3.QT.Rule.QTSysSet"/>
+    <property name="GKPaymentMstRule" ref="GGK3.GK.Rule.GKPaymentMst"/>
+    <property name="OrganizationRule" ref="GQT3.QT.Rule.Organization" />
+  </object>
+  <object id="GBK3.BK.Facade.PaymentXm" type="GBK3.BK.Facade.PaymentXmFacade, GBK3.BK.Facade" >
+    <property name="CurrentRule" ref="GBK3.BK.Rule.PaymentXm"/>
+  </object>
+
+  <!--GGK3.GK-->
+  <object id="GGK3.GK.Facade.GKPaymentMst" type="GGK3.GK.Facade.GKPaymentMstFacade, GGK3.GK.Facade" >
+    <property name="CurrentRule" ref="GGK3.GK.Rule.GKPaymentMst"/>
+    <property name="GKPaymentDtlRule" ref="GGK3.GK.Rule.GKPaymentDtl" />
+    <property name="PaymentDtlRule" ref="GBK3.BK.Rule.PaymentDtl" />
+    <property name="PaymentXmRule" ref="GBK3.BK.Rule.PaymentXm" />
+    <property name="PaymentMstRule" ref="GBK3.BK.Rule.PaymentMst" />
+    <property name="OrganizationRule" ref="GQT3.QT.Rule.Organization" />
+  </object>
+  <object id="GGK3.GK.Facade.GKPaymentDtl" type="GGK3.GK.Facade.GKPaymentDtlFacade, GGK3.GK.Facade" >
+    <property name="CurrentRule" ref="GGK3.GK.Rule.GKPaymentDtl"/>
+  </object>
+
+  <object id="GGK3.GK.Facade.GK3_BankVauit" type="GGK3.GK.Facade.GK3_BankVauitFacade, GGK3.GK.Facade" >
+    <property name="CurrentRule" ref="GGK3.GK.Rule.GK3_BankVauit"/>
+  </object>
+
+
+
+
+
+
+</objects>
+
+
+
+
+

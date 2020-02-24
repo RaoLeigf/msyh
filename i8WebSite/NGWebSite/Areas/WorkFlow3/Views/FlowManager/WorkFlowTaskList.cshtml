@@ -1,0 +1,742 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var PageUrl = window.location.href;
+        //定义模型
+        Ext.define('model', {
+            extend: 'Ext.data.Model',
+            fields: [
+                {
+                    name: 'id_',
+                    type: 'string',
+                    mapping: 'id_'
+                }, {
+                    name: 'proc_inst_id_',
+                    type: 'string',
+                    mapping: 'proc_inst_id_'
+                }, {
+                    name: 'pkstr',
+                    type: 'string',
+                    mapping: 'pkstr'
+                }, {
+                    name: 'act_name',
+                    type: 'string',
+                    mapping: 'act_name'
+                }, {
+                    name: 'pi_key',
+                    type: 'string',
+                    mapping: 'pi_key'
+                }, {
+                    name: 'taskstarttime',
+                    type: 'string',
+                    mapping: 'taskstarttime'
+                }, {
+                    name: 'oname',
+                    type: "string",
+                    mapping: 'oname'
+                }, {
+                    name: 'url',
+                    type: "string",
+                    mapping: 'url'
+                }, {
+                    name: 'bizname',
+                    type: "string",
+                    mapping: 'bizname'
+                }, {
+                    name: 'uitype',
+                    type: "int",
+                    mapping: 'uitype'
+                }, {
+                    name: 'pistartusername',
+                    type: "string",
+                    mapping: 'pistartusername'
+                }, {
+                    name: 'pdname',
+                    type: "string",
+                    mapping: 'pdname'
+                }, {
+                    name: 'duration',
+                    type: "string",
+                    mapping: 'duration'
+                }, {
+                    name: 'urlparam',
+                    type: "string",
+                    mapping: 'urlparam'
+                }, {
+                    name: 'pistarttime',
+                    type: 'string',
+                    mapping: 'pistarttime'
+                }
+            ]
+        });
+
+        var store = Ext.create('Ext.ng.JsonStore', {
+            model: 'model',
+            pageSize: 20,
+            autoLoad: false,
+            url: C_ROOT + 'WorkFlow3/FlowManager/GetPendingTaskByUser'
+        });
+
+        Ext.onReady(function () {
+            var languageInfoHtml = Ext.htmlDecode('@ViewBag.NG3Lang');
+            var languageInfo = Ext.decode(languageInfoHtml);
+            var RES = {
+                'MSG': {
+                    'alertTitle': languageInfo.alertTitle || '提示',
+                    'selectOneTask': languageInfo.selectOneTask ||'请选择需办理的任务!'
+                },
+                'taskUrlTitle': languageInfo.taskUrlTitle || '工作流任务'
+            };
+            RES.grid = {
+                'taskid': languageInfo.taskid || '任务号',
+                'pi_key': languageInfo.pi_key || '流程描述',
+                'bizname': languageInfo.bizname || '表单',
+                'act_name': languageInfo.act_name || '节点名称',
+                'taskstarttime': languageInfo.taskstarttime || '接收时间',
+                'duration': languageInfo.duration || '停留时间',
+                'pistartusername': languageInfo.pistartusername || '发起人',
+                'pistarttime': languageInfo.pistarttime || '发起时间',
+                'oname': languageInfo.oname || '发起组织',
+                'pdname': languageInfo.pdname || '流程定义',
+                'pkstr': languageInfo.pkstr || '表单编码'
+            };
+            RES.ResultWin = {
+                'title': languageInfo.resultWinTitle || '批量办理结果',
+                'msg': languageInfo.resultWinMsg || '结果',
+                'taskId': languageInfo.taskid || '任务号',
+                'pi_key': languageInfo.pi_key || '流程描述'
+            };
+            RES.btn = {
+                'close': languageInfo.btnClose || '关 闭',
+                'save': languageInfo.btnSave || '提 交'
+            };
+            RES.batchWin = {
+                'taskRemark': languageInfo.taskRemark || '办理意见',
+                'signature': languageInfo.signature || '签章',
+                'remarkEmptyText': languageInfo.remarkEmptyText || '请输入办理意见',
+                'title': languageInfo.batchWinTitle || '批量办理',
+                'progressText': languageInfo.batchProgressText || '正在批量办理',
+                'batchError': languageInfo.batchError || '批量办理失败，原因:'
+            };
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    {
+                        itemId: "edit", text: languageInfo.btnTaskComplete || "办理", width: this.itemWidth ,iconCls: "icon-Edit" },
+                    { itemId: 'wfbtn_terminate', iconCls: "icon-Cancel", text: "终止", width: this.itemWidth },
+                    '->', 'help', 'close'
+                ]
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+            var sm = Ext.create('Ext.selection.CheckboxModel', { headerWidth: 40 });
+
+            var grid = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                stateful: true,
+                selModel: sm,
+                stateId: 'SUP_WorkFlowTaskList_Grid1',
+                store: store,
+                buskey: 'phid', //对应的业务表主键属性
+                columnLines: true,
+                columns: [{
+                    header: RES.grid.taskid,
+                    dataIndex: 'id_',
+                    width: 80,
+                    sortable: false,
+                    hidden: false
+                }, {
+                    header: RES.grid.pi_key,
+                    dataIndex: 'pi_key',
+                    width: 300,
+                    //flex: 2,
+                    sortable: false,
+                    hidden: false
+                }, {
+                    header: RES.grid.bizname,
+                    dataIndex: 'bizname',
+                    width: 100,
+                    sortable: true,
+                    hidden: false
+                }, {
+                    header: RES.grid.act_name,
+                    dataIndex: 'act_name',
+                    width: 120,
+                    sortable: true,
+                    hidden: false
+                }, {
+                    header: RES.grid.taskstarttime,
+                    dataIndex: 'taskstarttime',
+                    width: 130,
+                    sortable: true,
+                    hidden: false
+                }, {
+                    header: RES.grid.duration,
+                    dataIndex: 'duration',
+                    //flex: 1,
+                    width: 95,
+                    sortable: false,
+                    hidden: false
+                }, {
+                    header: RES.grid.pistartusername,
+                    dataIndex: 'pistartusername',
+                    //flex: 1,
+                    width: 70,
+                    sortable: true,
+                    hidden: false
+                }, {
+                    header: RES.grid.pistarttime,
+                    dataIndex: 'pistarttime',
+                    //flex: 1,
+                    width: 130,
+                    sortable: true,
+                    hidden: false
+                }, {
+                    header: RES.grid.oname,
+                    dataIndex: 'oname',
+                    //flex: 2,
+                    width: 160,
+                    sortable: true,
+                    hidden: false
+                }, {
+                    header: RES.grid.pdname,
+                    dataIndex: 'pdname',
+                    //flex: 2,
+                    width: 160,
+                    sortable: false,
+                    hidden: false
+                }, {
+                    header: RES.grid.pkstr,
+                    dataIndex: 'pkstr',
+                    //flex: 1,
+                    width: 160,
+                    sortable: false,
+                    hidden: false
+                }
+                ],
+                plugins: ['wfShowConditionalToolTip'],
+                bbar: pagingbar
+            });
+
+            var clientFilter = {};
+            if (/*workType == "1"*/PageUrl.indexOf("workType") > 0) {
+                clientFilter["act_ru_task.FORM_RESOURCE_KEY_*str*like*1"] = 'Projectnew_Select';
+            } else {
+                clientFilter["act_ru_task.FORM_RESOURCE_KEY_*str*like*1"] = 'GH';
+            }
+
+            var queryPanel = Ext.create('Ext.ng3.QueryPanel', {
+                toolbar: ngToolbar,
+                pageid: "Web:WorkFlowTaskList",//对应内嵌查询业务点标识
+                grid: grid,
+                clientSqlFilter: clientFilter,
+                columnsPerRow: 4 //每行4列
+            });
+            //流程定义树
+            var pdTree = Ext.create('Ext.ng.wf.ProcessDirectoryTree', {
+                region: 'west'
+            });
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+                items: [ngToolbar, queryPanel, pdTree, grid]
+            });
+
+            function createTestResultWin(data) {
+                var testDataStore = Ext.create('Ext.data.Store', {
+                    fields: ['msg', 'id', 'piid', 'pi_key']
+                });
+                testDataStore.loadData(data);
+                var testResultWin = Ext.create('Ext.window.Window', {
+                    title: RES.ResultWin.title,
+                    closable: true,
+                    resizable: false,
+                    modal: true,
+                    width: 600,
+                    height: 480,
+                    margin: '0 0 0 0',
+                    padding: '0 0 0 0',
+                    layout: 'border',
+                    items: [{
+                        xtype: 'ngGridPanel',
+                        scroll: true,
+                        overflowY: 'auto',
+                        region: 'center',
+                        autoScroll: true,
+                        plugins: ['wfShowConditionalToolTip'],
+                        store: testDataStore,
+                        columns: [{
+                            text: RES.ResultWin.msg,
+                            dataIndex: 'msg',
+                            flex: 2
+                        },{
+                            text: RES.ResultWin.taskId,
+                            dataIndex: 'id',
+                            flex: 1
+                        }, {
+                            text: RES.ResultWin.pi_key,
+                            dataIndex: 'pi_key',
+                            flex: 2
+                        }]
+                    }],
+                    buttons: [
+                      "->",
+                      {
+                          itemId: 'tbb_close',
+                          text: RES.btn.close,
+                          handler: function () {
+                              testResultWin.close();
+                              testResultWin.destroy();
+                          }
+                      }
+                    ]
+                });
+                return testResultWin;
+            }
+
+            function CreateBatchEditWin(callback) {
+                var batchEditForm = Ext.create('Ext.ng.TableLayoutForm', {
+                    region: 'center',
+                    frame: true,
+                    split: true,
+                    autoScroll: true,
+                    buskey: 'phid', //对应的业务表主键
+                    columnsPerRow: 3,
+                    padding: '0 0 0 0',
+                    fieldDefaults: {
+                        labelWidth: 60,
+                        anchor: '100%',
+                        margin: '0 10 0 0',
+                        msgTarget: 'side'
+                    },
+                    fields: [
+                        {
+                            xtype: 'label',
+                            text: RES.batchWin.taskRemark + ':',
+                            colspan: 2
+                        }, {
+                            xtype: 'label',
+                            text: RES.batchWin.signature +':',
+                            colspan: 1
+                        }, {
+                            xtype: 'ngUsefulTextArea',
+                            labelWidth: 0,
+                            controlid: 'wf_remark',
+                            itemId: "wf_remark",
+                            name: 'SuggestValue',
+                            margin: '3 0 0 0',
+                            emptyText: RES.batchWin.remarkEmptyText,
+                            height: 160,
+                            colspan: 2,
+                        }, {
+                            xtype: 'signatureImage',
+                            region: 'east',
+                            labelWidth: 0,
+                            margin: '3 0 0 0',
+                            name: 'signature',
+                            itemId: "signature",
+                            colspan: 1,
+                            width:150,
+                            //padding: '15 0 15 0',
+                            border: true,
+                            height: 160
+                        }]
+                });
+                var batchEditWin = Ext.create("Ext.window.Window", {
+                    title: RES.batchWin.title,
+                    modal: true,
+                    width: 460,
+                    height: 250,
+                    closeable: true,
+                    resizable: false,
+                    closeAction: "hide",
+                    items:[batchEditForm],
+                    //items: [{
+                    //    xtype: 'panel',
+                    //    region: 'center',
+                    //    layout: 'column',
+                    //    width: 310,
+                    //    height: 200,
+                    //    items: [{
+                    //        xtype: 'ngUsefulTextArea',
+                    //        region: 'center',
+                    //        controlid: 'wf_remark',
+                    //        itemId: "wf_remark",
+                    //        name: 'SuggestValue',
+                    //        emptyText: '请输入办理意见',
+                    //        width: 150,
+                    //        height: 130
+                    //        //height:'100%'
+                    //    }, {
+                    //        xtype: 'signatureImage',
+                    //        region: 'east',
+                    //        name: 'signature',
+                    //        itemId: "signature",
+                    //        width: 140,
+                    //        height: 130,
+                    //        padding: '15 5 15 5',
+                    //        border: true
+                    //    }]
+                    //}],
+                    buttons: ["->", {
+                        text: RES.btn.save,
+                        handler: function () {
+                            var remark = batchEditForm.down("#wf_remark").getValue();
+                            var singature = '';
+                            if (!Ext.isEmpty(batchEditForm.down('#signature'))) {
+                                singature = batchEditForm.down('#signature').signature
+                            }
+                            if (Ext.isEmpty(singature)) {
+                                singature = '';
+                            }
+                            var data = { 'remark': remark, 'singature': singature };
+                            batchEditWin.hide();
+                            batchEditWin.destroy();
+                            callback(data);
+                        }
+                    }, {
+                        text: RES.btn.close,
+                        handler: function () {
+                            batchEditWin.hide();
+                            batchEditWin.destroy();
+                        }
+                    }]
+                });
+                return batchEditWin;
+            }
+
+
+            //批量终止
+            function CreateBatchStopWin(callback) {
+                var batchEditForm = Ext.create('Ext.ng.TableLayoutForm', {
+                    region: 'center',
+                    frame: true,
+                    split: true,
+                    autoScroll: true,
+                    buskey: 'phid', //对应的业务表主键
+                    columnsPerRow: 3,
+                    padding: '0 0 0 0',
+                    fieldDefaults: {
+                        labelWidth: 60,
+                        anchor: '100%',
+                        margin: '0 10 0 0',
+                        msgTarget: 'side'
+                    },
+                    fields: [
+                        {
+                            xtype: 'label',
+                            text: '终止意见:',
+                            colspan: 2
+                        }, {
+                            xtype: 'label',
+                            text: '签章:',
+                            colspan: 1
+                        }, {
+                            xtype: 'ngUsefulTextArea',
+                            labelWidth: 0,
+                            controlid: 'wf_remark',
+                            itemId: "wf_remark",
+                            name: 'SuggestValue',
+                            margin: '3 0 0 0',
+                            emptyText: '请输入终止意见',
+                            height: 160,
+                            colspan: 2,
+                        }, {
+                            xtype: 'signatureImage',
+                            region: 'east',
+                            labelWidth: 0,
+                            margin: '3 0 0 0',
+                            name: 'signature',
+                            itemId: "signature",
+                            colspan: 1,
+                            width: 150,
+                            //padding: '15 0 15 0',
+                            border: true,
+                            height: 160
+                        }]
+                });
+
+                var batchEditWin = Ext.create("Ext.window.Window", {
+                    title: "批量终止",
+                    modal: true,
+                    width: 460,
+                    height: 250,
+                    closeable: true,
+                    resizable: false,
+                    closeAction: "hide",
+                    items: [batchEditForm],
+                    //items: [{
+                    //    xtype: 'panel',
+                    //    region: 'center',
+                    //    layout: 'column',
+                    //    width: 310,
+                    //    height: 200,
+                    //    items: [{
+                    //        xtype: 'ngUsefulTextArea',
+                    //        region: 'center',
+                    //        controlid: 'wf_remark',
+                    //        itemId: "wf_remark",
+                    //        name: 'SuggestValue',
+                    //        emptyText: '请输入办理意见',
+                    //        width: 150,
+                    //        height: 130
+                    //        //height:'100%'
+                    //    }, {
+                    //        xtype: 'signatureImage',
+                    //        region: 'east',
+                    //        name: 'signature',
+                    //        itemId: "signature",
+                    //        width: 140,
+                    //        height: 130,
+                    //        padding: '15 5 15 5',                            
+                    //        border: true
+                    //    }]
+                    //}],
+                    buttons: ["->", {
+                        text: '提 交',
+                        handler: function () {
+                            var remark = batchEditForm.down("#wf_remark").getValue();
+                            var singature = '';
+                            if (!Ext.isEmpty(batchEditForm.down('#signature'))) {
+                                singature = batchEditForm.down('#signature').signature
+                            }
+                            if (Ext.isEmpty(singature)) {
+                                singature = '';
+                            }
+                            var data = { 'remark': remark, 'singature': singature };
+                            batchEditWin.hide();
+                            batchEditWin.destroy();
+                            callback(data);
+                        }
+                    }, {
+                            text: '关 闭',
+                            handler: function () {
+                                batchEditWin.hide();
+                                batchEditWin.destroy();
+                            }
+                        }]
+                });
+                return batchEditWin;
+            }
+
+            //表单查询通用帮助特殊处理
+            var bizCommHelp = queryPanel.queryBy(function (i) {
+                return i.itemId == 'act_ng_bizinfo.bizid';
+            })
+            if (bizCommHelp && bizCommHelp.length > 0) {
+                bizCommHelp[0].on('beforetriggerclick', function (ctrl) {
+                    ctrl.showCommonUse = false;
+                });
+            }
+            //编辑
+            ngToolbar.get('edit').on('click', function () {
+                var id;
+                var checkedArr = sm.selected.items;
+                if (checkedArr.length < 1) {
+                    Ext.Msg.alert(RES.MSG.alertTitle, RES.MSG.selectOneTask);
+                    return;
+                }
+                if (checkedArr.length == 1) {
+                    var record = grid.getSelectionModel().getSelection();
+                    if (record.length > 0) {
+                        id = record[0].get('id_');
+                    }
+                    if (Ext.isEmpty(id)) {
+                        return;
+                    }
+
+                    //备忘录提醒
+                    if (record[0].data.url.indexOf('GYS/YS/BudgetMst/BudgetMstEdit') >= 0) {
+                        Ext.Ajax.request({
+                            params: { 'userid': $appinfo.userID, 'MenoRemind': '3' },
+                            url: C_ROOT + 'GQT/QT/QTMemo/Remind',
+                            async: false,
+                            success: function (response) {
+                                //var resp = Ext.JSON.decode(response.responseText);
+                                if (response.text == "true") {
+                                    Ext.MessageBox.confirm('提示', '系统检测到存在未处理的代办事项，是否立即前往【备忘录】办理？', callBack);
+
+                                    function callBack(callBackid) {
+                                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                                            BL();
+                                        } else {
+                                            $OpenTab('备忘录', C_ROOT + 'GQT/QT/QTMemo/QTMemoList');
+                                            return;
+                                        }
+                                    }
+                                } else {
+                                    BL();
+                                }
+
+                            }
+                        });
+                    } else if (record[0].data.url.indexOf('GXM/XM/ProjectMst/ProjectMstEdit') >= 0) {
+                        Ext.Ajax.request({
+                            params: { 'userid': $appinfo.userID, 'MenoRemind': '1' },
+                            url: C_ROOT + 'GQT/QT/QTMemo/Remind',
+                            async: false,
+                            success: function (response) {
+                                //var resp = Ext.JSON.decode(response.responseText);
+                                if (response.text == "true") {
+                                    Ext.MessageBox.confirm('提示', '系统检测到存在未处理的代办事项，是否立即前往【备忘录】办理？', callBack);
+
+                                    function callBack(callBackid) {
+                                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                                            BL();
+                                        } else {
+                                            $OpenTab('备忘录', C_ROOT + 'GQT/QT/QTMemo/QTMemoList');
+                                            return;
+                                        }
+                                    }
+                                } else {
+                                    BL();
+                                }
+
+                            }
+                        });
+                    } else {
+                        BL();
+                    }
+
+                    function BL() {
+                        if (Ext.isEmpty(record[0].data.uitype) || record[0].data.uitype != 4) {
+                            var lang = { 'openNotWebError': languageInfo.openWinInWebFram || '不支持打开非web单据！', 'alertTitle': RES.MSG.alertTitle || '提示' };
+                            $WorkFlow.setNGLang(lang);
+                            $WorkFlow.openWinFromPage(record[0].data.url, record[0].data.urlparam + "@@@@**IsWFTaskList=true", true);
+                        }
+                        else {
+                            $OpenTab(RES.taskUrlTitle, C_ROOT + record[0].data.url + '&iswftasklist=true');
+                        }
+                    }
+                }
+                else { //批量办理
+                    var taskList = [];
+                    checkedArr.forEach(function (item) {
+                        taskList.push({ 'id': item.data.id_, 'piid': item.data.proc_inst_id_, 'pi_key': item.data.pi_key });
+                    })
+                    var win = CreateBatchEditWin(function (data) {
+                        data.taskList = taskList;
+                        Ext.Msg.show({
+                            msg: RES.batchWin.progressText + '...',
+                            wait: true,
+                            progress: true,
+                            dosable: true,
+                            waitConfig: {
+                                interval: 200
+                            },
+                            icon: Ext.Msg.INFO
+                        });
+                        Ext.Ajax.request({
+                            url: C_ROOT + 'WorkFlow3/WorkFlow/BatchTaskComplete',
+                            params: { "data": data },
+                            success: function (response) {
+                                Ext.Msg.hide();
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.success) {
+                                    var respWin = createTestResultWin(resp.rspData);
+                                    respWin.show();
+                                    store.load();
+                                } else {
+                                    Ext.Msg.alert(RES.MSG.alertTitle, RES.batchWin.batchError + response.responseText);
+                                }
+                            }
+                        });
+                    });
+                    win.show();
+                    return;
+                }
+            });
+
+            ngToolbar.get('help').on('click', function () {
+                $OpenOnlineHelp('WorkFlowTaskList');
+            });
+
+
+
+            ngToolbar.get('wfbtn_terminate').on('click', function () {
+                var checkedArr = sm.selected.items;
+                var win = CreateBatchStopWin(function (data) {
+                    Ext.Msg.show({
+                        // title:'Save Changes?',
+                        msg: '正在批量终止...',
+                        wait: true,
+                        progress: true,
+                        dosable: true,
+                        waitConfig: {
+                            interval: 200
+                        },
+                        icon: Ext.Msg.INFO
+                    });
+
+                    Ext.Msg.hide();
+
+                    checkedArr.forEach(function (item) {
+
+                        Ext.Ajax.request({
+                            params: { 'data': JSON.stringify({ "bizphid": item.data.id_, "piid": item.data.proc_inst_id_, 'remark': data.remark, 'singature': data.singature }) },
+                            async: false,
+                            url: C_ROOT + 'WorkFlow3/WorkFlow/FlowTerminate',
+                            success: function (response) {
+                                var resp = Ext.JSON.decode(response.responseText);
+                                if (resp.success) {
+                                    NG3Refresh();
+                                    NGMsg.Info('终止成功！');
+
+                                } else {
+                                    Ext.MessageBox.alert('终止失败', resp.errorMsg);
+                                }
+                            }
+                        });
+                    })
+                })
+
+                win.show();
+
+            });
+
+            //Grid双击事件
+            grid.on('itemdblclick', function (view, record, item, index, e, eOpts) {
+                var btn_edit = ngToolbar.items.get('edit');
+                if (btn_edit) {
+                    btn_edit.fireEvent('click');
+                }
+            });
+
+            //store与树绑定
+            store.on('beforeload', function (store, operation, eOpts) {
+                var selectPds = pdTree.getAllChildren();
+                Ext.apply(store.proxy.extraParams, { 'pdList': selectPds });
+            });
+
+            pdTree.on("select", function (rowMode, rcd, item) {
+                store.currentPage = 1;
+                store.load();
+            });
+        });
+
+        function NG3Refresh() {
+            store.load();
+        }
+
+        function RefreshData() {
+            store.load();
+        }
+
+    </script>
+}
+
+

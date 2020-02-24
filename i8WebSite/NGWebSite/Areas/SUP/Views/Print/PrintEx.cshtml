@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = "套打";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+@section script
+{
+    <script src="@Url.Content("~/NG3/supcan/dynaload.js")" type="text/javascript" charset="gb2312"></script>
+    <script type="text/javascript">
+        var pageid = '@ViewBag.PageId';
+        var filename = '@ViewBag.FileName';
+        var tempDir = '@ViewBag.TempDir';
+        var isMoudleReady = false;  //模板已经加载完毕
+        var isPrinting = false;     //正在打印
+        var fileExists = -1;
+        var printStoreInfo = {};
+        var currentPage=1, pageCount=0,pageSize=20;
+        var extraParams = {};
+        var storeUrl;
+        var gridprintmode = "0";
+
+        var printData = [];
+        function CheckPrintFileCreated() {
+            Ext.Ajax.request({
+                params: { "filename": filename },
+                url: '@Url.Content("~/SUP/Print/CheckPrintFileCreated")',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.status === "ok") {
+                        fileExists = 1;
+                    }
+                    else {
+                        fileExists = -1;
+                    }
+                }
+            });
+        }
+        function GetPrintStoreInfo(){
+            Ext.Ajax.request({
+                params: { "filename": filename },
+                url: '@Url.Content("~/SUP/Print/GetPrintStoreInfo")',
+                success: function (response) {
+                    printStoreInfo = Ext.JSON.decode(response.responseText);
+                    currentPage = printStoreInfo.currentPage - 0;
+                    pageCount = printStoreInfo.pageCount - 0;
+                    pageSize = printStoreInfo.pageSize - 0;
+                    extraParams = printStoreInfo.extraParams;
+                    extraParams.limit = pageSize;
+                    storeUrl = printStoreInfo.url;
+                    gridprintmode = printStoreInfo.gridprintmode;
+                    if (gridprintmode == "1") {//加载所有数据
+                        LoadAllPrintData();
+                    }
+                    else
+                    {
+                        document.AFEX.func('SetSource', 'ds1\r\n' + $path(tempDir + "/" + filename + ".txt"));  //json字符串
+                        document.AFEX.func('Calc', '');
+                    }
+
+                }
+            });
+        }
+        //一次加载所有数据打印
+        function LoadAllPrintData(){
+            printData = [];
+            LoadPrintData(true, function () {
+                var json = JSON.stringify(printData);
+                document.AFEX.func('SetSource', 'ds1\r\n' + json);  //json字符串
+                document.AFEX.func('Calc', '');
+
+            });
+        }
+        //批量打印
+        function BatchPrint() {
+            isPrinting = true;
+            document.AFEX.func("BeginBatchPrint", "isShareBlankPart=true"); //直接开始批打印
+            document.AFEX.func("Print", "1");        //将参数置为“1”(选择打印机)
+            currentPage++;
+            extraParams.page = currentPage - 1;
+            LoadPrintData(true, function () {              
+                document.AFEX.func("EndBatchPrint", ""); //终止批打印：把打印任务送往打印机 
+                isPrinting = false;
+            }, function () {              
+                var json = JSON.stringify(printData);
+                document.AFEX.func('SetSource', 'ds1\r\n' + json);  //json字符串
+                document.AFEX.func('Calc', '');
+                document.AFEX.func("Print", "0");
+                printData = [];
+
+            });
+        }
+        function printAFEX() { //打印方法
+
+            store.un("load", printAFEX);
+            LoadCurrPageData();                          //加载当前页数据
+            if (store.currentPage == 1) {                //第一页
+                isPrinting = true;
+                document.AFEX.func("BeginBatchPrint", "isShareBlankPart=true"); //直接开始批打印
+                document.AFEX.func("Print", "1");        //将参数置为“1”(选择打印机)
+            }
+            else {
+                document.AFEX.func("Print", "0");        //打印当前页数据
+            }
+            if (store.currentPage < pageCount) {         //还未到最后一页，准备打印下一页数据
+                store.on("load", printAFEX);
+                store.loadPage(store.currentPage + 1);
+            }
+            else {                                       //已到最后一页
+                document.AFEX.func("EndBatchPrint", ""); //终止批打印：把打印任务送往打印机 
+                isPrinting = false;
+            }
+        }
+        function LoadPrintData(loadAll,callback,singlecallback) {
+            Ext.Ajax.request({
+                params: extraParams,
+                url: storeUrl,
+                success: function (response) {                  
+                    var resp = Ext.JSON.decode(response.responseText);
+                    Ext.Array.each(resp.Record, function (record) {                   
+                        printData.push(record);
+                    });
+                    if (singlecallback) singlecallback();
+                    if (loadAll) {
+                        if (currentPage < pageCount) {
+                            currentPage++;
+                            extraParams.page = currentPage - 1;
+                            setTimeout(function () {
+                                LoadPrintData(loadAll, callback, singlecallback);
+                            }, 50);
+                        }
+                        else {
+                            if (callback) callback();
+                        }
+                    }
+                    else {
+                        if (callback) callback();
+                    }
+                }
+            });
+
+        }
+        
+        //#region 3、报表控件的回调函数--OnReady
+        function OnReady(id) {
+            if (id == "AFEX") {
+                document.AFEX.func("SetSource", C_ROOT + 'ESB/DataServiceCenter/DataCenter');
+                var interId = setInterval(function () {
+                    if (fileExists == -1) {
+                        fileExists = 0;
+                        CheckPrintFileCreated();
+                        return;
+                    }
+                    if (fileExists == 1) {
+                        clearInterval(interId);
+                        document.AFEX.func("Build", $path(tempDir + "/" + filename + ".xml"));
+                        isMoudleReady = true;
+                        GetPrintStoreInfo();                   
+                    }
+                }, 300);
+            }
+        }
+        //#endregion
+
+        //#region 4、报表控件相关操作的回调函数--OnEvent
+        function OnEvent(id, Event, p1, p2, p3, p4) {
+            if (!isMoudleReady) {
+                document.AFEX.func("CancelEvent", ""); //阻止事件
+                return false;
+            }
+            if (id == 'AFEX' && Event == "Toolbar" && p1 == "11") {
+                if (gridprintmode == "0") {
+                    document.AFEX.func("CancelEvent", ""); //阻止系统打印事件
+                    if (isPrinting) {
+                        // Ext.MessageBox.alert('提示', "当前打印任务还未完成，请稍后再试！");
+                        document.AFEX.func("MessageBoxFloat", "当前打印任务还未完成，请稍后再试！" + "\r\n title=Warning; icon=Information; center=true");
+                        return false;
+                    }
+                    else {
+                        BatchPrint();
+
+                    }
+                } else {
+                    return true;
+                }
+            }
+            else if (id == 'AFEX' && Event == "PrintSetupBeforeUpdate") {
+                Ext.Ajax.request({
+                    url: '@Url.Content("~/SUP/Print/SetPrintSetup")',
+                    params: { ctype: cType, PrintPage: p1 },
+                    success: function (res, opts) {
+                    }
+                });
+            }
+        }
+
+        function printAFEX() { //打印方法
+
+        }
+        //#endregion
+
+        //#region 5、页面自适应相关事件
+        window.onload = function () {
+            SetPrintDivHeight();
+        }
+
+        window.onresize = function () {
+            SetPrintDivHeight();
+        }
+        function SetPrintDivHeight() {
+            var w = window, doc = document, de = 'documentElement';
+            var width = w.innerWidth ? w.innerWidth : (doc[de] && doc[de].clientWidth) ? doc[de].clientWidth : doc.body.offsetWidth;
+            var height = w.innerHeight ? w.innerHeight : (doc[de] && doc[de].clientHeight) ? doc[de].clientHeight : doc.body.offsetHeight;
+            document.getElementById("PrintDivEx").style.height = height + "px";
+        }
+        //#endregion
+    </script>
+}
+<div id="PrintDivEx" style="width: 100%; height: 20px; overflow: hidden;">
+    <script type="text/javascript">
+        insertReport('AFEX', 'Main=105,100,189,20,32,106,107;TabScrollBar=show;CollapseToolbar=true;print=11,216,18;Form=110,162,164;Property=2,112,192,144,478,382,274');
+    </script>
+</div>

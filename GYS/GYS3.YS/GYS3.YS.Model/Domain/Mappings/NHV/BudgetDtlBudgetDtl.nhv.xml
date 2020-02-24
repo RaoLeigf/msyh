@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="BudgetDtlBudgetDtlModel">
+		<property name="FDtlCode" >
+			<length min="0" max="255" message ="长度不超过255！"/>
+		</property>
+		<property name="FName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FMeasUnit" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FSourceOfFunds" >
+			<length min="0" max="30" message ="长度不超过30！"/>
+		</property>
+		<property name="FBudgetAccounts" >
+			<length min="0" max="20" message ="长度不超过20！"/>
+		</property>
+		<property name="FOtherInstructions" >
+			<length min="0" max="2000" message ="长度不超过2000！"/>
+		</property>
+		<property name="FPaymentMethod" >
+			<length min="0" max="10" message ="长度不超过10！"/>
+		</property>
+		<property name="FExpensesChannel" >
+			<length min="0" max="200" message ="长度不超过10！"/>
+		</property>
+		<property name="FFeedback" >
+			<length min="0" max="200" message ="长度不超过200！"/>
+		</property>
+    <property name="FQtZcgnfl" >
+      <length min="0" max="20" message ="长度不超过20！"/>
+    </property>
+	</class>
+</nhv-mapping>

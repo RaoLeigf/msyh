@@ -1,0 +1,31 @@
+
+引用路径替换
+E:\SRC\NG3\NG3_Business\SuitCode\G6H\BusinessDlls\
+-> E:\SRC\NG3\NG3_Business\SuitCode\G6H_5.1RC2\BusinessDlls\
+
+
+protected override string BillNoIdentity { get; set; }
+-> 删除
+
+NG3.0 5.0-5.1RC2
+base.DataHandlingPrimaryKey
+-> base.RuleHelper.DataHandlingPrimaryKey
+
+base.DataHandlingForeignKey
+-> base.RuleHelper.DataHandlingForeignKey
+
+
+DeleteByForeignKey
+-》 RuleHelper.DeleteByForeignKey
+
+base.LoadWithPage
+-> base.FacadeHelper.LoadWithPage
+
+base.LoadWithPageInfinity
+-> base.ServiceHelper.LoadWithPageInfinity
+
+Save<Int64>(mstforminfo.AllRow)
+-> Save<Int64>(mstforminfo.AllRow,"")
+
+base.Find
+-> base.ServiceHelper.Find

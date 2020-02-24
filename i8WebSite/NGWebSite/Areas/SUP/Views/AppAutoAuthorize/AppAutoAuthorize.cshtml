@@ -1,0 +1,235 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@section Script
+{
+    <script type="text/javascript">
+
+        var panel;
+        var itemsPerPage = 20;//grid列表每页显示二十条
+        var ngtoolbar;//初始化设置会比选项设置多一个按钮
+
+        Ext.onReady(function () {
+
+            Ext.define('gridModel', {
+                extend: 'Ext.data.Model',
+                fields: [{
+                    name: 'phid',
+                    type: 'string',
+                    mapping: 'phid'
+                }, {
+                    name: 'role',
+                    type: 'string',
+                    mapping: 'role'
+                }, {
+                    name: 'rolename',
+                    type: 'string',
+                    mapping: 'rolename'
+                }, {
+                    name: 'autoauthorize',
+                    type: 'boolean',
+                    mapping: 'autoauthorize'
+                }, {
+                    name: 'multipledeviceuse',
+                    type: 'boolean',
+                    mapping: 'multipledeviceuse'
+                }
+                ]
+            });
+
+            var gridStore = Ext.create('Ext.data.Store', { //可以加排序函数对数据排序
+                model: 'gridModel',
+                autoLoad: true,
+                pageSize: itemsPerPage,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/AppAutoAuthorize/GetAppAutoAuthorizeList',
+                    reader: {
+                        type: 'json',
+                        root: 'Record',
+                        totalProperty: 'totalRows'
+                    }
+                }
+            });
+
+            gridStore.on('beforeload', function (store, operation, eOpts) {
+                Ext.apply(store.proxy.extraParams, { 'rolename': ngToolbar.get('query').value });
+            });
+
+            ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                height: 30,
+                ngbuttons: ['addrow', 'deleterow', 'save', {
+                    width: 120,
+                    xtype: 'textfield',
+                    itemId: 'query',
+                    name: 'queryname',
+                    emptyText: '搜索内容',
+                    enableKeyEvents: true,
+                },
+                'location', '->', 'close'],
+            });
+
+
+            //var pagingbar = Ext.create('Ext.ng.PagingBar', {
+            //    store: gridStore
+            //});
+
+            var roleHelp = Ext.create("Ext.ng.RichHelp", {
+                fieldLabel: '查询字段',
+                name: 'searchfield',
+                itemId: 'searchfield',
+                id: 'searchfield',
+                helpid: 'fg3_role',
+                valueField: 'phid',
+                displayField: 'rolename',
+                //displayFormat: 'rolename',
+                listFields: 'c_name',
+                listHeadTexts: '查询字段',
+                ORMMode: false,
+                mustInput: true,
+                acceptInput: true, //接受用户自由输入
+                //editable: false,
+                //tabIndex: 1,
+                anchor: '100%',
+                flex: 1,
+            });
+
+            var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                store: gridStore,
+                tbar: ngToolbar,
+                buskey: 'phid',
+                stateful: true,
+                stateId: '8e439b45-8c96-4193-b1f4-64e867ec60a1',
+                columns: [
+                    { header: '', dataIndex: 'phid', sortable: true, editable: false, hidden: true },
+                    { header: '', dataIndex: 'role', sortable: true, editable: false, hidden: true },
+                    {
+                        header: '角色', dataIndex: 'rolename', flex: 1, sortable: true, editable: false,
+                        editor: {
+                            xtype: 'ngRichHelp',
+                            //fieldLabel: '角色',
+                            name: 'searchfield',
+                            itemId: 'searchfield',
+                            id: 'searchfield',
+                            helpid: 'fg3_role',
+                            valueField: 'phid',
+                            displayField: 'rolename',
+                            //displayFormat: 'rolename',
+                            listFields: 'c_name',
+                            listHeadTexts: '查询字段',
+                            ORMMode: false,
+                            mustInput: true,
+                            acceptInput: true, //接受用户自由输入
+                            isInGrid: true,
+                            //tabIndex: 1,
+                            anchor: '100%',
+                            flex: 1,
+                            listeners: {
+                                helpselected: function (obj) {
+
+                                    for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                                        if (gridPanel.store.data.items[i].raw.role == obj.code) {
+                                            Ext.MessageBox.alert('提示', '该角色已存在！');
+                                            return;
+                                        }
+                                    }
+                                    var data = this.findParentByType('ngGridPanel').getSelectionModel().getSelection();
+                                    data[0].set('rolename', obj.name);
+                                    data[0].set('role', obj.code);
+                                },
+                                beforetriggerclick: function () {
+
+                                }
+                            },
+                        }
+                    },
+                    { xtype: 'checkcolumn', header: '允许自动分配', width: 80, dataIndex: 'autoauthorize', sortable: false, flex: 1 },
+                    { xtype: 'checkcolumn', header: '允许账号多设备使用', width: 80, dataIndex: 'multipledeviceuse', sortable: false, flex: 1 },
+                ],
+                plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1,
+                    })
+                ],
+            });
+
+            //新增
+            ngToolbar.get('addrow').on('click', function () {
+
+                var p = new Object({
+                    role: '角色',
+                    autoauthorize: 0,
+                    multipledeviceuse: 0,
+                });
+                gridPanel.store.add(p);
+
+            })
+
+            //删除
+            ngToolbar.get('deleterow').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选中你要删除的行！');
+                }
+                else {
+                    gridPanel.store.remove(gridPanel.getSelectionModel().getSelection()[0]);
+                    check = false;
+                }
+            })
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+
+                for (var i = 0; i < gridPanel.store.getCount() ; i++) {
+                    if (!gridPanel.store.data.items[i].data.autoauthorize && !gridPanel.store.data.items[i].data.multipledeviceuse) {
+                        Ext.MessageBox.alert('提示', '请至少选中一项！');
+                        return;
+                    }
+                }
+
+                var gridData = gridPanel.getChange();
+                if (gridData.indexOf("modifiedRow") > 0 || gridData.indexOf("newRow") > 0 || gridData.indexOf("deletedRow") > 0) {
+                    var myMask = new Ext.LoadMask(document.body, { msg: "正在保存中,请稍候..." });
+                    myMask.show();
+                    Ext.Ajax.request({
+                        url: C_ROOT + 'SUP/AppAutoAuthorize/Save',
+                        params: { "gridData": gridData },
+                        success: function (response) {
+                            myMask.hide();
+                            if (response.text > 0) {
+                                check = true;
+                                Ext.MessageBox.alert('提示', '保存成功');
+                                gridPanel.store.reload();
+                            }
+                        },
+                        failure: function (response) {
+                            myMask.hide();
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    });
+                }
+                else {
+                    Ext.MessageBox.alert('提示', '数据没有更改!');
+                }
+            })
+
+            ngToolbar.get('location').on('click', function () {
+                gridPanel.store.load();
+            })
+
+            Ext.create('Ext.container.Viewport', {
+                title: 'Border Layout',
+                layout: 'border',
+                items: gridPanel
+            });
+
+        });
+
+    </script>
+}
+
+

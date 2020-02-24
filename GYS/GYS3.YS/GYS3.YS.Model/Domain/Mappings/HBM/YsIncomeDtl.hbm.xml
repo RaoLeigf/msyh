@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GYS3.YS.Model.Domain" assembly="GYS3.YS.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="YsIncomeDtlModel" table="ys3_incomedtl">
+		<id name="PhId" access="property" column="Phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="Mst_Phid" type="System.Int64" not-null="false" />
+		<property name="FSubjectCode" column="F_subjectCode" type="System.String" length="100" not-null="false" />
+		<property name="FSubjectname" column="F_subjectname" type="System.String" length="100" not-null="false" />
+		<property name="FSubitemid" column="F_Subitemid" type="System.Int64" not-null="false" />
+		<property name="FSubitemCode" column="F_SubitemCode" type="System.String" length="100" not-null="false" />
+    <property name="FSubitemName" column="F_SubitemName" type="System.String" length="100" not-null="false" />
+		<property name="FBudgetamount" column="F_budgetamount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="FBudgetid" column="F_budgetid" type="System.Int64" not-null="false" />
+		<property name="FBudgetcode" column="F_budgetcode" type="System.String" length="100" not-null="false" />
+		<property name="FFormation" column="F_formation" type="System.String" length="100" not-null="false" />
+		<property name="FProcessStatus" column="F_ProcessStatus" type="System.String" length="100" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

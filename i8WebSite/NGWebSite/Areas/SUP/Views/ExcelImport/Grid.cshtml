@@ -1,0 +1,173 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section script
+{
+    <script type="text/javascript">
+        var tableName = '@ViewBag.tableName';
+        var gridPanel;
+        Ext.onReady(function () {
+
+            //加载数据
+            Ext.Ajax.request({
+                //url: 'GetFieldNames',
+                url: 'GetColumInfoAndData',
+                params: {
+                    tableName: tableName
+                },
+                success: function (response) {
+                    var res = Ext.JSON.decode(response.responseText);
+
+                    if (res.status == false) {
+
+                        window.parent.CloseTab(tableName, res.message);
+                        return;
+                    }
+                    //debugger;
+                    var json = res.data.columinfo;//列信息
+                    var fields = json.fieldNames;
+                    var gridConfig = json.columnNames;
+                    var buskeyInfo = json.buskeyInfo;
+                    if (buskeyInfo == null) {
+                        buskeyInfo = 'phid';
+                    }
+                    //处理列的editor
+                    for (var i = 0; i < gridConfig.length; i++) {
+                        var col = gridConfig[i];
+                        var editor = col.editor;
+                        if (editor) {
+                            var listener = editor.listeners;
+                            if (listener) {
+                                for (var index in listener) {
+                                    if (index) {
+                                        var s = listener[index];
+                                        if (Ext.isString(s)) {
+                                            listener[index] = Ext.decode(s);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (col.renderer) {
+                            if (Ext.isString(col.renderer)) {
+                                col.renderer = Ext.decode(col.renderer);
+                            }
+                        }
+
+                    }
+
+                    var columns = gridConfig;
+                    var tbar = [
+                                { xtype: 'button', text: '增行', iconCls: 'add', handler: AddRow },
+                                { xtype: 'button', text: '删行', iconCls: 'delete', handler: DeleteRow },
+                                //'->',
+                                //{
+                                //    xtype: 'button', text: "保存Excel数据到服务端", id: 'submit', iconCls: 'icon-save',
+                                //    handler: SubmitExcelData
+                                //},
+                    ];
+
+                    Ext.define('gridModel', {
+                        extend: 'Ext.data.Model',
+                        idProperty: 'abcd',
+                        fields: fields,
+                    });
+
+                    store = Ext.create('Ext.data.Store', {
+                        id: 'store',
+                        //pageSize: 25,
+                        //proxy: {
+                        //    type: 'ajax',
+                        //    url: 'GetExcelData?tableName=' + tableName,
+                        //    reader: {
+                        //        type: 'json',
+                        //        totalProperty: 'totalRows',
+                        //        root: 'Record'
+                        //    },
+                        //},
+                        model: gridModel,
+                    });
+                    //store.load();
+                    store.loadData(res.data.exceldata);//数据信息,和列信息一起获取下来
+
+                    var celledit = Ext.create('Ext.grid.plugin.CellEditing', { clicksToEdit: 1 });
+                    var rowedit = Ext.create('Ext.grid.plugin.RowEditing', {
+                        clicksToMoveEditor: 1,
+                        autoCancel: true
+                    });
+
+
+                    //Ext.getCmp("pagingbar").bindStore(store);
+                    //Ext.getCmp(tableName).reconfigure(store, columns);
+
+                    gridPanel = Ext.create('Ext.ng.GridPanel', {
+                        id: tableName,
+                        buskey: buskeyInfo,
+                        store: store,
+                        region: 'center',
+                        padding: 0,
+                        columnLines: true,
+                        //selType: 'rowmodel',
+                        plugins: [celledit, { ptype: 'bufferedrenderer' }], // bufferedrenderer插件分屏显示，数据量大也不卡
+                        columns: columns,
+                        viewConfig: {
+                            forceFit: true,
+                            scrollOffset: 0
+                        },
+                        tbar: tbar,
+                    });
+
+                    //创建Viewport
+                    Ext.create('Ext.container.Viewport', {
+                        renderTo: Ext.getBody(),
+                        layout: 'border',
+                        padding: 0,
+                        items: [
+                            gridPanel,
+                        ]
+                    });
+                }
+            });
+
+            function CloseTab(id) {
+                if (tabMain.getComponent(id)) {
+                    tabMain.remove(panel);
+                }
+            }
+
+            //grid中新增一行
+            function AddRow() {
+                store.insert(0, new gridModel());
+                gridPanel.getView().refresh();
+            };
+            //grid删除一行
+            function DeleteRow() {
+                var selectModel = gridPanel.getSelectionModel();
+                if (selectModel.hasSelection()) {
+                    var selected = selectModel.getSelection();
+                    gridPanel.getStore().remove(selected);
+                    gridPanel.getView().refresh();
+
+                }
+            };
+
+        });
+
+        var getData = function () {
+            if (typeof (gridPanel) == 'undefined') {
+                //Ext.MessageBox.alert('提示', '你要保存的数据不正确，请重新导入文件');
+                return 'error';
+            } else {
+                if (gridPanel.isValid()) {
+                    return gridPanel.getAllGridData();
+                }
+            }
+        }
+
+
+    </script>
+
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GGK3.GK.Rule.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GGK3.GK.Rule.Interface.IGKPaymentDtlRule">
+            <summary>
+            GKPaymentDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GGK3.GK.Rule.Interface.IGKPaymentMstRule">
+            <summary>
+            GKPaymentMst业务逻辑层接口
+            </summary>
+        </member>
+    </members>
+</doc>

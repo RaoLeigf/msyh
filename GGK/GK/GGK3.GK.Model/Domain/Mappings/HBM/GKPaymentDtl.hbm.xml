@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping namespace="GGK3.GK.Model.Domain" assembly="GGK3.GK.Model" xmlns="urn:nhibernate-mapping-2.2">
+	<class name="GKPaymentDtlModel" table="gk3_payment_dtl">
+		<id name="PhId" access="property" column="phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="OrgPhid" column="org_phid" type="System.Int64" not-null="false" />
+		<property name="OrgCode" column="org_code" type="System.String" length="50" not-null="false" />
+		<property name="RefbillPhid" column="refbill_phid" type="System.Int64" not-null="false" />
+		<property name="RefbillCode" column="refbill_code" type="System.String" length="50" not-null="false" />
+		<property name="RefbillDtlPhid" column="refbill_dtl_phid" type="System.Int64" not-null="false" />
+		<property name="RefbillDtlPhid2" column="refbill_dtl_phid2" type="System.Int64" not-null="false" />
+		<property name="FAmount" column="f_amount" type="System.Decimal" not-null="false" />
+		<property name="FCurrency" column="f_currency" type="System.String" length="10" not-null="false" />
+		<property name="FPayAcntname" column="f_pay_acntname" type="System.String" length="100" not-null="false" />
+		<property name="FPayAcnt" column="f_pay_acnt" type="System.String" length="50" not-null="false" />
+		<property name="FPayBankcode" column="f_pay_bankcode" type="System.String" length="50" not-null="false" />
+		<property name="FRecAcntname" column="f_rec_acntname" type="System.String" length="100" not-null="false" />
+		<property name="FRecAcnt" column="f_rec_acnt" type="System.String" length="50" not-null="false" />
+		<property name="FRecBankcode" column="f_rec_bankcode" type="System.String" length="50" not-null="false" />
+		<property name="FRecCityname" column="f_rec_cityname" type="System.String" length="100" not-null="false" />
+		<property name="FSamecity" column="f_samecity" type="System.Byte" not-null="false" />
+		<property name="FSamebank" column="f_samebank" type="System.Byte" not-null="false" />
+		<property name="FIsurgent" column="f_isurgent" type="System.Byte" not-null="false" />
+		<property name="FCorp" column="f_corp" type="System.Byte" not-null="false" />
+		<property name="FUsage" column="f_usage" type="System.String" length="10" not-null="false" />
+		<property name="FPostscript" column="f_postscript" type="System.String" length="60" not-null="false" />
+		<property name="FExplation" column="f_explation" type="System.String" length="20" not-null="false" />
+		<property name="FDescribe" column="f_describe" type="System.String" length="500" not-null="false" />
+		<property name="FSubmitdate" column="f_submitdate" type="System.DateTime" not-null="false" />
+		<property name="FSeqno" column="f_seqno" type="System.String" length="50" not-null="false" />
+		<property name="FBkSn" column="f_bk_sn" type="System.String" length="50" not-null="false" />
+		<property name="FResult" column="f_result" type="System.String" length="10" not-null="false" />
+		<property name="FResultmsg" column="f_resultmsg" type="System.String" length="200" not-null="false" />
+		<property name="FState" column="f_state" type="System.Byte" not-null="false" />
+		<property name="FNewCode" column="f_new_code" type="System.String" length="50" not-null="false" />
+		<property name="QtKmdm" column="qt_kmdm" type="System.String" length="50" not-null="false" />
+		<property name="QtKmmc" column="qt_kmmc" type="System.String" length="100" not-null="false" />
+		<property name="FPayCityname" column="f_pay_cityname" type="System.String" length="100" not-null="false" />
+		<property name="FPayBankname" column="f_pay_bankname" type="System.String" length="100" not-null="false" />
+		<property name="FRecBankname" column="f_rec_bankname" type="System.String" length="100" not-null="false" />
+		<property name="OldMstPhid" column="old_mst_phid" type="System.Int64" not-null="false" />
+		<property name="OldDtlPhid" column="old_dtl_phid" type="System.Int64" not-null="false" />
+		<property name="BankPhid" column="bank_phid" type="System.Int64" not-null="false" />
+		<property name="FIseqno" column="f_iseqno" type="System.String" length="50" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	</class>
+</hibernate-mapping>

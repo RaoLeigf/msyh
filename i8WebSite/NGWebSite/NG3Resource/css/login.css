@@ -1,0 +1,54 @@
+﻿        body
+        {
+            margin: 0px;
+            padding: 0px;
+            font-size: 12px;
+            font-family: Tahoma,Verdana,微软雅黑,新宋体;
+        }
+       .container
+        {
+            width: 960px;
+           margin: 40px auto;
+        }
+        .header
+        {
+            height: 60px;
+            top:10px;
+            position: relative;
+            background-image: url("../../resource/pic/newgrand.gif");
+            background-repeat: no-repeat;
+        }
+        .content
+        {
+            height: 600px;
+            position: relative;
+            background-image: url("../../resource/pic/login.jpg?ver=3");
+            background-repeat: no-repeat;
+        }
+        .rightsave
+        {
+            z-index: 2;
+            position: absolute;
+            right: 65px;
+            top: 480px;
+            width: 386px;
+            height: 37px;
+        }
+        .logo
+        {
+            z-index: 2;
+            position: absolute;
+            left: 65px;
+            top: 40px;
+            width: 457px;
+            height: 317px;
+        }
+        .login
+        {
+            z-index: 2;
+            position: absolute;
+            right: 145px;
+            top: 150px;
+            width: 275px;
+            height: 200px;
+        }

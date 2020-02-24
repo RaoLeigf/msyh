@@ -1,0 +1,357 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{ 
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GQT/QT/QTMemoEdit.js") type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (!langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+	    var pageName = '@ViewBag.Title';
+        var store;//Grid数据源
+		var deletedata = [];
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'addrow', 'deleterow','save',
+					{ id: "bj", text: "编辑", width: this.itemWidth, iconCls: "icon-Edit"},
+                    '->', 'close'
+                ]
+            });
+
+			var fields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "MenoStatus",
+    "type": "string",
+    "mapping": "MenoStatus"
+  },
+  {
+    "name": "MenoName",
+    "type": "string",
+    "mapping": "MenoName"
+  },
+  {
+    "name": "MenoRemind",
+    "type": "string",
+    "mapping": "MenoRemind"
+  },
+  {
+    "name": "WordPhid",
+    "type": "string",
+    "mapping": "WordPhid"
+  },
+  {
+    "name": "BZ",
+    "type": "string",
+    "mapping": "BZ"
+  },
+  {
+    "name": "Creator",
+    "type": "string",
+    "mapping": "Creator"
+  },
+  {
+    "name": "NgRecordVer",
+    "type": "int",
+    "mapping": "NgRecordVer"
+  }
+];
+			var modelFileds = $MergIndividualModelCol(fields, individualInfo, 'Grid');//合并model
+
+			//定义模型
+			Ext.define('model', {
+				extend: 'Ext.data.Model',
+				fields: modelFileds
+			});          
+
+            store = Ext.create('Ext.ng.JsonStore', {
+                model: 'model',
+                pageSize: 25,
+				autoLoad: true,
+                url: C_ROOT + 'GQT/QT/QTMemo/GetQTMemoList?userId=' + $appinfo.userID
+            });
+
+            var pagingbar = Ext.create('Ext.ng.PagingBar', {
+                store: store
+            });
+
+			var initConfig = {
+				region: 'center',             
+				store: store,
+				columnLines: true,
+				stateful: true,
+				stateId: 'fc31b4ce-6c71-411e-9efc-381dff943e2a',   
+				buskey: 'PhId', //对应的业务表主键属性         
+				layout: {
+					type: 'hbox',
+					align: 'stretch'
+				},            
+				viewConfig: {
+					forceFit: true,
+					scrollOffset: 0
+				},
+				plugins: [
+                    Ext.create('Ext.grid.plugin.CellEditing', {
+                        clicksToEdit: 1    //单击编辑，单元格修改
+                        //autoEncode: false  //不解析成html
+                    })
+                ],
+				bbar: [pagingbar]
+			};
+ 
+			var gridConfig = Ext.apply(initConfig,individualInfo.grid['Grid']);
+			var grid = Ext.create('Ext.ng.GridPanel',gridConfig);
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                id: "viewPort",
+                layout: 'border',
+				items: [ngToolbar, grid]
+            });
+
+
+			/*
+            //新增
+            ngToolbar.get('add').on('click', function () {
+                $OpenTab(pageName + '-新增', C_ROOT + 'GQT/QT/QTMemo/QTMemoEdit?otype=add');
+            });
+
+            //修改
+            ngToolbar.get('edit').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+                
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-修改', C_ROOT + 'GQT/QT/QTMemo/QTMemoEdit?otype=edit&id=' + id);
+                }
+            });
+
+			//删除
+            ngToolbar.get('delete').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    recoderefresh(data);
+                
+                    Ext.MessageBox.confirm('提示', '是否删除此记录？', callBack);
+
+                    function callBack(callBackid) {
+                        if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                            return;
+                        } else {
+                            Ext.Ajax.request({
+                                params: { 'id': data[0].get('PhId') },
+                                url: C_ROOT + 'GQT/QT/QTMemo/Delete',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp.Status === "success") {
+
+                                        Ext.Array.each(data, function (record) {
+                                            store.remove(record); //前端删除
+                                        });
+
+                                        NGMsg.Info('删除成功！');
+                                    } else {
+                                        NGMsg.Info('删除失败！');
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            //查看
+            ngToolbar.get('view').on('click', function () {
+                var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+                    var id = data[0].get('PhId');
+                    $OpenTab(pageName + '-查看', C_ROOT + 'GQT/QT/QTMemo/QTMemoEdit?otype=view&id=' + id);
+                }
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+				$Print("PrintTest1", grid, "列表");
+            });
+			*/
+			//编辑
+			ngToolbar.get('bj').on('click', function () {
+				var data = grid.getSelectionModel().getSelection();
+
+                if (data.length > 0) {
+					var phid=data[0].get('PhId');
+                    var WordPhid = data[0].get('WordPhid');
+					if(WordPhid!='' && WordPhid!='0')
+					{
+						$OpenTab('备忘录-修改', C_ROOT + 'GQT/QT/QTMemo/BwlEdit?otype=edit&id=' + WordPhid);
+					}else{
+						$OpenTab('备忘录-新增', C_ROOT + 'GQT/QT/QTMemo/BwlEdit?otype=add&no=' + phid);
+					}
+                }
+			});
+			
+			//增行
+            ngToolbar.items.get('addrow').on('click', function () {
+                //var data = grid.getSelectionModel().getSelection();
+                
+
+                //if (data.length > 0) {
+                    var model1 = grid.getSelectionModel();
+                    var rowid = store.getCount();
+
+                    store.insert(rowid, model1);
+                //}
+            });
+
+            //删行
+            ngToolbar.items.get('deleterow').on('click', function () {
+                var selection = grid.getSelectionModel().getSelection();
+                var phid = selection[0].data.PhId;
+                if (!phid || phid.length == 0) {
+
+                } else {
+                    deletedata.push(selection[0].data.PhId);
+                }
+                store.remove(selection);
+
+            });
+			
+			 //保存
+            ngToolbar.items.get('save').on('click', function () {
+                var adddata = [];
+                var updatedata = [];
+                for (var i = 0; i < store.getModifiedRecords().length; i++) {
+                    var phid = store.getModifiedRecords()[i].data.PhId;
+                    var MenoStatus = store.getModifiedRecords()[i].data.MenoStatus;//状态
+                    var MenoName = store.getModifiedRecords()[i].data.MenoName;//标题
+                    var MenoRemind = store.getModifiedRecords()[i].data.MenoRemind;//提醒方式
+					MenoRemind=MenoRemind.replace(/项目送审时/g,'0');
+					MenoRemind=MenoRemind.replace(/项目审批时/g,'1');
+					MenoRemind=MenoRemind.replace(/年中调整送审时/g,'2');
+					MenoRemind=MenoRemind.replace(/年中调整审批时/g,'3');
+					var BZ = store.getModifiedRecords()[i].data.BZ;//备注
+                    if (!phid || phid.length == 0) {
+                        adddata.push({ 'MenoStatus': MenoStatus, 'MenoName': MenoName, 'MenoRemind': MenoRemind, 'BZ': BZ });
+                    } else {
+                        updatedata.push({ 'PhId': phid, 'MenoStatus': MenoStatus, 'MenoName': MenoName, 'MenoRemind': MenoRemind, 'BZ': BZ});
+                    }
+                    
+                }
+                Ext.Ajax.request({
+                    params: { "adddata": adddata, "updatedata": updatedata,"deletedata":deletedata },
+                    url: C_ROOT + 'GQT/QT/QTMemo/Save2',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            Ext.MessageBox.alert('提示', '保存成功');
+                            store.load();
+                            deletedata = [];
+                        } else {
+                            Ext.MessageBox.alert('提示', '保存失败');
+                        }
+                    }
+                });
+
+            })
+			
+			//代码转名称
+            grid.getColumn('MenoStatus').renderer = function (val) {
+                switch (val) {
+                    case "1":
+                        return "已处置";
+                    case "0":
+                        return "未处置";
+                }
+            };
+			grid.getColumn('MenoRemind').renderer = function (val) {
+				/*var data=val.split(',');
+				var showdata=["项目送审时","项目审批时","年中调整送审时","年中调整审批时"];
+				var show;
+				for(var i=0;i<data.length;i++){
+					show +=showdata[data[i]]
+				}
+				return show;*/
+				val=val.replace(/0/g,'项目送审时');
+				val=val.replace(/1/g,'项目审批时');
+				val=val.replace(/2/g,'年中调整送审时');
+				val=val.replace(/3/g,'年中调整审批时');
+				return val;
+                /*switch (val) {
+                    
+                    case "0":
+                        return "项目送审时";
+					case "1":
+                        return "项目审批时";
+					case "2":
+                        return "预算送审时";
+					case "3":
+                        return "预算审批时";
+                }*/
+            };
+			
+			grid.on('beforeedit', function (editor, e, eOpts) {
+				if(e.field=="MenoRemind"&&e.value!=undefined)
+				{
+					e.value=e.value.replace(/0/g,'项目送审时');
+					e.value=e.value.replace(/1/g,'项目审批时');
+					e.value=e.value.replace(/2/g,'年中调整送审时');
+					e.value=e.value.replace(/3/g,'年中调整审批时');
+				}
+				//debugger;
+				//if (??) return false;
+			});
+			
+			//刷新列表中想修改或删除的行数据
+            var recoderefresh = function (data) {
+                var jsonStr = "{PhId:" + data[0].get('PhId') + "}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+					url: C_ROOT + 'GQT/QT/QTMemo/GetQTMemoList',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            Ext.apply(data[0].data, resp.Record[0]);
+                            grid.getView().refresh(true);
+                        }
+                    }
+                });
+            };
+
+        });
+
+		function NG3Refresh() {
+            store.load();
+        }
+
+    </script>
+}
+
+

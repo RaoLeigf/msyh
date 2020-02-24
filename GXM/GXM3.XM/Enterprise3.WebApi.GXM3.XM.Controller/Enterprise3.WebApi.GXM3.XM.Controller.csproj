@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DB48DEDD-1A6A-4117-B061-AB468744AAFB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Enterprise3.WebApi.GXM3.XM.Controller</RootNamespace>
+    <AssemblyName>Enterprise3.WebApi.GXM3.XM.Controller</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Enterprise3.WebApi.GXM3.XM.Controller.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Enterprise3.Common.Base, Version=1.0.15.4500, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.Common.Model, Version=1.0.15.4500, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.Common.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Base, Version=1.0.15.4500, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Enterprise3.NHORM.Interface, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll</HintPath>
+    </Reference>
+    <Reference Include="Enterprise3.NHORM.Service, Version=1.0.15.4500, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Enterprise3.WebApi.ApiControllerBase, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\Enterprise3.WebApi.ApiControllerBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="SUP.Common.Base">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataAccess">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="SUP.Common.DataEntity">
+      <HintPath>..\..\..\BusinessDlls\SUP.Common.DataEntity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDlls\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDllsApi\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ProjectMstApiController.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportMstApiController.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GData\Common\GData3.Common.Utils\GData3.Common.Utils.csproj">
+      <Project>{A4DA9236-7F50-4C27-B4C7-2B3F051E0FC1}</Project>
+      <Name>GData3.Common.Utils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Service.Interface\GQT3.QT.Service.Interface.csproj">
+      <Project>{B481911F-AF15-4453-BBE8-D0E72B33A4CC}</Project>
+      <Name>GQT3.QT.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Service\GQT3.QT.Service.csproj">
+      <Project>{3D439830-7810-4DEE-A0DF-5786F298E819}</Project>
+      <Name>GQT3.QT.Service</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GSP\SP\Enterprise3.WebApi.GSP3.SP.Model\Enterprise3.WebApi.GSP3.SP.Model.csproj">
+      <Project>{8E7FDDB9-8FED-40ED-8742-8B5CB47E479E}</Project>
+      <Name>Enterprise3.WebApi.GSP3.SP.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GSP\SP\GSP3.SP.Model\GSP3.SP.Model.csproj">
+      <Project>{259AD850-29EA-46A1-80C7-DCD20149220A}</Project>
+      <Name>GSP3.SP.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GSP\SP\GSP3.SP.Service.Interface\GSP3.SP.Service.Interface.csproj">
+      <Project>{BF6674C1-A5DE-476C-A9FB-E24F6DB0B7A1}</Project>
+      <Name>GSP3.SP.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\Enterprise3.WebApi.GYS3.YS.Model\Enterprise3.WebApi.GYS3.YS.Model.csproj">
+      <Project>{05EF7A66-99AC-498B-84E3-23223A8E2406}</Project>
+      <Name>Enterprise3.WebApi.GYS3.YS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\GYS3.YS.Model\GYS3.YS.Model.csproj">
+      <Project>{DD639BB1-92FC-4DA9-A0A0-C5F1AC91B7F5}</Project>
+      <Name>GYS3.YS.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\GYS\GYS3.YS\GYS3.YS.Service.Interface\GYS3.YS.Service.Interface.csproj">
+      <Project>{3A283FB2-32B7-4114-B5D9-9DB4B265583E}</Project>
+      <Name>GYS3.YS.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Enterprise3.WebApi.GXM3.XM.Model\Enterprise3.WebApi.GXM3.XM.Model.csproj">
+      <Project>{422da3ae-3e7c-427c-adbe-518a9c9023ed}</Project>
+      <Name>Enterprise3.WebApi.GXM3.XM.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GXM3.XM.Model\GXM3.XM.Model.csproj">
+      <Project>{229f2520-c7ca-4086-9da9-cccc9abe0f75}</Project>
+      <Name>GXM3.XM.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GXM3.XM.Service.Interface\GXM3.XM.Service.Interface.csproj">
+      <Project>{1a34edef-eec3-469f-a603-09eb6ff72363}</Project>
+      <Name>GXM3.XM.Service.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GXM3.XM.Service\GXM3.XM.Service.csproj">
+      <Project>{a197a976-d7d8-4b9e-9a20-1fcab5ef900b}</Project>
+      <Name>GXM3.XM.Service</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\..\BusinessDlls\Enterprise3.Common.Model.dll" />
+    <Analyzer Include="..\..\..\BusinessDlls\Enterprise3.NHORM.Interface.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)WebSite\NG3WebSite\bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).pdb $(SolutionDir)BusinessDlls\Bin /r/y
+xcopy $(TargetDir)$(TargetName).dll $(SolutionDir)i8WebSite\WebApiSite\bin\ /r/y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

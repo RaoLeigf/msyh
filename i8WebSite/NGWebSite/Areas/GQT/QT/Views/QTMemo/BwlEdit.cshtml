@@ -1,0 +1,408 @@
+﻿@using NG3.Web.Controller.Extensions
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    #webofficeiframe {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
+@section Script
+{
+    <script type="text/javascript" src="@Url.Script("~/NG3Resource/js/WM/WMHelp.js")"></script>
+    <script type="text/javascript">
+        var langInfo = Ext.htmlDecode('@ViewBag.NG3Lang');
+        var Lang = Ext.isEmpty(langInfo) ? {} : Ext.decode(langInfo); //自定义
+
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        var type = '@ViewBag.Type';
+        var busno = '@ViewBag.No';
+        var kingGridUrl = '';
+        var mutAdd = false;
+        Ext.useShims = true;
+
+        function RefreshList() {
+            if (window.external.RefreshWebListPage != undefined) {
+                window.external.RefreshWebListPage();
+            } else {
+                $NG3Refresh();
+            }
+        }
+
+        Ext.onReady(function () {
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    'save', { id: 'book', text: '添加标签', iconCls: "icon-Verify" }, '->', 'close'
+                ]
+            });
+			ngToolbar.get('book').hide();
+            var mstform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 400,
+                autoScroll: true,
+                buskey: 'PhId', //对应的业务表主键属性
+                otype: otype, //操作类型,add||edit||view
+                columnsPerRow: 2,
+                fieldDefaults: {
+                    labelWidth: 87,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                fields: [
+                     {
+                         xtype: 'ngText',
+                         fieldLabel: Lang.Cno ||'模板编号',
+                         name: 'Cno',
+                         itemId: 'Cno',
+                         readOnly: false,
+                         mustInput: true,
+                         colspan: 1,
+						 hidden:true
+                     }, {
+                         xtype: 'ngText',
+                         fieldLabel: Lang.Cname ||'备忘录名称',
+                         name: 'Cname',
+                         itemId: 'Cname',
+                         readOnly: false,
+                         mustInput: true,
+                         colspan: 1
+                     }, {
+                         xtype: 'ngComboBox',
+                         fieldLabel: Lang.Filetype || '文档类型',
+                         name: 'Filetype',
+                         itemId: 'Filetype',
+                         queryMode: 'local', //local指定为本地数据,如果是后台传输则值为remote
+                         mustInput: true,
+                         value: "1",
+                         valueField: 'value',
+                         displayField: 'code',
+                         data: [
+                             {
+                                 code: 'Word文档(*.doc)',
+                                 value: '1'
+                             }, {
+                                 code: 'Excel文档(*.xls)',
+                                 value: '2'
+                             }
+                         ],
+                         colspan: 1,
+						 hidden:true
+                     }, {
+                         xtype: 'ngRichHelp',
+                         fieldLabel: Lang.PhidOrg || '录入组织',
+                         name: 'PhidOrg',
+                         itemId: 'PhidOrg',
+                         helpid: 'fg_orglist',
+                         //outFilter: {},
+                         ORMMode: true,
+                         valueField: 'PhId',
+                         displayField: 'OName',
+                         //listFields: '',
+                         //listHeadTexts: '',
+                         maxLength: 100,
+                         editable: false,
+                         mustInput: true,
+                         colspan: 1,
+                         listeners: {
+                             change: function (_this, newValue) {
+                             },
+                             helpselected: function (obj) {
+                             }
+                         },
+						 hidden:true
+                     }, {
+                         xtype: 'textarea',
+                         fieldLabel: Lang.Remarks || '备注',
+                         name: 'Remarks',
+                         itemId: 'Remarks',
+                         readOnly: false,
+                         mustInput: false,
+                         colspan: 2
+                     }, {
+                         xtype: 'ngText',
+                         fieldLabel: '类别',
+                         name: 'Type',
+                         itemId: 'Type',
+                         readOnly: false,
+                         mustInput: false,
+                         hidden: true,
+                         colspan: 1
+                     }, {
+                         xtype: 'ngText',
+                         fieldLabel: '经格控件',
+                         name: 'PhIdJingGe',
+                         itemId: 'PhIdJingGe',
+                         readOnly: false,
+                         mustInput: false,
+                         hidden: true,
+                         colspan: 1
+                     }, {
+                         xtype: 'container',
+                         hidden: true,
+                         items: [
+                             {
+                                 xtype: 'hiddenfield',
+                                 fieldLabel: '物理主键',
+                                 name: 'PhId',
+                                 itemId: 'PhId'
+                             }, {
+                                 xtype: 'hiddenfield',
+                                 fieldLabel: '版本',
+                                 name: 'NgRecordVer',
+                                 itemId: 'NgRecordVer'
+                             }
+                         ]
+                     }
+                ]
+            });
+
+            mstform.queryById('Filetype').on('select', function (me,records,eOpts) {
+                //var sltVal = records[0].data.value;
+                window.frames['webofficeiframe'].ChangeWordToExcel();
+            });
+
+            var mstform2 = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                split: true,
+                minWidth: 400,
+                autoScroll: true,
+
+                columnsPerRow: 2,
+                fieldDefaults: {
+                    labelWidth: 87,
+                    anchor: '100%',
+                    margin: '0 10 5 0',
+                    msgTarget: 'side'
+                },
+                fields: [
+                    {
+                        xtype: 'fieldcontainer',
+                        fieldLabel: Lang.ContinueAdd || '连续录入',
+                        name: 'NextInput',
+                        itemId: 'NextInput',
+                        readOnly: false,
+                        mustInput: false,
+                        colspan: 1,
+                        defaultType: 'checkboxfield',
+                        defaults: {
+                            flex: 1
+                        },
+                        layout: 'hbox',
+                        items: [
+                            {
+                                name: 'NextInput',
+                                itemId: 'NextInput',
+                                //checked: true,
+                                inputValue: '1',
+                                handler: function (me, value) {
+                                    if (value == "1") {
+                                        mutAdd = true;
+                                    } else {
+                                        mutAdd = false;
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+            var wordpannel = Ext.create('Ext.panel.Panel', {
+                id: 'WebOfficePanel',
+                //title: '正文',
+                //  hideMode: 'visibility',
+                collapse: false,
+                region: 'north',
+                width: '100%',
+                layout: 'fit',
+                autoHeight: true,
+                height: '100%',//?OpType=Edit&RecordID=16
+                html: '<div id="webofficetab" style="height: 100%"><iframe src="' + kingGridUrl + '" width="100%" height="100%"  scrolling="auto"  id="webofficeiframe" name="webofficeiframe"></iframe></div>',
+                listeners: {
+                    beforeRender: function (com, eOpts) {
+                        com.setHeight(document.body.clientHeight - 250);
+                    }
+                }
+            });
+
+
+            //布局
+            var viewport = Ext.create('Ext.container.Viewport', {
+                layout: 'border',
+                items: [ngToolbar, {
+                    xtype: 'panel',
+                    region: 'center',
+                    autoScroll: true,
+                    overflowY: 'scroll',
+                    layout: 'border',
+                    bodyStyle: "padding-right:20px",
+                    items: [mstform, mstform2, wordpannel]
+                }]
+            });
+
+            //当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'hrarctemplate' },
+                    url: '@Url.Content("~/WM/Common/HrArcTemplate/GetHrArcTemplateInfo")',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mstform.getForm();
+                            mstformobj.setValues(resp.Data);
+
+                            //代码转名称
+                            var codectl = [];
+                            codectl.push(mstform.queryById('PhidOrg')); //录入组织
+                            //codectl.push(mstform.queryById('PhidFiller')); //录入人
+                            BatchBindCombox(codectl);
+                            //当修改时
+                            if (otype == $Otype.EDIT) {
+                                kingGridUrl = C_ROOT + "WM/Archive/KingGridObject/KingGridObjectEdit?OpType=Edit&RecordID=" + mstform.queryById("PhIdJingGe").getValue();
+                                window.document.getElementById("webofficeiframe").src = kingGridUrl;
+                            }
+
+                            //当查看时
+                            if (otype == $Otype.VIEW) {
+                                kingGridUrl = C_ROOT + "WM/Archive/KingGridObject/KingGridObjectEdit?OpType=View&RecordID=" + mstform.queryById("PhIdJingGe").getValue();
+                                window.document.getElementById("webofficeiframe").src = kingGridUrl;
+                            }
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.Msg);
+                        }
+                    }
+                });
+            }
+
+            //当新增时
+            if (otype == $Otype.ADD) {
+                mstform.queryById("Cno").setValue(busno);
+                mstform.queryById('PhidOrg').setValue($appinfo.orgID);
+                mstform.queryById("Type").setValue('bwl');//设置模板类型为'bwl'
+                //代码转名称
+                var codectl = [];
+                codectl.push(mstform.queryById('PhidOrg')); //录入组织
+                //codectl.push(mstform.queryById('PhidFiller')); //录入人
+                BatchBindCombox(codectl);
+                kingGridUrl = C_ROOT + "WM/Archive/KingGridObject/KingGridObjectEdit?OpType=Add";
+                window.document.getElementById("webofficeiframe").src = kingGridUrl;
+                //window.frames[0].src = kingGridUrl;
+				mstform2.hide()
+            }
+            if (otype == $Otype.EDIT) {
+                //mstform2.queryById("NextInput").hide();
+                mstform2.hide()
+            }
+
+            //当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+                //mstform2.queryById("NextInput").hide();
+                mstform2.hide()
+            }
+
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                var mstvf = mstform.isValid();
+
+                if (!mstvf) {
+                    return;
+                }
+
+
+                if (window.frames['webofficeiframe']) {
+                    var res = window.frames['webofficeiframe'].SaveDocument();
+                    if (!res || res == '' || res == '0') {
+                        NGMsg.Error('金格控件保存文档异常');
+                        return;
+                    }
+                }
+
+                mstform.queryById("PhIdJingGe").setValue(res);
+                var mstformData = mstform.getFormData();
+                NG3Ajaxrequest({
+                    params: {
+                        'mstformData': mstformData
+                    },
+                    url: '@Url.Content("~/WM/Common/HrArcTemplate/Save")',
+                    success: function (response) {
+                        if (Ext.isEmpty(response.responseText)) {
+                            window.frames['webofficeiframe'].document.location = C_ROOT + "WM/Archive/KingGridObject/KingGridObjectEdit?OpType=Edit&RecordID=" + res;
+                            return;
+                        }
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+							if(otype == $Otype.ADD){
+								//保存金格主键
+								var WordPhid=resp.KeyCodes[0];
+								Ext.Ajax.request({
+                                    url: '@Url.Content("~/GQT/QT/QTMemo/SaveWord")',
+									params: { 'id':busno ,'WordPhid': WordPhid },
+									async:false,
+                                    success: function (response) {
+                                        
+                                    }
+                                });
+							}
+                            if (otype == $Otype.ADD && mutAdd == true) {
+                                Ext.Ajax.request({
+                                    url: '@Url.Content("~/WM/Common/HrArcTemplate/GetTemplateCno")',
+                                    success: function (response) {
+                                        mstform.queryById("Cno").setValue(response.responseText);
+                                        mstform.queryById("Cname").setValue("");
+                                        mstform.queryById("Ctext").setValue("");
+                                        mstform.queryById("PhId").setValue("");
+                                        mstform.queryById("NgRecordVer").setValue("");
+                                        kingGridUrl = C_ROOT + "WM/Archive/KingGridObject/KingGridObjectEdit?OpType=Add";
+                                        window.document.getElementById("webofficeiframe").src = kingGridUrl;
+                                    }
+                                });
+								$NG3Refresh();
+                                RefreshList();
+                            }
+                            else {
+								$NG3Refresh();
+                                RefreshList();
+                                $CloseTab();
+                            }
+                        } else {
+                            NGMsg.Error(resp.Msg);
+                        }
+                    },
+                    failure: function (response, opts) {//后台查重提示后处理
+                        window.frames['webofficeiframe'].document.location = C_ROOT + "WM/Archive/KingGridObject/KingGridObjectEdit?OpType=Edit&RecordID=" + res;
+                    }
+                }, "正在保存...");
+            });
+
+            //添加标签
+            Ext.useShims = true;//帮助显示在最顶层
+            ngToolbar.get('book').on('click', function () {
+                var templateHelp = Ext.create('Ext.ng.OfficeTagHelp', {
+                    modal: true,
+                    width: 600,
+                    height: 400,
+                    y: 100,
+                    listeners: {
+                        helpselected: function (obj) {
+                            window.frames['webofficeiframe'].WebAddBookMarks(obj.code, obj.name);
+                        },
+                        beforeshow: $winBeforeShow,
+                        beforeclose:$winBeforeClose
+                    }
+                });
+                templateHelp.show();
+            });
+        });
+
+    </script>
+}

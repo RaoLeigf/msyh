@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nhv-mapping namespace="GJX3.JX.Model.Domain" assembly="GJX3.JX.Model" xmlns="urn:nhibernate-validator-1.0">
+	<class name="PerformanceDtlEvalModel">
+		<property name="PhId" >
+			<not-null />
+			<not-Empty />
+		</property>
+		<property name="FName" >
+			<length min="0" max="100" message ="长度不超过100！"/>
+		</property>
+		<property name="FContent" >
+			<length min="0" max="1000" message ="长度不超过1000！"/>
+		</property>
+	</class>
+</nhv-mapping>

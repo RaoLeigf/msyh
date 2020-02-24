@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GSP3.SP.Dac</name>
+    </assembly>
+    <members>
+        <member name="T:GSP3.SP.Dac.GAppvalPost4OperDac">
+            <summary>
+            GAppvalPost4Oper数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.GAppvalPostDac">
+            <summary>
+            GAppvalPost数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.GAppvalProc4PostDac">
+            <summary>
+            GAppvalProc4Post数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.GAppvalProcCondsDac">
+            <summary>
+            GAppvalProcConds数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.GAppvalProcDac">
+            <summary>
+            GAppvalProc数据访问处理类
+            </summary>
+        </member>
+        <member name="T:GSP3.SP.Dac.GAppvalRecordDac">
+            <summary>
+            GAppvalRecord数据访问处理类
+            </summary>
+        </member>
+    </members>
+</doc>

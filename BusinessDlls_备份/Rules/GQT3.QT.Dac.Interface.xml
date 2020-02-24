@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GQT3.QT.Dac.Interface</name>
+    </assembly>
+    <members>
+        <member name="T:GQT3.QT.Dac.Interface.IBudgetAccountsDac">
+            <summary>
+            BudgetAccounts数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.ICorrespondenceSettings2Dac">
+            <summary>
+            CorrespondenceSettings2数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.ICorrespondenceSettingsDac">
+            <summary>
+            CorrespondenceSettings数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IExpenseCategoryDac">
+            <summary>
+            ExpenseCategory数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IGHProjDtlShareDac">
+            <summary>
+            GHProjDtlShare数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IOrganizationDac">
+            <summary>
+            Organization数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IOrgRelatitem2Dac">
+            <summary>
+            OrgRelatitem数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IPaymentMethodDac">
+            <summary>
+            PaymentMethod数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IPerformEvalTargetClassDac">
+            <summary>
+            PerformEvalTargetClass数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IPerformEvalTargetDac">
+            <summary>
+            PerformEvalTarget数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IPerformEvalTargetTypeDac">
+            <summary>
+            PerformEvalTargetType数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IPerformEvalTypeDac">
+            <summary>
+            PerformEvalType数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IProcurementCatalogDac">
+            <summary>
+            ProcurementCatalog数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IProcurementProceduresDac">
+            <summary>
+            ProcurementProcedures数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IProcurementTypeDac">
+            <summary>
+            ProcurementType数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IProjectThresholdDac">
+            <summary>
+            ProjectThreshold数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IProjLibProjDac">
+            <summary>
+            ProjLibProj数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IQtBaseProjectDac">
+            <summary>
+            QtBaseProject数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IQtSysCodeSeqDac">
+            <summary>
+            QtSysCodeSeq数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IQtZcgnflDac">
+            <summary>
+            QtZcgnfl数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IRWReportDac">
+            <summary>
+            RWReport数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.ISourceOfFundsDac">
+            <summary>
+            SourceOfFunds数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IUserDac">
+            <summary>
+            User数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IUserOrgDac">
+            <summary>
+            UserOrg数据访问层接口
+            </summary>
+        </member>
+        <member name="T:GQT3.QT.Dac.Interface.IVCorrespondenceSetting2Dac">
+            <summary>
+            VCorrespondenceSetting2数据访问层接口
+            </summary>
+        </member>
+    </members>
+</doc>

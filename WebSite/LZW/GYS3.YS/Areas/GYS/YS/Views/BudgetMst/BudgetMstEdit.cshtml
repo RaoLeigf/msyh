@@ -1,0 +1,3404 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Script
+{
+    <script src="@Url.Script("~/NG3Resource/js/NG3APPcommon.js")" type="text/javascript"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/WorkFlowHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/EmpHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/js/help/OrgHelp.js") type="text/javascript" charset="utf-8"></script>
+    <script src="@Url.Script("~/Resource/attach/js/loadattach.js")" type="text/javascript" charset="utf-8"></script>
+    @*<script src="@Url.Content("~/NG3Resource/js/G6H/G6HCommon.js")" type="text/javascript" charset="gb2312"></script>*@
+    <script src=@Url.Script("~/NG3Resource/js/ExMergeGrid.js") type="text/javascript" charset="utf-8"></script>
+    <script src=@Url.Script("~/NG3Resource/IndividualInfo/GYS/YS/BudgetMstEdit.js") type="text/javascript" charset="utf-8"></script>
+    @*<script src="@ViewBag.UserDefScriptUrl" type="text/javascript" charset="utf-8"></script>*@
+    <script type="text/javascript">
+        //多语言，在Controller调用base.InitialMultiLanguage(busType)方法获取
+        var langinfo = Ext.htmlDecode("@ViewBag.NG3Lang");
+        var Lang = (langinfo || Ext.isEmpty(langinfo)) ? {} : JSON.parse(langinfo);
+
+        //从viewBag获取自定义信息，在Controller调用base.GetIndividualUI(busType)方法获取
+        var defCustomInfo = Ext.htmlDecode('@ViewBag.IndividualInfo');
+        if (Ext.isEmpty(defCustomInfo)) {
+            //数据库没有，取js模板的individualConfigInfo
+            defCustomInfo = individualConfigInfo;
+        }
+
+        //自定义信息与多语言合并
+        var individualInfo = $DealIndividualInfo(defCustomInfo, Lang);
+    </script>
+    <script type="text/javascript">
+        var otype = '@ViewBag.OType';
+        var busid = '@ViewBag.ID';
+        var workType = '@ViewBag.workType'; //业务类型
+        var midYearEdit = '@ViewBag.midYearEdit'; //年中调整
+		//var busno = '@ViewBag.No';
+        var mainPanel_form,FunctionalOvervPanel_form,ProjOverviewPanel_form,projectStartInfoPanel_form,longTargetPanel_form,yearTargetPanel_form;
+        var ImplPlanPanel_store, FundApplPanel_store, BudgetDtlPanel_store;
+        var datafromxmk = 0, oldPhId = "";;
+        var xmkMstPhid;
+        var attachGuid = '';
+        var attachment;
+        var activeTab = 3;
+        var budgetDtlFName = "";
+        var tempData;
+        if (otype == $Otype.ADD) { //明细区默认显示项目预算明细
+            activeTab = 0;
+        }
+
+        Ext.onReady(function () {
+              //审批流控件
+            var wfinfojson = "";
+            var workflowPanel;
+            var wfinfo = Ext.htmlDecode('@ViewBag.WorkFlowInfo');
+            var performTargetTypeLevel1 = "", performTargetTypeLevel2 = ""; //绩效目标分解类型级别1、2
+            var orgProjectProjectThreshold = 0, orgProjectProjectType = '';//项目阈值 项目类型
+
+            //工具栏
+            var ngToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                ngbuttons: [
+                    'save', 'attachment', 'addrow',
+                    { id: "copyRow", text: "增行", width: this.itemWidth, iconCls: "icon-AddRow" },
+                    'deleterow',
+                    { id: "purchase", text: "集中采购", width: this.itemWidth, iconCls: "icon-Confirm" },
+                    '->', 'print', 'close'
+                ]
+            });
+            ngToolbar.get('addrow').hide();
+            ngToolbar.get('deleterow').hide();
+            ngToolbar.get('copyRow').hide();
+            //工作流面板
+            if (wfinfo != "" && !Ext.isEmpty(wfinfo)) {
+                wfinfojson = Ext.decode(wfinfo);
+
+                workflowPanel = Ext.create('Ext.panel.Panel', {
+                    region: 'north',
+                    border: 'fit',
+                    items: [
+                        {
+                            xtype: 'ngWorkFlowPanel',
+                            toolbar: ngToolbar, //单据toolbar
+                            otype: otype, //单据otype
+                            bizType: "GHBudget", //注册的表单id（原商业对象）
+                            bizPhid: busid, //单据phid
+                            showToolBarItems: ['attachment'], //任务办理时可见toolbar按钮itemid数组
+                            workFlowInfo: wfinfojson,
+                            bizSaveAsync: true,
+                            bizSaveFn: function (callback) { //单据保存方法，方法需返回bool值，Ajax方法需使用同步模式
+                                save(callback);
+                            },
+                            listeners: {
+                                taskComplete: function (compId, wfParam) {
+                                    //在这里进行自定义组件任务处理，并把工作流参数传到服务端，并在服务端调用工作流api
+                                }
+                            }
+                        }
+                    ]
+                });
+            }
+
+			//定义mainPanel_form
+			var mainPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var mainPanel_formConfig = mainPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(mainPanel_formConfig, individualInfo.form['mainPanel']);
+			}
+			mainPanel_form = Ext.create('Ext.ng.TableLayoutForm', mainPanel_formConfig);
+
+			//定义yearTargetPanel_form
+			var yearTargetPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				columnsPerRow: 1,
+				fieldDefaults: {
+				    anchor: "111%"
+				},
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var yearTargetPanel_formConfig = yearTargetPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(yearTargetPanel_formConfig, individualInfo.form['yearTargetPanel']);
+			}
+			yearTargetPanel_form = Ext.create('Ext.ng.TableLayoutForm', yearTargetPanel_formConfig);
+
+			//定义longTargetPanel_form
+			var longTargetPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				columnsPerRow: 1,
+				fieldDefaults: {
+				    anchor: "111%"
+				},
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var longTargetPanel_formConfig = longTargetPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(longTargetPanel_formConfig, individualInfo.form['longTargetPanel']);
+			}
+			longTargetPanel_form = Ext.create('Ext.ng.TableLayoutForm', longTargetPanel_formConfig);
+
+			//获取ImplPlanPanel_grid自带model
+			var ImplPlanPanel_modelFields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "MstPhid",
+    "type": "string",
+    "mapping": "MstPhid"
+  },
+  {
+    "name": "FImplContent",
+    "type": "string",
+    "mapping": "FImplContent"
+  },
+  {
+    "name": "FStartDate",
+    "type": "date",
+    "mapping": "FStartDate"
+  },
+  {
+    "name": "FEndDate",
+    "type": "date",
+    "mapping": "FEndDate"
+  }
+]
+			//调用$MergIndividualModelCol合并grid的Model
+			var ImplPlanPanel_allFields = $MergIndividualModelCol(ImplPlanPanel_modelFields, individualInfo, 'ImplPlanPanel');
+			//定义模型
+			Ext.define('ImplPlanPanel_model', {
+				extend: 'Ext.data.Model',
+				fields: ImplPlanPanel_allFields
+			});
+			//定义ImplPlanPanel_store
+			ImplPlanPanel_store = Ext.create('Ext.ng.JsonStore', {
+				model: 'ImplPlanPanel_model',
+				pageSize: 20
+			});
+			//定义ImplPlanPanel_cellEditing
+			var  ImplPlanPanel_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+				clicksToEdit: 1    //单击编辑，单元格修改
+			});
+			//从自定义信息中获取到grid的配置
+			var ImplPlanPanel_indvidualGrid = individualInfo.grid['ImplPlanPanel'];
+			//动态内容的配置不能写在插件中
+			var ImplPlanPanel_gridInitialConfig = {
+				stateful: true,
+				region: 'center',
+				stateId: '59ffdf71-fdfc-4c1f-bd06-c03e1d470d1f', //这里请使用guid，防止冲突
+				store: ImplPlanPanel_store,
+				otype: otype, //操作类型,add||edit
+				plugins: [ImplPlanPanel_cellEditing]
+			}
+			//动态配置与静态配置合并
+			var ImplPlanPanel_gridConfig = Ext.apply(ImplPlanPanel_gridInitialConfig, ImplPlanPanel_indvidualGrid);
+			//定义ImplPlanPanel_grid
+			var ImplPlanPanel_grid = Ext.create('Ext.ng.GridPanel', ImplPlanPanel_gridConfig);
+
+			//获取FundApplPanel_grid自带model
+			var FundApplPanel_modelFields = [
+  {
+    "name": "PhId",
+    "type": "string",
+    "mapping": "PhId"
+  },
+  {
+    "name": "MstPhid",
+    "type": "string",
+    "mapping": "MstPhid"
+  },
+  {
+    "name": "FSourceOfFunds",
+    "type": "string",
+    "mapping": "FSourceOfFunds"
+    },
+    {
+        "name": "FSourceOfFunds_EXName",
+        "type": "string",
+        "mapping": "FSourceOfFunds_EXName"
+    },
+  {
+    "name": "FAmount",
+    "type": "float",
+    "mapping": "FAmount"
+  }
+]
+			//调用$MergIndividualModelCol合并grid的Model
+			var FundApplPanel_allFields = $MergIndividualModelCol(FundApplPanel_modelFields, individualInfo, 'FundApplPanel');
+			//定义模型
+			Ext.define('FundApplPanel_model', {
+				extend: 'Ext.data.Model',
+				fields: FundApplPanel_allFields
+			});
+			//定义FundApplPanel_store
+			FundApplPanel_store = Ext.create('Ext.ng.JsonStore', {
+				model: 'FundApplPanel_model',
+				pageSize: 20
+			});
+			//定义FundApplPanel_cellEditing
+			var  FundApplPanel_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+				clicksToEdit: 1    //单击编辑，单元格修改
+			});
+			//从自定义信息中获取到grid的配置
+			var FundApplPanel_indvidualGrid = individualInfo.grid['FundApplPanel'];
+			//动态内容的配置不能写在插件中
+			var FundApplPanel_gridInitialConfig = {
+				stateful: true,
+				region: 'center',
+				stateId: 'e744af6a-d87e-429d-b68f-f63cff865fb2', //这里请使用guid，防止冲突
+				store: FundApplPanel_store,
+				otype: otype, //操作类型,add||edit
+				plugins: [FundApplPanel_cellEditing]
+			}
+			//动态配置与静态配置合并
+			var FundApplPanel_gridConfig = Ext.apply(FundApplPanel_gridInitialConfig, FundApplPanel_indvidualGrid);
+			//定义FundApplPanel_grid
+			var FundApplPanel_grid = Ext.create('Ext.ng.GridPanel', FundApplPanel_gridConfig);
+
+			//定义FunctionalOvervPanel_form
+			var FunctionalOvervPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				columnsPerRow: 1,
+				fieldDefaults: {
+				    anchor: "111%"
+				},
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var FunctionalOvervPanel_formConfig = FunctionalOvervPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(FunctionalOvervPanel_formConfig, individualInfo.form['FunctionalOvervPanel']);
+			}
+			FunctionalOvervPanel_form = Ext.create('Ext.ng.TableLayoutForm', FunctionalOvervPanel_formConfig);
+
+			//定义ProjOverviewPanel_form
+			var ProjOverviewPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				columnsPerRow: 1,
+				fieldDefaults: {
+				    anchor: "111%"
+				},
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var ProjOverviewPanel_formConfig = ProjOverviewPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(ProjOverviewPanel_formConfig, individualInfo.form['ProjOverviewPanel']);
+			}
+			ProjOverviewPanel_form = Ext.create('Ext.ng.TableLayoutForm', ProjOverviewPanel_formConfig);
+
+			//定义projectStartInfoPanel_form
+			var projectStartInfoPanel_formInitialConfig = {
+				region: 'north',
+				frame: true,
+				split: true,
+				minWidth: 600,
+				fieldDefaults: {
+				    anchor: "111%"
+				},
+				buskey: 'PhId', //对应的业务表主键
+				otype: otype //操作类型,add||edit
+			};
+			var projectStartInfoPanel_formConfig = projectStartInfoPanel_formInitialConfig;
+			if (individualInfo.form) {
+				Ext.apply(projectStartInfoPanel_formConfig, individualInfo.form['projectStartInfoPanel']);
+			}
+			projectStartInfoPanel_form = Ext.create('Ext.ng.TableLayoutForm', projectStartInfoPanel_formConfig);
+
+			//获取BudgetDtlPanel_grid自带model
+			var BudgetDtlPanel_modelFields = [
+              {
+                "name": "PhId",
+                "type": "string",
+                "mapping": "PhId"
+              },
+              {
+                "name": "MstPhid",
+                "type": "string",
+                "mapping": "MstPhid"
+              },
+              {
+                  "name": "FDtlCode",
+                  "type": "string",
+                  "mapping": "FDtlCode"
+              },
+              {
+                "name": "FName",
+                "type": "string",
+                "mapping": "FName"
+               },
+                {
+                    "name": "FQty",
+                    "type": "float",
+                    "mapping": "FQty"
+                },
+                {
+                    "name": "FQty2",
+                    "type": "float",
+                    "mapping": "FQty2"
+                },
+                {
+                    "name": "FPrice",
+                    "type": "float",
+                    "mapping": "FPrice"
+                },
+              {
+                "name": "FAmount",
+                "type": "float",
+                "mapping": "FAmount"
+              },
+                {
+                    "name": "FBudgetAmount",
+                    "type": "float",
+                    "mapping": "FBudgetAmount"
+                },
+              {
+                "name": "FSourceOfFunds",
+                "type": "string",
+                "mapping": "FSourceOfFunds"
+              },
+              {
+                "name": "FSourceOfFunds_EXName",
+                "type": "string",
+                "mapping": "FSourceOfFunds_EXName"
+              },
+              {
+                "name": "FBudgetAccounts",
+                "type": "string",
+                "mapping": "FBudgetAccounts"
+              },
+              {
+                "name": "FBudgetAccounts_EXName",
+                "type": "string",
+                "mapping": "FBudgetAccounts_EXName"
+              },
+              {
+                "name": "FPaymentMethod",
+                "type": "string",
+                "mapping": "FPaymentMethod"
+              },
+              {
+                "name": "FPaymentMethod_EXName",
+                "type": "string",
+                "mapping": "FPaymentMethod_EXName"
+              },
+              {
+                "name": "FExpensesChannel",
+                "type": "string",
+                "mapping": "FExpensesChannel"
+                },
+                {
+                    "name": "FExpensesChannel_EXName",
+                    "type": "string",
+                    "mapping": "FExpensesChannel_EXName"
+                },
+	            {
+		            "name": "FFeedback",
+		            "type": "string",
+		            "mapping": "FFeedback"
+                },
+                {
+                    "name": "FIfPurchase",
+                    "type": "int",
+                    "mapping": "FIfPurchase"
+                },
+              {
+                "name": "FOtherInstructions",
+                "type": "string",
+                "mapping": "FOtherInstructions"
+                },
+                {
+                    "name": "Xm3_DtlPhid",
+                    "type": "string",
+                    "mapping": "Xm3_DtlPhid"
+                }
+            ]
+			//调用$MergIndividualModelCol合并grid的Model
+			var BudgetDtlPanel_allFields = $MergIndividualModelCol(BudgetDtlPanel_modelFields, individualInfo, 'BudgetDtlPanel');
+			//定义模型
+			Ext.define('BudgetDtlPanel_model', {
+				extend: 'Ext.data.Model',
+				fields: BudgetDtlPanel_allFields
+			});
+			//定义BudgetDtlPanel_store
+			BudgetDtlPanel_store = Ext.create('Ext.ng.JsonStore', {
+				model: 'BudgetDtlPanel_model',
+				pageSize: 20
+			});
+			//定义BudgetDtlPanel_cellEditing
+			var  BudgetDtlPanel_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+				clicksToEdit: 1    //单击编辑，单元格修改
+			});
+			//从自定义信息中获取到grid的配置
+			var BudgetDtlPanel_indvidualGrid = individualInfo.grid['BudgetDtlPanel'];
+			//动态内容的配置不能写在插件中
+			var BudgetDtlPanel_gridInitialConfig = {
+				stateful: true,
+				region: 'center',
+				stateId: '7e19b268-cd16-4e72-bf12-df59ecfe7d16', //这里请使用guid，防止冲突
+				store: BudgetDtlPanel_store,
+				otype: otype, //操作类型,add||edit
+				plugins: [BudgetDtlPanel_cellEditing]
+			}
+			//动态配置与静态配置合并
+			var BudgetDtlPanel_gridConfig = Ext.apply(BudgetDtlPanel_gridInitialConfig, BudgetDtlPanel_indvidualGrid);
+			//定义BudgetDtlPanel_grid
+			var BudgetDtlPanel_grid = Ext.create('Ext.ng.GridPanel', BudgetDtlPanel_gridConfig);
+
+
+            //获取PerformTargetPanel_grid自带model
+            var PerformTargetPanel_modelFields = [
+                {
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "MstPhid",
+                    "type": "string",
+                    "mapping": "MstPhid"
+                },
+                {
+                    "name": "",
+                    "type": "string",
+                    "mapping": ""
+                },
+                {
+                    "name": "FTargetTypeCode",
+                    "type": "string",
+                    "mapping": "FTargetTypeCode"
+                },
+                {
+                    "name": "FTargetTypeCode_EXName",
+                    "type": "string",
+                    "mapping": "FTargetTypeCode_EXName"
+                },
+                {
+                    "name": "FTargetClassCode",
+                    "type": "string",
+                    "mapping": "FTargetClassCode"
+                },
+                {
+                    "name": "FTargetClassCode_EXName",
+                    "type": "string",
+                    "mapping": "FTargetClassCode_EXName"
+                },
+                {
+                    "name": "FTargetCode",
+                    "type": "string",
+                    "mapping": "FTargetCode"
+                },
+                {
+                    "name": "FTargetCode_EXName",
+                    "type": "string",
+                    "mapping": "FTargetCode_EXName"
+                },
+                {
+                    "name": "FTargetName",
+                    "type": "string",
+                    "mapping": "FTargetName"
+                },
+                {
+                    "name": "FTargetValue",
+                    "type": "string",
+                    "mapping": "FTargetValue"
+                },
+                {
+                    "name": "FTargetWeight",
+                    "type": "string",
+                    "mapping": "FTargetWeight"
+                },
+                {
+                    "name": "FTargetDescribe",
+                    "type": "string",
+                    "mapping": "FTargetDescribe"
+                },
+                {
+                    "name": "FIfCustom",
+                    "type": "int",
+                    "mapping": "FIfCustom"
+                },
+                {
+                    "name": "NgRecordVer",
+                    "type": "int",
+                    "mapping": "NgRecordVer"
+                }
+            ]
+            //调用$MergIndividualModelCol合并grid的Model
+            var PerformTargetPanel_allFields = $MergIndividualModelCol(PerformTargetPanel_modelFields, individualInfo, 'PerformTargetPanel');
+            //定义模型
+            Ext.define('PerformTargetPanel_model', {
+                extend: 'Ext.data.Model',
+                fields: PerformTargetPanel_allFields
+            });
+            //定义PerformTargetPanel_store
+            var PerformTargetPanel_store = Ext.create('Ext.ng.JsonStore', {
+                sorters: [
+                    { property: 'FTargetTypeCode', direction: 'asc' },
+                    { property: 'FTargetClassCode', direction: 'asc' },
+                    { property: 'FTargetCode', direction: 'asc' }
+                ],
+                model: 'PerformTargetPanel_model',
+                pageSize: 20
+            });
+            //定义PerformTargetPanel_cellEditing
+            var PerformTargetPanel_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1    //单击编辑，单元格修改
+            });
+            //从自定义信息中获取到grid的配置
+            var PerformTargetPanel_indvidualGrid = individualInfo.grid['PerformTargetPanel'];
+            //动态内容的配置不能写在插件中
+            var PerformTargetPanel_gridInitialConfig = {
+                stateful: true,
+                region: 'center',
+                stateId: '6708af1f-cb94-46f9-87c4-d1f23d066bf6', //这里请使用guid，防止冲突
+                store: PerformTargetPanel_store,
+                otype: otype, //操作类型,add||edit
+                plugins: [PerformTargetPanel_cellEditing]
+            }
+            //动态配置与静态配置合并
+            var PerformTargetPanel_gridConfig = Ext.apply(PerformTargetPanel_gridInitialConfig, PerformTargetPanel_indvidualGrid);
+            //定义PerformTargetPanel_grid
+            var PerformTargetPanel_grid = Ext.create('Ext.ng.GridPanel', PerformTargetPanel_gridConfig);
+            //缓存数据，在合并单元格后删除，需要用原始数据来加载
+            var PerformTargetPanel_CacheData;
+
+
+            var tabItems = {
+                TabPage1: {
+                    id: 'TabPage1',
+                    layout: 'border',
+                    hidden: true,
+                    title: '职能部门概述',
+                    items: [FunctionalOvervPanel_form]
+                },
+                TabPage2: {
+                    id: 'TabPage2',
+                    layout: 'border',
+                    title: '项目概况',
+                    items: [ProjOverviewPanel_form]
+                },
+                TabPage3: {
+                    id: 'TabPage3',
+                    layout: 'border',
+                    title: '项目立项情况',
+                    items: [projectStartInfoPanel_form]
+                },
+                TabPage4: {
+                    id: 'TabPage4',
+                    layout: 'border',
+                    title: '项目预算明细',
+                    items: [BudgetDtlPanel_grid]
+                },
+                TabPage5: {
+                    id: 'TabPage5',
+                    layout: 'border',
+                    title: '项目资金申请',
+                    items: [FundApplPanel_grid]
+                },
+                TabPage6: {
+                    id: 'TabPage6',
+                    layout: 'border',
+                    title: '实施计划',
+                    items: [ImplPlanPanel_grid]
+                },
+                TabPage7: {
+                    id: 'TabPage7',
+                    layout: 'border',
+                    title: '总体绩效目标',
+                    items: [longTargetPanel_form]
+                },
+				//TabPage8:{
+				//	id: 'TabPage8',
+				//	layout: 'border',
+				//	title: '年度绩效目标',
+				//	items: [yearTargetPanel_form]
+				//}
+                TabPage9: {
+                    id: 'TabPage9',
+                    layout: 'border',
+                    title: '绩效目标分解',
+                    items: [PerformTargetPanel_grid]
+                }
+			}
+
+			var tabArr = [];
+			var indTabItems = individualInfo.tabPanel['DtlPanel'].items;
+			for (var i = 0; i < indTabItems.length; i++) {
+				var tab = indTabItems[i];
+				if (!tab.hidden) {
+					tabArr.push(Ext.apply(tabItems[tab.id], tab));
+				}
+			}
+
+			var tabPanel = Ext.create('Ext.tab.Panel', {
+				layout: 'border',
+				region: 'center',
+				deferredRender: false,
+				plain: true,
+                activeTab: activeTab,  //明细区默认显示项目预算明细
+				minHeight: 400,
+				minWidth: 600,
+				defaults: { bodyStyle: 'padding:3px' },
+				items: tabArr
+			});
+
+			var myViewport = Ext.create('Ext.container.Viewport', {
+				id: "viewPort",
+				layout: 'border',
+				items:
+				[
+                    ngToolbar,
+					{
+						xtype: 'panel',
+						layout: 'border',
+						region: 'center',
+						autoScroll: true,
+						bodyStyle: 'padding-right:20px',
+						//style: 'overflow-y:scroll,padding-right:20px',
+						items: [ mainPanel_form, tabPanel]
+					}
+				]
+			});
+
+            if (otype == $Otype.ADD) {
+                //根据操作员id获取默认部门和默认组织
+                var orgCode = "";
+                var dept = "";
+                Ext.Ajax.request({
+                    params: { 'userID': $user.id },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings/FindFDeclarationUnit',
+                    async: false,
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var orgDept = resp.Msg;
+                            var orgDeptArray = orgDept.split(",");
+                            orgCode = orgDeptArray[0];
+                            dept = orgDeptArray[1];
+                        }
+                    }
+                });
+                mainPanel_form.queryById("FDeclarationUnit").setValue(orgCode);
+                mainPanel_form.queryById("FBudgetDept").setValue(dept);
+
+                if (orgCode) {
+                    var filter2 = "(Z_QTDYGX2.DEF_STR1='" + orgCode + "')";
+                    mainPanel_form.queryById("FExpenseCategory").setClientSqlFilter(filter2);
+                }
+			    //代码转名称
+			    var codectl = [mainPanel_form.queryById('FDeclarationUnit'), mainPanel_form.queryById('FBudgetDept'), mainPanel_form.queryById('FExpenseCategory')]; //
+                BatchBindCombox(codectl);
+
+                mainPanel_form.queryById("FType").setValue(workType);
+                if (workType == "c" || workType == "x") {
+                    mainPanel_form.queryById("FVerNo").setValue("0001");
+                } else if (workType == "z") { //年中调整
+                    mainPanel_form.queryById("FVerNo").setValue("0002");
+                }
+			    mainPanel_form.queryById("FProjStatus").setValue(2); //
+			    var cbbudgetdtldata = BudgetDtlPanel_grid.getSelectionModel();
+			    BudgetDtlPanel_store.insert(BudgetDtlPanel_store.getCount(), cbbudgetdtldata);
+			    var cbbudgetdtldata = ImplPlanPanel_grid.getSelectionModel();
+                ImplPlanPanel_store.insert(ImplPlanPanel_store.getCount(), cbbudgetdtldata);
+                var myDate = new Date();
+                var y = myDate.getFullYear();
+                //var startdate = y + '-01-01';
+                //var enddate = y + '-12-31';
+                //mainPanel_form.queryById("FStartDate").setValue(startdate); //
+                //mainPanel_form.queryById("FEndDate").setValue(enddate); //
+
+
+			}
+
+
+
+			//当修改、查看时取数、绑定
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'budgetmst' },
+                    url: C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = mainPanel_form.getForm();
+
+                            mstformobj.setValues(resp.Data);
+                            //oldPhId = Ext.getCmp('PhId').getValue();
+							//mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstformobj.fireEvent('dataready', resp.Data);
+
+							//代码转名称
+                            var codectl = [mainPanel_form.queryById('FDeclarationUnit'), mainPanel_form.queryById('FBudgetDept'), mainPanel_form.queryById('FExpenseCategory'),
+                                mainPanel_form.queryById('FPerformType'),
+                                mainPanel_form.queryById('FPerformEvalType')
+                            ]; //
+                            BatchBindCombox(codectl);
+
+                            hidePerformTargetTab(false, false); //处理绩效目标分解tab
+
+                            activeTabpage("TabPage4"); //默认展示TabPage4
+                            var orgcode = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                            getProjectThreshold(orgcode); //获取阈值
+
+                            //是否显示天数、人数、单价
+                            var unitCode = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                            var xmCOde = mainPanel_form.queryById("FExpenseCategory").getValue();
+                            //debugger;
+                            Ext.Ajax.request({
+                                params: { "Dylx": '08', "DefStr1": unitCode },
+                                url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetCorrespondenceSettings2ListbyRelation',
+                                success: function (response) {
+                                    var resp = Ext.JSON.decode(response.responseText);
+                                    if (resp != null && resp != undefined) {
+                                        for (var i = 0; i < resp.Record.length; i++) {
+                                            var recordData = resp.Record[i];
+                                            if (recordData.Dydm == xmCOde) {
+                                                tempData = recordData;
+                                                if (recordData.DefStr2 == "0") {
+                                                    BudgetDtlPanel_grid.getColumn('FQty').hide();
+                                                    BudgetDtlPanel_grid.getColumn('FQty2').hide();
+                                                    BudgetDtlPanel_grid.getColumn('FPrice').hide();
+                                                    BudgetDtlPanel_grid.getColumn('FAmount').readOnly = false;
+
+                                                }
+                                                if (recordData.DefStr2 == "1") {
+                                                    BudgetDtlPanel_grid.getColumn('FQty').show();
+                                                    BudgetDtlPanel_grid.getColumn('FQty2').show();
+                                                    BudgetDtlPanel_grid.getColumn('FPrice').show();
+                                                    BudgetDtlPanel_grid.getColumn('FAmount').readOnly = true;
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.Msg);
+                        }
+                    }
+                });
+
+                //FunctionalOvervPanel: 通过 projectdtltextcontent 获取
+                Ext.Ajax.request({
+                    params: { 'id': busid, 'tabtype': 'budgetdtltextcontent' },
+                    url: C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Status === "success") {
+                            var mstformobj = FunctionalOvervPanel_form.getForm(); //mainPanel_form.getForm();
+                            mstformobj.setValues(resp.Data);
+
+                            var projfromObj = ProjOverviewPanel_form.getForm();
+                            projfromObj.setValues(resp.Data);
+
+                            var startfromObj = projectStartInfoPanel_form.getForm();
+                            startfromObj.setValues(resp.Data);
+
+                            var longformObj = longTargetPanel_form.getForm();
+                            longformObj.setValues(resp.Data);
+
+                            var yearformObj = yearTargetPanel_form.getForm();
+                            yearformObj.setValues(resp.Data);
+
+                            //mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                            mstformobj.fireEvent('dataready', resp.Data);
+
+                            ////代码转名称
+                            //var codectl = [];
+                            //BatchBindCombox(codectl);
+
+                        } else {
+                            Ext.MessageBox.alert('取数失败', resp.Msg);
+                        }
+                    }
+                });
+
+
+                //ImplPlanPanel明细
+				Ext.apply(ImplPlanPanel_store.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo');
+                Ext.apply(ImplPlanPanel_store.proxy.extraParams, { 'id': busid, 'tabtype': 'budgetdtlimplplan' });
+                ImplPlanPanel_store.cachePageData = false;
+                ImplPlanPanel_store.load();
+                ImplPlanPanel_store.cachePageData = true;
+
+                //FundApplPanel明细
+				Ext.apply(FundApplPanel_store.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo');
+                Ext.apply(FundApplPanel_store.proxy.extraParams, { 'id': busid, 'tabtype': 'budgetdtlfundappl' });
+                FundApplPanel_store.cachePageData = false;
+                FundApplPanel_store.load();
+                FundApplPanel_store.cachePageData = true;
+
+                //BudgetDtlPanel明细
+				Ext.apply(BudgetDtlPanel_store.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo');
+                Ext.apply(BudgetDtlPanel_store.proxy.extraParams, { 'id': busid, 'tabtype': 'budgetdtlbudgetdtl' });
+                BudgetDtlPanel_store.cachePageData = false;
+                BudgetDtlPanel_store.load();
+                BudgetDtlPanel_store.cachePageData = true;
+
+                //PerformTargetPanel明细
+                Ext.apply(PerformTargetPanel_store.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo');
+                Ext.apply(PerformTargetPanel_store.proxy.extraParams, { 'id': busid, 'tabtype': 'budgetdtlperformtarget' });
+                PerformTargetPanel_store.cachePageData = false;
+                PerformTargetPanel_store.load({
+                    callback: function (records, operation, success) {
+                        //合并单元格
+                        ExMergeGrid(PerformTargetPanel_grid, [0, 1], false); // 最后一个参数为false逐个列合并
+                    }
+                });
+                PerformTargetPanel_store.cachePageData = true;
+
+            }
+
+
+            if (workflowPanel) {
+                SyncWorkFlowUI(wfinfojson);
+                //插入审批流控件
+                myViewport.insert(1, workflowPanel);
+            }
+
+			//当新增时
+            if (otype == $Otype.ADD) {
+				//if (busno != undefined && busno != "") {
+                //    Ext.getCmp("No").userSetReadOnly(true);
+                //    Ext.getCmp("No").setValue(busno);
+                //}
+            }
+
+			//当修改时
+            if (otype == $Otype.EDIT) {
+                //修改时预算单位,部门,项目名称不能修改
+                //Ext.getCmp("FDeclarationUnit").userSetReadOnly(true);
+                //Ext.getCmp("FBudgetDept").userSetReadOnly(true);
+                //Ext.getCmp("FProjName").userSetReadOnly(true);
+                mainPanel_form.queryById("FDeclarationUnit").readOnly = true;
+                mainPanel_form.queryById("FBudgetDept").readOnly = true;
+                mainPanel_form.queryById("FProjName").readOnly = true;
+            }
+
+			//当查看时
+            if (otype == $Otype.VIEW) {
+                ngToolbar.get('save').disable();
+            }
+
+            //////集中采购
+
+            //定义PurchaseDtlPanel_form
+            var PurchaseDtlPanel_formInitialConfig = {
+                region: 'north',
+                frame: true,
+                //split: true,
+                border: true,// collapsible: true,
+                //  minWidth: 600,
+                buskey: 'PhId', //对应的业务表主键
+                otype: otype //操作类型,add||edit
+            };
+            var PurchaseDtlPanel_formConfig = PurchaseDtlPanel_formInitialConfig;
+            if (individualInfo.form) {
+                Ext.apply(PurchaseDtlPanel_formConfig, individualInfo.form['PurchaseDtlPanel']);
+            }
+            var PurchaseDtlPanel_form = Ext.create('Ext.ng.TableLayoutForm', PurchaseDtlPanel_formConfig);
+
+            //获取PurDtl4SOFGrid_grid自带model
+            var PurDtl4SOFGrid_modelFields = [
+                {
+                    "name": "FSourceOfFunds",
+                    "type": "string",
+                    "mapping": "FSourceOfFunds"
+                },
+                {
+                    "name": "FSourceOfFunds_EXName",
+                    "type": "string",
+                    "mapping": "FSourceOfFunds_EXName"
+                },
+                {
+                    "name": "FAmount",
+                    "type": "float",
+                    "mapping": "FAmount"
+                },
+                {
+                    "name": "MstPhid",
+                    "type": "string",
+                    "mapping": "MstPhid"
+                },
+                {
+                    "name": "FDtlCode",
+                    "type": "string",
+                    "mapping": "FDtlCode"
+                },
+                {
+                    "name": "PhId",
+                    "type": "string",
+                    "mapping": "PhId"
+                },
+                {
+                    "name": "NgRecordVer",
+                    "type": "int",
+                    "mapping": "NgRecordVer"
+                },
+                {
+                    "name": "FName",
+                    "type": "string",
+                    "mapping": "FName"
+                },
+                {
+                    "name": "key",
+                    "type": "string",
+                    "mapping": "key"
+                }
+            ]
+            //调用$MergIndividualModelCol合并grid的Model
+            var PurDtl4SOFGrid_allFields = $MergIndividualModelCol(PurDtl4SOFGrid_modelFields, individualInfo, 'PurDtl4SOFGrid');
+            //定义模型
+            Ext.define('PurDtl4SOFGrid_model', {
+                extend: 'Ext.data.Model',
+                fields: PurDtl4SOFGrid_allFields
+            });
+            //定义PurDtl4SOFGrid_store
+            var PurDtl4SOFGrid_store = Ext.create('Ext.ng.JsonStore', {
+                model: 'PurDtl4SOFGrid_model',
+                pageSize: 20
+            });
+            //定义PurDtl4SOFGrid_cellEditing
+            var PurDtl4SOFGrid_cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1    //单击编辑，单元格修改
+            });
+            //从自定义信息中获取到grid的配置
+            var PurDtl4SOFGrid_indvidualGrid = individualInfo.grid['PurDtl4SOFGrid'];
+            //动态内容的配置不能写在插件中
+            var PurDtl4SOFGrid_gridInitialConfig = {
+                stateful: true,
+                region: 'center',
+                //split: true, border: true, collapsible: true,
+                stateId: 'a27126c8-735c-45c8-835e-a5fc72c1c0f6', //这里请使用guid，防止冲突
+                store: PurDtl4SOFGrid_store,
+                otype: otype, //操作类型,add||edit
+                plugins: [PurDtl4SOFGrid_cellEditing]
+            }
+            //动态配置与静态配置合并
+            var PurDtl4SOFGrid_gridConfig = Ext.apply(PurDtl4SOFGrid_gridInitialConfig, PurDtl4SOFGrid_indvidualGrid);
+            //定义PurDtl4SOFGrid_grid
+            var PurDtl4SOFGrid_grid = Ext.create('Ext.ng.GridPanel', PurDtl4SOFGrid_gridConfig);
+
+            var PurchaseTabItems = {
+                TabPage10: {
+                    id: 'TabPage10',
+                    layout: 'border',
+                    title: '资金来源',
+                    items: [PurDtl4SOFGrid_grid]
+                }
+            }
+
+            var PurchaseTabArr = [];
+            var PurchaseIndTabItems = individualInfo.tabPanel['PurDtl4SOFTab'].items;
+            for (var i = 0; i < PurchaseIndTabItems.length; i++) {
+                var tab = PurchaseIndTabItems[i];
+                if (!tab.hidden) {
+                    PurchaseTabArr.push(Ext.apply(PurchaseTabItems[tab.id], tab));
+                    //PurchaseTabArr.push(Ext.apply(PurchaseIndTabItems[tab.id], tab));
+                }
+            }
+
+            var PurchaseTabPanel = Ext.create('Ext.tab.Panel', {
+                layout: 'border',
+                region: 'center',
+                split: true, border: true,// collapsible: true,
+                deferredRender: false,
+                plain: true,
+                activeTab: 0,
+                // minHeight: 400,
+                // minWidth: 600,
+                defaults: { bodyStyle: 'padding:3px' },
+                items: PurchaseTabArr
+            });
+
+            //定义PurchaseDtlPanelText_form
+            var PurchaseDtlPanelText_formInitialConfig = {
+                region: 'north',
+                frame: true,
+                split: true,
+                border: true,// collapsible: true,
+                //minWidth: 600,
+                buskey: 'PhId', //对应的业务表主键
+                otype: otype //操作类型,add||edit
+            };
+            var PurchaseDtlPanelText_formConfig = PurchaseDtlPanelText_formInitialConfig;
+            if (individualInfo.form) {
+                Ext.apply(PurchaseDtlPanelText_formConfig, individualInfo.form['PurchaseDtlPanelText']);
+            }
+            var PurchaseDtlPanelText_form = Ext.create('Ext.ng.TableLayoutForm', PurchaseDtlPanelText_formConfig);
+
+
+            var Purchaseform = Ext.create('Ext.ng.TableLayoutForm', {
+                region: 'north',
+                frame: true,
+                // split: true,
+                // minWidth: 400,
+                // collapsible: true,
+                //autoScroll: true,
+                //buskey: 'PhId', //对应的业务表主键属性
+                //otype: otype, //操作类型,add||edit||view
+                //columnsPerRow: 3,
+                //fieldDefaults: {
+                //    labelWidth: 87,
+                //    anchor: '100%',
+                //    margin: '0 10 5 0',
+                //    msgTarget: 'side'
+                //},
+                fields: [
+                    {
+                        xtype: 'ngText',
+                        fieldLabel: '预算单位:',
+                        name: 'FDeclarationUnit',
+                        colspan: 1,
+                        readOnly: true,
+                        id: 'FDeclarationUnit'
+                    }, {
+                        xtype: 'ngText',
+                        fieldLabel: '预算部门:',
+                        name: 'FBudgetDept',
+                        readOnly: true,
+                        colspan: 1,
+                        id: 'FBudgetDept'
+                    }, {
+                        xtype: 'ngText',
+                        fieldLabel: '项目:',
+                        name: 'FProjName',
+                        readOnly: true,
+                        colspan: 1,
+                        id: 'FProjName'
+                    }
+                ]
+            });
+
+            Ext.define('Purchasemodel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'PhId',
+                        type: 'System.Int64',
+                        mapping: 'PhId'
+                    },
+                    {
+                        name: 'FProjName',
+                        type: 'System.String',
+                        mapping: 'FProjName'
+                    }
+                ]
+            });
+            //采购计划
+            Ext.define('PurchaseDtlPanelModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+
+                        name: "FContent",
+                        type: 'System.String',
+                        mapping: 'FContent'
+                    },
+                    {
+
+                        name: "FCatalogCode",
+                        type: 'System.String',
+                        mapping: 'FCatalogCode'
+                    },
+                    {
+
+                        name: "FTypeCode",
+                        type: 'System.String',
+                        mapping: 'FTypeCode'
+                    },
+                    {
+
+                        name: "FProcedureCode",
+                        type: 'System.String',
+                        mapping: 'FProcedureCode'
+                    },
+                    {
+
+                        name: "FQty",
+                        type: 'int',
+                        mapping: 'FQty'
+                    },
+                    {
+
+                        name: "FMeasUnit",
+                        type: 'System.String',
+                        mapping: 'FMeasUnit'
+                    },
+                    {
+
+                        name: "FPrice",
+                        type: 'float',
+                        mapping: 'FPrice'
+                    },
+
+                    {
+
+                        name: "MstPhid",
+                        type: 'System.Int64',
+                        mapping: 'MstPhid'
+                    },
+                    {
+
+                        name: "FDtlCode",
+                        type: 'System.String',
+                        mapping: 'FDtlCode'
+                    },
+                    {
+
+                        name: "FSpecification",
+                        type: 'System.String',
+                        mapping: 'FSpecification'
+                    },
+                    {
+
+                        name: "FRemark",
+                        type: 'System.String',
+                        mapping: 'FRemark'
+                    },
+                    {
+
+                        name: "FEstimatedPurTime",
+                        type: 'System.Datetime',
+                        mapping: 'FEstimatedPurTime'
+                    },
+                    {
+
+                        name: "FIfPerformanceAppraisal",
+                        type: 'int',
+                        mapping: 'FIfPerformanceAppraisal'
+                    },
+                    {
+
+                        name: "FAmount",
+                        type: 'float',
+                        mapping: 'FAmount'
+                    },
+                    {
+
+                        name: "FName",
+                        type: 'System.String',
+                        mapping: 'FName'
+                    },
+                    {
+                        "name": "key",
+                        "type": "string",
+                        "mapping": "key"
+                    }
+                ]
+            });
+            var PurchaseDtlPanelStore = Ext.create('Ext.ng.JsonStore', {
+                model: 'PurchaseDtlPanelModel',
+                autoLoad: false
+                // url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo'
+            })
+
+            var Purchasestore = Ext.create('Ext.ng.JsonStore', {
+                model: 'Purchasemodel',
+                autoLoad: false
+                // url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo'
+            })
+
+
+            var Purchasegrid = Ext.create('Ext.ng.GridPanel', {
+                region: 'west',
+                border: false,
+                frame: true,
+                width: 200,
+                store: Purchasestore,
+                columnLines: true,
+                buskey: 'PhId', //对应的子表主键属性
+                columns: [
+                    {
+                        header: '项目',
+                        dataIndex: 'FProjName',
+                        width: 190,
+                        sortable: false,
+                        // hidden: true
+                    }
+                ],
+                listeners: {
+                    'selectionchange': function (view, selected, eOpts) {
+                        if (selected[0] != undefined && selected[0].data != undefined) {
+                            //切换明细项目时先把原来采购明细保存
+
+                            var PurchaseDtlData = PurchaseDtlPanel_form.getFormData();
+                            var PurchaseDtlDataObj = JSON.parse(PurchaseDtlData);
+                            var PurchaseDtlFName = "##$$##";
+                            if (PurchaseDtlDataObj.form.modifiedRow) {
+                                PurchaseDtlFName = PurchaseDtlDataObj.form.modifiedRow.FName;
+                                if (PurchaseDtlFName) {
+                                    PurchaseDtlPanelStore.clearFilter();
+                                    PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                                    if (PurchaseDtlPanelStore.getCount() == 0) {
+                                        PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.modifiedRow);
+                                    } else {
+                                        PurchaseDtlPanelStore.removeAt(0);
+                                        PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.modifiedRow);
+                                    }
+                                }
+                            }
+                            else if (PurchaseDtlDataObj.form.newRow) {
+                                PurchaseDtlFName = PurchaseDtlDataObj.form.newRow.FName;
+                                if (PurchaseDtlFName) {
+                                    PurchaseDtlPanelStore.clearFilter();
+                                    PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                                    if (PurchaseDtlPanelStore.getCount() == 0) {
+                                        PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.newRow);
+                                    } else {
+                                        PurchaseDtlPanelStore.removeAt(0);
+                                        PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.newRow);
+                                    }
+                                }
+                            }
+
+
+
+                            PurchaseDtlPanelStore.clearFilter();
+                            PurDtl4SOFGrid_store.clearFilter();
+                            var FProjName = selected[0].data.FProjName;
+                            // alert(FProjName);
+                            PurDtl4SOFGrid_store.filter("FName", FProjName);
+                            //当没有相关资金来源时,从项目明细中重新获取
+                            if (PurDtl4SOFGrid_store.getCount() == 0) {
+                                for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                                    if (BudgetDtlPanel_store.getAt(i).get('FIfPurchase') == 1 && BudgetDtlPanel_store.getAt(i).get('FName') == FProjName) {
+                                        //不存在资金来源数据时,添加数据
+                                        PurDtl4SOFGrid_store.add({ FName: BudgetDtlPanel_store.getAt(i).get('FName'), FSourceOfFunds: BudgetDtlPanel_store.getAt(i).get('FSourceOfFunds'), FSourceOfFunds_EXName: BudgetDtlPanel_store.getAt(i).get('FSourceOfFunds_EXName'), FAmount: BudgetDtlPanel_store.getAt(i).get('FAmount'), MstPhid: busid, FDtlCode: BudgetDtlPanel_store.getAt(i).get('FDtlCode') });
+
+
+                                    }
+                                }
+                            }
+
+
+                            PurchaseDtlPanelStore.filter("FName", FProjName);
+                            if (PurchaseDtlPanelStore.getCount() == 0) {
+                                PurchaseDtlPanelStore.add({ FName: FProjName, MstPhid: busid, FDtlCode: BudgetDtlPanel_store.getAt(i).get('FDtlCode'), FIfPerformanceAppraisal: 2 });
+                            }
+                            //PurchaseDtlPanelStore.data.items[0].data
+                            var Purchaseobj = PurchaseDtlPanel_form.getForm();
+                            Purchaseobj.setValues(PurchaseDtlPanelStore.data.items[0].data);
+
+                            //代码转名称
+                            var codectl = [
+                                PurchaseDtlPanel_form.queryById('FCatalogCode'),
+                                PurchaseDtlPanel_form.queryById('FTypeCode'),
+                                PurchaseDtlPanel_form.queryById('FProcedureCode')
+
+                            ]; //mainPanel_form.queryById('FIfPerformanceAppraisal')
+                            BatchBindCombox(codectl);
+                        }
+                    }
+                    ,
+                    'afterrender': function (eOpts) {
+                       // Purchasegrid.getSelectionModel().select(0, true);
+                    }
+                    //,
+                    //'beforeselect': function (combo, record, index, eOpts) {
+                    //   // alert(11);
+                    //}
+                }
+
+            });
+            //工具栏
+            var ngpurchaseToolbar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                //rightName: '', //权限名称
+                ngbuttons: [
+                    'ok'
+                ]
+            });
+
+            if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                // if (PurchaseDtlPanelStore.getCount() == 0) {
+                Ext.apply(PurchaseDtlPanelStore.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo');
+                Ext.apply(PurchaseDtlPanelStore.proxy.extraParams, { 'id': busid, 'tabtype': 'projectdtlpurchasedtl' });
+                PurchaseDtlPanelStore.cachePageData = false;
+                PurchaseDtlPanelStore.load();
+                PurchaseDtlPanelStore.cachePageData = true;
+                // }
+
+                // if (PurDtl4SOFGrid_store.getCount() == 0) {
+                Ext.apply(PurDtl4SOFGrid_store.proxy.url = C_ROOT + 'GYS/YS/BudgetMst/GetBudgetMstInfo');
+                Ext.apply(PurDtl4SOFGrid_store.proxy.extraParams, { 'id': busid, 'tabtype': 'projectdtlpurdtl4sof' });
+                PurDtl4SOFGrid_store.cachePageData = false;
+                PurDtl4SOFGrid_store.load();
+                PurDtl4SOFGrid_store.cachePageData = true;
+                // }
+
+            }
+            //定义窗口
+            Ext.define("Ext.ng.gh.baseWindow", {
+                extend: 'Ext.window.Window',
+                cancelback: Ext.emptyFn,
+                closeAction: 'close',
+                initComponent: function () {
+                    var me = this;
+                    me.callParent();
+                    me.on("close", Ext.bind(function (p, opts) {
+                        me.invokeCancelback();
+                    }, me));
+                },
+                invokeCancelback: function () {
+                    var me = this;
+                    if (!Ext.isEmpty(me.cancelback)) {
+                        me.cancelback();
+                    }
+                }
+            });
+
+            //集中采购
+            ngToolbar.get('purchase').on('click', function () {
+                var purchaseCount = 0;
+                Purchasestore.removeAll();
+                PurDtl4SOFGrid_store.clearFilter();
+                PurchaseDtlPanelStore.clearFilter();
+                //if (otype == $Otype.EDIT || otype == $Otype.VIEW) {
+                //    if (PurchaseDtlPanelStore.getCount() == 0) {
+                //        Ext.apply(PurchaseDtlPanelStore.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo');
+                //        Ext.apply(PurchaseDtlPanelStore.proxy.extraParams, { 'id': busid, 'tabtype': 'projectdtlpurchasedtl' });
+                //        PurchaseDtlPanelStore.cachePageData = false;
+                //        PurchaseDtlPanelStore.load();
+                //        PurchaseDtlPanelStore.cachePageData = true;
+                //    }
+
+                //    if (PurDtl4SOFGrid_store.getCount() == 0) {
+                //        Ext.apply(PurDtl4SOFGrid_store.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo');
+                //        Ext.apply(PurDtl4SOFGrid_store.proxy.extraParams, { 'id': busid, 'tabtype': 'projectdtlpurdtl4sof' });
+                //        PurDtl4SOFGrid_store.cachePageData = false;
+                //        PurDtl4SOFGrid_store.load();
+                //        PurDtl4SOFGrid_store.cachePageData = true;
+                //    }
+
+                //}
+
+                var PurDtl4SOFGridCount = PurDtl4SOFGrid_store.getCount();
+                var PurchaseDtlPanelStoreCount = PurchaseDtlPanelStore.getCount();
+                //var PurchaseDtlData = PurchaseDtlPanel_form.getFormData();
+                //var PurchaseDtlDataObj = JSON.parse(PurchaseDtlData);
+                // PurchaseDtlDataObj.add(PurchaseDtlDataObj.form.newRow);
+                for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                    if (BudgetDtlPanel_store.getAt(i).get('FIfPurchase') == 1 && BudgetDtlPanel_store.getAt(i).get('FName')) {
+                        purchaseCount += 1;
+
+                        Purchasestore.add({ 'FProjName': BudgetDtlPanel_store.getAt(i).get('FName') });
+                        //不存在资金来源数据时,添加数据
+                        if (PurDtl4SOFGridCount == 0) {
+                            PurDtl4SOFGrid_store.add({ FName: BudgetDtlPanel_store.getAt(i).get('FName'), FSourceOfFunds: BudgetDtlPanel_store.getAt(i).get('FSourceOfFunds'), FSourceOfFunds_EXName: BudgetDtlPanel_store.getAt(i).get('FSourceOfFunds_EXName'), FAmount: BudgetDtlPanel_store.getAt(i).get('FAmount'), MstPhid: busid, FDtlCode: BudgetDtlPanel_store.getAt(i).get('FDtlCode') });
+                        }
+
+                        if (PurchaseDtlPanelStoreCount == 0) {
+                            PurchaseDtlPanelStore.clearFilter();
+                            PurchaseDtlPanelStore.filter("FName", BudgetDtlPanel_store.getAt(i).get('FName'));
+                            if (PurchaseDtlPanelStore.getCount() == 0) {
+                                PurchaseDtlPanelStore.add({ FName: BudgetDtlPanel_store.getAt(i).get('FName'), MstPhid: busid, FDtlCode: BudgetDtlPanel_store.getAt(i).get('FDtlCode'), FIfPerformanceAppraisal: 2 });
+                            }
+                        }
+                        //PurDtl4SOFGrid_store.add({ FName: BudgetDtlPanel_store.getAt(i).get('FName'), FSourceOfFunds: BudgetDtlPanel_store.getAt(i).get('FSourceOfFunds'), FAmount: BudgetDtlPanel_store.getAt(i).get('FAmount') });
+                    }
+                }
+
+                if (purchaseCount == 0) {
+                    Ext.MessageBox.alert('提示', "没有选择集中采购的预算明细数据!");
+                    return;
+                }
+                //去掉相同项目名称
+                var PurchaseCount = Purchasestore.getCount();
+                for (var i = 0; i < PurchaseCount; i++) {
+                    Purchasestore.clearFilter();
+                    Purchasestore.filter("FProjName", Purchasestore.getAt(i).get("FProjName"));
+                    if (Purchasestore.getCount() > 1) {
+                        var count = Purchasestore.getCount() - 1;
+                        for (var j = 0; j < count; j++) {
+                            Purchasestore.removeAt(j);
+                            j--;
+                            count--;
+                            PurchaseCount--;
+                        }
+                        i--;
+                    }
+                }
+                Purchasestore.clearFilter();
+
+                if (otype == $Otype.EDIT || otype == $Otype.ADD) {
+                    for (var i = 0; i < Purchasestore.getCount(); i++) {
+                        var PurchaseFProjName = Purchasestore.getAt(i).get('FProjName');
+                        BudgetDtlPanel_store.clearFilter();
+                        BudgetDtlPanel_store.filterBy(function (record) {
+                            return record.get("FName") == PurchaseFProjName && record.get("FIfPurchase") == 1;
+                        })
+                        PurDtl4SOFGrid_store.clearFilter();
+                        PurDtl4SOFGrid_store.filter("FName", PurchaseFProjName);
+                        //当明细项目的采购行数跟采购里资金来源行数不同,则移除原来的资金来源,添加新的资金来源
+                        if (PurDtl4SOFGrid_store.getCount() != BudgetDtlPanel_store.getCount()) {
+                            var count = PurDtl4SOFGrid_store.getCount();
+                            for (var j = 0; j < count; j++) {
+                                PurDtl4SOFGrid_store.removeAt(j);
+                                j--;
+                                count--;
+                            }
+                            for (var j = 0; j < BudgetDtlPanel_store.getCount(); j++) {
+                                PurDtl4SOFGrid_store.add({ FName: BudgetDtlPanel_store.getAt(j).get('FName'), FSourceOfFunds: BudgetDtlPanel_store.getAt(j).get('FSourceOfFunds'), FSourceOfFunds_EXName: BudgetDtlPanel_store.getAt(j).get('FSourceOfFunds_EXName'), FAmount: BudgetDtlPanel_store.getAt(j).get('FAmount'), MstPhid: busid, FDtlCode: BudgetDtlPanel_store.getAt(j).get('FDtlCode') });
+                            }
+                        }
+                    }
+                }
+
+
+                //根据明细项目筛选,填入采购计划的总计金额
+                for (var i = 0; i < Purchasestore.getCount(); i++) {
+                    var PurchaseFProjName = Purchasestore.getAt(i).get('FProjName');
+                    PurchaseDtlPanelStore.clearFilter();
+                    PurchaseDtlPanelStore.filter("FName", PurchaseFProjName);
+                    PurDtl4SOFGrid_store.clearFilter();
+                    PurDtl4SOFGrid_store.filter("FName", PurchaseFProjName);
+                    var PurchaseDtlPanelAmount = 0, amount = 0;
+                    for (var j = 0; j < PurDtl4SOFGrid_store.getCount(); j++) {
+                        amount = PurDtl4SOFGrid_store.getAt(j).get('FAmount');
+                        if (amount == undefined) {
+                            amount = 0;
+                        }
+                        PurchaseDtlPanelAmount += amount;
+                    }
+                    PurchaseDtlPanelStore.getAt(0).set("FAmount", PurchaseDtlPanelAmount);
+                }
+                Purchasestore.clearFilter();
+                PurchaseDtlPanelStore.filter("FName", "##$$##");
+                PurDtl4SOFGrid_store.filter("FName", "##$$##");
+                BudgetDtlPanel_store.clearFilter();
+
+
+               
+
+                purchaseWin = Ext.create("Ext.ng.gh.baseWindow", {
+                    title: '集中采购',
+                    modal: true,
+                    height: 485,
+                    width: 1000,
+                    layout: 'border',
+                    items: [
+                        //{
+                        //    region: 'north',
+                        //    layout: 'border',
+                        //    height:50,
+                        //    border: false,
+                        //    item: [ngpurchaseToolbar]
+                        //},
+                        {
+                            region: 'west',
+                            layout: 'border',
+                            width: '20%',
+                            border: false,
+                            items: [Purchasegrid]
+                        },
+                        {
+                            region: 'center',
+                            layout: 'border',
+                            margin: '0 0 0 0',
+                            width: '78%',
+                            border: false,
+                            items: [ngpurchaseToolbar, PurchaseDtlPanel_form, PurchaseTabPanel]
+                        }
+                    ],
+                    invokeCancelback: function () {
+                        //点关闭时把修改的同步上去
+                        var PurchaseDtlData = PurchaseDtlPanel_form.getFormData();
+                        var PurchaseDtlDataObj = JSON.parse(PurchaseDtlData);
+                        //var PurchaseDtlFName = "##$$##";
+                        if (PurchaseDtlDataObj.form.modifiedRow) {
+                            var PurchaseDtlFName = PurchaseDtlDataObj.form.modifiedRow.FName;
+                            if (PurchaseDtlFName) {
+                                PurchaseDtlPanelStore.clearFilter();
+                                PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                                if (PurchaseDtlPanelStore.getCount() == 0) {
+                                    PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.modifiedRow);
+                                } else {
+                                    PurchaseDtlPanelStore.removeAt(0);
+                                    PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.modifiedRow);
+                                }
+                            }
+                        }
+                        else if (PurchaseDtlDataObj.form.newRow) {
+                            var PurchaseDtlFName = PurchaseDtlDataObj.form.newRow.FName;
+                            if (PurchaseDtlFName) {
+                                PurchaseDtlPanelStore.clearFilter();
+                                PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                                if (PurchaseDtlPanelStore.getCount() == 0) {
+                                    PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.newRow);
+                                } else {
+                                    PurchaseDtlPanelStore.removeAt(0);
+                                    PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.newRow);
+                                }
+                            }
+                        }
+                        PurchaseDtlPanel_form.getForm().reset();
+                        //Ext.getCmp('myFormId').getForm().loadRecord(Ext.create('MyProject.model.MyModel'))
+
+                        //var Purchaseobj = PurchaseDtlPanel_form.getForm();
+                        //Purchaseobj.setValues("");
+
+
+                    }
+                    //items: [/*Purchaseform,*/Purchasegrid,PurchaseDtlPanel_form, PurchaseTabPanel/*, PurchaseDtlPanelText_form*/]
+                });
+                purchaseWin.show();
+                for (var i = 0; i < Purchasestore.getCount(); i++) {
+                    if (Purchasestore.getAt(i).get('FProjName') == budgetDtlFName) {
+                        Purchasegrid.getSelectionModel().select(i, true);
+                        break;
+                    }
+                }
+                if (budgetDtlFName == "") {
+                    Purchasegrid.getSelectionModel().select(0, true);
+                }
+                budgetDtlFName = "";
+            });
+            //Ext.getCmp('Gridid').getSelectionModel().select(0, true);
+
+            //采购明细确定
+            ngpurchaseToolbar.items.get('ok').on('click', function () {
+                var PurchaseDtlData = PurchaseDtlPanel_form.getFormData();
+                var PurchaseDtlDataObj = JSON.parse(PurchaseDtlData);
+                //var PurchaseDtlFName = "##$$##";
+                if (PurchaseDtlDataObj.form.modifiedRow) {
+                    var PurchaseDtlFName = PurchaseDtlDataObj.form.modifiedRow.FName;
+                    if (PurchaseDtlFName) {
+                        PurchaseDtlPanelStore.clearFilter();
+                        PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                        if (PurchaseDtlPanelStore.getCount() == 0) {
+                            PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.modifiedRow);
+                        } else {
+                            PurchaseDtlPanelStore.removeAt(0);
+                            PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.modifiedRow);
+                        }
+                    }
+                }
+                else if (PurchaseDtlDataObj.form.newRow) {
+                    var PurchaseDtlFName = PurchaseDtlDataObj.form.newRow.FName;
+                    if (PurchaseDtlFName) {
+                        PurchaseDtlPanelStore.clearFilter();
+                        PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                        if (PurchaseDtlPanelStore.getCount() == 0) {
+                            PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.newRow);
+                        } else {
+                            PurchaseDtlPanelStore.removeAt(0);
+                            PurchaseDtlPanelStore.add(PurchaseDtlDataObj.form.newRow);
+                        }
+                    }
+                }
+
+                //for (var i = 0; i < Purchasestore.getCount(); i++) {
+                //    var PurchaseDtlFName = Purchasestore.getAt(i).get('FProjName');
+                //    PurDtl4SOFGrid_store.filter("FName", PurchaseDtlFName);
+                //    var PurDtl4SOFGridAmount = 0;
+                //    for (var j = 0; j < PurDtl4SOFGrid_store.getCount(); j++) {
+                //        PurDtl4SOFGridAmount += PurDtl4SOFGrid_store.getAt(j).get('FAmount')
+                //    }
+                //    if (PurDtl4SOFGridAmount > PurchaseDtlPanelStore.getAt(0).get('FAmount')) {
+                //        Ext.MessageBox.alert('提示', PurchaseDtlFName + "的资金来源金额不能大于项目金额总计");
+
+                //        return
+                //    }
+                //}
+
+                for (var i = 0; i < Purchasestore.getCount(); i++) {
+                    var PurchaseDtlFName = Purchasestore.getAt(i).get('FProjName');
+                    PurDtl4SOFGrid_store.clearFilter();
+                    PurDtl4SOFGrid_store.filter("FName", PurchaseDtlFName);
+                    var PurDtl4SOFGridAmount = 0;
+                    for (var j = 0; j < PurDtl4SOFGrid_store.getCount(); j++) {
+                        PurDtl4SOFGridAmount += PurDtl4SOFGrid_store.getAt(j).get('FAmount')
+                    }
+                    PurchaseDtlPanelStore.clearFilter();
+                    PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                    if (PurDtl4SOFGridAmount > PurchaseDtlPanelStore.getAt(0).get('FAmount')) {
+                        Ext.MessageBox.alert('提示', PurchaseDtlFName + "的资金来源金额不能大于项目金额总计");
+
+                        return
+                    }
+                }
+
+                PurDtl4SOFGrid_store.clearFilter();
+                PurchaseDtlPanelStore.clearFilter();
+
+                //判断必录项是否录了
+                for (var i = 0; i < PurchaseDtlPanelStore.getCount(); i++) {
+                    var PurchaseDtlFName = PurchaseDtlPanelStore.getAt(i).get('FName');
+                    if (!PurchaseDtlPanelStore.getAt(i).get('FContent') || !PurchaseDtlPanelStore.getAt(i).get('FTypeCode') ||
+                        !PurchaseDtlPanelStore.getAt(i).get('FProcedureCode') || !PurchaseDtlPanelStore.getAt(i).get('FIfPerformanceAppraisal') ||
+                        !PurchaseDtlPanelStore.getAt(i).get('FCatalogCode') || !PurchaseDtlPanelStore.getAt(i).get('FQty') ||
+                            !PurchaseDtlPanelStore.getAt(i).get('FMeasUnit') || !PurchaseDtlPanelStore.getAt(i).get('FPrice') ||
+                            !PurchaseDtlPanelStore.getAt(i).get('FSpecification') || !PurchaseDtlPanelStore.getAt(i).get('FEstimatedPurTime') 
+                    ) {
+                        Ext.MessageBox.alert('提示', PurchaseDtlFName + "的集中采购必录项未录全");
+
+                        return
+                    }
+                }
+                //PurchaseDtlPanelStore.clearFilter();
+                //PurDtl4SOFGrid_store.clearFilter();
+
+                PurchaseDtlPanel_form.getForm().reset();
+                //var Purchaseobj = PurchaseDtlPanel_form.getForm();
+                //Purchaseobj.setValues("");
+
+                purchaseWin.hide();
+            });
+
+            //////集中采购
+
+
+
+            //设置UI
+            var textBox = FunctionalOvervPanel_form.queryById("FFunctionalOverview");
+            //textBox.getDom().style.fontSize = '20pt';//设置字体大小
+            textBox.setFieldStyle("font-size:30pt;")
+
+            //保存
+            ngToolbar.get('save').on('click', function () {
+                ngToolbar.get('save').disable();
+                save();
+                ngToolbar.get('save').setDisabled(false);
+            });
+
+            function save(callback) {
+
+                var mainPanelvf = mainPanel_form.isValid();
+
+                var BudgetDtlPanelvf = BudgetDtlPanel_grid.isValid();
+                var FundApplPanelvf = FundApplPanel_grid.isValid();
+                var ImplPlanPanelvf = ImplPlanPanel_grid.isValid();
+
+                var projectStartInfoPanellvf = projectStartInfoPanel_form.isValid();
+                var FunctionalOvervPanelvf = FunctionalOvervPanel_form.isValid();
+                var ProjOverviewPanelvf = ProjOverviewPanel_form.isValid();
+                var longTargetPanelvf = longTargetPanel_form.isValid();
+                var yearTargetPanelvf = yearTargetPanel_form.isValid();
+                var PerformTargetPanel_gridvf = PerformTargetPanel_grid.isValid();
+
+
+                if (!mainPanelvf || !BudgetDtlPanelvf || !FundApplPanelvf || !ImplPlanPanelvf
+                    || !FunctionalOvervPanelvf || !ProjOverviewPanelvf || !longTargetPanelvf
+                    || !yearTargetPanelvf || !PerformTargetPanel_gridvf || !projectStartInfoPanellvf) {
+                    ngToolbar.get('save').enable();
+                    return;
+                }
+
+
+
+
+                var flg;
+                //调用二次开发脚本的校验方法
+                if (typeof beforeSaveEdit === "function") {
+                    flg = beforeSaveEdit();
+                    if (!flg)
+
+                        ngToolbar.get('save').setDisabled(false);
+                        return;
+                }
+
+                syncFundAppl(); //同步资金申请数据
+
+                //检查是否输入了绩效目标分解信息
+                if (!checkPerformTarget()) {
+                    return;
+                }
+
+                //如果没有启用项目绩效，则清除绩效目标分解
+                var ifPerEval = mainPanel_form.queryById("FIfPerformanceAppraisal").getValue();
+                if (ifPerEval == 2) {
+                    PerformTargetPanel_store.removeAll(); //清空绩效目标分解
+                }
+
+                BudgetDtlPanel_store.clearFilter();
+                BudgetDtlPanel_store.filter("FIfPurchase", 1);
+                if (BudgetDtlPanel_store.getCount() > 0) {
+                    if (PurchaseDtlPanelStore.getCount() == 0) {
+                        Ext.MessageBox.alert('提示', "请先录入集中采购数据");
+                        return;
+                    }
+                    for (var i = 0; i < BudgetDtlPanel_store.getCount; i++) {
+                        var FName = BudgetDtlPanel_store.getAt(i).get("FName");
+                        PurchaseDtlPanelStore.clearFilter();
+                        PurchaseDtlPanelStore.filter("FName", FName);
+                        if (PurchaseDtlPanelStore.getCount() == 0) {
+                            Ext.MessageBox.alert('提示', FName + "项目已选择集中采购,但未录入采购明细,请先录入!");
+                            return;
+                        }
+
+                        // PurchaseDtlPanelStore.getAt(0).get("FAmount")
+                    }
+                }
+                //项目明细删除明细后移除相应采购明细及资金来源
+                var PurchaseDtlPanelStoreCount = PurchaseDtlPanelStore.getCount();
+                for (var i = 0; i < PurchaseDtlPanelStoreCount; i++) {
+                    var FName = PurchaseDtlPanelStore.getAt(i).get("FName");
+                    BudgetDtlPanel_store.clearFilter();
+                    //BudgetDtlPanel_store.filter("FName", FName);
+                    BudgetDtlPanel_store.filterBy(function (record) {
+                        return record.get("FName") == FName && record.get("FIfPurchase") == 1;
+                    })
+                    if (BudgetDtlPanel_store.getCount == 0) {
+                        PurchaseDtlPanelStore.removeAt(i);
+                        PurchaseDtlPanelStoreCount--;
+                        i--;
+                        //PurDtl4SOFGrid_store.clearFilter();
+                        //PurDtl4SOFGrid_store.filter("FName", FName);
+                        //var PurDtl4SOFGrid_storeCount = PurDtl4SOFGrid_store.getCount();
+                        //for (var j = 0; j < PurDtl4SOFGrid_storeCount; j++) {
+                        //    PurDtl4SOFGrid_store.removeAt(0);
+                        //}
+                    }
+                }
+
+                var PurDtl4SOFGrid_storeCount = PurDtl4SOFGrid_store.getCount();
+                for (var i = 0; i < PurDtl4SOFGrid_storeCount; i++) {
+                    var FName = PurDtl4SOFGrid_store.getAt(i).get("FName");
+                    var FSourceOfFunds = PurDtl4SOFGrid_store.getAt(i).get("FSourceOfFunds");
+                    BudgetDtlPanel_store.clearFilter();
+                    //BudgetDtlPanel_store.filter("FName", FName);
+                    BudgetDtlPanel_store.filterBy(function (record) {
+                        return record.get("FName") == FName && record.get("FIfPurchase") == 1 && record.get("FSourceOfFunds") == FSourceOfFunds;
+                    })
+                    if (BudgetDtlPanel_store.getCount == 0) {
+                        PurDtl4SOFGrid_store.removeAt(i);
+                        PurDtl4SOFGrid_storeCount--;
+                        i--;
+                    }
+                }
+
+                //判断资金金额
+                for (var i = 0; i < Purchasestore.getCount(); i++) {
+                    var PurchaseDtlFName = Purchasestore.getAt(i).get('FProjName');
+                    PurDtl4SOFGrid_store.clearFilter();
+                    PurDtl4SOFGrid_store.filter("FName", PurchaseDtlFName);
+                    var PurDtl4SOFGridAmount = 0;
+                    for (var j = 0; j < PurDtl4SOFGrid_store.getCount(); j++) {
+                        PurDtl4SOFGridAmount += PurDtl4SOFGrid_store.getAt(j).get('FAmount')
+                    }
+                    PurchaseDtlPanelStore.clearFilter();
+                    PurchaseDtlPanelStore.filter("FName", PurchaseDtlFName);
+                    if (PurDtl4SOFGridAmount > PurchaseDtlPanelStore.getAt(0).get('FAmount')) {
+                        Ext.MessageBox.alert('提示', PurchaseDtlFName + "的资金来源金额不能大于项目金额总计");
+
+                        return
+                    }
+                }
+
+                ///判断必录项是否录了
+                PurDtl4SOFGrid_store.clearFilter();
+                PurchaseDtlPanelStore.clearFilter();
+                for (var i = 0; i < PurchaseDtlPanelStore.getCount(); i++) {
+                    var PurchaseDtlFName = PurchaseDtlPanelStore.getAt(i).get('FName');
+                    if (!PurchaseDtlPanelStore.getAt(i).get('FContent') || !PurchaseDtlPanelStore.getAt(i).get('FTypeCode') ||
+                        !PurchaseDtlPanelStore.getAt(i).get('FProcedureCode') || !PurchaseDtlPanelStore.getAt(i).get('FIfPerformanceAppraisal') ||
+                        !PurchaseDtlPanelStore.getAt(i).get('FCatalogCode') || !PurchaseDtlPanelStore.getAt(i).get('FQty') ||
+                        !PurchaseDtlPanelStore.getAt(i).get('FMeasUnit') || !PurchaseDtlPanelStore.getAt(i).get('FPrice') ||
+                        !PurchaseDtlPanelStore.getAt(i).get('FSpecification') || !PurchaseDtlPanelStore.getAt(i).get('FEstimatedPurTime') 
+                    ) {
+                        Ext.MessageBox.alert('提示', PurchaseDtlFName + "的集中采购必录项未录全");
+
+                        return
+                    }
+                }
+
+                BudgetDtlPanel_store.clearFilter();
+                //当明细项目有选择集中采购时,主表集中采购置为是
+                for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                    if (BudgetDtlPanel_store.getAt(i).get('FIfPurchase') == 1) {
+                        mainPanel_form.queryById("FIfPurchase").setValue(1);
+                    }
+                }
+
+                var mstformData = mainPanel_form.getFormData();
+                var mstformDataObj = JSON.parse(mstformData);
+
+                //当新增时
+                if (otype == $Otype.ADD) {
+                    mainPanel_form.queryById("FType").setValue(workType);     //单据类型
+                    if (workType == "c" || workType == "z") {  //版本标识
+                        mainPanel_form.queryById("FVerNo").setValue("0001");
+                    } else if (workType == "z") { //年中调整
+                        mainPanel_form.queryById("FVerNo").setValue("0002");
+                    }
+                    mainPanel_form.queryById("FApproveStatus").setValue("1"); //审批状态
+
+                    mainPanel_form.queryById("FMidYearChange").setValue("0"); //单据调整状态
+                    if (mainPanel_form.queryById("FPerformEvalType").valueModels.length == 0) {
+                        mstformDataObj.form.newRow.FPerformEvalType = mainPanel_form.queryById("FPerformEvalType").defValue;
+                    }
+                }
+                if (otype == $Otype.EDIT) {
+                    if (mainPanel_form.queryById("FPerformEvalType").valueModels.length == 0) {
+                        mstformDataObj.form.modifiedRow.FPerformEvalType = mainPanel_form.queryById("FPerformEvalType").defValue;
+                    }
+                }
+                if (midYearEdit == "midYearEdit") {
+                    mainPanel_form.queryById("FVerNo").setValue("0002");//年中调整年初预算时版本改为0002
+                }
+
+                var mstformData = mainPanel_form.getFormData();
+                var mydata = { 'mstformData': mstformData };
+
+
+                if (datafromxmk == 1) {
+
+                    BudgetDtlPanel_grid.getStore().each(function (record) {
+                        record.set("PhId", "");
+                        record.set("MstPhid", "");
+                    });
+                    FundApplPanel_grid.getStore().each(function (record) {
+                        record.set("PhId", "");
+                        record.set("MstPhid", "");
+                    });
+                    ImplPlanPanel_grid.getStore().each(function (record) {
+                        record.set("PhId", "");
+                        record.set("MstPhid", "");
+                    });
+                    //FundApplPanel_grid.getStore().getAt(0).set('MstPhid', "");
+
+                    var budgetdtlimplplangridData = ImplPlanPanel_grid.getAllData();
+                    var budgetdtlfundapplgridData = FundApplPanel_grid.getAllData();
+                    var budgetdtlbudgetdtlgridData = BudgetDtlPanel_grid.getAllData();
+                    budgetdtlimplplangridData = budgetdtlimplplangridData.replace("modifiedRow", "newRow");
+                    budgetdtlfundapplgridData = budgetdtlfundapplgridData.replace("modifiedRow", "newRow");
+                    budgetdtlbudgetdtlgridData = budgetdtlbudgetdtlgridData.replace("modifiedRow", "newRow");
+                    datafromxmk = 0;
+                } else {
+                    var budgetdtlimplplangridData = ImplPlanPanel_grid.getChangeForEntity();
+                    var budgetdtlfundapplgridData = FundApplPanel_grid.getChangeForEntity();
+                    //var budgetdtlbudgetdtlgridData = BudgetDtlPanel_grid.getChangeForEntity();
+                    var budgetdtlbudgetdtlgridData = BudgetDtlPanel_grid.getAllData();
+                }
+                
+                var projectdtlperformtargetgridData = PerformTargetPanel_grid.getChangeForEntity();
+                //var budgetdtlimplplangridData = ImplPlanPanel_grid.getChangeForEntity();
+                //var budgetdtlfundapplgridData = FundApplPanel_grid.getChangeForEntity();
+                //            var budgetdtlbudgetdtlgridData = BudgetDtlPanel_grid.getChangeForEntity();
+                myData = Ext.apply(mydata, { 'budgetdtlimplplangridData': budgetdtlimplplangridData });//合并
+                myData = Ext.apply(mydata, { 'budgetdtlfundapplgridData': budgetdtlfundapplgridData });//合并
+                myData = Ext.apply(mydata, { 'budgetdtlbudgetdtlgridData': budgetdtlbudgetdtlgridData });//合并
+                myData = Ext.apply(mydata, { 'budgetdtlperformtargetgridData': projectdtlperformtargetgridData });
+
+                //采购信息和资金来源
+                PurchaseDtlPanelStore.clearFilter();
+                var PurchaseDtlRecord = new Array();
+                PurchaseDtlPanelStore.each(function (record) {
+                    PurchaseDtlRecord.push(record.data);
+                });
+                PurDtl4SOFGrid_store.clearFilter();
+                var PurDtl4SOFGridRecord = new Array();
+                PurDtl4SOFGrid_store.each(function (record) {
+                    PurDtl4SOFGridRecord.push(record.data);
+                });
+
+                var PurchaseDtlRecordData = new Array();
+                for (var i = 0; i < PurchaseDtlRecord.length; i++) {
+                    PurchaseDtlRecordData.push({ "row": PurchaseDtlRecord[i] });
+                };
+                var PurchaseDtlRecordDataJson = JSON.stringify({ "table": { "key": "PhId", "newRow": PurchaseDtlRecordData } });
+
+                var PurDtl4SOFGridRecordData = new Array();
+                for (var i = 0; i < PurDtl4SOFGridRecord.length; i++) {
+                    PurDtl4SOFGridRecordData.push({ "row": PurDtl4SOFGridRecord[i] });
+                };
+                var PurDtl4SOFGridRecordDataJson = JSON.stringify({ "table": { "key": "PhId", "newRow": PurDtl4SOFGridRecordData } });
+                myData = Ext.apply(mydata, { 'projectdtlpurchasedtlformData': PurchaseDtlRecordDataJson });//合并
+                myData = Ext.apply(mydata, { 'projectdtlpurdtl4sofgridData': PurDtl4SOFGridRecordDataJson /*JSON.stringify(PurDtl4SOFGridRecordData)*/ });//合并
+
+
+                //文字描述部分
+                var FunctionalOvervPanelformData = FunctionalOvervPanel_form.getFormData();//所有列在里面了
+                var longTargetPanelformData = longTargetPanel_form.getFormData();
+                var yearTargetPanelformData = yearTargetPanel_form.getFormData();
+                var ProjOverviewPanelformData = ProjOverviewPanel_form.getFormData();
+                var projectStartInfoPanelformData = projectStartInfoPanel_form.getFormData();
+
+                var FunctionalOvervPanelformDataObj = JSON.parse(FunctionalOvervPanelformData);
+                var longTargetPanelformDataObj = JSON.parse(longTargetPanelformData);
+                var yearTargetPanelformDataObj = JSON.parse(yearTargetPanelformData);
+                var ProjOverviewPanelformDataObj = JSON.parse(ProjOverviewPanelformData);
+                var projectStartInfoPanelformDataObj = JSON.parse(projectStartInfoPanelformData);
+
+                if (otype == $Otype.ADD) {
+                                       
+                    FunctionalOvervPanelformDataObj.form.newRow.FProjOverview = ProjOverviewPanelformDataObj.form.newRow.FProjOverview;
+                    FunctionalOvervPanelformDataObj.form.newRow.FProjBasis = projectStartInfoPanelformDataObj.form.newRow.FProjBasis;
+                    FunctionalOvervPanelformDataObj.form.newRow.FFeasibility = projectStartInfoPanelformDataObj.form.newRow.FFeasibility;
+                    FunctionalOvervPanelformDataObj.form.newRow.FNecessity = projectStartInfoPanelformDataObj.form.newRow.FNecessity;
+                    FunctionalOvervPanelformDataObj.form.newRow.FLTPerformGoal = longTargetPanelformDataObj.form.newRow.FLTPerformGoal;
+                    FunctionalOvervPanelformDataObj.form.newRow.FAnnualPerformGoal = yearTargetPanelformDataObj.form.newRow.FAnnualPerformGoal;
+                }
+
+                if (otype == $Otype.EDIT) {
+                    var FProjOverviewData, FProjBasisData, FFeasibilityData, FNecessityData, FLTPerformGoalData, FAnnualPerformGoalData;
+                    //项目概况
+                    if (ProjOverviewPanelformDataObj.form.modifiedRow) {
+                        if (ProjOverviewPanelformDataObj.form.modifiedRow.FProjOverview == null || ProjOverviewPanelformDataObj.form.modifiedRow.FProjOverview == '') {
+                            Ext.MessageBox.alert('提示', "项目概况不能为空");
+                            return
+                        }
+                        FProjOverviewData = ProjOverviewPanelformDataObj.form.modifiedRow.FProjOverview;
+                    }
+                    else if (ProjOverviewPanelformDataObj.form.newRow) {
+                        if (ProjOverviewPanelformDataObj.form.newRow.FProjOverview == null || ProjOverviewPanelformDataObj.form.newRow.FProjOverview == '') {
+                            Ext.MessageBox.alert('提示', "项目概况不能为空");
+                            return
+                        }
+                        FProjOverviewData = ProjOverviewPanelformDataObj.form.newRow.FProjOverview;
+                    }
+                    FunctionalOvervPanelformDataObj.form.modifiedRow.FProjOverview = FProjOverviewData;
+
+                    //长期绩效目标
+                    if (longTargetPanelformDataObj.form.modifiedRow) {
+                        if (longTargetPanelformDataObj.form.modifiedRow.FLTPerformGoal == null || longTargetPanelformDataObj.form.modifiedRow.FLTPerformGoal == '') {
+                            Ext.MessageBox.alert('提示', "总体绩效目标不能为空");
+                            return
+                        }
+                        FLTPerformGoalData = longTargetPanelformDataObj.form.modifiedRow.FLTPerformGoal;
+                    }
+                    else if (longTargetPanelformDataObj.form.newRow) {
+                        if (longTargetPanelformDataObj.form.newRow.FLTPerformGoal == null || longTargetPanelformDataObj.form.newRow.FLTPerformGoal == '') {
+                            Ext.MessageBox.alert('提示', "总体绩效目标不能为空");
+                            return
+                        }
+                        FLTPerformGoalData = longTargetPanelformDataObj.form.newRow.FLTPerformGoal;
+                    }
+                    FunctionalOvervPanelformDataObj.form.modifiedRow.FLTPerformGoal = FLTPerformGoalData;
+
+                    //年度绩效目标
+                    if (yearTargetPanelformDataObj.form.modifiedRow) {
+                        FAnnualPerformGoalData = yearTargetPanelformDataObj.form.modifiedRow.FAnnualPerformGoal;
+                    }
+                    else if (yearTargetPanelformDataObj.form.newRow) {
+                        FAnnualPerformGoalData = yearTargetPanelformDataObj.form.newRow.FAnnualPerformGoal;
+                    }
+                    FunctionalOvervPanelformDataObj.form.modifiedRow.FAnnualPerformGoal = FAnnualPerformGoalData;
+
+                    //项目立项情况
+                    if (projectStartInfoPanelformDataObj.form.modifiedRow) {
+                        if (projectStartInfoPanelformDataObj.form.modifiedRow.FProjBasis == null || projectStartInfoPanelformDataObj.form.modifiedRow.FProjBasis == '') {
+                            Ext.MessageBox.alert('提示', "项目立项情况下的项目依据不能为空");
+                            return
+                        }
+                        if (projectStartInfoPanelformDataObj.form.modifiedRow.FFeasibility == null || projectStartInfoPanelformDataObj.form.modifiedRow.FFeasibility == '') {
+                            Ext.MessageBox.alert('提示', "项目立项情况下的可行性不能为空");
+                            return
+                        }
+                        if (projectStartInfoPanelformDataObj.form.modifiedRow.FNecessity == null || projectStartInfoPanelformDataObj.form.modifiedRow.FNecessity == '') {
+                            Ext.MessageBox.alert('提示', "项目立项情况下的必要性不能为空");
+                            return
+                        }
+                        FProjBasisData = projectStartInfoPanelformDataObj.form.modifiedRow.FProjBasis;
+                        FFeasibilityData = projectStartInfoPanelformDataObj.form.modifiedRow.FFeasibility;
+                        FNecessityData = projectStartInfoPanelformDataObj.form.modifiedRow.FNecessity;
+                    }
+                    else if (projectStartInfoPanelformDataObj.form.newRow) {
+                        if (projectStartInfoPanelformDataObj.form.newRow.FProjBasis == null || projectStartInfoPanelformDataObj.form.newRow.FProjBasis == '') {
+                            Ext.MessageBox.alert('提示', "项目立项情况下的项目依据不能为空");
+                            return
+                        }
+                        if (projectStartInfoPanelformDataObj.form.newRow.FFeasibility == null || projectStartInfoPanelformDataObj.form.newRow.FFeasibility == '') {
+                            Ext.MessageBox.alert('提示', "项目立项情况下的可行性不能为空");
+                            return
+                        }
+                        if (projectStartInfoPanelformDataObj.form.newRow.FNecessity == null || projectStartInfoPanelformDataObj.form.newRow.FNecessity == '') {
+                            Ext.MessageBox.alert('提示', "项目立项情况下的必要性不能为空");
+                            return
+                        }
+                        FProjBasisData = projectStartInfoPanelformDataObj.form.newRow.FProjBasis;
+                        FFeasibilityData = projectStartInfoPanelformDataObj.form.newRow.FFeasibility;
+                        FNecessityData = projectStartInfoPanelformDataObj.form.newRow.FNecessity;
+                    }
+                    FunctionalOvervPanelformDataObj.form.modifiedRow.FProjBasis = FProjBasisData;
+                    FunctionalOvervPanelformDataObj.form.modifiedRow.FFeasibility = FFeasibilityData;
+                    FunctionalOvervPanelformDataObj.form.modifiedRow.FNecessity = FNecessityData;
+                }
+
+                var budgetdtltextcontentgridData = JSON.stringify(FunctionalOvervPanelformDataObj);
+                //==end========处理文字内容 xm3_ProjectDtl_TextContent============//
+
+                myData = Ext.apply(mydata, { 'budgetdtltextcontentgridData': budgetdtltextcontentgridData });//合并
+                var extendData;
+                //调用二开代码获取二开需要保存的数据
+                if (typeof getExtendData === "function") {
+                    extendData = getExtendData();
+                    myData = Ext.apply(mydata, extendData);//合并
+                }
+
+                if (midYearEdit == "midYearEdit") {
+                    myData = Ext.apply(mydata, { 'midYearEdit': "midYearEdit" });//合并
+                }
+
+
+                //当修改时
+                if (otype == $Otype.EDIT && mainPanel_form.queryById("FProjStatus").getValue() == 1) {
+                    //项目状态更改成“单位备选”时
+                    //if (mainPanel_form.queryById("FProjStatus").getValue() == 1) {
+                        Ext.MessageBox.confirm('提示', '是否清除该项目预算申报的单据？', callBack);
+
+                        function callBack(callBackid) {
+                            if (callBackid.toString() == "no" || callBackid.toString() == "cancel") {
+                                Ext.Ajax.request({
+                                    params: mydata,
+                                    url: C_ROOT + 'GYS/YS/BudgetMst/save',
+                                    success: function (response) {
+                                        var resp = Ext.JSON.decode(response.responseText);
+                                        if (resp.Status === "success") {
+                                            LoadAttach.Save("", attachGuid, resp.KeyCodes[0]);//保存附件
+                                            if (callback) {
+                                                callback();
+                                            }
+                                            else {
+                                                Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                                    if (window.external.RefreshWebListPage != undefined) {
+                                                        window.external.RefreshWebListPage();
+                                                    } else {
+                                                        $NG3Refresh();
+                                                    }
+
+                                                    $CloseTab();
+                                                });
+                                            }
+
+                                        } else {
+
+                                            ngToolbar.get('save').setDisabled(false);
+                                            Ext.MessageBox.alert('保存失败', resp.Msg);
+                                        }
+                                    }
+                                });
+                            } else {
+                                Ext.Ajax.request({
+                                    params: { 'id': mainPanel_form.queryById("PhId").getValue(), 'XmMstPhid': mainPanel_form.queryById("XmMstPhid").getValue() },
+                                    url: C_ROOT + 'GYS/YS/BudgetMst/DeleteAndChangeXmk',
+                                    success: function (response) {
+                                        var resp = Ext.JSON.decode(response.responseText);
+                                        if (resp.Status === "success") {
+                                            Ext.MessageBox.alert('提示', '删除成功！');
+                                            if (window.external.RefreshWebListPage != undefined) {
+                                                window.external.RefreshWebListPage();
+                                            } else {
+                                                $NG3Refresh();
+                                            }
+                                            $CloseTab();
+                                        } else {
+                                            ngToolbar.get('save').setDisabled(false);
+                                            Ext.MessageBox.alert('提示', '删除失败！');
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    //}
+
+                } else {
+                    Ext.Ajax.request({
+                        params: mydata,
+                        url: C_ROOT + 'GYS/YS/BudgetMst/save',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            if (resp.Status === "success") {
+                                LoadAttach.Save("", attachGuid, resp.KeyCodes[0]);//保存附件
+                                if (callback) {
+                                    callback();
+                                }
+                                else {
+                                    Ext.MessageBox.alert('提示', "保存成功", function () {
+
+                                        if (window.external.RefreshWebListPage != undefined) {
+                                            window.external.RefreshWebListPage();
+                                        } else {
+                                            $NG3Refresh();
+                                        }
+
+                                        $CloseTab();
+                                    });
+                                }
+
+                            } else {
+                                ngToolbar.get('save').setDisabled(false);
+                                Ext.MessageBox.alert('保存失败', resp.Msg);
+                            }
+                        }
+                    });
+                }
+
+
+            }
+
+            //附件
+            ngToolbar.get('attachment').on('click', function () {
+                OpenAttachment();
+            });
+
+            //打印
+            ngToolbar.get('print').on('click', function () {
+                var forms = [mainPanel_form, FunctionalOvervPanel_form, ProjOverviewPanel_form, projectStartInfoPanel_form, longTargetPanel_form, yearTargetPanel_form];
+                var grids = [BudgetDtlPanel_grid, FundApplPanel_grid, ImplPlanPanel_grid];
+                var titles = ['预算申报表', '部门职能描述', '项目概况', '项目立项情况', '长期绩效目标', '年度绩效目标', '项目预算明细', '项目资金申请', '实施计划'];
+                //$PrintForm("ProjectMstEdit", forms, grids, titles);
+
+
+                $PrintHelp("BPM_GHBudgetInfo", 'BPM_GHBudgetInfo', forms, grids, titles)
+            });
+
+            //调用二次开发脚本
+            if (typeof AllReady === "function") {
+                AllReady();
+            }
+
+            //增行
+            ngToolbar.items.get('addrow').on('click', function () {
+                if (tabPanel.activeTab == null) return;
+
+                if (tabPanel.activeTab.id == 'TabPage4') {
+                    var cbbudgetdtldata = BudgetDtlPanel_grid.getSelectionModel();
+                    BudgetDtlPanel_store.insert(BudgetDtlPanel_store.getCount(), cbbudgetdtldata);
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('MstPhId', busid);
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FIfPurchase', 2);//是否集中采购 暂时改为1
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FPrice', BudgetDtlPanel_store.getAt(0).get("FPrice"));
+                    //BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('Xm3_DtlPhid', "0");
+                }
+
+                if (tabPanel.activeTab.id == 'TabPage6') {
+                    var cbbudgetdtldata = ImplPlanPanel_grid.getSelectionModel();
+                    ImplPlanPanel_store.insert(ImplPlanPanel_store.getCount(), cbbudgetdtldata);
+                    ImplPlanPanel_store.getAt(ImplPlanPanel_store.getCount() - 1).set('MstPhId', busid);
+                    if (ImplPlanPanel_store.getCount() == 1) {
+                        ImplPlanPanel_store.getAt(0).set('FStartDate', mainPanel_form.queryById("FStartDate").getValue());
+                        ImplPlanPanel_store.getAt(0).set('FEndDate', mainPanel_form.queryById("FEndDate").getValue());
+                    }
+                    if (ImplPlanPanel_store.getCount() > 1) {
+                        ImplPlanPanel_store.getAt(ImplPlanPanel_store.getCount() - 1).set('FStartDate', ImplPlanPanel_store.getAt(ImplPlanPanel_store.getCount() - 2).get("FStartDate"));
+                        ImplPlanPanel_store.getAt(ImplPlanPanel_store.getCount() - 1).set('FEndDate', ImplPlanPanel_store.getAt(ImplPlanPanel_store.getCount() - 2).get("FEndDate"));
+                    }
+                }
+
+                if (tabPanel.activeTab.id == 'TabPage9') {
+                    if (!performTargetTypeLevel2) {
+                        Ext.MessageBox.alert('提示', "请选择绩效项目类型");
+                        return;
+                    }
+
+                    var cbbudgetdtldata = PerformTargetPanel_grid.getSelectionModel();
+                    PerformTargetPanel_store.insert(PerformTargetPanel_store.getCount(), cbbudgetdtldata);
+                    PerformTargetPanel_store.getAt(PerformTargetPanel_store.getCount() - 1).set('MstPhId', busid);
+                }
+                
+            });
+
+            //删行
+            ngToolbar.items.get('deleterow').on('click', function () {
+                if (tabPanel.activeTab == null) return;
+
+                if (tabPanel.activeTab.id == 'TabPage4') {
+                    var selection = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                    if (selection) {
+                        if (selection[0].data.Xm3_DtlPhid > 0) {
+                            Ext.MessageBox.alert('提示', "该明细引用自项目,不能删除");
+                            return;
+                        }
+                        BudgetDtlPanel_store.remove(selection);
+                    }
+                }
+
+                if (tabPanel.activeTab.id == 'TabPage6') {
+                    var selection = ImplPlanPanel_grid.getSelectionModel().getSelection();
+                    if (selection) {
+                        ImplPlanPanel_store.remove(selection);
+                    }
+                }
+
+                if (tabPanel.activeTab.id == 'TabPage9') {
+                    var selection = PerformTargetPanel_grid.getSelectionModel().getSelection();
+                    if (selection) {
+                        PerformTargetPanel_store.remove(selection);
+
+                        ExsplitGrid(PerformTargetPanel_grid, [3, 4]); //还原单元格
+                        ExMergeGrid(PerformTargetPanel_grid, [3, 4], false);
+                    }
+                }
+
+            });
+
+            //复制
+            ngToolbar.items.get('copyRow').on('click', function () {
+                if (tabPanel.activeTab == null) return;
+                var selection = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                if (selection.length > 0) {
+                    //var dtlValue = selection;
+                    //dtlValue[0].data.Xm3_DtlPhid = "";
+                    //dtlValue[0].data.FAmount = 0;
+                    //dtlValue[0].data.FBudgetAccounts_EXName = "";
+                    //dtlValue[0].data.FBudgetAccounts = "";
+                    //dtlValue[0].data.FExpensesChannel = "";
+                    //dtlValue[0].data.FExpensesChannel_EXName = "";
+                    //dtlValue[0].data.FFeedback = "";
+                    //dtlValue[0].data.FOtherInstructions = "";
+                    //dtlValue[0].data.MstPhId = busid;
+                    BudgetDtlPanel_store.add(selection[0].data);
+                   // BudgetDtlPanel_store.insert(BudgetDtlPanel_store.getCount(), dtlValue[0].data);
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('MstPhId', busid);
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('Xm3_DtlPhid', "");
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FBudgetAmount', 0);
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FBudgetAccounts_EXName', "");
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FBudgetAccounts', "");
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FExpensesChannel', "");
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FExpensesChannel_EXName', "");
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FFeedback', "");
+                    BudgetDtlPanel_store.getAt(BudgetDtlPanel_store.getCount() - 1).set('FOtherInstructions', "");
+
+                } else {
+                    Ext.MessageBox.alert('提示', "请选择需要增加的明细项目");
+                    return;
+                }
+
+
+
+            });
+
+
+            //切换tab
+            tabPanel.on('tabchange', function (tp, newCard, oldCard, eOpts) {
+                if (tp.activeTab == null) return;
+
+                ngToolbar.get('addrow').hide(); //disable();
+                ngToolbar.get('deleterow').hide(); //disable();
+                ngToolbar.get('copyRow').hide(); //disable();
+
+                if (otype != $Otype.VIEW && (newCard.id == "TabPage4" || newCard.id == "TabPage6" || newCard.id == "TabPage9")) {
+                    ngToolbar.get('addrow').show(); //enable();
+                    ngToolbar.get('deleterow').show(); //enable();
+                }
+                //引用项目库时
+                if (otype != $Otype.VIEW && newCard.id == "TabPage4"/* && datafromxmk == 1*/) {
+
+                    ngToolbar.get('addrow').hide();
+                    ngToolbar.get('copyRow').show();
+                    //BudgetDtlPanel_grid.getStore().each(function (record) {
+                    //    if (record.Xm3_DtlPhid) {
+                    //        ngToolbar.get('addrow').hide();
+                    //        ngToolbar.get('copyRow').show();
+                    //        return;
+                    //    }
+                    //});
+
+
+                }
+
+                if (newCard.id == "TabPage5") {
+                    syncFundAppl();
+                }
+
+                if (newCard.id == "TabPage9") {
+                    //合并单元格
+                    ExMergeGrid(PerformTargetPanel_grid, [3, 4], false); // 最后一个参数为false逐个列合并
+                }
+
+                /*if (oldCard.id == "TabPage4" && tempData.DefStr2 == "1") {
+                    for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                        var day = BudgetDtlPanel_store.getAt(i).get("FQty");
+                        var people = BudgetDtlPanel_store.getAt(i).get("FQty2");
+                        var price = BudgetDtlPanel_store.getAt(i).get("FPrice");
+                        BudgetDtlPanel_store.getAt(i).set("FAmount", day * people * price);
+                    }
+                }*/
+            });
+
+
+            //同步预算明细数据到资金申请
+            function syncFundAppl() {
+                var count = FundApplPanel_store.getCount();
+                if (!BudgetDtlPanel_grid.hasModifyed() && count > 0) return;
+
+                var record, dSourceOfFunds, amount, find, fundName, projectAmount = 0;
+                var funds = new Array();
+                var fundsName = new Array();
+                for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                    record = BudgetDtlPanel_store.getAt(i);
+                    dSourceOfFunds = record.get('FSourceOfFunds');
+                    amount = record.get('FBudgetAmount');
+                    //record.get('FBudgetAmount').setValue(amount); //新增时
+                    if (amount == undefined) {
+                        amount = 0;
+                    }
+                    fundName = record.get('FSourceOfFunds_EXName');
+
+                    if (funds[dSourceOfFunds]) {
+                        funds[dSourceOfFunds] = { Amount: funds[dSourceOfFunds].Amount + amount, Name: fundName }; //funds[dSourceOfFunds] + amount;
+                    } else {
+                        funds[dSourceOfFunds] = { Amount: amount, Name: fundName };
+                    }
+
+                    projectAmount = projectAmount + amount;
+                }
+                mainPanel_form.queryById("FBudgetAmount").setValue(projectAmount);
+
+                //同步更新
+                for (var v in funds) {
+                    find = FundApplPanel_store.findExact("FSourceOfFunds", v)
+                    if (find == -1) {
+                        FundApplPanel_store.insert(FundApplPanel_store.getCount(), { PhId: "", MstPhid: "", FSourceOfFunds: v, FAmount: funds[v].Amount, FSourceOfFunds_EXName: funds[v].Name });
+                    }
+                    else {
+                        record = FundApplPanel_store.getAt(find);
+                        record.set("FAmount", funds[v].Amount);
+                    }
+                }
+
+                //同步删除：把预算明细中不存在对应资金来源的数据，在资金申请中删除
+                for (var i = 0; i < FundApplPanel_store.getCount(); i++) {
+                    v = FundApplPanel_store.getAt(i).get("FSourceOfFunds");
+                    find = BudgetDtlPanel_store.findExact("FSourceOfFunds", v);
+                    if (find == -1) {
+                        FundApplPanel_store.removeAt(i);
+                        i--;
+                    }
+                }
+
+            }
+
+            //通用帮助设置条件
+            //按当前操作员过滤申报单位
+            mainPanel_form.queryById("FDeclarationUnit").setOutFilter({ userid: $appinfo.userID });
+
+            //预算科目过滤
+          //  BudgetDtlPanel_grid.getColumn("FBudgetAccounts_EXName").getEditor().setClientSqlFilter("kmlb='1'");
+            BudgetDtlPanel_grid.getColumn('FBudgetAccounts_EXName').getEditor().on("beforetriggerclick", function (str) {
+                //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var FDeclarationUnit = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空');
+                    return false;
+                }
+                var filter = "(Z_QTDYGX.DEF_STR1='" + FDeclarationUnit + "')";
+                BudgetDtlPanel_grid.getColumn('FBudgetAccounts_EXName').getEditor().setClientSqlFilter(filter);
+
+            });
+
+
+            //按当前申报单位过滤预算部门、支出类别
+            mainPanel_form.queryById("FDeclarationUnit").on("helpselected", function (obj) {
+                var unitCode = obj.code;
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                }
+                else {
+                    Ext.MessageBox.alert('请先选择申报单位');
+                    return;
+                }
+
+                //预算单位
+                if (filter) {
+                    mainPanel_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+                }
+
+                //支出类别
+                if (filter2) {
+                    mainPanel_form.queryById("FExpenseCategory").setClientSqlFilter(filter2);
+                }
+                //获得阈值
+                getProjectThreshold(unitCode);
+
+            });
+
+            mainPanel_form.queryById("FBudgetDept").on("beforetriggerclick", function (str) {
+                var unitCode = Ext.getCmp('FDeclarationUnit').getValue();
+                var filter, filter2;
+                if (unitCode) {
+                    filter = "(Z_QTDYGX.dwdm='" + $appinfo.logid + "' and Z_QTDYGX.dylx = '97' and fg_orglist.ocode like '" + unitCode + "%')";
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                }
+                else {
+                    Ext.MessageBox.alert('请先选择申报单位');
+                    return;
+                }
+
+                //预算单位
+                if (filter) {
+                    mainPanel_form.queryById("FBudgetDept").setClientSqlFilter(filter);
+                }
+                //支出类别
+                if (filter2) {
+                    mainPanel_form.queryById("FExpenseCategory").setClientSqlFilter(filter2);
+                }
+
+            });
+
+            //项目类型
+            mainPanel_form.queryById("FExpenseCategory").on("beforetriggerclick", function (str) {
+
+                var unitCode = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                var filter2;
+                if (unitCode) {
+                    filter2 = "(Z_QTDYGX2.DEF_STR1='" + unitCode + "')";
+                }
+                else {
+                    Ext.MessageBox.alert('请先选择申报单位');
+                    return;
+                }
+                //支出类别
+                if (filter2) {
+                    mainPanel_form.queryById("FExpenseCategory").setClientSqlFilter(filter2);
+                }
+
+            });
+
+            //是否显示天数、人数、单价FExpenseCategory
+            mainPanel_form.queryById("FExpenseCategory").on("helpselected", function (obj) {
+                //判断项目类型是否是末级组织
+                var expenseCategoryCode = mainPanel_form.queryById("FExpenseCategory").getValue();
+                //debugger;
+                Ext.Ajax.request({
+                    params: { "expenseCategoryCode": expenseCategoryCode },
+                    url: C_ROOT + 'GQT/QT/ExpenseCategory/IfLastStage',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        //debugger;
+                        if (resp != null && resp != undefined) {
+                            if (resp.Data.length > 0) {
+                                mainPanel_form.queryById("FExpenseCategory").setValue("");
+                                Ext.MessageBox.alert("提示", '请选择末级项目类型');
+                                return;
+                            }
+                        }
+                    }
+
+                });
+
+                var unitCode = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                var xmCOde = obj.code;
+                //debugger;
+                Ext.Ajax.request({
+                    params: { "Dylx": '08', "DefStr1": unitCode },
+                    url: C_ROOT + 'GQT/QT/CorrespondenceSettings2/GetCorrespondenceSettings2ListbyRelation',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp != null && resp != undefined) {
+                            for (var i = 0; i < resp.Record.length; i++) {
+                                var recordData = resp.Record[i];
+                                if (recordData.Dydm == xmCOde) {
+                                    tempData = recordData;
+                                    if (recordData.DefStr2 == "0") {
+                                        BudgetDtlPanel_grid.getColumn('FQty').hide();
+                                        BudgetDtlPanel_grid.getColumn('FQty2').hide();
+                                        BudgetDtlPanel_grid.getColumn('FPrice').hide();
+                                        BudgetDtlPanel_grid.getColumn('FAmount').readOnly = false;
+
+                                    }
+                                    if (recordData.DefStr2 == "1") {
+                                        BudgetDtlPanel_grid.getColumn('FQty').show();
+                                        BudgetDtlPanel_grid.getColumn('FQty2').show();
+                                        BudgetDtlPanel_grid.getColumn('FPrice').show();
+                                        BudgetDtlPanel_grid.getColumn('FAmount').readOnly = true;
+                                        for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                                            BudgetDtlPanel_store.getAt(i).set("FPrice", recordData.DefStr3);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        //debugger;
+                    }
+                });
+            });
+
+            //编辑人数、天数的时候自动求总金额
+            BudgetDtlPanel_grid.on('edit', function (editor, context) {
+                if (context.field == "FQty") {
+                    context.record.data.FAmount = context.record.data.FQty * context.record.data.FQty2 * context.record.data.FPrice;
+                    this.getView().refresh(true);
+                }
+                if (context.field == "FQty2") {
+                    context.record.data.FAmount = context.record.data.FQty * context.record.data.FQty2 * context.record.data.FPrice;
+                    this.getView().refresh(true);
+                    //debugger;
+                }
+            });
+
+            mainPanel_form.queryById("FIfPerformanceAppraisal").on("helpselected", function (str) {
+                var Code = str.code;
+                if (Code == 2) {
+                    //检查阈值
+                    if (!controlProjectProjectThreshold()) {
+                        return false;
+                    }
+
+                    mainPanel_form.queryById("FIfKeyEvaluation").setValue(2);//绩效为否时,重点评价也为否
+                    mainPanel_form.queryById("FPerformType").setValue("");
+                    mainPanel_form.queryById("FPerformEvalType").setValue("");
+
+                    //PerformTargetPanel_store.removeAll(); //清空绩效目标分解
+
+                    hidePerformTargetTab(true, true);
+                }
+                else if (Code == 1) {
+                    hidePerformTargetTab(false, true);
+                    Ext.Ajax.request({
+                        params: { "helpid": 'GHPerformEvalType', "ORMMode": "true" },
+                        url: C_ROOT + 'SUP/RichHelp/GetHelpList',
+                        success: function (response) {
+                            var resp = Ext.JSON.decode(response.responseText);
+                            var data = {
+                                FCode: resp.Record[0].FCode,
+                                FName: resp.Record[0].FName,
+                                PhId: resp.Record[0].PhId
+                            };
+                            var model = {
+                                data: data,
+                                row: data
+                            }
+                            var iiouu = mainPanel_form.queryById("FPerformEvalType");
+                            //mainPanel_form.queryById("FPerformEvalType").valueModels.push(model);
+                            mainPanel_form.queryById("FPerformEvalType").defValue = resp.Record[0].FCode;
+                            mainPanel_form.queryById("FPerformEvalType").rawValue = resp.Record[0].FName;
+                            mainPanel_form.queryById("FPerformEvalType").setValue(resp.Record[0].FName);
+                        }
+                    });
+                }
+            });
+
+            //重点评价只有在绩效评价为是是才能选是
+            mainPanel_form.queryById("FIfKeyEvaluation").on("beforetriggerclick", function () {
+
+                //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var FIfPerformanceAppraisal = mainPanel_form.queryById("FIfPerformanceAppraisal").getValue();
+                if (FIfPerformanceAppraisal != 1) {
+                    Ext.MessageBox.alert("提示", '请先选择绩效评价');
+                    return false;
+                }
+            });
+            //绩效项目类型只有在绩效评价为是是才能选是
+            mainPanel_form.queryById("FPerformType").on("beforetriggerclick", function () {
+
+                //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var FIfPerformanceAppraisal = mainPanel_form.queryById("FIfPerformanceAppraisal").getValue();
+                if (FIfPerformanceAppraisal != 1) {
+                    Ext.MessageBox.alert("提示", '请先选择绩效评价');
+                    return false;
+                }
+            });
+            //绩效评价类型只有在绩效评价为是是才能选是
+            mainPanel_form.queryById("FPerformEvalType").on("beforetriggerclick", function () {
+
+                //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var FIfPerformanceAppraisal = mainPanel_form.queryById("FIfPerformanceAppraisal").getValue();
+                if (FIfPerformanceAppraisal != 1) {
+                    Ext.MessageBox.alert("提示", '请先选择绩效评价');
+                    return false;
+                }
+            });
+
+
+            //绩效项目类型
+            mainPanel_form.queryById("FPerformType").on('beforetriggerclick', function (obj) {
+                var typecode = mainPanel_form.queryById("FPerformType").getValue();
+                if (typecode) {
+                    mainPanel_form.queryById("FPerformType").setClientSqlFilter("a.f_code<>" + typecode);
+                }
+            });
+
+            mainPanel_form.queryById("FPerformType").on("helpselected", function (obj) {
+                var parentCode = obj.data.f_parentcode;
+                if (!parentCode) {
+                    Ext.MessageBox.alert("提示", "请选择二级类型");
+                    return false;
+                }
+
+                //缓存类型级别，在指标选择时控制层次
+                performTargetTypeLevel1 = parentCode;
+                performTargetTypeLevel2 = obj.data.f_code;
+
+                getPerformTarget(performTargetTypeLevel2, true);
+            });
+
+            //过滤指标
+            PerformTargetPanel_grid.getColumn("FTargetCode").getEditor().on('beforetriggerclick', function (obj) {
+                if (!performTargetTypeLevel2) {
+                    Ext.MessageBox.alert('提示', "请选择绩效项目类型");
+                    return false;
+                }
+
+                //过滤掉已经选择的指标
+                var codes = "", code;
+                for (var i = 0; i < PerformTargetPanel_store.getCount(); i++) {
+                    code = PerformTargetPanel_store.getAt(i).get('FTargetCode');
+                    if (code) {
+                        if (codes == "") {
+                            codes = "'" + code + "'";
+                        }
+                        else {
+                            codes = codes + ",'" + code + "'";
+                        }
+                    }
+                }
+
+                var sqlFilter = "Z_QTPerformEvalTarget.f_TargetTypeCode='" + performTargetTypeLevel2 + "'";
+                if (codes) {
+                    sqlFilter = sqlFilter + " and Z_QTPerformEvalTarget.f_TargetCode not in(" + codes + ")";
+                }
+                PerformTargetPanel_grid.getColumn("FTargetCode").getEditor().setClientSqlFilter(sqlFilter);
+            });
+
+
+
+            BudgetDtlPanel_grid.getColumn('FIfPurchase').renderer = function (val) {
+                switch (val) {
+                    case 1:
+                        return "是";
+                    case 2:
+                        return "否";
+                }
+            };
+
+            BudgetDtlPanel_grid.getColumn('FIfPurchase').getEditor().on('helpselected', function (obj) {
+                if (obj.code == 1) {
+                    var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                    data[0].set('FIfPurchase', obj.code);
+                    budgetDtlFName = data[0].data.FName;
+                    ngToolbar.get('purchase').fireEvent('click');
+                }
+
+            });
+
+            mainPanel_form.queryById("FProjName").on("helpselected", function (str) {
+                var PhId = str.data["PhId"];
+                dataFromXmk(PhId);
+
+            });
+            mainPanel_form.queryById("FProjName").on("beforetriggerclick", function (str) {
+
+                //if (otype == $Otype.EDIT) {
+                //    Ext.MessageBox.alert("提示", '修改时不能重新引用项目!');
+                //    return false;
+                //}
+                var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var FBudgetDept = Ext.getCmp('FBudgetDept').getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空');
+                    return false;
+                }
+                if (!FBudgetDept) {
+                    Ext.MessageBox.alert("提示", '预算部门不能为空');
+                    return false;
+                }
+
+                str.setOutFilter({ f_DeclarationUnit: FDeclarationUnit, f_BudgetDept: FBudgetDept, f_ApproveStatus: "3" });
+
+            });
+
+            BudgetDtlPanel_grid.getColumn('FSourceOfFunds_EXName').getEditor().on('beforetriggerclick', function (obj) {
+                var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                if (data[0].data.Xm3_DtlPhid > 0) {
+                    Ext.MessageBox.alert("提示", '该资金来源引用自项目,不能修改');
+                    return ;
+                }
+                var FDeclarationUnit = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空');
+                    return false;
+                }
+                var filter = "(Z_QTDYGX.DEF_STR1='" + FDeclarationUnit + "')";
+                BudgetDtlPanel_grid.getColumn('FSourceOfFunds_EXName').getEditor().setClientSqlFilter(filter);
+
+            });
+
+            BudgetDtlPanel_grid.getColumn('FPaymentMethod_EXName').getEditor().on('beforetriggerclick', function (obj) {
+                var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                if (data[0].data.Xm3_DtlPhid > 0) {
+                    Ext.MessageBox.alert("提示", '该支付方式引用自项目,不能修改');
+                    return ;
+                }
+            });
+
+            BudgetDtlPanel_grid.getColumn('FSourceOfFunds_EXName').getEditor().on('helpselected', function (obj) {
+                var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                data[0].set('FSourceOfFunds', obj.code);
+                data[0].set('FSourceOfFunds_EXName', obj.name);
+            });
+
+            BudgetDtlPanel_grid.getColumn('FPaymentMethod_EXName').getEditor().on('helpselected', function (obj) {
+                var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                data[0].set('FPaymentMethod', obj.code);
+                data[0].set('FPaymentMethod_EXName', obj.name);
+            });
+
+            BudgetDtlPanel_grid.getColumn('FBudgetAccounts_EXName').getEditor().on('helpselected', function (obj) {
+                var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                //判断预算科目是否是末级
+
+                Ext.Ajax.request({
+                    params: { "budgetAccountsCode": obj.code },
+                    url: C_ROOT + 'GQT/QT/BudgetAccounts/IfLastStage',
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        //debugger;
+                        if (resp != null && resp != undefined) {
+                            if (resp.Data.length > 0) {
+                                data[0].set('FBudgetAccounts', '');
+                                data[0].set('FBudgetAccounts_EXName', '');
+                                Ext.MessageBox.alert("提示", '请选择末级预算科目');
+                            } else {
+                                data[0].set('FBudgetAccounts', obj.code);
+                                data[0].set('FBudgetAccounts_EXName', obj.name);
+                            }
+                        }
+                    }
+
+                });
+            });
+
+
+
+
+            //附件方法
+            function OpenAttachment(buscode) {
+                var param = {
+                    product: "", //传相应产品，i6、i6s、i6P、A3、GE，可为空
+                    attachguid: attachGuid, //会话guid,可传空生成方法cs代码:Guid.NewGuid().ToString()
+                    attachTName: "c_pfc_attachment",
+                    busTName: "ys3_BudgetMst", //传相应业务表
+                    busid: busid, //传相应产品业务单据phid
+                    bustypecode: "GHBudgetInfo"//业务类型编码
+                };
+                var result = LoadAttach.InitBeforeOpen(param);
+                var obj = eval(result);
+                if (obj) {
+                    if (obj.status == "success") //初始化成功
+                    {
+                        attachGuid = obj.msg;
+                    } else {
+                        Ext.MessageBox.alert('提示', "附件初始化失败");
+                        return;
+                    }
+                } else {
+                    Ext.MessageBox.alert('提示', "附件初始化失败");
+                    return;
+                }
+                var opt = {
+                    product: "", //传相应产品，可为空
+                    mode: "NG3", //固定传NG3
+                    openbymianframe: "1", //通过主框架打开附件 0或空否  1 是固定传1
+                    oper: "winfrom", //web、pb、winfrom、progress（进度条模式）,固定传 winfrom
+                    asr_tbl: "c_pfc_attachment",
+                    tbl: "ys3_BudgetMst", //传相应业务表
+                    fill: $appinfo.logid, //传相应操作员id
+                    fillname: $appinfo.username, //传相应操作员姓名
+                    chkSign: "0", //默认传0
+                    chkCheckIn: "0", //默认传0
+                    btnAdd: "1", //新增按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    addserverstuts: "0", //导入按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnScan: "1", //扫描按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnDelete: "1", //删除按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnEdit: "1", //编辑按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnView: "1", //查看按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnDownload: "1", //下载按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnCancel: "1", //取消按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnOk: "1", //确定按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    btnWebAdd: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                    btnWebOk: "2", //web新增按钮oper为web时有效 0、禁用 1、显示 2、隐藏
+                    archivestuts: "2", //归档按钮oper非web时有效 0、禁用 1、显示 2、隐藏
+                    status: otype, //add 新增模式，view 查看模式， edit 编辑模式
+                    showlist: "1", //显示文件列表 0 不显示 1显示
+                    zip: "0", //附件压缩 0 不压缩 1 压缩
+                    filenum: "", //附件上传数量限制 0或空不限制附件上传数量
+                    filetype: "", //附件上传类型限制目前仅支持传入"image",如果传了"image"附件控件就只能上传图片
+                    guid: attachGuid //传第二步附件初始化获得的guid
+                };
+                LoadAttach.Init(opt);
+            }
+
+
+            //支出渠道
+            BudgetDtlPanel_grid.getColumn('FExpensesChannel_EXName').getEditor().on("beforetriggerclick", function (str) {
+                //var FDeclarationUnit = Ext.getCmp('FDeclarationUnit').getValue();
+                var FDeclarationUnit = mainPanel_form.queryById("FDeclarationUnit").getValue();
+                if (!FDeclarationUnit) {
+                    Ext.MessageBox.alert("提示", '申报单位不能为空');
+                    return false;
+                }
+                BudgetDtlPanel_grid.getColumn('FExpensesChannel_EXName').getEditor().setOutFilter({ DWDM: FDeclarationUnit });
+
+            });
+            BudgetDtlPanel_grid.getColumn('FExpensesChannel_EXName').getEditor().on('helpselected', function (obj) {
+                var data = BudgetDtlPanel_grid.getSelectionModel().getSelection();
+                data[0].set('FExpensesChannel', obj.code);
+                data[0].set('FExpensesChannel_EXName', obj.name);
+            });
+
+            //日期格式
+            ImplPlanPanel_grid.getColumn('FStartDate').renderer = function (val) {
+                if (val) {
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+
+            ImplPlanPanel_grid.getColumn('FEndDate').renderer = function (val) {
+                if (val) {
+                    var str = Ext.util.Format.date(val, 'Y-m-d');
+                    return str;
+                } else {
+                    return '';
+                }
+            };
+            BudgetDtlPanel_grid.getColumn('FBudgetAmount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+
+            FundApplPanel_grid.getColumn('FAmount').renderer = function (val) {
+                if (val) {
+                    var moneyRend = Ext.util.Format.usMoney;
+                    var newvalue = moneyRend(val);
+                    return newvalue.replace('$', '');
+                } else {
+                    return '';
+                }
+            };
+
+            //控制系统选入的一些列不可编辑
+            PerformTargetPanel_grid.on("beforeedit", function (editor, e, eOpts) {
+                //Ext.MessageBox.alert("提示", "e:" + e);
+                if (e.record.data) {
+                    if ((e.field == "FTargetTypeCode_EXName" || e.field == "FTargetClassCode_EXName" || e.field == "FTargetCode") && e.record.data.FIfCustom == 2) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                }
+            });
+
+            PerformTargetPanel_grid.getColumn('FTargetCode').getEditor().on('helpselected', function (obj) {
+                var data = PerformTargetPanel_grid.getSelectionModel().getSelection();
+                data[0].set('FTargetCode', obj.code);
+                data[0].set('FTargetCode_EXName', obj.name);
+                data[0].set('FTargetTypeCode', obj.data.f_targettypecode);
+                data[0].set('FTargetClassCode', obj.data.f_targetclasscode);
+                data[0].set('FTargetName', obj.data.f_targetname);
+                data[0].set('FTargetValue', obj.data.f_targetvalue);
+                data[0].set('FTargetWeight', obj.data.f_targetweight);
+                data[0].set('FTargetDescribe', obj.data.f_targetdescribe);
+
+                data[0].set('FTargetClassCode_EXName', obj.data.classname);
+                data[0].set('FTargetTypeCode_EXName', obj.data.typename);
+
+                PerformTargetPanel_store.sort();
+                ExsplitGrid(PerformTargetPanel_grid, [3, 4]); //还原单元格
+                ExMergeGrid(PerformTargetPanel_grid, [3, 4], false); //合并单元格
+            });
+
+            PerformTargetPanel_grid.getColumn('FTargetTypeCode_EXName').getEditor().on('helpselected', function (obj) {
+                var data = PerformTargetPanel_grid.getSelectionModel().getSelection();
+                data[0].set('FTargetTypeCode', obj.data.FCode);
+                data[0].set('FTargetTypeCode_EXName', obj.data.FName);
+
+                //PerformTargetPanel_store.sort();
+                ExsplitGrid(PerformTargetPanel_grid, [3, 4]); //还原单元格
+                ExMergeGrid(PerformTargetPanel_grid, [3, 4], false); //合并单元格
+            });
+
+            PerformTargetPanel_grid.getColumn('FTargetClassCode_EXName').getEditor().on('helpselected', function (obj) {
+                var data = PerformTargetPanel_grid.getSelectionModel().getSelection();
+                data[0].set('FTargetClassCode', obj.data.FCode);
+                data[0].set('FTargetClassCode_EXName', obj.data.FName);
+
+                PerformTargetPanel_store.sort();
+                ExsplitGrid(PerformTargetPanel_grid, [3, 4]); //还原单元格
+                ExMergeGrid(PerformTargetPanel_grid, [3, 4], false); //合并单元格
+            });
+
+            //实施计划开始结束时间修改
+            mainPanel_form.queryById("FStartDate").on("select", function (str) {
+                var data = str.rawValue;
+                for (var i = 0; i < ImplPlanPanel_store.getCount(); i++) {
+                    if (!ImplPlanPanel_store.getAt(i).get("FStartDate")) {
+                        ImplPlanPanel_store.getAt(i).set('FStartDate', data);
+                    }
+                }
+            });
+
+            mainPanel_form.queryById("FEndDate").on("select", function (str) {
+                var data = str.rawValue;
+                for (var i = 0; i < ImplPlanPanel_store.getCount(); i++) {
+                    if (!ImplPlanPanel_store.getAt(i).get("FEndDate")) {
+                        ImplPlanPanel_store.getAt(i).set('FEndDate', data);
+                    }
+                }
+            });
+
+            //过滤指标类型
+            PerformTargetPanel_grid.getColumn("FTargetTypeCode_EXName").getEditor().on('beforetriggerclick', function (obj) {
+                var sqlFilter = "f_code='" + performTargetTypeLevel2 + "'";
+                PerformTargetPanel_grid.getColumn("FTargetTypeCode_EXName").getEditor().setClientSqlFilter(sqlFilter); //只能选同样的二级类别
+            });
+
+            //控制工作流ui可编辑属性
+            function SyncWorkFlowUI(workInfo) {
+                //if (otype == $Otype.VIEW) return;
+
+                var fld, fldName, fldValue, pos;
+                var BudgetDtlPanelEditable = false;
+                var ImplPlanPanelEditable = false;
+
+
+                for (var i = 0; i < workInfo.biz_properties.length; i++) {
+                    fld = workInfo.biz_properties[i];
+                    pos = fld.control_id.indexOf('BudgetDtlPanel#');
+                    if (pos >= 0) {
+                        fldName = fld.control_id.substr(pos + 'BudgetDtlPanel#'.length);
+                        if (fldName) {
+                            fldValue = fld.value;
+                            if (fldValue == 1) {
+                                BudgetDtlPanel_grid.setReadOnlyCol(fldName, false);
+                                BudgetDtlPanelEditable = true;
+                            }
+                            else {
+                                BudgetDtlPanel_grid.setReadOnlyCol(fldName, true);
+                            }
+                        }
+                    }
+
+                    pos = fld.control_id.indexOf('ImplPlanPanel#');
+                    if (fld.control_id.indexOf('ImplPlanPanel#') >= 0) {
+                        fldName = fld.control_id.substr(pos + 'ImplPlanPanel#'.length);
+                        if (fldName) {
+                            fldValue = fld.value;
+                            if (fldValue == 1) {
+                                ImplPlanPanel_grid.setReadOnlyCol(fldName, false);
+                                ImplPlanPanelEditable = true;
+                            }
+                            else {
+                                ImplPlanPanel_grid.setReadOnlyCol(fldName, true);
+                            }
+                        }
+                    }
+                }
+
+                if (BudgetDtlPanelEditable) {
+                    BudgetDtlPanel_grid.setGridReadOnly(false);
+                }
+
+                if (ImplPlanPanelEditable) {
+                    ImplPlanPanel_grid.setGridReadOnly(false);
+                }
+            }
+
+            ////数据变化后重新合并单元格
+            //PerformTargetPanel_store.on('datachanged', function ( store, eOpts ) {
+            //    //合并单元格
+            //    ExMergeGrid(PerformTargetPanel_grid, [3, 4], false); // 最后一个参数为false逐个列合并
+            //})
+
+            //获取绩效评价指标
+            function getPerformTarget(performTypeCode, clearStore) {
+
+                if (PerformTargetPanel_store.getCount() > 0) {
+                    var typeCode = PerformTargetPanel_store.getAt(0).get("FTargetTypeCode");
+                    if (typeCode == performTypeCode) {
+                        return;
+                    }
+                }
+
+                Ext.Ajax.request({
+                    params: { 'clientSqlFilter': "Z_QTPerformEvalTarget.f_TargetTypeCode='" + performTypeCode + "'" },
+                    url: C_ROOT + 'SUP/RichHelp/GetHelpList?helpid=GHPerformEvalTarget&ORMMode=false',
+                    async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.decode(response.responseText);
+
+                        if (resp.Record) {
+                            if (clearStore)  //清除原来记录
+                            {
+                                PerformTargetPanel_store.removeAll();
+                            }
+
+                            var records = resp.Record;
+                            var data;
+                            for (var i = 0; i < records.length; i++) {
+                                data = {
+                                    "FTargetCode": records[i].f_targetcode,
+                                    "FTargetCode_EXName": records[i].f_targetname,
+                                    "FTargetTypeCode": records[i].f_targettypecode,
+                                    "FTargetClassCode": records[i].f_targetclasscode,
+                                    "FTargetName": records[i].f_targetname,
+                                    "FTargetValue": records[i].f_targetvalue,
+                                    "FTargetWeight": records[i].f_targetweight,
+                                    "FTargetDescribe": records[i].f_targetdescribe,
+                                    "FTargetClassCode_EXName": records[i].classname,
+                                    "FTargetTypeCode_EXName": records[i].typename,
+                                    "FIfCustom": 2
+                                };
+                                PerformTargetPanel_store.add(data);
+                            }
+
+                            PerformTargetPanel_store.sort();
+                            ExsplitGrid(PerformTargetPanel_grid, [3, 4]); //还原单元格
+                            ExMergeGrid(PerformTargetPanel_grid, [3, 4], false); //合并单元格
+                        }
+                    }
+                });
+            }
+
+            //检查绩效目标分解
+            function checkPerformTarget() {
+                var FIfPerformanceAppraisal = mainPanel_form.queryById("FIfPerformanceAppraisal").getValue();
+                if (FIfPerformanceAppraisal == 1) {
+                    var count = PerformTargetPanel_store.getCount();
+                    //检查是否录入
+                    if (count <= 0) {
+                        hidePerformTargetTab(false, true);
+                        Ext.MessageBox.alert('提示', "请输入绩效目标分解指标信息");
+                        return false;
+                    }
+
+                    //检查权重合计是否为100%
+                    var weightTotal = 0, weight = 0;
+                    for (var i = 0; i < count; i++) {
+                        weight = PerformTargetPanel_store.getAt(i).get('FTargetWeight') - 0;
+                        weightTotal = weightTotal + weight;
+                    }
+
+                    if (weightTotal != 100) {
+                        hidePerformTargetTab(false, true);
+                        Ext.MessageBox.alert('提示', "指标权重合计必须为100");
+                        return false;
+                    }
+
+                    return true;
+                } else {
+                    if (!controlProjectProjectThreshold()) //组织绩效项目阈值控制
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+
+            //处理绩效目标分解tab页面的显示隐藏
+            function hidePerformTargetTab(ishide, activetab) {
+                if (ishide) {
+                    if (tabPanel.tabBar.items.length >= 8) {
+                        tabPanel.tabBar.items.getAt(7).hide();
+                    }
+                    var tab = Ext.getCmp("TabPage9");
+                    var tab7 = Ext.getCmp("TabPage7");
+                    if (tab && tab7) {
+                        if (activetab) {
+                            tabPanel.setActiveTab(tab7);
+                        }
+                        tab.hide();
+                    }
+                }
+                else {
+                    var ifShow = mainPanel_form.queryById("FIfPerformanceAppraisal").getValue();
+                    if (ifShow == 1) {
+                        if (tabPanel.tabBar.items.length >= 8) {
+                            tabPanel.tabBar.items.getAt(7).show();
+                        }
+                        var tab = Ext.getCmp("TabPage9");
+                        var tab7 = Ext.getCmp("TabPage7");
+                        if (tab && tab7) {
+                            tab.show();
+                            if (activetab) {
+                                tabPanel.setActiveTab(tab7);
+                                tabPanel.setActiveTab(tab);
+                            }
+                        }
+                    }
+                    else {
+                        hidePerformTargetTab(true, true);
+                    }
+                }
+            }
+
+
+            //设置默认展示tab
+            function activeTabpage(tabpageid) {
+                //默认 tabpage1
+                var tabActive = Ext.getCmp(tabpageid);
+                if (tabActive) {
+                    tabActive.show();
+                    tabPanel.setActiveTab(tabActive);
+                }
+            }
+
+            //获得项目阈值
+            function getProjectThreshold(orgcode) {
+                var jsonStr = "{Orgcode: '" + orgcode + "'}";
+                Ext.Ajax.request({
+                    params: { 'queryfilter': jsonStr, 'limit': 1 },
+                    url: C_ROOT + 'GQT/QT/ProjectThreshold/GetProjectThresholdList',
+                    //async: false, //同步请求
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.Record.length === 1) {
+                            orgProjectProjectThreshold = resp.Record[0].FThreshold;
+                            orgProjectProjectType = resp.Record[0].ProjTypeId;
+                            //Ext.MessageBox.alert("提示", orgProjectProjectThreshold);
+                        }
+                    }
+                });
+            };
+
+            //组织绩效项目阈值控制
+            function controlProjectProjectThreshold() {
+
+                if (orgProjectProjectThreshold && orgProjectProjectThreshold != 0) {
+
+
+
+                    //取得合计数
+                    //var projAmount = mainPanel_form.queryById("FProjAmount").getValue();
+                    var projAmount = 0, amount = 0;
+                    for (var i = 0; i < BudgetDtlPanel_store.getCount(); i++) {
+                        amount = BudgetDtlPanel_store.getAt(i).get('FAmount');
+                        if (amount) {
+                            projAmount = projAmount + amount;
+                        }
+                    }
+
+                    if (projAmount >= orgProjectProjectThreshold) {
+
+                        //获取项目类型
+                        var projectType = mainPanel_form.queryById("FExpenseCategory").getValue();
+                        var arry = orgProjectProjectType.split(',');
+
+                        if (array_contain(arry, projectType).state) {
+                            mainPanel_form.queryById("FIfPerformanceAppraisal").setValue(1);
+                            hidePerformTargetTab(false, true);
+                            Ext.MessageBox.alert("提示", "项目金额大于阈值,必须启用绩效评价");
+                            return false;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
+
+                }
+
+                return true;
+            }
+
+
+            //数组是否包含元素
+            function array_contain(array, obj) {
+
+                if (array != null && array != undefined) {
+                    for (var i = 0; i < array.length; i++) {
+                        if (array[i] == obj)
+                            return { state: true };
+                    }
+                }
+                return { state: false };
+            }
+
+        });
+
+        function dataFromXmk(PhId) {
+
+            Ext.Ajax.request({
+                params: { 'id': PhId, 'tabtype': 'projectmst' },
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        var mstformobj = mainPanel_form.getForm();
+                        resp.Data.FDeclarer = "";
+                        resp.Data.FDateofDeclaration = "";
+                        resp.Data.FMeetingTime = "";
+                        resp.Data.FMeetiingSummaryNo = "";
+                        resp.Data.FProjStatus = 2;
+                        xmkMstPhid = resp.Data.PhId
+                        mstformobj.setValues(resp.Data);
+
+                        Ext.getCmp("XmMstPhid").setValue(xmkMstPhid);
+
+
+
+                        //mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                        mstformobj.fireEvent('dataready', resp.Data);
+
+                        //代码转名称
+                        var codectl = [mainPanel_form.queryById('FDeclarationUnit'), mainPanel_form.queryById('FBudgetDept')]; //
+                        BatchBindCombox(codectl);
+
+                    } else {
+                        Ext.MessageBox.alert('取数失败', resp.Msg);
+                    }
+                }
+            });
+
+            //FunctionalOvervPanel: 通过 projectdtltextcontent 获取
+            Ext.Ajax.request({
+                params: { 'id': PhId, 'tabtype': 'projectdtltextcontent' },
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.Status === "success") {
+                        var mstformobj = FunctionalOvervPanel_form.getForm(); //mainPanel_form.getForm();
+                        mstformobj.setValues(resp.Data);
+
+                        var projfromObj = ProjOverviewPanel_form.getForm();
+                        projfromObj.setValues(resp.Data);
+
+                        var startfromObj = projectStartInfoPanel_form.getForm();
+                        startfromObj.setValues(resp.Data);
+
+                        var longformObj = longTargetPanel_form.getForm();
+                        longformObj.setValues(resp.Data);
+
+                        var yearformObj = yearTargetPanel_form.getForm();
+                        yearformObj.setValues(resp.Data);
+
+                        //mstformobj绑定完成触发dataready，供二次开发调用（比如代码转名称）；
+                        mstformobj.fireEvent('dataready', resp.Data);
+
+                        ////代码转名称
+                        //var codectl = [];
+                        //BatchBindCombox(codectl);
+
+                    } else {
+                        Ext.MessageBox.alert('取数失败', resp.Msg);
+                    }
+                }
+            });
+
+
+            Ext.Ajax.request({
+                params: { 'id': PhId, 'tabtype': 'projectdtlbudgetdtl' },
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.totalRows > 0) {
+                        BudgetDtlPanel_store.removeAll();
+
+                        for (var i = 0; i < resp.Record.length; i++) {
+                            resp.Record[i].Xm3_DtlPhid = resp.Record[i].PhId;
+                            BudgetDtlPanel_store.add(resp.Record[i]);
+
+                        }
+
+                    }
+                }
+            });
+
+            Ext.Ajax.request({
+                params: { 'id': PhId, 'tabtype': 'projectdtlimplplan' },
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.totalRows > 0) {
+                        ImplPlanPanel_store.removeAll();
+
+                        for (var i = 0; i < resp.Record.length; i++) {
+                            ImplPlanPanel_store.add(resp.Record[i]);
+                            //BudgetDtlPanel_store.add({ FImplContent: resp.Record[i].FImplContent, FStartDate: resp.Record[i].FStartDate, FEndDate: resp.Record[i].FEndDate });
+
+                        }
+
+                    }
+                }
+            });
+
+            Ext.Ajax.request({
+                params: { 'id': PhId, 'tabtype': 'projectdtlfundappl' },
+                url: C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo',
+                success: function (response) {
+                    var resp = Ext.JSON.decode(response.responseText);
+                    if (resp.totalRows > 0) {
+                        FundApplPanel_store.removeAll();
+
+                        for (var i = 0; i < resp.Record.length; i++) {
+
+                            FundApplPanel_store.add(resp.Record[i]);
+
+                        }
+
+                    }
+                }
+            });
+
+            ////ImplPlanPanel明细
+            //ImplPlanPanel_store.removeAll();
+            //Ext.apply(ImplPlanPanel_store.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo');
+            //Ext.apply(ImplPlanPanel_store.proxy.extraParams, { 'id': PhId, 'tabtype': 'ProjectDtlImplPlan'.toLowerCase() });
+            //ImplPlanPanel_store.cachePageData = false;
+            //ImplPlanPanel_store.load();
+            //ImplPlanPanel_store.cachePageData = true;
+
+            ////FundApplPanel明细
+            //FundApplPanel_store.removeAll();
+            //Ext.apply(FundApplPanel_store.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo');
+            //Ext.apply(FundApplPanel_store.proxy.extraParams, { 'id': PhId, 'tabtype': 'ProjectDtlFundAppl'.toLowerCase() });
+            //FundApplPanel_store.cachePageData = false;
+            //FundApplPanel_store.load();
+            //FundApplPanel_store.cachePageData = true;
+
+            ////BudgetDtlPanel明细
+            //BudgetDtlPanel_store.removeAll();
+            //Ext.apply(BudgetDtlPanel_store.proxy.url = C_ROOT + 'GXM/XM/ProjectMst/GetProjectMstInfo');
+            //Ext.apply(BudgetDtlPanel_store.proxy.extraParams, { 'id': PhId, 'tabtype': 'ProjectDtlBudgetDtl'.toLowerCase() });
+            //BudgetDtlPanel_store.cachePageData = false;
+            //BudgetDtlPanel_store.load();
+            //BudgetDtlPanel_store.cachePageData = true;
+
+            //BudgetDtlPanel_store.each(function (record) {
+            //    record.set("Xm3_DtlPhid", record.PhId);  //引用自项目库的保存该明细phid
+            //});
+
+
+
+
+
+
+            //修改时预算单位,部门,项目名称不能修改
+            Ext.getCmp("FDeclarationUnit").userSetReadOnly(true);
+            Ext.getCmp("FBudgetDept").userSetReadOnly(true);
+            Ext.getCmp("FProjName").userSetReadOnly(true);
+
+            datafromxmk = 1;
+        }
+
+    </script>
+}

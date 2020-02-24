@@ -1,0 +1,648 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@section Script
+{
+    <script type="text/javascript">
+
+        var typeTree;   //业务类型树
+        var ngToolBar;
+        var gridPanel;
+        //var orgTreePanel;
+        //var orgtree;    //组织树
+        var gridStore;
+        var typeStore;
+        var itemsPerPage = 20;  //gird每页显示20行
+        var c_btype = -1;        //业务类型
+        var busphid = -1;   //业务类型主键
+        var busname = "";   //业务类型名称
+        var otype;  //grid行状态
+
+        Ext.onReady(function () {
+
+            Ext.define('gridModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'c_code',
+                        type: 'System.String',
+                        mapping: 'c_code'
+                    }, {
+                        name: 'ruletype',
+                        type: 'System.String',
+                        mapping: 'ruletype'
+                    }, {
+                        name: 'rulename',
+                        type: 'System.String',
+                        mapping: 'rulename'
+                    }, {
+                        name: 'codemode',
+                        type: 'System.String',
+                        mapping: 'codemode',
+                    }, {
+                        name: 'isdefault',
+                        type: 'System.String',
+                        mapping: 'isdefault'
+                    }, {
+                        name: 'codelimit',
+                        type: 'System.Int32',
+                        mapping: 'codelimit'
+                    }, {
+                        name: 'delimiter',
+                        type: 'System.String',
+                        mapping: 'delimiter'
+                    }, {
+                        name: 'remark',
+                        type: 'System.String',
+                        mapping: 'remark'
+                    }
+                ]
+            });
+
+            Ext.define('typeModel', {
+                extend: 'Ext.data.Model',
+                fields: [
+                    {
+                        name: 'code',
+                        type: 'System.String',
+                        mapping:'c_code'
+                    }, {
+                        name: 'name',
+                        type: 'System.String',
+                        mapping:'doc_title'
+                    }
+                ]
+            })
+
+            //业务类型树
+            var typeTreePanel = Ext.create('Ext.ng.BusTreePanel', {
+                //tablename: 'metadata_uicontainer',
+            });
+
+            gridStore = window.Ext.create('Ext.ng.JsonStore',{
+                model: 'gridModel',
+                autoLoad: true,
+                pageSize: itemsPerPage,
+                proxy: {
+                    type: 'ajax',
+                    url: C_ROOT + 'SUP/BillCodeRule/GetBillCodeRuleList',
+                    reader: {
+                        type: 'json',
+                        root: 'Rule',
+                        totalProperty: 'totalRows'
+                    }
+                }
+                
+            });
+
+            typeTree = typeTreePanel.getTree();
+            typeTree.on('itemclick', function (me, param) {
+                c_btype = param.get('bustype');
+                busphid = param.get('phid');
+                busname = param.get('text');
+                var nodetype = param.get('nodetype');
+                if(nodetype == 2){
+                    Ext.apply(gridStore.proxy.extraParams, { 'c_btype': c_btype});
+                    gridStore.cachePageData = false;
+                    gridStore.reload();
+                    gridStore.cachePageData = true;
+                }
+            })
+
+            typeStore = window.Ext.create('Ext.ng.JsonStore', {
+                model: 'typeModel',
+                url: C_ROOT + 'SUP/BillCodeRule/GetBillType'
+                //proxy: {
+                //    type: 'ajax',
+                    
+                //},
+                //listeners: {
+                //    load: function () {
+                //        Ext.MessageBox.alert("气死人");
+                //    }
+                //}
+            })
+
+            ngToolBar = Ext.create('Ext.ng.Toolbar', {
+                region: 'north',
+                height: 30,
+                ngbuttons: [
+                    { itemId: 'save', text: '保存', iconCls: 'icon-save' },
+                    { itemId: 'addRow', text: '增行', iconCls: 'icon-New' },
+                    { itemId: 'deleteRow', text: '删行', iconCls: 'icon-delete' },
+                    { itemId: 'copy', text: '复制', iconCLs: 'icon-Copy' },
+                    { itemId: 'ruleSetting', text: '规则设置', iconCls: 'icon-Edit' },
+                    //{ itemId: 'ruleDistribution', text: '规则分配', iconCls: 'icon-Edit' },
+                    '->', 'close'
+                ]
+            });
+            
+            var codemodestore = Ext.create('Ext.data.Store', {
+                fields: ['code', 'name'],
+                data: [
+                    { "code": "1", "name": "系统自动生成编码且不允许修改" },
+                    { "code": "2", "name": "手动填写前缀系统自动补齐流水号" },
+                    { "code": "3", "name": "系统自动生成编码后允许修改" },
+                    { "code": "4", "name": "系统不生成编码" }
+                ]
+            });
+
+            var isdefaultstore = Ext.create('Ext.data.Store', {
+                fields: ['code', 'name'],
+                data: [
+                    { "code": "1", "name": "是" },
+                    { "code": "0", "name": "否" }
+                ]
+            });
+
+            var delimiterstore = Ext.create('Ext.data.Store', {
+                fields: ['code', 'name'],
+                data: [
+                    { "code": " ", "name": "无" },
+                    { "code": "-", "name": "-" },
+                    { "code": ".", "name": "." },
+                    { "code": "_", "name": "_" },
+                    { "code": "/", "name": "/" },
+                ]
+            });
+
+            var schemectrlEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+                clicksToEdit: 1,    //单击编辑，单元格修改
+            });
+
+            var gridPanel = Ext.create('Ext.ng.GridPanel', {
+                region: 'center',
+                width: 820,
+                stateId: 'gridpanel',
+                border: false,
+                frame: true,
+                store: gridStore,
+                columnLines: true,
+                otype: 'edit',
+                buskey: 'c_code',
+                columns: [
+                    {
+                        xtype: 'rownumberer',
+                        text: '行号',
+                        width: 35,
+                        stateId: 'lineid',
+                        hidden: true
+                    }, {
+                        header: '系统编码',
+                        dataIndex: 'c_code',
+                        flex: 1,
+                        align: 'center',
+                        titleAlign: 'center',
+                        hidden: true
+                    }, {
+                        header: '类型',
+                        dataIndex: 'ruletype',
+                        flex: 2,
+                        align: 'center',
+                        titleAlign: 'center',
+                        mustInput: true,
+                        editor: {
+                            xtype: 'combobox',
+                            store: typeStore,
+                            valueField: 'code',
+                            displayField: 'name',
+                            editable: false,
+                            autoRender: true,
+                            listeners: {
+                                focus: {
+                                    fn: function () {
+                                        typeTree = typeTreePanel.getTree();
+                                        var data = typeTree.getSelectionModel().getSelection();
+                                        if (data == "") {
+                                            Ext.MessageBox.alert("提示", "请选择业务类型");
+                                            return;
+                                        }
+                                        Ext.apply(typeStore.proxy.extraParams, { 'busphid': busphid });
+                                        typeStore.cachePageData = false;
+                                        typeStore.reload();
+                                        typeStore.cachePageData = true;
+                                    }
+                                },
+                                blur: function (me, obj) {
+                                    var count = gridStore.getCount();
+                                    for (var i = 0; i < count; i++) {
+                                        var record = gridStore.getAt(i);
+                                        var type = record.data.ruletype;
+                                        if (type = me.value) {
+                                            Ext.MessageBox.alert('提示','类型不允许重复');
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        renderer: function (value) {
+                            var i = typeStore.find('code', value);
+                            if (i >= 0) {
+                                return typeStore.getAt(i).get('name');
+                            }
+                            return value;
+                        }
+                    }, {
+                            header: '规则名称',
+                            dataIndex: 'rulename',
+                            flex: 2,
+                            align: 'center',
+                            titleAlign: 'center',
+                            mustInput: true,
+                            editor: { allowBlank: true }
+                    }, {
+                            header: '编码方式',
+                            dataIndex: 'codemode',
+                            flex: 3,
+                            align: 'center',
+                            titleAlign: 'center',
+                            mustInput: true,
+                            editor: {
+                                xtype: 'combobox',
+                                store: codemodestore,
+                                queryMode: 'local',
+                                valueField: 'code',
+                                displayField: 'name',
+                                mustInput: true,
+                                editable: false,
+                                autoRender: true
+                            }, renderer: function (value) {
+                                var i = codemodestore.find('code', value);
+                                if (i >= 0) {
+                                    return codemodestore.getAt(i).get('name');
+                                }
+                                return value;
+                            }
+                    },{
+                            header: '是否默认',
+                            dataIndex: 'isdefault',
+                            flex: 1,
+                            align: 'center',
+                            titleAlign: 'center',
+                            hidden: true,
+                            editor: {
+                                xtype: 'combobox',
+                                store: isdefaultstore,
+                                queryMode: 'local',
+                                valueField: 'code',
+                                displayField: 'name',
+                                mustInput: true,
+                                editable: false,
+                                autoRender: true
+                            }, renderer: function (value) {
+                                var i = isdefaultstore.find('code', value);
+                                if (i >= 0) {
+                                    return isdefaultstore.getAt(i).get('name');
+                                }
+                                return value;
+                            }
+                    }, {
+                            header: '编码限长',
+                            dataIndex: 'codelimit',
+                            id: 'codelimitid',
+                            flex: 1,
+                            align: 'center',
+                            titleAlign: 'center',
+                            mustInput: true,
+                            editor:
+                                {
+                                    allowBlank: true,
+                                },
+                    }, {
+                            header: '分隔符',
+                            dataIndex: 'delimiter',
+                            flex: 1,
+                            align: 'center',
+                            titleAlign: 'center',
+                            mustInput: true,
+                            editor: {
+                                xtype: 'combobox',
+                                store: delimiterstore,
+                                queryMode: 'local',
+                                valueField: 'code',
+                                displayField: 'name',
+                                mustInput: true,
+                                editable: false,
+                                autoRender: true
+                            }, renderer: function (value) {
+                                var i = delimiterstore.find('code', value);
+                                if (i >= 0) {
+                                    return delimiterstore.getAt(i).get('name');
+                                }
+                                return value;
+                            }
+                    }, {
+                            header: '备注',
+                            dataIndex: 'remark',
+                            flex: 2,
+                            align: 'center',
+                            titleAlign: 'center',
+                            editor: { allowBlank: true }
+                        }
+                ],
+                plugins: [schemectrlEditing],
+                listeners: {
+                    'beforeedit': function (editor, e, eOpts) {
+                        if (e.field == '' || e.field == 'noindex') {
+                            return false;
+                        }
+                    }
+                }
+            });
+
+            ////组织树
+            //orgtree = Ext.create('Ext.ng.TreePanel', {
+            //    region: 'center',
+            //    id: 'treeorg',
+            //    url: '../../DMC/Rights/OrgRelat/GetUserVisibleTreeData?orginnertype=funcorg&includedept=false&needcheck=true&userId=-9876',
+            //});
+
+            //orgTreePanel = Ext.create('Ext.panel.Panel', {
+            //    region: 'east',
+            //    layout: 'border',
+            //    border: 0,
+            //    width: 173,
+            //    layout: 'fit',
+            //    hidden: true,
+            //    items: [orgtree],
+            //    dockedItems: [{
+            //        xtype: 'toolbar',
+            //        dock: 'top',
+            //        border: 0,
+            //        items: [
+            //            {
+            //                xtype: 'button',
+            //                text: '保存',
+            //                id: 'orgsave',
+            //                height: 25,
+            //                iconCls: "icon-save",
+            //                handler: function () {
+            //                    var griddata = gridPanel.getSelectionModel().getSelection();
+            //                    var treedata = orgtree.getChecked();
+            //                    if (griddata.length > 0) {
+            //                        var billRule_m_code = griddata[0].get('c_code');
+            //                        var data = [];
+            //                        if (treedata.length > 0) {
+            //                            for (var i = 0; i < treedata.length; i++) {
+            //                                data[i] = treedata[i].get('id');
+            //                            }
+            //                        }
+            //                        Ext.Ajax.request({
+            //                            url: C_ROOT + 'SUP/BillCodeRule/SaveRuleDistribution',
+            //                            params: { "data": data, "billRule_m_code": billRule_m_code },
+            //                            success: function (response) {
+            //                                if (isNaN(response.text)) {
+            //                                    var resp = Ext.JSON.decode(response.text);
+            //                                    var num = resp.length;
+            //                                    var message = "";
+            //                                    if (num == 1) {
+            //                                        message = resp[0].oname + "组织";
+            //                                    } else {
+            //                                        for (var j = 0; j < num; j++) {
+            //                                            if (message == "") {
+            //                                                message = resp[j].oname + "组织";
+            //                                            } else {
+            //                                                message = message + "," + resp[j].oname + "组织";
+            //                                            }
+            //                                        }
+            //                                    }
+            //                                    Ext.MessageBox.alert('提示', message + '已被分配同一类型的方案，不允许重新分配');
+            //                                } else if (response.text > 0) {
+            //                                    Ext.MessageBox.alert('提示', '分配成功');
+            //                                    gridStore.cachePageData = false;
+            //                                    gridStore.reload();
+            //                                    gridStore.cachePageData = true;
+            //                                    orgTreePanel.hide();
+            //                                } else if(response.text == 0){
+            //                                    Ext.MessageBox.alert('提示', '没有选择分配的组织');
+            //                                    gridStore.cachePageData = false;
+            //                                    gridStore.reload();
+            //                                    gridStore.cachePageData = true;
+            //                                }else{
+            //                                    Ext.MessageBox.alert('提示', '分配异常');
+            //                                    gridStore.cachePageData = false;
+            //                                    gridStore.reload();
+            //                                    gridStore.cachePageData = true;
+            //                                }
+            //                            },
+            //                            failure: function (response) {
+            //                                Ext.MessageBox.alert('提示', '分配失败');
+            //                            }
+            //                        })
+            //                    } else {
+            //                        Ext.MessageBox.alert('提示','请选择行');
+            //                    }
+                                
+            //                }
+            //            }, {
+            //                xtype: 'button',
+            //                text: '清空',
+            //                id: 'clear',
+            //                height: 25,
+            //                iconCls: "icon-Clear"
+            //            }
+            //        ]
+            //    }]
+            //});
+
+            //增行
+            ngToolBar.get('addRow').on('click', function () {
+                typeTree = typeTreePanel.getTree();
+                var data = typeTree.getSelectionModel().getSelection();
+                if (data == "") {
+                    Ext.MessageBox.alert("提示", "请选择业务类型");
+                    return;
+                }
+                var nodetype = data[0].get("nodetype");
+                if (nodetype == 2) {
+                    //var model = Ext.ModelManager.getModel('gridModel');
+                    var m = Ext.create('gridModel', {
+                        c_code: '',
+                        isdefault:'1'
+                    })
+                    gridStore.add(m);
+                } else {
+                    Ext.MessageBox.alert("提示", "请选择业务类型");
+                }
+            })
+
+            //删行
+            ngToolBar.get('deleteRow').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选中你要删除的行！');
+                }else {
+                    Ext.MessageBox.confirm('警告', '确定删除该条记录', function (e) {
+                        if (e == "yes") {
+                            gridStore.remove(gridPanel.getView().getSelectionModel().getSelection()[0]);
+                        }
+                    })
+                }
+            })
+
+            //编码规则保存
+            ngToolBar.get('save').on('click', function () {
+                Ext.MessageBox.confirm('提示', '是否保存所有操作？', function (v) {
+                    if (v == 'yes')
+                    {
+                        var griddata = gridPanel.getChange();
+                        typeTree = typeTreePanel.getTree();
+                        var data = typeTree.getSelectionModel().getSelection();
+                        if (data.length > 0) {
+                            var treetype = data[0].get("bustype");
+                        }
+                        if (griddata.indexOf("newRow") > 0 || griddata.indexOf("modifiedRow") > 0 || griddata.indexOf("deletedRow") > 0) {
+                            var decodedata = Ext.JSON.decode(griddata);
+                            var deletedata = decodedata.table.deletedRow;
+                            if (decodedata.table.modifiedRow != null) {
+                                for (var i = 0; i < decodedata.table.modifiedRow.length; i++) {
+                                    //decodedata.table.modifiedRow[i].row.ruletype == null || 
+                                    if (decodedata.table.modifiedRow[i].row.rulename == "" || decodedata.table.modifiedRow[i].row.codemode == "" || decodedata.table.modifiedRow[i].row.codelimit == "" || decodedata.table.modifiedRow[i].row.delimiter == "")
+                                    {
+                                        Ext.MessageBox.alert('提示', '必输项不能为空');
+                                        return;
+                                    }
+                                    if (decodedata.table.modifiedRow[i].row.codelimit > 40 || decodedata.table.modifiedRow[i].row.codelimit < 0 || isNaN(decodedata.table.modifiedRow[i].row.codelimit)) {
+                                        Ext.MessageBox.alert("提示", "编码限长必须输入小于40的正整数");
+                                        return;
+                                    }
+                                }
+                            }
+                            if (decodedata.table.newRow != null) {
+                                for (var i = 0; i < decodedata.table.newRow.length; i++) {
+                                    //decodedata.table.newRow[i].row.ruletype == null || 
+                                    if (decodedata.table.newRow[i].row.rulename == "" || decodedata.table.newRow[i].row.codemode == "" || decodedata.table.newRow[i].row.codelimit == "" || decodedata.table.newRow[i].row.delimiter == "") {
+                                        Ext.MessageBox.alert('提示', '必输项不能为空');
+                                        return;
+                                    }
+                                    if (decodedata.table.newRow[i].row.codelimit > 40 || decodedata.table.newRow[i].row.codelimit < 0 || isNaN(decodedata.table.newRow[i].row.codelimit)) {
+                                        Ext.MessageBox.alert("提示", "编码限长必须输入小于40的正整数");
+                                        return;
+                                    }
+                                }
+                            }
+                            var myMask = new Ext.LoadMask(document.body, { msg: "正在保存中,请稍候..." });
+                            myMask.show();
+                            Ext.Ajax.request({
+                                url: C_ROOT + 'SUP/BillCodeRule/Save',
+                                params: { "griddata": griddata, "treetype": treetype ,"deletedata": deletedata},
+                                success: function (response) {
+                                    myMask.hide();
+                                    if (response.text > 0) {
+                                        check = true;
+                                        Ext.MessageBox.alert('提示', '保存成功');
+                                        gridStore.cachePageData = false;
+                                        gridStore.reload();
+                                        gridStore.cachePageData = true;
+                                        //orgTreePanel.hide();
+                                    }
+                                },
+                                failure: function (response) {
+                                    myMask.hide();
+                                    Ext.MessageBox.alert('提示', '保存失败');
+                                }
+                            })
+                        } else {
+                            Ext.MessageBox.alert('提示', '数据没有更改!');
+                        }
+                    }
+                });
+            })
+
+            //复制
+            ngToolBar.get('copy').on('click', function () {
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data != "" || data != null) {
+                    var m = Ext.create('gridModel', {
+                        ruletype: data[0].get('ruletype'),
+                        rulename: data[0].get('rulename'),
+                        codemode: data[0].get('codemode'),
+                        isdefault: data[0].get('isdefault'),
+                        codelimit: data[0].get('codelimit'),
+                        delimiter: data[0].get('delimiter'),
+                        remark: data[0].get('remark'),
+                    })
+                    gridStore.add(m);
+                } else {
+                    Ext.MessageBox.alert('提示','请选择要复制的行');
+                }
+                
+            });
+
+            //规则设置
+            ngToolBar.get('ruleSetting').on('click', function () {
+                typeTree = typeTreePanel.getTree();
+                var data = typeTree.getSelectionModel().getSelection();
+                var changedata = gridPanel.getChange();
+                if (data == "") {
+                    Ext.MessageBox.alert("提示", "请选择业务类型");
+                    return;
+                }
+                var nodetype = data[0].get("nodetype");
+                if (nodetype != 2) {
+                    Ext.MessageBox.alert("提示", "请选择业务类型");
+                    return;
+                }
+                var data = gridPanel.getSelectionModel().getSelection();
+                if (data == null || data == '') {
+                    Ext.MessageBox.alert('提示', '请选择要编辑的行');
+                } else {
+                    //data[0].get('ruletype') == null || 
+                    if (data[0].get('rulename') == "" || data[0].get('codemode') == "" || data[0].get('isdefault') == "" || data[0].get('codelimit') == "" || data[0].get('delimiter') == "") {
+                        Ext.MessageBox.alert('提示', '必输项不能为空');
+                        return;
+                    }
+                    if (changedata.indexOf("newRow") > 0 || changedata.indexOf("modifiedRow") > 0 || changedata.indexOf("deletedRow") > 0) {
+                        Ext.MessageBox.alert('提示', '请先保存修改');
+                        return;
+                    }
+                    var codemode = data[0].get("codemode");
+                    if(codemode != "4"){
+                        var c_code = data[0].get('c_code');
+                        var ruletype = data[0].get('ruletype');
+                        var codelimit = data[0].get('codelimit');
+                        var delimiter = data[0].get('delimiter');
+                        $OpenTab('单据编码规则设置', C_ROOT + 'SUP/BillCodeRule/BillCodeRuleEdit?c_bcode=' + c_code + '&ruletype=' + ruletype + '&codelimit=' + codelimit + '&delimiter=' + delimiter + '&codemode=' + codemode + '&c_btype=' + c_btype + '&busname=' + busname);
+                    }else{
+                        Ext.MessageBox.alert('提示','编码方式为系统不生成编码,无需设置规则');
+                    }
+                }
+            })
+
+            ////规则分配
+            //ngToolBar.get('ruleDistribution').on('click', function () {
+            //    typeTree = typeTreePanel.getTree();
+            //    var data = typeTree.getSelectionModel().getSelection();
+            //    if (data == "") {
+            //        Ext.MessageBox.alert("提示", "请选择业务类型");
+            //        return;
+            //    }
+            //    var nodetype = data[0].get("nodetype");
+            //    if (nodetype != 2) {
+            //        Ext.MessageBox.alert("提示", "请选择业务类型");
+            //        return;
+            //    }
+            //    var data = gridPanel.getSelectionModel().getSelection();
+            //    if (data == null || data == '') {
+            //        Ext.MessageBox.alert('提示', '请选择要编辑的行');
+            //    } else {
+            //        orgTreePanel.show();
+            //    }
+            //})
+
+            Ext.create('Ext.container.Viewport', {
+                title: 'Border Layout',
+                layout: 'border',
+                items: [
+                    ngToolBar,
+                    typeTreePanel,
+                    gridPanel,
+                    //orgTreePanel
+                ]
+            });
+
+        });
+    </script>
+}

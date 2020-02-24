@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DataService>
+  <Tables>
+    <Table Name="uic_supplier_progress">
+      <Field Name="purid" IsKey="true" />
+      <Field Name="lineid" IsKey="true" />
+      <Field Name="attids" />
+      <Field Name="groupisnew" />
+      <Field Name="grouprecordocode"/>
+      <Field Name="grouprecordtime"/>
+      <Field Name="groupremark"/>
+      <Field Name="groupstatename"/>
+      <Field Name="groupstateno"/>
+      <Field Name="recordtype"/>
+      <Field Name="supplyisnew" />
+      <Field Name="supplyrecordocode" />
+      <Field Name="supplyrecordtime" />
+      <Field Name="supplyremark" />
+      <Field Name="supplystatename" />
+      <Field Name="supplystateno" />
+    </Table>
+    <Table Name="ec_purdtl">
+      <Field Name="purno"></Field>
+      <Field Name="itemno"></Field>
+      <Field Name="qty"></Field>
+      <Field Name="deliverdate"></Field>
+    </Table>
+    <Table Name="itemdata">
+      <Field Name="itemname"></Field>
+    </Table>
+  </Tables>
+  <Read>
+    <Sql>
+      select [fields] from [table]
+      inner join ec_purmst on [table].purid = ec_purmst.purid [where]
+    </Sql>
+    <Query>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>
+    </Query>
+  </Read>
+  <Record>
+    <Sql>
+      select [fields] from [table]
+      inner join ec_purdtl on [table].purid = ec_purdtl.purid and [table].lineid = ec_purdtl.lineid 
+      inner join itemdata on itemdata.itemno = ec_purdtl.itemno 
+      [where]
+    </Sql>
+    <Where>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>
+    </Where>
+  </Record>
+  <Create>
+
+  </Create>
+  <Update>
+
+  </Update>
+  <Delete>
+
+  </Delete>
+  <Destroy>
+
+  </Destroy>
+  <GetSupplierProgress>
+    <Sql>
+      select * from uic_supplier_progress [where]
+    </Sql>
+    <Query>
+      <Exp Field="purid"  Target="Client" Value="purid"/>
+      <Exp Field="lineid"  Target="Client" Value="lineid"/>
+    </Query>
+  </GetSupplierProgress>
+
+  <InsertSupplierProgressHis>
+    <Sql>
+      insert into uic_supplier_progress_his (purid,lineid,isnew,stateno,statename,remark,recordocode,recordtype,recordtime,hisid,attids)
+      select purid,lineid,case when recordtype='0' then supplyisnew else groupisnew end,case when recordtype='0' then supplystateno else groupstateno end
+      ,case when recordtype='0' then supplystatename else groupstatename end,case when recordtype='0' then supplyremark else groupremark end
+      ,case when recordtype='0' then supplyrecordocode else grouprecordocode end ,recordtype,case when recordtype='0' then supplyrecordtime else grouprecordtime end
+      ,@hisid,attids from uic_supplier_progress where purid=@purid and lineid=@lineid
+    </Sql>
+    
+  </InsertSupplierProgressHis>
+  
+</DataService>
