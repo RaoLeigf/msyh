@@ -103,6 +103,13 @@ namespace GQT3.QT.Facade.Interface
         /// <param name="orgTree"></param>
         /// <returns></returns>
         List<OrganizeModel> GetAllChild(OrganizeModel orgTree);
+
+        /// <summary>
+        /// 根据操作员组织权限列表
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        IList<OrganizeModel> GetAuthOrgList(long UserId);
         #endregion
     }
 }

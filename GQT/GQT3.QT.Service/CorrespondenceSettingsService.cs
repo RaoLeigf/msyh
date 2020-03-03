@@ -1530,6 +1530,15 @@ namespace GQT3.QT.Service
             var org = OrganizationFacade.Find(x => orgphidList.Contains(x.PhId), "OCode").Data.ToList();
             return org;
         }
+        /// <summary>
+        /// 根据操作员组织权限列表
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        public IList<OrganizeModel> GetAuthOrgList(long UserId)
+        {
+            return OrganizationFacade.GetAuthOrgList(UserId);
+        }
     }
 }
 

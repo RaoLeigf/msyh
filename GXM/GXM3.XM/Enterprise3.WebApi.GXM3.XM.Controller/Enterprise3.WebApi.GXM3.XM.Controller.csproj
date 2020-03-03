@@ -53,6 +53,10 @@
       <HintPath>..\..\..\BusinessDlls\Enterprise3.WebApi.ApiControllerBase.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
+    <Reference Include="NPOI, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\BusinessDllsApi\NPOI.dll</HintPath>
+    </Reference>
     <Reference Include="SUP.Common.Base">
       <HintPath>..\..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
     </Reference>

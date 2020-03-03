@@ -88,5 +88,15 @@
             <param name="DJH"></param>
             <returns></returns>
         </member>
+        <member name="T:GXM3.XM.Rule.Interface.IXmReportDtlRule">
+            <summary>
+            XmReportDtl业务逻辑层接口
+            </summary>
+        </member>
+        <member name="T:GXM3.XM.Rule.Interface.IXmReportMstRule">
+            <summary>
+            XmReportMst业务逻辑层接口
+            </summary>
+        </member>
     </members>
 </doc>

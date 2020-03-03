@@ -450,5 +450,32 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:GXM3.XM.Service.Interface.IXmReportMstService">
+            <summary>
+            XmReportMst服务组装层接口
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Service.Interface.IXmReportMstService.SaveXmReportMst(GXM3.XM.Model.Domain.XmReportMstModel,System.Collections.Generic.List{GXM3.XM.Model.Domain.XmReportDtlModel})">
+            <summary>
+            保存数据
+            </summary>
+            <param name="xmReportMstEntity"></param>
+            <param name="xmReportDtlEntities"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.Interface.IXmReportMstService.FindXmReportDtlByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取XmReportDtl明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.Interface.IXmReportMstService.GetMSYHProjectReport(System.Int64)">
+            <summary>
+            通过单据主键获取签报单信息
+            </summary>
+            <param name="phid">单据主键</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

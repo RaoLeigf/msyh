@@ -339,5 +339,61 @@
               查找类似 对象初始化失败！ 的本地化字符串。
             </summary>
         </member>
+        <member name="T:GXM3.XM.Rule.XmReportDtlRule">
+            <summary>
+            XmReportDtl业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.XmReportDtlRule.XmReportDtlDac">
+            <summary>
+            XmReportDtl数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.XmReportDtlRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.XmReportDtlModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.XmReportDtlRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.XmReportDtlModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
+        <member name="T:GXM3.XM.Rule.XmReportMstRule">
+            <summary>
+            XmReportMst业务逻辑处理类
+            </summary>
+        </member>
+        <member name="P:GXM3.XM.Rule.XmReportMstRule.XmReportMstDac">
+            <summary>
+            XmReportMst数据访问处理对象
+            </summary>
+        </member>
+        <member name="M:GXM3.XM.Rule.XmReportMstRule.DataCheck(System.Collections.Generic.IList{GXM3.XM.Model.Domain.XmReportMstModel},System.String@)">
+            <summary>
+            数据校验(重写方法)
+            </summary>
+            <param name="entities">实体集合</param>
+            <param name="prompt">提示信息</param>
+            <returns>处理成功返回True</returns>
+        </member>
+        <member name="M:GXM3.XM.Rule.XmReportMstRule.DataHandling``1(System.Collections.Generic.IList{GXM3.XM.Model.Domain.XmReportMstModel}@,``0)">
+            <summary>
+            数据处理
+            </summary>
+            <para>
+            此方法必须进行重写,执行顺序在DataCheck方法之前。
+            </para>
+            <param name="entities">实体集合</param>
+            <param name="masterId">主表关键字值</param>
+        </member>
     </members>
 </doc>

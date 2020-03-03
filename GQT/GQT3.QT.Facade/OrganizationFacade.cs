@@ -472,7 +472,41 @@ namespace GQT3.QT.Facade
             }
             return OrgList;
         }
-        
+
+
+        /// <summary>
+        /// 根据操作员组织权限列表
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        public IList<OrganizeModel> GetAuthOrgList(long UserId)
+        {
+            List<OrganizeModel> trees = new List<OrganizeModel>();
+
+            List<Int64> PHIDs1 = new List<Int64>();//存有权限的组织phid 
+
+            Dictionary<string, object> dic_userorg = new Dictionary<string, object>();
+            new CreateCriteria(dic_userorg)
+                .Add(ORMRestrictions<Int64>.Eq("UserId", UserId));
+            //IList<UserOrganize2Model> userOrganize2s = UserOrgRule.Find(dic_userorg);
+            List<long> PHIDs2 = UserOrgRule.Find(dic_userorg).ToList().Select(x => x.OrgId).Distinct().ToList();
+
+            Dictionary<string, object> dic_sb = new Dictionary<string, object>();
+            new CreateCriteria(dic_sb).
+                        Add(ORMRestrictions<string>.Eq("Dylx", "SB"));
+            List<Int64> PHIDs3 = CorrespondenceSettings2Rule.Find(dic_sb).ToList().Select(x => long.Parse(x.DefStr2)).Distinct().ToList();
+
+            PHIDs1 = PHIDs3.Intersect(PHIDs2).ToList();
+
+            var dic = new Dictionary<string, object>();
+            new CreateCriteria(dic)
+                .Add(ORMRestrictions<List<Int64>>.In("PhId", PHIDs1));
+
+            var result = OrganizationRule.Find(dic);
+
+            return result;
+        }
+
         #endregion
     }
 }

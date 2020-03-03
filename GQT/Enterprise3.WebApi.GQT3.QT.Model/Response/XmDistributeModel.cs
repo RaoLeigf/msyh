@@ -98,6 +98,16 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Response
             set;
         }
 
+        /// <summary>
+        /// 机构Id
+        /// </summary>
+        [DataMember]
+        public virtual System.Int64 CurOrgId
+        {
+            get;
+            set;
+        }
+
         #region 项目分发所需
         /// <summary>
         /// 分发组织id

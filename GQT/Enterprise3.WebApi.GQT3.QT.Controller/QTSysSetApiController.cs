@@ -73,6 +73,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
 
         IExpenseMstService ExpenseMstService { get; set; }
 
+        IQtXmDistributeService QtXmDistributeService { get; set; }
         #endregion
 
         /// <summary>
@@ -99,6 +100,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             ProjectMstService = base.GetObject<IProjectMstService>("GXM3.XM.Service.ProjectMst");
             BudgetMstService = base.GetObject<IBudgetMstService>("GYS3.YS.Service.BudgetMst");
             ExpenseMstService = base.GetObject<IExpenseMstService>("GYS3.YS.Service.ExpenseMst");
+            QtXmDistributeService = base.GetObject<IQtXmDistributeService>("GQT3.QT.Service.QtXmDistribute");
         }
 
         /// <summary>
@@ -158,7 +160,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     foreach (QTSysSetModel set in SysSet.infoData)
                     {
                         //通过phid获取组织集合
-                        if(set.PhidList != null && set.PhidList.Count > 0 && allOrgs != null && allOrgs.Count > 0)
+                        if (set.PhidList != null && set.PhidList.Count > 0 && allOrgs != null && allOrgs.Count > 0)
                         {
                             set.OrgList = allOrgs.ToList().FindAll(t => set.PhidList.Contains(t.PhId));
                         }
@@ -261,7 +263,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                                     {
                                         return DCHelper.ErrorMessage(pro.TypeCode + "此编码不能同时存在私有与公有之中！");
                                     }
-                                    if(PayMethodNots != null && PayMethodNots.Count > 0 && PayMethodNots.FindAll(t=>t.TypeCode == pro.TypeCode && t.Issystem != (byte)1).Count > 0)
+                                    if (PayMethodNots != null && PayMethodNots.Count > 0 && PayMethodNots.FindAll(t => t.TypeCode == pro.TypeCode && t.Issystem != (byte)1).Count > 0)
                                     {
                                         return DCHelper.ErrorMessage(pro.TypeCode + "此编码不能同时存在私有与公有之中！");
                                     }
@@ -3349,6 +3351,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         {
                             foreach (QTSysSetModel z in PayMethodsByTypecode)
                             {
+
                                 z.PersistentState = PersistentState.Deleted;
                                 resultSysSet.Add(z);
                             }
@@ -3362,6 +3365,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     {
                         foreach (QTSysSetModel z in allSysSetsNot)
                         {
+
                             z.PersistentState = PersistentState.Deleted;
                             resultSysSet.Add(z);
                         }
@@ -3375,6 +3379,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
                             if (pro.PersistentState != PersistentState.Deleted)
                             {
+
                                 if (string.IsNullOrEmpty(pro.TypeCode))
                                 {
                                     return DCHelper.ErrorMessage("业务条线编码不能为空！");
@@ -3401,6 +3406,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                                     {
                                         return DCHelper.ErrorMessage(pro.TypeCode + "此编码不能同时存在私有与公有之中！");
                                     }
+                                }
+                            }
+                            else
+                            {
+                                //删除前需要判断有没有被引用
+                                var qtXmDistributeList = QtXmDistributeService.Find(x => x.FBusiness == pro.TypeCode);
+                                if (qtXmDistributeList != null && qtXmDistributeList.Data != null && qtXmDistributeList.Data.Count > 0)
+                                {
+                                    return DCHelper.ErrorMessage("存在被引用的数据！");
                                 }
                             }
                         }
@@ -3472,10 +3486,12 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
                             if (pro.PersistentState != PersistentState.Deleted)
                             {
+
                                 if (string.IsNullOrEmpty(pro.TypeCode))
                                 {
                                     return DCHelper.ErrorMessage("业务条线编码不能为空！");
                                 }
+                                
                                 if (resultSysSet.FindAll(t => t.Orgid == pro.Orgid && t.TypeCode == pro.TypeCode && t.PersistentState != PersistentState.Deleted).Count > 1)
                                 {
                                     return DCHelper.ErrorMessage(orgname + "该组织下的业务条线编码重复，请进行修改！");
@@ -3486,6 +3502,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                                     {
                                         return DCHelper.ErrorMessage(pro.TypeCode + "此编码不能同时存在私有与公有之中！");
                                     }
+                                }
+                            }
+                            else
+                            {
+                                //删除前需要判断有没有被引用
+                                var qtXmDistributeList = QtXmDistributeService.Find(x => x.FBusiness == pro.TypeCode);
+                                if (qtXmDistributeList != null && qtXmDistributeList.Data != null && qtXmDistributeList.Data.Count > 0)
+                                {
+                                    return DCHelper.ErrorMessage("存在被引用的数据！");
                                 }
                             }
                         }
@@ -6997,7 +7022,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             ////判断该组织下是否有走工作流的单据
                             //if ((newApp.FIfuse == (byte)1 && allAppvalRecords != null && allAppvalRecords.Count > 0) || (allAppvalRecords != null && allAppvalRecords.Count > 0))
                             //{
-                                
+
                             //}
 
                             if (allAppvalRecords.ToList().FindAll(t => t.FBilltype == newApp.FCode).Count > 0)
@@ -7253,16 +7278,16 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             new CreateCriteria(dic)
                 .Add(ORMRestrictions<string>.Eq("Dylx", "CodingRule"))
                 .Add(ORMRestrictions<string>.Eq("Dydm", orgid));
-            var Query = CorrespondenceSettingsService.Find(dic,new string[] { "DefInt1" }).Data;
-            if(Query!=null && Query.Count > 0)
+            var Query = CorrespondenceSettingsService.Find(dic, new string[] { "DefInt1" }).Data;
+            if (Query != null && Query.Count > 0)
             {
-                
+
             }
             else
             {
                 //初始化
-                var nameList = new List<string>() {"年度","月份","日期","组织编码","部门编码","四位流水号" };
-                var codeList= new List<string>() { "Year", "Month", "Date", "OrgCode", "DeptCode", "Num" };
+                var nameList = new List<string>() { "年度", "月份", "日期", "组织编码", "部门编码", "四位流水号" };
+                var codeList = new List<string>() { "Year", "Month", "Date", "OrgCode", "DeptCode", "Num" };
                 OrganizeModel organize = QTSysSetService.GetOrg(long.Parse(orgid));
                 for (var i = 0; i < nameList.Count; i++)
                 {
@@ -7276,7 +7301,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     a.DefInt2 = 0;//是否启用（1：启用）
                     Query.Add(a);
                 }
-                
+
             }
             var result = new
             {
@@ -7308,7 +7333,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     var Query = CorrespondenceSettingsService.Find(dic, new string[] { "DefInt1" }).Data;
                     if (Query != null && Query.Count > 0)
                     {
-                        foreach(var a in Query)
+                        foreach (var a in Query)
                         {
                             a.PersistentState = PersistentState.Deleted;
                             data.Add(a);
@@ -7582,7 +7607,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         public string GetQtByOrg([FromUri]string orgCode, [FromUri]string DicType)
         {
             var result = QTSysSetService.Find(x => x.DicType == DicType && x.Orgcode == orgCode && x.Isactive == 0).Data.ToList();
-            if(result!=null && result.Count > 0)
+            if (result != null && result.Count > 0)
             {
                 return DCHelper.ModelListToJson<QTSysSetModel>(result, result.Count);
             }

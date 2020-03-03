@@ -38,18 +38,32 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         /// <summary>
         /// 取列表数据
         /// </summary>
-        /// <returns>返回Json串</returns>
+        /// <param name="OrgPhid"></param>
+        /// <param name="FProjname">项目名称(模糊查询)</param>
+        /// <param name="FProjcodeOrder">项目编号排序(0 不排序 1正序 2倒序)</param>
+        /// <param name="FBusinessOrder">业务条线排序(0 不排序 1正序 2倒序)</param>
+        /// <param name="Sort">0 先排编号  1 先排业条线</param>
+        /// <returns></returns>
         [HttpGet]
-        public string GetQtXmDistributeList([FromUri]long OrgPhid)
+        public string GetQtXmDistributeList([FromUri]long OrgPhid,
+            [FromUri]string FProjname,
+            [FromUri]int FProjcodeOrder,
+            [FromUri]int FBusinessOrder,
+            [FromUri]int Sort)
         {
             if (OrgPhid == 0)
             {
                 return DCHelper.ErrorMessage("组织ID为空！");
             }
             List<XmDistributeModel> result = new List<XmDistributeModel>();
+
+            if (FProjname == null)
+            {
+                FProjname = string.Empty;
+            }
             var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == OrgPhid).Data.ToList();
             //取有权限修改的
-            var data1 = QtXmDistributeService.Find(x => x.Distributeorgid==OrgPhid, "FProjcode").Data.ToList();
+            var data1 = QtXmDistributeService.Find(x => x.Distributeorgid == OrgPhid && x.FProjname.Contains(FProjname), "FProjcode").Data.ToList();
             if (data1 != null && data1.Count > 0)
             {
                 var data2 = new List<QtXmDistributeModel>();
@@ -58,6 +72,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 {
                     data2 = data1.FindAll(x => x.FProjcode == code);
                     XmDistributeModel a = new XmDistributeModel();
+                    a.CurOrgId = data2.First(p => p.FProjcode == code).CurOrgId;
                     a.CanFF = true;
                     a.FProjcode = code;
                     a.FProjname = data2[0].FProjname;
@@ -69,7 +84,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             a.FBusiness_EXName = syssets.Find(x => x.TypeCode == a.FBusiness).TypeName;
                         }
                     }
-                    a.EnableOrgList= data2.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
+                    a.EnableOrgList = data2.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
                     if (a.EnableOrgList != null && a.EnableOrgList.Count > 0)
                     {
                         a.EnableOrgList2 = new List<object>();
@@ -93,8 +108,9 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             }
 
             //取没分发权限的
-            var data3 = QtXmDistributeService.Find(x => x.Distributeorgid != OrgPhid && x.Orgid == OrgPhid).Data.ToList();
-            if(data3!=null&& data3.Count > 0)
+            var data3 = QtXmDistributeService.Find(x => x.Distributeorgid != OrgPhid && x.Orgid == OrgPhid && x.FProjname.Contains(FProjname)).Data.ToList();
+
+            if (data3 != null && data3.Count > 0)
             {
                 var data4 = new List<QtXmDistributeModel>();
                 var FProjcodeList2 = data3.Select(x => x.FProjcode).Distinct().ToList();
@@ -102,11 +118,12 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 {
                     data4 = QtXmDistributeService.Find(x => x.FProjcode == code).Data.ToList();
                     XmDistributeModel b = new XmDistributeModel();
+                    b.CurOrgId = data3.First(p => p.FProjcode == code).CurOrgId;
                     b.CanFF = false;
                     b.FProjcode = code;
                     b.FProjname = data4[0].FProjname;
                     b.FBusiness = data4[0].FBusiness;
-                    if (!string.IsNullOrEmpty(b.FBusiness) && syssets!=null)
+                    if (!string.IsNullOrEmpty(b.FBusiness) && syssets != null)
                     {
                         if (syssets.Find(x => x.TypeCode == b.FBusiness) != null)
                         {
@@ -130,7 +147,49 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 }
             }
 
-            result = result.OrderBy(x => x.FProjcode).ToList();
+            //先排编号
+            if (Sort == 0)
+            {
+                if (FProjcodeOrder == 1)
+                {
+                    result = result.OrderBy(x => x.FProjcode).ToList();
+                }
+                else if (FProjcodeOrder == 2)
+                {
+                    result = result.OrderByDescending(x => x.FProjcode).ToList();
+                }
+
+                if (FBusinessOrder == 1)
+                {
+                    result = result.OrderBy(x => x.FBusiness).ToList();
+                }
+                else if (FBusinessOrder == 2)
+                {
+                    result = result.OrderByDescending(x => x.FBusiness).ToList();
+                }
+            }
+            //先排业务条线
+            else if (Sort == 1)
+            {
+                if (FBusinessOrder == 1)
+                {
+                    result = result.OrderBy(x => x.FBusiness).ToList();
+                }
+                else if (FBusinessOrder == 2)
+                {
+                    result = result.OrderByDescending(x => x.FBusiness).ToList();
+                }
+
+                if (FProjcodeOrder == 1)
+                {
+                    result = result.OrderBy(x => x.FProjcode).ToList();
+                }
+                else if (FProjcodeOrder == 2)
+                {
+                    result = result.OrderByDescending(x => x.FProjcode).ToList();
+                }
+            }
+            //result = result.OrderBy(x => x.FProjcode).ToList();
             return DCHelper.ModelListToJson<XmDistributeModel>(result, (Int32)result.Count);
         }
 
@@ -163,6 +222,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             List<QtXmDistributeModel> modelList = new List<QtXmDistributeModel>();
             if (data.data != null && data.data.Count > 0)
             {
+                data.data.Reverse();
                 for (var i = 0; i < data.data.Count; i++)
                 {
                     QtXmDistributeModel model = new QtXmDistributeModel();
@@ -190,22 +250,49 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         public string PostXmFF([FromBody]XmDistributeModel data)
         {
             var selectdata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
+
+            //判断是否有权限操作
+            var orgList = CorrespondenceSettingsService.GetAuthOrgList(data.userid)?.Select(p => p.PhId)?.ToList() ?? new List<long>();
+
+            //全部删除情况
+            if (data.EnableOrgList == null
+                || data.EnableOrgList.Count == 0)
+            {
+                return DCHelper.ErrorMessage("默认组织不能被删除！");
+            }
+
+            //没有任何权限
+            if (orgList == null
+                || orgList.Count() == 0)
+            {
+                return DCHelper.ErrorMessage("没有权限修改！");
+            }
+            //没有修改的权限
+            if (data.EnableOrgList.Except(orgList).Count() > 0)
+            {
+                return DCHelper.ErrorMessage("没有权限修改！");
+            }
+            //默认组织不能删除
+            if (!data.EnableOrgList.Exists(p => p == selectdata.First().Distributeorgid))
+            {
+                return DCHelper.ErrorMessage("默认组织不能被删除");
+            }
             var orglist = new List<Int64>();
             var rundata = new List<QtXmDistributeModel>();
             if (selectdata != null && selectdata.Count > 0)
             {
                 //既然能选到 数据库必有数据
                 var data1 = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
-                orglist = (data1!=null && data1.Count>0) ? data1.Select(x => x.Orgid).ToList() : new List<long>(); 
+                orglist = (data1 != null && data1.Count > 0) ? data1.Select(x => x.Orgid).ToList() : new List<long>();
             }
-            var AddOrg = (data.EnableOrgList!=null && data.EnableOrgList.Count>0) ? data.EnableOrgList.Except(orglist).ToList():null;
-            var deleteOrg = (data.EnableOrgList != null && data.EnableOrgList.Count > 0)?orglist.Except(data.EnableOrgList).ToList(): orglist;
+            var AddOrg = (data.EnableOrgList != null && data.EnableOrgList.Count > 0) ? data.EnableOrgList.Except(orglist).ToList() : null;
+            var deleteOrg = (data.EnableOrgList != null && data.EnableOrgList.Count > 0) ? orglist.Except(data.EnableOrgList).ToList() : orglist;
 
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             if (deleteOrg != null && deleteOrg.Count > 0)
             {
                 rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && deleteOrg.Contains(x.Orgid)).Data.ToList();
-                foreach(var b in rundata)
+                foreach (var b in rundata)
                 {
                     b.PersistentState = PersistentState.Deleted;
                 }
@@ -227,7 +314,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     rundata.Add(model);
                 }
             }
-            
+
             savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
             return DataConverterHelper.SerializeObject(savedresult);
         }
@@ -242,7 +329,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         {
             var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
-            foreach(var a in rundata)
+            foreach (var a in rundata)
             {
                 a.FProjname = data.FProjname;
                 a.FBusiness = data.FBusiness;
@@ -275,7 +362,10 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         /// </summary>
         /// <returns>返回Json串</returns>
         [HttpGet]
-        public string GetQtXmDistributeByOrg([FromUri]long OrgPhid)
+        public string GetQtXmDistributeByOrg([FromUri]long OrgPhid,
+            [FromUri]int pageIndex = 0,
+            [FromUri]int pageSize = 0,
+            [FromUri]string search = "")
         {
             if (OrgPhid == 0)
             {
@@ -305,11 +395,27 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             {
                 return DCHelper.ErrorMessage(e.Message);
             }
+
+            
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.Trim();
+                data = data.Where(p => p.FProjcode.Contains(search)
+                    || p.FProjname.Contains(search)
+                    || (p.FBusiness_EXName??string.Empty).Contains(search)).ToList();
+            }
+            var count = data.Count;
+            if (pageIndex != 0 && pageSize != 0)
+            {
+                data = data.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            }
+            
             var result = new
             {
                 Status = ResponseStatus.Success,
                 Msg = "获取成功!",
-                data = data
+                data = data,
+                Count = count
             };
             return DataConverterHelper.SerializeObject(result);
         }

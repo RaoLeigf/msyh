@@ -262,5 +262,12 @@ namespace GQT3.QT.Service.Interface
         /// <param name="orgphidList"></param>
         /// <returns></returns>
         List<OrganizeModel> GetOrgCodeList(List<long> orgphidList);
+
+        /// <summary>
+        /// 根据操作员组织权限列表
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        IList<OrganizeModel> GetAuthOrgList(long UserId);
     }
 }

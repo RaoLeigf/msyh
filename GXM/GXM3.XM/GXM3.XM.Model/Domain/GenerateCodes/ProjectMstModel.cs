@@ -639,6 +639,7 @@ namespace GXM3.XM.Model.Domain
             get;
             set;
         }
+
         /// <summary>
         /// 是否申请补助
         /// </summary>

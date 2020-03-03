@@ -19,6 +19,8 @@ using GXM3.XM.Service.Interface;
 using GYS3.YS.Model.Domain;
 using GYS3.YS.Service.Interface;
 using Newtonsoft.Json;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using SUP.Common.Base;
 using SUP.Common.DataAccess;
 using SUP.Common.DataEntity;
@@ -68,6 +70,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         IGAppvalProcService GAppvalProcService { get; set; }
 
         IQtXmDistributeService QtXmDistributeService { get; set; }
+
+        IBudgetAccountsService BudgetAccountsService { get; set; }
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -88,6 +92,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             GAppvalRecordService = base.GetObject<IGAppvalRecordService>("GSP3.SP.Service.GAppvalRecord");
             GAppvalProcService = base.GetObject<IGAppvalProcService>("GSP3.SP.Service.GAppvalProc");
             QtXmDistributeService = base.GetObject<IQtXmDistributeService>("GQT3.QT.Service.QtXmDistribute");
+            BudgetAccountsService = base.GetObject<IBudgetAccountsService>("GQT3.QT.Service.BudgetAccounts");
         }
 
         /// <summary>
@@ -5415,92 +5420,462 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
         }
 
-        /// <summary>
-        /// 项目分发数据导入
-        /// </summary>
-        /// <returns></returns>
+        ///// <summary>
+        ///// 模板导入用户数据
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpPost]
+        //public async Task<string> PostImportXMData()
+        //{
+        //    try
+        //    {
+        //        //判断form表单类型是否正确
+        //        if (!Request.Content.IsMimeMultipartContent())
+        //        {
+        //            var data = new
+        //            {
+        //                Status = ResponseStatus.Error,
+        //                Msg = "请求数据不是multipart/form-data类型"
+        //            };
+        //            return DataConverterHelper.SerializeObject(data);
+        //        }
+
+        //        //I6WebAppInfo i6AppInfo = (I6WebAppInfo)HttpContext.Current.Session["NGWebAppInfo"] ?? null;
+        //        //获取AppInfo值 头部信息记录
+        //        var base64EncodedBytes = Convert.FromBase64String(HttpContext.Current.Request.Headers.GetValues("AppInfo").First());
+        //        var jsonText = Encoding.UTF8.GetString(base64EncodedBytes);
+        //        var AppInfo = JsonConvert.DeserializeObject<AppInfoBase>(jsonText);
+
+        //        //如果路径不存在,创建路径
+        //        var root = System.Web.Hosting.HostingEnvironment.MapPath("~/UpLoadFiles/XM/");
+        //        string filePath = root;
+        //        if (!Directory.Exists(filePath))
+        //        {
+        //            Directory.CreateDirectory(filePath);
+        //        }
+
+        //        var multipartMemoryStreamProvider = await Request.Content.ReadAsMultipartAsync();
+        //        var contentsList = multipartMemoryStreamProvider.Contents;
+
+        //        string uploadPath = "";
+        //        string extension = "";
+        //        //保存导入的模板文件
+        //        foreach (var content in contentsList)
+        //        {
+        //            //通过判断fileName是否为空,是否为文件
+        //            if (!string.IsNullOrEmpty(content.Headers.ContentDisposition.FileName))
+        //            {
+        //                //处理文件名字符串
+        //                string fileName = content.Headers.ContentDisposition.FileName.Replace("\"", string.Empty);
+        //                using (Stream stream = await content.ReadAsStreamAsync())
+        //                {
+        //                    byte[] bytes = new byte[stream.Length];
+        //                    stream.Read(bytes, 0, bytes.Length);
+        //                    stream.Seek(0, SeekOrigin.Begin);
+
+        //                    //获取对应文件后缀名
+        //                    extension = Path.GetExtension(fileName);
+        //                    //获取文件名
+        //                    string b_name = Path.GetFileName(fileName);
+
+        //                    //修改文件名
+        //                    string newFileName = Guid.NewGuid().ToString("N") + extension;
+        //                    uploadPath = Path.Combine(filePath, newFileName);
+
+        //                    //保存文件
+        //                    MemoryStream ms = new MemoryStream(bytes);
+        //                    FileStream fs = new FileStream(uploadPath, FileMode.Create);
+        //                    ms.WriteTo(fs);
+        //                    ms.Close();
+        //                    fs.Close();
+        //                }
+
+        //            }
+        //        }
+
+                
+        //        var data1 = new
+        //        {
+        //            Status = ResponseStatus.Success,
+        //            Msg = "操作员编码不重复！",
+        //            UploadPath = uploadPath,
+        //            IsRepeat = 0
+        //        };
+        //        return DataConverterHelper.SerializeObject(data1);
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return DCHelper.ErrorMessage("模板导入失败！");
+        //    }
+
+        //}
+
         /// <summary>
         /// 模板导入用户数据
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<string> PostImportXMData()
+        public async Task<string> PostImportXMData([FromBody]ImportXMDataRequest request)
         {
+            
+            var now = DateTime.Now;
             try
             {
-                //判断form表单类型是否正确
-                if (!Request.Content.IsMimeMultipartContent())
+                if(request.UserId == 0)
                 {
-                    var data = new
+                    return DataConverterHelper.SerializeObject(new
                     {
                         Status = ResponseStatus.Error,
-                        Msg = "请求数据不是multipart/form-data类型"
-                    };
-                    return DataConverterHelper.SerializeObject(data);
+                        Msg = "用户信息为空"
+                    });
                 }
 
-                //I6WebAppInfo i6AppInfo = (I6WebAppInfo)HttpContext.Current.Session["NGWebAppInfo"] ?? null;
-                //获取AppInfo值 头部信息记录
-                var base64EncodedBytes = Convert.FromBase64String(HttpContext.Current.Request.Headers.GetValues("AppInfo").First());
-                var jsonText = Encoding.UTF8.GetString(base64EncodedBytes);
-                var AppInfo = JsonConvert.DeserializeObject<AppInfoBase>(jsonText);
-
-                //如果路径不存在,创建路径
-                var root = System.Web.Hosting.HostingEnvironment.MapPath("~/UpLoadFiles/XM/");
-                string filePath = root;
-                if (!Directory.Exists(filePath))
+                if (request.OrgId == 0)
                 {
-                    Directory.CreateDirectory(filePath);
-                }
-
-                var multipartMemoryStreamProvider = await Request.Content.ReadAsMultipartAsync();
-                var contentsList = multipartMemoryStreamProvider.Contents;
-
-                string uploadPath = "";
-                string extension = "";
-                //保存导入的模板文件
-                foreach (var content in contentsList)
-                {
-                    //通过判断fileName是否为空,是否为文件
-                    if (!string.IsNullOrEmpty(content.Headers.ContentDisposition.FileName))
+                    return DataConverterHelper.SerializeObject(new
                     {
-                        //处理文件名字符串
-                        string fileName = content.Headers.ContentDisposition.FileName.Replace("\"", string.Empty);
-                        using (Stream stream = await content.ReadAsStreamAsync())
+                        Status = ResponseStatus.Error,
+                        Msg = "机构信息为空"
+                    });
+                }
+
+                if (request.FYear == 0)
+                {
+                    return DataConverterHelper.SerializeObject(new
+                    {
+                        Status = ResponseStatus.Error,
+                        Msg = "年份不正确"
+                    });
+                }
+
+
+                var files = HttpContext.Current.Request.Files;
+                if(files == null || files.Count == 0)
+                {
+                    return DataConverterHelper.SerializeObject(new {
+                        Status = ResponseStatus.Error,
+                        Msg = "上传文件为空"
+                    });
+                }
+
+                var file = files[0];
+                if (file.ContentType != "application/vnd.ms-excel"
+                && file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                && file.ContentType != "application/octet-stream")
+                {
+                    return DataConverterHelper.SerializeObject(new
+                    {
+                        Status = ResponseStatus.Error,
+                        Msg = "文件格式不正确"
+                    });
+                }
+                
+
+                HSSFWorkbook wk = new HSSFWorkbook(file.InputStream);
+                ISheet sheet = wk.GetSheetAt(0);
+
+                /*
+                 * 第一行为标题行，第二行为注意事项，第三个为小标题，第四行开始为正式数据（ 科目名称（选填）	支出分项名称（选填））
+                 * 1.导入数据需要在日志上记录
+                 * 2.项目编码对应的项目名称和业务条线的正确
+                 * 3.下拉项的中文名称是否能找到对应的编码
+                 * 4.单文件上传，不需要多文件上传
+                 */
+
+                var projectMstUploads = new List<ProjectMstUpload>();
+                //循环读取数据
+                for(int i = 3; i <= sheet.LastRowNum; i++)
+                {
+                    try
+                    {
+                        var row = sheet.GetRow(i);
+
+                        var fProjCode = row.GetCell(0)?.ToString()?.Trim() ?? string.Empty;//项目编码
+                        var fProjName = row.GetCell(1)?.ToString()?.Trim() ?? string.Empty;//项目名称
+                        long.TryParse(row.GetCell(6)?.ToString()?.Trim() ?? "0", out long fProPrice);//项目金额
+                        var fBusinessName = row.GetCell(3)?.ToString()?.Trim() ?? string.Empty;//业务条线
+                        var fBudgetDept = row.GetCell(4)?.ToString()?.Trim() ?? string.Empty;//费用归属
+                        var fName = row.GetCell(5)?.ToString()?.Trim() ?? string.Empty;//费用说明
+                        long.TryParse(row.GetCell(6)?.ToString()?.Trim() ?? "0", out long fAmount);//费用金额
+                        var fBudgetAccounts = row.GetCell(7)?.ToString()?.Trim() ?? string.Empty;//科目名称
+                        var fSubitemName = row.GetCell(8)?.ToString()?.Trim() ?? string.Empty;//支出分项名称
+                        var fIsApply = row.GetCell(9)?.ToString()?.Trim() ?? string.Empty;//是否申请补助
+                        var fIsPurchase = row.GetCell(10)?.ToString()?.Trim() ?? string.Empty;//是否集中采购
+                        var fIsReport = row.GetCell(11)?.ToString()?.Trim() ?? string.Empty;//是否必须签报列支
+                        var fIsResolution = row.GetCell(12)?.ToString()?.Trim() ?? string.Empty;//是否集体决议
+                        //var fIsShare = row.GetCell(13)?.ToString()?.Trim() ?? string.Empty;//是否个人额度分摊
+
+                        var projectMstUpload = new ProjectMstUpload
                         {
-                            byte[] bytes = new byte[stream.Length];
-                            stream.Read(bytes, 0, bytes.Length);
-                            stream.Seek(0, SeekOrigin.Begin);
-
-                            //获取对应文件后缀名
-                            extension = Path.GetExtension(fileName);
-                            //获取文件名
-                            string b_name = Path.GetFileName(fileName);
-
-                            //修改文件名
-                            string newFileName = Guid.NewGuid().ToString("N") + extension;
-                            uploadPath = Path.Combine(filePath, newFileName);
-
-                            //保存文件
-                            MemoryStream ms = new MemoryStream(bytes);
-                            FileStream fs = new FileStream(uploadPath, FileMode.Create);
-                            ms.WriteTo(fs);
-                            ms.Close();
-                            fs.Close();
+                            LineNum = i + 1,
+                            FProjCode = fProjCode,
+                            FProjName = fProjName,
+                            FProPrice = fProPrice,
+                            FBusinessName = fBusinessName,
+                            FBudgetDept = fBudgetDept,
+                            FName = fName,
+                            FAmount = fAmount,
+                            FBudgetAccounts = fBudgetAccounts,
+                            FSubitemName = fBusinessName,
+                            FIsApply = fIsApply,
+                            FIsPurchase = fIsPurchase,
+                            FIsReport = fIsReport,
+                            FIsResolution = fIsResolution,
+                            //FIsShare = fIsShare
+                        };
+                        #region 数据校验
+                        //数据填写不完整
+                        if (string.IsNullOrEmpty(fProjCode)
+                            || string.IsNullOrEmpty(fProjName)
+                            || string.IsNullOrEmpty(fBusinessName)
+                            || string.IsNullOrEmpty(fBudgetDept)
+                            || string.IsNullOrEmpty(fName)
+                            || string.IsNullOrEmpty(fIsApply)
+                            || string.IsNullOrEmpty(fIsPurchase)
+                            || string.IsNullOrEmpty(fIsReport)
+                            || string.IsNullOrEmpty(fIsResolution)
+                            )
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(必填数据没有填写完整)");
                         }
 
+                        //验证金额是否是数字
+                        try
+                        {
+                            long.Parse(row.GetCell(6)?.ToString()?.Trim());
+                        }
+                        catch
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【费用金额】不是数字类型)");
+                        }
+
+                        //四个选择项需要输入 是/否
+                        if (fIsApply != "是" || fIsApply != "否")
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【是否申请补助】只能输入 是/否)");
+                        }
+                        if (fIsPurchase != "是" || fIsPurchase != "否")
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【是否集中采购】只能输入 是/否)");
+                        }
+                        if (fIsReport != "是" || fIsReport != "否")
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【是否必须签报列支】只能输入 是/否)");
+                        }
+                        if (fIsResolution != "是" || fIsResolution != "否")
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【是否集体决议】只能输入 是/否)");
+                        }
+                        
+
+                        //验证项目编码是否正确
+                        var qtXmDistribute = QtXmDistributeService.Find(p => p.FProjcode == fProjCode && p.Orgid
+                         == request.OrgId).Data.ToList();
+                        if (qtXmDistribute == null || qtXmDistribute.Count == 0)
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【项目编码】不正确)");
+                        }
+
+                        if (qtXmDistribute.First().FProjname != fProjName)
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【项目名称】不正确)");
+                        }
+
+                        //验证业务条线是否正确
+                        var business = QTSysSetService.Find(p => p.Orgid == request.OrgId
+                            && p.TypeCode == qtXmDistribute.First().FBusiness
+                            && p.DicType == "Business");
+
+                        if (business.Data == null || business.Data.Count == 0 || business.Data.First().DicName != fBusinessName)
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【业务条线】不正确)");
+                        }
+
+                        projectMstUpload.FBusinessCode = business.Data.First().TypeCode;
+
+                        //验证费用归属
+                        var depts = CorrespondenceSettingsService.GetDeptByUnit(request.OrgId, request.UserId);
+                        if(depts == null 
+                            ||depts.Count == 0
+                            ||!depts.ToList().Exists(p => p.OName == fBudgetDept))
+                        {
+                            throw new Exception($"第{i + 1}行数据上传失败。(【费用归属】不正确)");
+                        }
+                        projectMstUpload.FBudgetDeptCode = depts.Where(p => p.OName == fBudgetDept).First().OCode;
+
+                        //科目名称（选填）fBudgetAccounts	
+                        if (fBudgetAccounts != string.Empty)
+                        {
+                            var budgetAccounts = BudgetAccountsService.Find(p => p.KMMC == fBudgetAccounts);
+                            
+                            if(budgetAccounts.Data == null || budgetAccounts.Data.Count == 0)
+                            {
+                                throw new Exception($"第{i + 1}行数据上传失败。(【科目名称】不正确)");
+                            }
+
+                            projectMstUpload.FBudgetAccountsCode = budgetAccounts.Data.First().KMDM;
+                        }
+
+                        //支出分项名称（选填）fSubitemName
+                        if (fSubitemName != string.Empty)
+                        {
+                            var fSubitemBusiness = QTSysSetService.Find(p => p.Orgid == request.OrgId
+                            && p.DicName == fSubitemName
+                            && p.DicType == "ZcfxName");
+
+                            if(fSubitemBusiness.Data == null || fSubitemBusiness.Data.Count == 0)
+                            {
+                                throw new Exception($"第{i + 1}行数据上传失败。(【支出分项名称】不正确)");
+                            }
+
+                            projectMstUpload.FSubitemCode = fSubitemBusiness.Data.First().TypeCode;
+                        }
+
+                        #endregion
+
+                        projectMstUploads.Add(projectMstUpload);
                     }
+                    catch(Exception ex)
+                    {
+                        //写入日志
+                        Logger.Error($"时间：{now}  用户：{request.UserId}  异常：{ex.Message}");
+                    } 
                 }
 
-                
-                var data1 = new
+                //没有成功的数据
+                if(projectMstUploads.Count == 0)
                 {
-                    Status = ResponseStatus.Success,
-                    Msg = "操作员编码不重复！",
-                    UploadPath = uploadPath,
-                    IsRepeat = 0
-                };
-                return DataConverterHelper.SerializeObject(data1);
+                    return DCHelper.ErrorMessage("模板导入失败！");
+                }
+
+                var allList = new List<ProjectAllDataModel>();
+                
+                var allCodes = ProjectMstService.Find(p => p.PhId != 0 && p.FDeleteMark == 0)?.Data?.Select(p => p.FProjName)?.ToList() ?? new List<string>();
+
+                //导入正确的数据
+                var projectMstUploadsGroup = projectMstUploads.GroupBy(p => new { p.FProjCode, p.FBudgetDeptCode });
+                foreach(var projectMstUploadGroup in projectMstUploadsGroup)
+                {
+                    var projectAllData = new ProjectAllDataModel();
+                    //主表信息所有数据都有
+                    var baseData = projectMstUploadGroup.First();
+                    
+                    var projectMst = new ProjectMstModel
+                    {
+                        FYear = request.FYear.ToString(),
+                        FDeclarationUnit = request.OrgCode,
+                        FProjCode = baseData.FProjCode,
+                        FProjName = baseData.FProjName,
+                        FProjAmount = projectMstUploadGroup.Sum(p => p.FAmount),
+                        FBudgetAmount = projectMstUploadGroup.Sum(p => p.FAmount),
+                        FBusinessName = baseData.FBusinessName,
+                        FBudgetDept = baseData.FBudgetDept,
+                        FProjStatus = 1,
+                        FApproveStatus = "1",
+                        FIsApply = baseData.FIsApply == "是" ? (byte)1 : (byte)0,
+                        FIsPurchase = baseData.FIsPurchase == "是" ? (byte)1 : (byte)0,
+                        FIsReport = baseData.FIsReport == "是" ? (byte)1 : (byte)0,
+                        FIsResolution = baseData.FIsResolution == "是" ? (byte)1 : (byte)0,
+                        FBusinessCode = baseData.FBusinessCode,
+                        PersistentState = PersistentState.Added
+                    };
+
+                    var projectdtlList = projectMstUploadGroup.Select(p => new ProjectDtlBudgetDtlModel
+                    {
+                        FName = p.FName,
+                        FAmount = p.FAmount,
+                        FBudgetAccounts = p.FBudgetAccounts,
+                        FSubitemCode = p.FSubitemCode,
+                        FAmountAfterEdit = p.FAmount,
+                        PersistentState = PersistentState.Added   
+                    });
+
+                    //没有进度状态
+                    var processStatus = BudgetProcessCtrlService.FindBudgetProcessCtrl(projectMst.FDeclarationUnit, projectMst.FBudgetDept, projectMst.FYear);
+                    if(processStatus == "1")
+                    {
+                        projectMst.FType = "c";
+                        projectMst.FVerNo = "0001";
+                    }
+                    else{
+                        projectMstUploadGroup.ToList().ForEach(p =>
+                        {
+                            //写入日志
+                            Logger.Error($"时间：{now}  用户：{request.UserId}  异常：第{p.LineNum}行数据上传失败。(此组织的进度已不在年初，无法修改年初数据！)");
+                        }); 
+                    }
+
+                    //申报部门
+                    projectMst.FDeclarationDept = ProjectMstService.GetDefaultDept(request.UserId);
+                    //申报人
+                    projectMst.FDeclarerId = request.UserId;
+
+                    string maxCode = "";
+                    if(allCodes != null  && allCodes.Count > 0)
+                    {
+                        maxCode = allCodes.ToList().FindAll(p => p.StartsWith(projectMst.FProjCode)) == null
+                            ? "" : allCodes.ToList().FindAll(p => p.StartsWith(projectMst.FProjCode)).Max();
+                    }
+
+                    var projCode = string.Empty;
+                    //分发的编码再加6位流水线号
+                    if (string.IsNullOrEmpty(maxCode))
+                    {
+                        projCode = projectMst.FProjCode + "000001";
+                        
+                    }
+                    else
+                    {
+                        projCode = projectMst.FProjCode + string.Format("{0:D6}", int.Parse(maxCode.Substring(maxCode.Length - 6, 6)) + 1);
+                        allCodes.Add(projCode);
+                    }
+
+
+                    allCodes.Add(projCode);
+                    projectMst.FProjCode = projCode;
+
+                    var dtlCode = "";
+                    var dtlName = "";
+                    if(projectdtlList.Count() > 0)
+                    {
+                        projectMst.FBudgetAmount = projectdtlList.Sum(p => p.FAmount);
+                        projectMst.FProjAmount = projectdtlList.Sum(p => p.FAmount);
+
+                        var alldtlCodes = projectdtlList.Where(p => string.IsNullOrEmpty(p.FDtlCode)).Select(p => p.FDtlCode).ToList();
+
+                        foreach(var projectdtl in projectdtlList)
+                        {
+                            dtlCode = projectdtl.FDtlCode;
+                            dtlName = projectdtl.FName;
+                            if (string.IsNullOrEmpty(dtlCode))
+                            {
+                                if (alldtlCodes != null && alldtlCodes.Count > 0)
+                                {
+                                    projectdtl.FDtlCode = projCode + string.Format("{0:D4}", int.Parse(alldtlCodes.Max().Substring(alldtlCodes.Max().Length - 4, 4)) + 1);
+                                }
+                                else
+                                {
+                                    projectdtl.FDtlCode = projCode + string.Format("{0:D4}", 1);
+                                }
+                            }
+                            dtlCode = projectdtl.FDtlCode;
+                            alldtlCodes.Add(dtlCode);
+                        }
+                        //projectAllData.ProjectMst = projectMst;
+                        //projectAllData.ProjectDtlBudgetDtls = projectdtlList.ToList();
+                        //allList.Add(projectAllData);
+                        ProjectMstService.SaveProjectMst(projectMst, null, null, null, null, null, projectdtlList.ToList(), null);
+                    }
+                    
+
+                }
+                //return "模板导入成功";
+                return DataConverterHelper.SerializeObject(new
+                {
+                    Staus = ResponseStatus.Success,
+                    Msg = "模板导入成功"
+                });
 
             }
             catch (Exception e)
@@ -5509,7 +5884,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             }
 
         }
-        }
+
 
         #region//签报单相关接口
 

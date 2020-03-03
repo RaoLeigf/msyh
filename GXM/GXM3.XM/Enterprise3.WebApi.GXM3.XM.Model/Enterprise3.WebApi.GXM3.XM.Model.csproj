@@ -57,9 +57,11 @@
     <Compile Include="Common\DCHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request\BaseListModel.cs" />
+    <Compile Include="Request\ImportXMDataRequest.cs" />
     <Compile Include="Request\ProjectAllDataRequest.cs" />
     <Compile Include="Request\ProjectMstListModel.cs" />
     <Compile Include="Request\ProjectMstRequest.cs" />
+    <Compile Include="Request\ProjectMstUpload.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\GData\YQHL\GData.YQHL.Model\GData.YQHL.Model.csproj">
