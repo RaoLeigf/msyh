@@ -21,6 +21,8 @@ using GYS3.YS.Service.Interface;
 using Newtonsoft.Json;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using NPOI.XSSF.UserModel;
 using SUP.Common.Base;
 using SUP.Common.DataAccess;
 using SUP.Common.DataEntity;
@@ -5886,6 +5888,42 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         }
 
 
+        /// <summary>
+        /// 下载模板
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public string PostModelExcel([FromBody]List<ProjectMstExcelModel> model)
+        {
+            var path = AppDomain.CurrentDomain.BaseDirectory + @"\\DownLoadFiles\\ProjectMst";
+            FileStream modelFs = File.OpenRead(path + "\\model.xlsx");
+            
+            var book = new XSSFWorkbook(modelFs);
+            //测试新建一个sheet
+            var sheet = book.GetSheet("支出预算");
+
+            for(int i = 0; i < model.Count; i++)
+            {
+                var row = sheet.GetRow(i + 3);
+                
+                row.GetCell(0).SetCellValue(model[i].ProjectCode ?? string.Empty);//项目编码
+                row.GetCell(1).SetCellValue(model[i].ProjectName ?? string.Empty);//项目名称
+                row.GetCell(3).SetCellValue(model[i].FBusinessName ?? string.Empty);//业务条线
+            }
+
+
+
+            string filename = "model_"+DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".xls";
+            using (FileStream fs = File.OpenWrite(path + "\\" + filename))
+            {
+                book.Write(fs);//向打开的这个xls文件中写入并保存。  
+                fs.Flush();
+                fs.Close();
+            }
+            return "";
+            
+        }
         #region//签报单相关接口
 
         /// <summary>

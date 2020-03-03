@@ -57,6 +57,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\BusinessDllsApi\NPOI.dll</HintPath>
     </Reference>
+    <Reference Include="NPOI.OOXML, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\GYS\GYS3.YS\Enterprise3.WebApi.GYS3.YS.Controller\bin\Debug\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net, Version=2.2.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1" />
     <Reference Include="SUP.Common.Base">
       <HintPath>..\..\..\BusinessDlls\SUP.Common.Base.dll</HintPath>
     </Reference>

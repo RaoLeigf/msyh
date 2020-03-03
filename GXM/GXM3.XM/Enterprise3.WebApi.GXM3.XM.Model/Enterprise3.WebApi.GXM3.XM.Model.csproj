@@ -59,6 +59,7 @@
     <Compile Include="Request\BaseListModel.cs" />
     <Compile Include="Request\ImportXMDataRequest.cs" />
     <Compile Include="Request\ProjectAllDataRequest.cs" />
+    <Compile Include="Request\ProjectMstExcelModel.cs" />
     <Compile Include="Request\ProjectMstListModel.cs" />
     <Compile Include="Request\ProjectMstRequest.cs" />
     <Compile Include="Request\ProjectMstUpload.cs" />
