@@ -984,7 +984,7 @@ namespace GSP3.SP.Facade
                             throw new Exception("此申请单据记录有误！");
                         }
                     }
-                    else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype == BillType.MiddleProject)
+                    else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype == BillType.MiddleProject || gAppval.FBilltype == BillType.ExpendBudeget) 
                     {
                         dic.Clear();
                         new CreateCriteria(dic)

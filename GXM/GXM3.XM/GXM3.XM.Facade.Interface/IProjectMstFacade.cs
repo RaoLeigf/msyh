@@ -86,6 +86,15 @@ namespace GXM3.XM.Facade.Interface
         SavedResult<long> UpdateProject(GAppvalRecordModel recordModel, string fApproval);
 
         /// <summary>
+        /// 修改项目审批状态（民生银行）
+        /// </summary>
+        /// <param name="recordModel">审批对象</param>
+        /// <param name="fApproval">审批字段</param>
+        /// <returns></returns>
+        SavedResult<long> UpdateExpenProject(GAppvalRecordModel recordModel, string fApproval);
+
+
+        /// <summary>
         /// 跨审批流退回时修改项目状态以及审批状态
         /// </summary>
         /// <param name="recordModel">审批对象</param>

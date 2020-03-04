@@ -1042,6 +1042,27 @@ namespace GXM3.XM.Facade
         }
 
         /// <summary>
+        /// 修改项目审批状态（民生银行）
+        /// </summary>
+        /// <param name="recordModel">审批对象</param>
+        /// <param name="fApproval">审批字段</param>
+        /// <returns></returns>
+        public SavedResult<long> UpdateExpenProject(GAppvalRecordModel recordModel, string fApproval)
+        {
+            if (recordModel.RefbillPhid == 0)
+                return null;
+
+            ProjectMstModel projectMst = this.ProjectMstRule.Find(recordModel.RefbillPhid);
+            projectMst.FApproveStatus = fApproval;
+            projectMst.FApproveDate = DateTime.Now;
+            projectMst.FApprover = recordModel.OperaPhid;
+            projectMst.FApprover_EXName = recordModel.OperaName;
+            projectMst.PersistentState = PersistentState.Modified;
+
+            return ProjectMstRule.Save<Int64>(projectMst);
+        }
+
+        /// <summary>
         /// 跨审批流退回时修改项目状态以及审批状态
         /// </summary>
         /// <param name="recordModel">审批对象</param>

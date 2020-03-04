@@ -503,6 +503,11 @@ namespace GSP3.SP.Service
                         {
                             this.ProjectMstFacade.UpdateProject(recordModel, "3");
                         }
+                        if(BillType.ExpendBudeget == recordModel.FBilltype)
+                        {
+                            this.ProjectMstFacade.UpdateExpenProject(recordModel, "3");
+                        }
+                        //if(BillType.ExpendBudeget == recordModel.FBilltype)
                         if (BillType.MiddleAddBudget == recordModel.FBilltype || BillType.MiddleUpdateBudget == recordModel.FBilltype || BillType.MiddleDtlBudget == recordModel.FBilltype || recordModel.FBilltype == BillType.MiddleBudget)
                         {
                             this.BudgetMstFacade.UpdateBudget(recordModel, "3");
@@ -763,6 +768,10 @@ namespace GSP3.SP.Service
                         {
                             this.ProjectMstFacade.UpdateProject(recordModel, "3");
                         }
+                        if (BillType.ExpendBudeget == recordModel.FBilltype)
+                        {
+                            this.ProjectMstFacade.UpdateExpenProject(recordModel, "3");
+                        }
                         if (BillType.MiddleAddBudget == recordModel.FBilltype || BillType.MiddleUpdateBudget == recordModel.FBilltype || BillType.MiddleDtlBudget == recordModel.FBilltype || recordModel.FBilltype == BillType.MiddleBudget)
                         {
                             this.BudgetMstFacade.UpdateBudget(recordModel, "3");
@@ -873,7 +882,7 @@ namespace GSP3.SP.Service
                         throw new Exception("送审的单据应满足未送审或者已退回状态！");
                     }
                 }
-                else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype== BillType.MiddleProject)
+                else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype== BillType.MiddleProject || gAppval.FBilltype == BillType.ExpendBudeget)
                 {
                     dic.Clear();
                     List<string> approvals = new List<string>();
@@ -953,7 +962,7 @@ namespace GSP3.SP.Service
                         throw new Exception("作废的单据不能进行送审！");
                     }
                 }
-                else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype == BillType.MiddleProject)
+                else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype == BillType.MiddleProject || gAppval.FBilltype == BillType.ExpendBudeget)
                 {
                     dic.Clear();
                     new CreateCriteria(dic)
