@@ -63,6 +63,10 @@ namespace GSP3.SP.Model.Enums
         /// </summary>
         public static string InComeBudget = "010";
 
+        /// <summary>
+        /// 支出预算的审批流
+        /// </summary>
+        public static string ExpendBudeget = "011";
         #endregion
 
     }

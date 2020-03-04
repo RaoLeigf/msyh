@@ -5921,7 +5921,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 fs.Flush();
                 fs.Close();
             }
-            return "";
+            return JsonConvert.SerializeObject(new { path = "ProjectMst",filename = filename });
             
         }
         #region//签报单相关接口
