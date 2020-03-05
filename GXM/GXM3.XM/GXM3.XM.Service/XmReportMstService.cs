@@ -27,19 +27,19 @@ using GQT3.QT.Facade.Interface;
 
 namespace GXM3.XM.Service
 {
-	/// <summary>
-	/// XmReportMst服务组装处理类
-	/// </summary>
+    /// <summary>
+    /// XmReportMst服务组装处理类
+    /// </summary>
     public partial class XmReportMstService : EntServiceBase<XmReportMstModel>, IXmReportMstService
     {
-		#region 类变量及属性
-		/// <summary>
+        #region 类变量及属性
+        /// <summary>
         /// XmReportMst业务外观处理对象
         /// </summary>
-		IXmReportMstFacade XmReportMstFacade
+        IXmReportMstFacade XmReportMstFacade
         {
             get
-            {          
+            {
                 if (CurrentFacade == null)
                     throw new NGAppException("InitializeObjectFail");
 
@@ -47,16 +47,18 @@ namespace GXM3.XM.Service
             }
         }
 
-		/// <summary>
+        /// <summary>
         /// OrderDetails业务外观处理对象
         /// </summary>
-		private IXmReportDtlFacade XmReportDtlFacade { get; set; }
+        private IXmReportDtlFacade XmReportDtlFacade { get; set; }
 
         IProjectMstFacade ProjectMstFacade { get; set; }
 
         IQTSysSetFacade QTSysSetFacade { get; set; }
 
         IProjectDtlBudgetDtlFacade ProjectDtlBudgetDtlFacade { get; set; }
+
+        IXmReportReturnFacade XmReportReturnFacade { get; set; }
         #endregion
 
         #region 实现 IXmReportMstService 业务添加的成员
@@ -69,7 +71,7 @@ namespace GXM3.XM.Service
         /// <returns></returns>
         public SavedResult<Int64> SaveXmReportMst(XmReportMstModel xmReportMstEntity, List<XmReportDtlModel> xmReportDtlEntities)
         {
-			return XmReportMstFacade.SaveXmReportMst(xmReportMstEntity, xmReportDtlEntities);
+            return XmReportMstFacade.SaveXmReportMst(xmReportMstEntity, xmReportDtlEntities);
         }
 
         /// <summary>
@@ -82,6 +84,15 @@ namespace GXM3.XM.Service
             return XmReportDtlFacade.FindByForeignKey(id);
         }
 
+        /// <summary>
+        /// 通过外键值获取XmReportReturn明细数据
+        /// </summary>
+        /// <param name="id">外键值</param>
+        /// <returns></returns>
+        public FindedResults<XmReportReturnModel> FindXmReportReturnByForeignKey<TValType>(TValType id)
+        {
+            return XmReportReturnFacade.FindByForeignKey(id);
+        }
 
         /// <summary>
         /// 通过单据主键获取签报单信息
@@ -93,14 +104,14 @@ namespace GXM3.XM.Service
             XmReportMstModel xmReportMst = new XmReportMstModel();
             //先查询是否已存在签报单数据
             var reports = this.XmReportMstFacade.Find(t => t.XmPhid == phid).Data;
-            if(reports != null && reports.Count > 0)
+            if (reports != null && reports.Count > 0)
             {
-                if(reports.Count == 1)
+                if (reports.Count == 1)
                 {
                     xmReportMst = reports[0];
                     //获取单据编码名称
                     var projects = this.ProjectMstFacade.Find(t => t.PhId == phid).Data;
-                    if(projects != null && projects.Count > 0)
+                    if (projects != null && projects.Count > 0)
                     {
                         xmReportMst.FProjCode = projects[0].FProjCode;
                         xmReportMst.FProjName = projects[0].FProjName;
@@ -143,7 +154,7 @@ namespace GXM3.XM.Service
                     }
                     //获取明细数据集合(项目明细转签报明细)
                     var projectDtls = this.ProjectDtlBudgetDtlFacade.Find(t => t.MstPhid == projects[0].PhId).Data;
-                    if(projectDtls != null && projectDtls.Count > 0)
+                    if (projectDtls != null && projectDtls.Count > 0)
                     {
                         IList<XmReportDtlModel> xmReportDtls = new List<XmReportDtlModel>();
                         foreach (var dtl in projectDtls)
@@ -164,6 +175,8 @@ namespace GXM3.XM.Service
             }
             return xmReportMst;
         }
+
+
         #endregion
     }
 }

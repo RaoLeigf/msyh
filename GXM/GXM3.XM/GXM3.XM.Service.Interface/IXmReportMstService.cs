@@ -23,18 +23,18 @@ using GXM3.XM.Model.Domain;
 
 namespace GXM3.XM.Service.Interface
 {
-	/// <summary>
-	/// XmReportMst服务组装层接口
-	/// </summary>
+    /// <summary>
+    /// XmReportMst服务组装层接口
+    /// </summary>
     public partial interface IXmReportMstService : IEntServiceBase<XmReportMstModel>
     {
-		#region IXmReportMstService 业务添加的成员
+        #region IXmReportMstService 业务添加的成员
 
         /// <summary>
         /// 保存数据
         /// </summary>
-		/// <param name="xmReportMstEntity"></param>
-		/// <param name="xmReportDtlEntities"></param>
+        /// <param name="xmReportMstEntity"></param>
+        /// <param name="xmReportDtlEntities"></param>
         /// <returns></returns>
         SavedResult<Int64> SaveXmReportMst(XmReportMstModel xmReportMstEntity, List<XmReportDtlModel> xmReportDtlEntities);
 
@@ -45,7 +45,12 @@ namespace GXM3.XM.Service.Interface
         /// <returns></returns>
         FindedResults<XmReportDtlModel> FindXmReportDtlByForeignKey<TValType>(TValType id);
 
-
+        /// <summary>
+        /// 通过外键值获取XmReportReturn明细数据
+        /// </summary>
+        /// <param name="id">外键值</param>
+        /// <returns></returns>
+        FindedResults<XmReportReturnModel> FindXmReportReturnByForeignKey<TValType>(TValType id);
         /// <summary>
         /// 通过单据主键获取签报单信息
         /// </summary>

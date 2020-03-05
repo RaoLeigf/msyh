@@ -46,7 +46,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
     public class ProjectMstApiController : ApiBase
     {
         IProjectMstService ProjectMstService;
-      
+
 
         ICorrespondenceSettingsService CorrespondenceSettingsService { get; set; }
 
@@ -1020,7 +1020,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 #region 生成项目明细编码: 项目明细编码=项目编码 + 6位流水号
                 string dtlCode = "";
                 string dtlName = "";
-                if(projectdtlbudgetdtlgridinfo != null && projectdtlbudgetdtlgridinfo.Count > 0)
+                if (projectdtlbudgetdtlgridinfo != null && projectdtlbudgetdtlgridinfo.Count > 0)
                 {
                     for (var i = 0; i < projectdtlbudgetdtlgridinfo.Count; i++)
                     {
@@ -2088,7 +2088,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             }
             //立项与预立项的单据上报要进行进度控制的判断
             List<long> phids = new List<long>();
-            foreach(var phid in paramters.fPhIdList)
+            foreach (var phid in paramters.fPhIdList)
             {
                 phids.Add(long.Parse(phid));
             }
@@ -4229,7 +4229,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         .Add(ORMRestrictions<EnumYesNo>.Eq("FIfPerformanceAppraisal", projectMst.FIfPerformanceAppraisal));
                 }
                 //名生银行的需要按用户筛选数据且不分页
-                if(projectMst.UserId != 0)
+                if (projectMst.UserId != 0)
                 {
                     new CreateCriteria(dic)
                         .Add(ORMRestrictions<long>.Eq("FDeclarerId", projectMst.UserId));
@@ -4311,7 +4311,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     }
 
                     var businesses = syssets.FindAll(x => x.DicType == "Business" && x.Orgcode == data.FDeclarationUnit && x.TypeCode == data.FBusinessCode);
-                    if(businesses != null && businesses.Count > 0)
+                    if (businesses != null && businesses.Count > 0)
                     {
                         //业务条线转名称
                         data.FBusinessName = businesses[0].TypeName;
@@ -4332,7 +4332,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     //data.FIfYsxz = FIfYsxz;
                 }
                 List<ProjectAllDataModel> projectAllDatas = new List<ProjectAllDataModel>();
-                if(result != null && result.Count > 0)
+                if (result != null && result.Count > 0)
                 {
                     projectAllDatas = this.ProjectMstService.GetProjectAllDataModels(result.ToList());
                 }
@@ -4377,10 +4377,10 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                 //保留要保存数据
                 List<ProjectAllDataModel> projectAlls = new List<ProjectAllDataModel>();
-                
+
                 //保存信息
                 SavedResult<Int64> savedresult = new SavedResult<Int64>();
-                
+
                 foreach (var projectData in projectAllData.ProjectAllDataModels)
                 {
                     ProjectAllDataModel projectAll = new ProjectAllDataModel();
@@ -4428,7 +4428,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                                     {
                                         return DCHelper.ErrorMessage("审批中的草案单据不能进行修改！");
                                     }
-                                    if(!string.IsNullOrEmpty(mstforminfo.FApproveStatus) && mstforminfo.FApproveStatus == "3")
+                                    if (!string.IsNullOrEmpty(mstforminfo.FApproveStatus) && mstforminfo.FApproveStatus == "3")
                                     {
                                         //审批通过的项目草案再次修改  状态要变成项目立项待送审
                                         mstforminfo.FProjStatus = 1;
@@ -4542,7 +4542,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         return DCHelper.ErrorMessage("分发的单据编码不能为空！");
                     }
 
-                    
+
                     var projCode = mstforminfo.FProjCode;
                     var year = mstforminfo.FYear;
 
@@ -4558,7 +4558,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         //获取最大项目库编码
                         if (allCodes != null && allCodes.Count > 0)
                         {
-                            maxCode = allCodes.ToList().FindAll(t => t.StartsWith(projCode)) == null ?"": allCodes.ToList().FindAll(t => t.StartsWith(projCode)).Max();
+                            maxCode = allCodes.ToList().FindAll(t => t.StartsWith(projCode)) == null ? "" : allCodes.ToList().FindAll(t => t.StartsWith(projCode)).Max();
                         }
                         //分发的编码再加6位流水线号
                         if (string.IsNullOrEmpty(maxCode))
@@ -4586,10 +4586,10 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         mstforminfo.FProjAmount = projectdtlbudgetdtlgridinfo.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted).Sum(t => t.FAmount);
 
                         //暂存该项目下有效的明细编码
-                        List<string> alldtlCodes = projectdtlbudgetdtlgridinfo.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted && !string.IsNullOrEmpty(t.FDtlCode)).Select(t=>t.FDtlCode).ToList();
+                        List<string> alldtlCodes = projectdtlbudgetdtlgridinfo.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted && !string.IsNullOrEmpty(t.FDtlCode)).Select(t => t.FDtlCode).ToList();
                         for (var i = 0; i < projectdtlbudgetdtlgridinfo.Count; i++)
                         {
-                            if(projectdtlbudgetdtlgridinfo[i].PersistentState == PersistentState.Deleted)
+                            if (projectdtlbudgetdtlgridinfo[i].PersistentState == PersistentState.Deleted)
                             {
                                 continue;
                             }
@@ -4597,18 +4597,18 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                             dtlName = projectdtlbudgetdtlgridinfo[i].FName;
                             if (string.IsNullOrEmpty(dtlCode))
                             {
-                                if(alldtlCodes != null && alldtlCodes.Count > 0)
+                                if (alldtlCodes != null && alldtlCodes.Count > 0)
                                 {
                                     projectdtlbudgetdtlgridinfo[i].FDtlCode = projCode + string.Format("{0:D4}", int.Parse(alldtlCodes.Max().Substring(alldtlCodes.Max().Length - 4, 4)) + 1);
                                 }
                                 else
                                 {
                                     projectdtlbudgetdtlgridinfo[i].FDtlCode = projCode + string.Format("{0:D4}", 1);
-                                }                               
+                                }
                             }
                             dtlCode = projectdtlbudgetdtlgridinfo[i].FDtlCode;
                             alldtlCodes.Add(dtlCode);
-                                                    
+
                         }
                     }
                     #endregion
@@ -4618,9 +4618,9 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     projectAlls.Add(projectAll);
 
                 }
-                if(projectAlls != null && projectAlls.Count > 0)
+                if (projectAlls != null && projectAlls.Count > 0)
                 {
-                    foreach(var pro in projectAlls)
+                    foreach (var pro in projectAlls)
                     {
                         //保存数据
                         savedresult = ProjectMstService.SaveProjectMst(pro.ProjectMst, null, null, null, null, null, pro.ProjectDtlBudgetDtls, null);
@@ -4631,8 +4631,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             catch (Exception ex)
             {
                 return DCHelper.ErrorMessage(ex.Message);
-            }       
-            
+            }
+
         }
 
         /// <summary>
@@ -4914,7 +4914,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 return DCHelper.ErrorMessage("传递的单据集合有误！");
             }
-            if(paramters.UserId == 0)
+            if (paramters.UserId == 0)
             {
                 return DCHelper.ErrorMessage("用户信息不能为空！");
             }
@@ -5066,13 +5066,13 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 {
                     foreach (var pro in allProjects)
                     {
-                        if(pro.FApproveStatus == "3" && pro.FProjStatus != 3)
+                        if (pro.FApproveStatus == "3" && pro.FProjStatus != 3)
                         {
-                            if(allTextContents != null && allTextContents.Count > 0)
+                            if (allTextContents != null && allTextContents.Count > 0)
                             {
-                                if(allTextContents.ToList().Find(t=>t.MstPhid == pro.PhId) != null)
+                                if (allTextContents.ToList().Find(t => t.MstPhid == pro.PhId) != null)
                                 {
-                                    if(allTextContents.ToList().Find(t => t.MstPhid == pro.PhId).FResolution != "0")
+                                    if (allTextContents.ToList().Find(t => t.MstPhid == pro.PhId).FResolution != "0")
                                     {
                                         return DCHelper.ErrorMessage("选中的单据会议决议未通过，不能生成预算！");
                                     }
@@ -5106,7 +5106,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 return DCHelper.ErrorMessage(ex.Message);
             }
-           
+
         }
 
         /// <summary>
@@ -5116,26 +5116,26 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         /// <returns></returns>
         public string PostMSYHPersonnels([FromBody]ProjectAllDataRequest param)
         {
-            if(param == null || param.ProjectDtlPersonnels == null || param.ProjectDtlPersonnels.Count <= 0)
+            if (param == null || param.ProjectDtlPersonnels == null || param.ProjectDtlPersonnels.Count <= 0)
             {
                 return DCHelper.ErrorMessage("传递的参数不能为空！");
             }
-            if(param.FPhid == 0)
+            if (param.FPhid == 0)
             {
-                return DCHelper.ErrorMessage("对应的主表主键信息不能为空！");               
+                return DCHelper.ErrorMessage("对应的主表主键信息不能为空！");
             }
             try
             {
                 //先进行数据验证（人员分摊的总金额应该跟项目总额相同）
-                foreach(var per in param.ProjectDtlPersonnels)
+                foreach (var per in param.ProjectDtlPersonnels)
                 {
-                    if(per.PhId == 0)
+                    if (per.PhId == 0)
                     {
                         per.PersistentState = PersistentState.Added;
                     }
                     else
                     {
-                        if(per.PersistentState != PersistentState.Deleted)
+                        if (per.PersistentState != PersistentState.Deleted)
                         {
                             per.PersistentState = PersistentState.Modified;
                         }
@@ -5143,14 +5143,14 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 }
                 //项目信息
                 var pros = this.ProjectMstService.Find(t => t.PhId == param.FPhid).Data;
-                if(pros != null && pros.Count > 0)
+                if (pros != null && pros.Count > 0)
                 {
-                    if(pros[0].FIsShare != 1 || pros[0].FProjStatus == 3)
+                    if (pros[0].FIsShare != 1 || pros[0].FProjStatus == 3)
                     {
                         return DCHelper.ErrorMessage("此单据无权进行额度分摊！");
                     }
                     SavedResult<long> savedResult = new SavedResult<long>();
-                    if(pros[0].FProjAmount == param.ProjectDtlPersonnels.ToList().FindAll(t=>t.PersistentState != PersistentState.Deleted).Sum(t => t.FAmount))
+                    if (pros[0].FProjAmount == param.ProjectDtlPersonnels.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted).Sum(t => t.FAmount))
                     {
                         savedResult = this.ProjectMstService.SaveMSYHPersonnels(param.ProjectDtlPersonnels, param.FPhid);
                         return DataConverterHelper.SerializeObject(savedResult);
@@ -5165,7 +5165,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     return DCHelper.ErrorMessage("项目信息查找失败！");
                 }
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 return DCHelper.ErrorMessage(ex.Message);
             }
         }
@@ -5177,7 +5178,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         /// <returns></returns>
         public string PostMSYHTextContent([FromBody]ProjectAllDataRequest param)
         {
-            if(param == null || param.ProjectDtlTextContents == null)
+            if (param == null || param.ProjectDtlTextContents == null)
             {
                 return DCHelper.ErrorMessage("传递的数据不能为空！");
             }
@@ -5189,7 +5190,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 return DCHelper.ErrorMessage("组织信息不能为空！");
             }
-            if(param.UserId == 0)
+            if (param.UserId == 0)
             {
                 return DCHelper.ErrorMessage("申报人信息不能为空！");
             }
@@ -5205,7 +5206,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 savedResult = this.ProjectMstService.SaveMSYHTextContent(projectDtlTextContent);
                 return DataConverterHelper.SerializeObject(savedResult);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return DCHelper.ErrorMessage(ex.Message);
             }
@@ -5256,7 +5257,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         Approval += total2;
                     }
                 }
-                
+
             }
             catch (Exception e)
             {
@@ -5318,7 +5319,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         [HttpGet]
         public string GetMSYHPersonName([FromUri]Model.Request.BaseListModel param)
         {
-            if(param.FPhid == 0)
+            if (param.FPhid == 0)
             {
                 return DCHelper.ErrorMessage("单据主键不能为空！");
             }
@@ -5346,11 +5347,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         /// <returns></returns>
         public string PostMSYHPersonName([FromBody]ProjectAllDataRequest param)
         {
-            if(param.ProjectDtlPersonNames == null || param.ProjectDtlPersonNames.Count <= 0)
+            if (param.ProjectDtlPersonNames == null || param.ProjectDtlPersonNames.Count <= 0)
             {
                 return DCHelper.ErrorMessage("维护人员信息名单不能为空！");
             }
-            if(param.FPhid == 0)
+            if (param.FPhid == 0)
             {
                 return DCHelper.ErrorMessage("单据主键不能为空！");
             }
@@ -5358,16 +5359,16 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 List<ProjectDtlPersonNameModel> projectDtlPersonNames = new List<ProjectDtlPersonNameModel>();
                 SavedResult<long> savedResult = new SavedResult<long>();
-                foreach(var pro in param.ProjectDtlPersonNames)
+                foreach (var pro in param.ProjectDtlPersonNames)
                 {
                     pro.MstPhid = param.FPhid;
-                    if(pro.IsFix == 1)
+                    if (pro.IsFix == 1)
                     {
                         pro.IsRelation = 1;
                     }
-                    if(pro.IsRelation == 1)
+                    if (pro.IsRelation == 1)
                     {
-                        if(pro.PhId == 0)
+                        if (pro.PhId == 0)
                         {
                             pro.PersistentState = PersistentState.Added;
                         }
@@ -5379,11 +5380,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     }
                     else
                     {
-                        if(pro.PhId != 0)
+                        if (pro.PhId != 0)
                         {
                             pro.PersistentState = PersistentState.Deleted;
                             projectDtlPersonNames.Add(pro);
-                        }                      
+                        }
                     }
                 }
                 savedResult = this.ProjectMstService.SaveMSYHPersonNames(projectDtlPersonNames, param.FPhid);
@@ -5495,7 +5496,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         //            }
         //        }
 
-                
+
         //        var data1 = new
         //        {
         //            Status = ResponseStatus.Success,
@@ -5520,11 +5521,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         [HttpPost]
         public async Task<string> PostImportXMData([FromBody]ImportXMDataRequest request)
         {
-            
+
             var now = DateTime.Now;
             try
             {
-                if(request.UserId == 0)
+                if (request.UserId == 0)
                 {
                     return DataConverterHelper.SerializeObject(new
                     {
@@ -5553,9 +5554,10 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
 
                 var files = HttpContext.Current.Request.Files;
-                if(files == null || files.Count == 0)
+                if (files == null || files.Count == 0)
                 {
-                    return DataConverterHelper.SerializeObject(new {
+                    return DataConverterHelper.SerializeObject(new
+                    {
                         Status = ResponseStatus.Error,
                         Msg = "上传文件为空"
                     });
@@ -5572,7 +5574,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         Msg = "文件格式不正确"
                     });
                 }
-                
+
 
                 HSSFWorkbook wk = new HSSFWorkbook(file.InputStream);
                 ISheet sheet = wk.GetSheetAt(0);
@@ -5587,7 +5589,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                 var projectMstUploads = new List<ProjectMstUpload>();
                 //循环读取数据
-                for(int i = 3; i <= sheet.LastRowNum; i++)
+                for (int i = 3; i <= sheet.LastRowNum; i++)
                 {
                     try
                     {
@@ -5669,7 +5671,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【是否集体决议】只能输入 是/否)");
                         }
-                        
+
 
                         //验证项目编码是否正确
                         var qtXmDistribute = QtXmDistributeService.Find(p => p.FProjcode == fProjCode && p.Orgid
@@ -5698,9 +5700,9 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                         //验证费用归属
                         var depts = CorrespondenceSettingsService.GetDeptByUnit(request.OrgId, request.UserId);
-                        if(depts == null 
-                            ||depts.Count == 0
-                            ||!depts.ToList().Exists(p => p.OName == fBudgetDept))
+                        if (depts == null
+                            || depts.Count == 0
+                            || !depts.ToList().Exists(p => p.OName == fBudgetDept))
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【费用归属】不正确)");
                         }
@@ -5710,8 +5712,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         if (fBudgetAccounts != string.Empty)
                         {
                             var budgetAccounts = BudgetAccountsService.Find(p => p.KMMC == fBudgetAccounts);
-                            
-                            if(budgetAccounts.Data == null || budgetAccounts.Data.Count == 0)
+
+                            if (budgetAccounts.Data == null || budgetAccounts.Data.Count == 0)
                             {
                                 throw new Exception($"第{i + 1}行数据上传失败。(【科目名称】不正确)");
                             }
@@ -5726,7 +5728,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                             && p.DicName == fSubitemName
                             && p.DicType == "ZcfxName");
 
-                            if(fSubitemBusiness.Data == null || fSubitemBusiness.Data.Count == 0)
+                            if (fSubitemBusiness.Data == null || fSubitemBusiness.Data.Count == 0)
                             {
                                 throw new Exception($"第{i + 1}行数据上传失败。(【支出分项名称】不正确)");
                             }
@@ -5738,31 +5740,31 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                         projectMstUploads.Add(projectMstUpload);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         //写入日志
                         Logger.Error($"时间：{now}  用户：{request.UserId}  异常：{ex.Message}");
-                    } 
+                    }
                 }
 
                 //没有成功的数据
-                if(projectMstUploads.Count == 0)
+                if (projectMstUploads.Count == 0)
                 {
                     return DCHelper.ErrorMessage("模板导入失败！");
                 }
 
                 var allList = new List<ProjectAllDataModel>();
-                
+
                 var allCodes = ProjectMstService.Find(p => p.PhId != 0 && p.FDeleteMark == 0)?.Data?.Select(p => p.FProjName)?.ToList() ?? new List<string>();
 
                 //导入正确的数据
                 var projectMstUploadsGroup = projectMstUploads.GroupBy(p => new { p.FProjCode, p.FBudgetDeptCode });
-                foreach(var projectMstUploadGroup in projectMstUploadsGroup)
+                foreach (var projectMstUploadGroup in projectMstUploadsGroup)
                 {
                     var projectAllData = new ProjectAllDataModel();
                     //主表信息所有数据都有
                     var baseData = projectMstUploadGroup.First();
-                    
+
                     var projectMst = new ProjectMstModel
                     {
                         FYear = request.FYear.ToString(),
@@ -5790,22 +5792,23 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         FBudgetAccounts = p.FBudgetAccounts,
                         FSubitemCode = p.FSubitemCode,
                         FAmountAfterEdit = p.FAmount,
-                        PersistentState = PersistentState.Added   
+                        PersistentState = PersistentState.Added
                     });
 
                     //没有进度状态
                     var processStatus = BudgetProcessCtrlService.FindBudgetProcessCtrl(projectMst.FDeclarationUnit, projectMst.FBudgetDept, projectMst.FYear);
-                    if(processStatus == "1")
+                    if (processStatus == "1")
                     {
                         projectMst.FType = "c";
                         projectMst.FVerNo = "0001";
                     }
-                    else{
+                    else
+                    {
                         projectMstUploadGroup.ToList().ForEach(p =>
                         {
                             //写入日志
                             Logger.Error($"时间：{now}  用户：{request.UserId}  异常：第{p.LineNum}行数据上传失败。(此组织的进度已不在年初，无法修改年初数据！)");
-                        }); 
+                        });
                     }
 
                     //申报部门
@@ -5814,7 +5817,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     projectMst.FDeclarerId = request.UserId;
 
                     string maxCode = "";
-                    if(allCodes != null  && allCodes.Count > 0)
+                    if (allCodes != null && allCodes.Count > 0)
                     {
                         maxCode = allCodes.ToList().FindAll(p => p.StartsWith(projectMst.FProjCode)) == null
                             ? "" : allCodes.ToList().FindAll(p => p.StartsWith(projectMst.FProjCode)).Max();
@@ -5825,7 +5828,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     if (string.IsNullOrEmpty(maxCode))
                     {
                         projCode = projectMst.FProjCode + "000001";
-                        
+
                     }
                     else
                     {
@@ -5839,14 +5842,14 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                     var dtlCode = "";
                     var dtlName = "";
-                    if(projectdtlList.Count() > 0)
+                    if (projectdtlList.Count() > 0)
                     {
                         projectMst.FBudgetAmount = projectdtlList.Sum(p => p.FAmount);
                         projectMst.FProjAmount = projectdtlList.Sum(p => p.FAmount);
 
                         var alldtlCodes = projectdtlList.Where(p => string.IsNullOrEmpty(p.FDtlCode)).Select(p => p.FDtlCode).ToList();
 
-                        foreach(var projectdtl in projectdtlList)
+                        foreach (var projectdtl in projectdtlList)
                         {
                             dtlCode = projectdtl.FDtlCode;
                             dtlName = projectdtl.FName;
@@ -5869,7 +5872,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         //allList.Add(projectAllData);
                         ProjectMstService.SaveProjectMst(projectMst, null, null, null, null, null, projectdtlList.ToList(), null);
                     }
-                    
+
 
                 }
                 //return "模板导入成功";
@@ -5898,15 +5901,15 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         {
             var path = AppDomain.CurrentDomain.BaseDirectory + @"\\DownLoadFiles\\ProjectMst";
             FileStream modelFs = File.OpenRead(path + "\\model.xlsx");
-            
+
             var book = new XSSFWorkbook(modelFs);
             //测试新建一个sheet
             var sheet = book.GetSheet("支出预算");
 
-            for(int i = 0; i < model.Count; i++)
+            for (int i = 0; i < model.Count; i++)
             {
                 var row = sheet.GetRow(i + 3);
-                
+
                 row.GetCell(0).SetCellValue(model[i].ProjectCode ?? string.Empty);//项目编码
                 row.GetCell(1).SetCellValue(model[i].ProjectName ?? string.Empty);//项目名称
                 row.GetCell(3).SetCellValue(model[i].FBusinessName ?? string.Empty);//业务条线
@@ -5914,15 +5917,15 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
 
 
-            string filename = "model_"+DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".xls";
+            string filename = "model_" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".xls";
             using (FileStream fs = File.OpenWrite(path + "\\" + filename))
             {
                 book.Write(fs);//向打开的这个xls文件中写入并保存。  
                 fs.Flush();
                 fs.Close();
             }
-            return JsonConvert.SerializeObject(new { path = "ProjectMst",filename = filename });
-            
+            return JsonConvert.SerializeObject(new { path = "ProjectMst", filename = filename });
+
         }
         #region//签报单相关接口
 
@@ -5934,7 +5937,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         [HttpGet]
         public string GetMSYHProjectForQB([FromUri]Model.Request.BaseListModel param)
         {
-            if(param.OrgId == 0 || string.IsNullOrEmpty(param.OrgCode))
+            if (param.OrgId == 0 || string.IsNullOrEmpty(param.OrgCode))
             {
                 return DCHelper.ErrorMessage("组织信息不能为空！");
             }
@@ -5951,6 +5954,21 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 IList<ProjectMstModel> projectMsts = new List<ProjectMstModel>();
                 //筛选出该组织该人员可以进行签报的项目数据
                 projectMsts = this.ProjectMstService.Find(t => t.FDeclarationUnit == param.OrgCode && t.FDeclarerId == param.UserId && t.FApproveStatus == "3" && t.FYear == param.Year).Data;
+                //取业务条线 用于代码转名称
+                var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == param.OrgId).Data.ToList();
+                if (syssets != null)
+                {
+                    foreach (var mst in projectMsts)
+                    {
+                        if (!string.IsNullOrEmpty(mst.FBusinessCode))
+                        {
+                            if (syssets.Find(x => x.TypeCode == mst.FBusinessCode) != null)
+                            {
+                                mst.FBusinessName = syssets.Find(x => x.TypeCode == mst.FBusinessCode).TypeName;
+                            }
+                        }
+                    }
+                }
                 var data = new
                 {
                     Status = ResponseStatus.Success,
@@ -5963,6 +5981,42 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 return DCHelper.ErrorMessage(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 获取该组织该人员进行签报时能取的费用说明
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetCostitemForQB([FromUri]Model.Request.BaseListModel param)
+        {
+            if (param.OrgId == 0)
+            {
+                return DCHelper.ErrorMessage("组织信息不能为空！");
+            }
+            if (param.FPhid == 0)//项目单据的主键 不是签报单据的主键
+            {
+                return DCHelper.ErrorMessage("请先选择项目！");
+            }
+            var syssets = QTSysSetService.Find(x => x.DicType == "Costitem" && x.Orgid == param.OrgId).Data.ToList();
+            var dtls = ProjectMstService.FindProjectDtlBudgetDtlByForeignKey(param.FPhid).Data.ToList();
+            if (dtls != null && dtls.Count > 0)
+            {
+                for (var i = 0; i < dtls.Count; i++)
+                {
+                    var set = new QTSysSetModel();
+                    set.TypeName = dtls[i].FName;
+                    syssets.Add(set);
+                }
+            }
+            var data = new
+            {
+                Status = ResponseStatus.Success,
+                Msg = "获取成功！",
+                Costitem = syssets,//费用说明
+            };
+            return DataConverterHelper.SerializeObject(data);
         }
         #endregion
         #endregion

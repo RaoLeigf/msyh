@@ -1,4 +1,4 @@
-#region Summary
+﻿#region Summary
 /**************************************************************************************
     * 类 名 称：        XmReportDtlModel
     * 命名空间：        GXM3.XM.Model.Domain
@@ -24,16 +24,16 @@ using Enterprise3.Common.Model.Enums;
 namespace GXM3.XM.Model.Domain
 {
 	/// <summary>
-	/// XmReportDtl实体定义类
+	/// XmReportReturn实体定义类
 	/// </summary>
 	[Serializable]
 	[DataContract(Namespace = "")]
-	public partial class XmReportDtlModel : EntityBase<XmReportDtlModel>
+	public partial class XmReportReturnModel : EntityBase<XmReportReturnModel>
 	{
 		/// <summary>
 		/// 构造函数
 		/// </summary>
-		public XmReportDtlModel()
+		public XmReportReturnModel()
 		{
 			List<PropertyColumnMapperInfo> list = new List<PropertyColumnMapperInfo>();
 
@@ -68,80 +68,40 @@ namespace GXM3.XM.Model.Domain
 		}
 
 		/// <summary>
-		/// 对象的项目主键
+		/// 报账日期
 		/// </summary>
 		[DataMember]
-		public virtual System.Int64 XmPhid
+		public virtual System.DateTime? FTime
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 费用项目名称
+		/// 关联报账单编码
 		/// </summary>
 		[DataMember]
-		public virtual System.String XmName
+		public virtual System.String FCode
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 数量
+		/// 关联报账单名称
 		/// </summary>
 		[DataMember]
-		public virtual System.Int32 FNum
+		public virtual System.String FName
 		{
 			get;
 			set;
 		}
 
 		/// <summary>
-		/// 金额
-		/// </summary>
-		[DataMember]
-		public virtual System.Decimal FPrice
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 明细金额
+		/// 报账金额
 		/// </summary>
 		[DataMember]
 		public virtual System.Decimal FAmount
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 是否为固定成本
-		/// </summary>
-		[DataMember]
-		public virtual System.Int32 FIsCost
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 明细备注
-		/// </summary>
-		[DataMember]
-		public virtual System.String FRemark
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 费用项目代码
-		/// </summary>
-		[DataMember]
-		public virtual System.String CostitemCode
 		{
 			get;
 			set;

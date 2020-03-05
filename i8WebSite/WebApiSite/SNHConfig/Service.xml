@@ -30,7 +30,7 @@
         <property name="ProjectDtlPurchaseDtlFacade" ref="GXM3.XM.Facade.ProjectDtlPurchaseDtl" />
         <property name="ProjectDtlPurDtl4SOFFacade" ref="GXM3.XM.Facade.ProjectDtlPurDtl4SOF" />
         <property name="ProjectDtlPerformTargetFacade" ref="GXM3.XM.Facade.ProjectDtlPerformTarget" />
-        <property name="ProjectDtlPersonnelFacade" ref="GXM3.XM.Facade.ProjectDtlPersonnel" />  
+        <property name="ProjectDtlPersonnelFacade" ref="GXM3.XM.Facade.ProjectDtlPersonnel" />
         <property name="ProjectDtlPersonNameFacade" ref="GXM3.XM.Facade.ProjectDtlPersonName" />
         <property name="BudgetMstFacade" ref="GYS3.YS.Facade.BudgetMst" />
         <property name="QtSysCodeSeqFacade" ref="GQT3.QT.Facade.QtSysCodeSeq" />
@@ -38,7 +38,7 @@
         <property name="CorrespondenceSettingsFacade" ref="GQT3.QT.Facade.CorrespondenceSettings"/>
         <property name="UserFacade" ref="GQT3.QT.Facade.User" />
         <property name="QTSysSetFacade" ref="GQT3.QT.Facade.QTSysSet" />
-        <property name="OrganizationFacade" ref="GQT3.QT.Facade.Organization" /> 
+        <property name="OrganizationFacade" ref="GQT3.QT.Facade.Organization" />
         <property name="PerformEvalTargetTypeFacade" ref="GQT3.QT.Facade.PerformEvalTargetType" />
         <property name="QtAttachmentFacade" ref="GQT3.QT.Facade.QtAttachment"/>
         <property name="BudgetDtlImplPlanFacade" ref="GYS3.YS.Facade.BudgetDtlImplPlan" />
@@ -58,6 +58,7 @@
         <property name="ProjectMstFacade" ref="GXM3.XM.Facade.ProjectMst"/>
         <property name="QTSysSetFacade" ref="GQT3.QT.Facade.QTSysSet" />
         <property name="ProjectDtlBudgetDtlFacade" ref="GXM3.XM.Facade.ProjectDtlBudgetDtl" />
+        <property name="XmReportReturnFacade" ref="GXM3.XM.Facade.XmReportReturn" />
       </object>
     </property>
   </object>
@@ -439,7 +440,7 @@
     </property>
   </object>
 
-  
+
   <!--GSP3.SP-->
   <object id="GSP3.SP.Service.GAppvalPost" parent="BaseTransactionManager" >
     <property name="Target" >
@@ -538,7 +539,7 @@
       </object>
     </property>
   </object>
-  
+
 </objects>
 
 

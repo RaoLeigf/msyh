@@ -54,7 +54,7 @@
   </object>
   <object type="Enterprise3.WebApi.GQT3.QT.Controller.CoverUpForOrgApiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
     <property name="QtCoverUpForOrgService" ref="GQT3.QT.Service.QtCoverUpForOrg"/>
-    <property name="QtCoverUpDataService" ref="GQT3.QT.Service.QtCoverUpData"/>  
+    <property name="QtCoverUpDataService" ref="GQT3.QT.Service.QtCoverUpData"/>
     <property name="QtTableCustomizeService" ref="GQT3.QT.Service.QtTableCustomize"/>
   </object>
   <object type="Enterprise3.WebApi.GQT3.QT.Controller.QtNaviGationapiController, Enterprise3.WebApi.GQT3.QT.Controller" singleton="false">
@@ -78,11 +78,11 @@
   </object>
   <object type="Enterprise3.WebApi.GSP3.SP.Controller.GAppvalRecordController, Enterprise3.WebApi.GSP3.SP.Controller" singleton="false">
     <property name="GAppvalRecordService" ref="GSP3.SP.Service.GAppvalRecord"/>
-    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>    
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
     <property name="OrgRelatitem2Service" ref="GQT3.QT.Service.OrgRelatitem2"/>
   </object>
-  
-  
+
+
   <!--GBK3.BK-->
   <object type="Enterprise3.WebApi.GBK3.BK.Controller.PaymentMstApiController, Enterprise3.WebApi.GBK3.BK.Controller" singleton="false">
     <property name="PaymentMstService" ref="GBK3.BK.Service.PaymentMst"/>
@@ -91,7 +91,7 @@
     <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
   </object>
 
-  
+
   <!--GGK3.GK-->
   <object type="Enterprise3.WebApi.GGK3.GK.Controller.GKPaymentMstApiController, Enterprise3.WebApi.GGK3.GK.Controller" singleton="false">
     <property name="GKPaymentMstService" ref="GGK3.GK.Service.GKPaymentMst"/>
@@ -100,7 +100,7 @@
   <object type="Enterprise3.WebApi.GGK3.GK.Controller.GK3_BankVauitApiController, Enterprise3.WebApi.GGK3.GK.Controller" singleton="false">
     <property name="GK3_BankVauitService" ref="GGK3.GK.Service.GK3_BankVauit"/>
   </object>
-  
+
   <!--GYS3.YS-->
   <object type="Enterprise3.WebApi.GYS3.YS.Controller.BudgetMstApiController, Enterprise3.WebApi.GYS3.YS.Controller" singleton="false">
     <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
@@ -143,7 +143,7 @@
     <property name="BudgetAccountsService" ref="GQT3.QT.Service.BudgetAccounts"/>
     <property name="BudgetProcessCtrlService" ref="GYS3.YS.Service.BudgetProcessCtrl"/>
   </object>
-  
+
   <!--GXM3.XM-->
   <object type="Enterprise3.WebApi.GXM3.XM.Controller.ProjectMstApiController, Enterprise3.WebApi.GXM3.XM.Controller" singleton="false">
     <property name="ProjectMstService" ref="GXM3.XM.Service.ProjectMst"/>
@@ -163,13 +163,15 @@
 
   <object type="Enterprise3.WebApi.GXM3.XM.Controller.ReportMstApiController, Enterprise3.WebApi.GXM3.XM.Controller" singleton="false">
     <property name="XmReportMstService" ref="GXM3.XM.Service.XmReportMst"/>
+    <property name="ProjectMstService" ref="GXM3.XM.Service.ProjectMst"/>
+    <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
 
   </object>
 
   <!--GJX3.JX-->
   <object type="Enterprise3.WebApi.GJX3.JX.Controller.PerformanceMstApiController, Enterprise3.WebApi.GJX3.JX.Controller" singleton="false">
-    <property name="PerformanceMstService" ref="GJX3.JX.Service.PerformanceMst"/>  
-    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>  
+    <property name="PerformanceMstService" ref="GJX3.JX.Service.PerformanceMst"/>
+    <property name="BudgetMstService" ref="GYS3.YS.Service.BudgetMst"/>
     <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
     <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
     <property name="QtAttachmentService" ref="GQT3.QT.Service.QtAttachment"/>

@@ -46,6 +46,9 @@
   <object id="GXM3.XM.Rule.XmReportDtl" type="GXM3.XM.Rule.XmReportDtlRule, GXM3.XM.Rule" >
     <property name="CurrentDac" ref="GXM3.XM.Dac.XmReportDtl"/>
   </object>
+  <object id="GXM3.XM.Rule.XmReportReturn" type="GXM3.XM.Rule.XmReportReturnRule, GXM3.XM.Rule" >
+    <property name="CurrentDac" ref="GXM3.XM.Dac.XmReportReturn"/>
+  </object>
 
 
   <!--GQT3.QT-->
@@ -307,6 +310,6 @@
   <object id="GGK3.GK.Rule.GK3_BankVauit" type="GGK3.GK.Rule.GK3_BankVauitRule, GGK3.GK.Rule" >
     <property name="CurrentDac" ref="GGK3.GK.Dac.GK3_BankVauit"/>
   </object>
-  
-  
+
+
 </objects>

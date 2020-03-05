@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-mapping-2.2">
-	<class name="XmReportMstModel" table="XM3_ReportMst">
-		<id name="PhId" access="property" column="Phid" >
-			<generator class="assigned">
-			</generator>
-		</id>
-		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
-		<property name="FTitle" column="f_title" type="System.String" length="100" not-null="false" /> 
+  <class name="XmReportMstModel" table="XM3_ReportMst">
+    <id name="PhId" access="property" column="Phid" >
+      <generator class="assigned">
+      </generator>
+    </id>
+    <version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+    <property name="FTitle" column="f_title" type="System.String" length="100" not-null="false" />
     <property name="FCode" column="f_code" type="System.String" length="100" not-null="false" />
     <property name="XmPhid" column="xm_phid" type="System.Int64" not-null="false" />
-		<property name="FBusinessCode" column="F_BusinessCode" type="System.String" length="100" not-null="false" />
-		<property name="FReason" column="f_reason" type="System.String" length="500" not-null="false" />
-		<property name="FTime" column="f_time" type="System.DateTime" not-null="false" />
-		<property name="FDeclarerId" column="F_DeclarerId" type="System.Int64" not-null="false" />
-		<property name="FPhone" column="f_phone" type="System.String" length="100" not-null="false" />
-		<property name="FSumAmount" column="f_sumAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
-		<property name="FSurplusAmount" column="f_surplusAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
-		<property name="FOpinion" column="f_opinion" type="System.String" length="500" not-null="false" />
-		<property name="FUrl" column="f_url" type="System.String" length="100" not-null="false" />
-		<property name="FApprove" column="f_Approve" type="System.Byte" not-null="false" />
-		<property name="FApproveAmount" column="f_approveAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
-		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
-		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
-		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
-		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
-		<property name="Editor" column="editor" type="System.Int64" not-null="true" />  
+    <property name="FBusinessCode" column="F_BusinessCode" type="System.String" length="100" not-null="false" />
+    <property name="FReason" column="f_reason" type="System.String" length="500" not-null="false" />
+    <property name="FTime" column="f_time" type="System.DateTime" not-null="false" />
+    <property name="FDeclarerId" column="F_DeclarerId" type="System.Int64" not-null="false" />
+    <property name="FPhone" column="f_phone" type="System.String" length="100" not-null="false" />
+    <property name="FSumAmount" column="f_sumAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FSurplusAmount" column="f_surplusAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FOpinion" column="f_opinion" type="System.String" length="500" not-null="false" />
+    <property name="FUrl" column="f_url" type="System.String" length="100" not-null="false" />
+    <property name="FApprove" column="f_Approve" type="System.Byte" not-null="false" />
+    <property name="FApproveAmount" column="f_approveAmount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+    <property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+    <property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+    <property name="Creator" column="creator" type="System.Int64" not-null="true" />
+    <property name="Editor" column="editor" type="System.Int64" not-null="true" />
     <property name="FIsDraft" column="F_IsDraft" type="System.Int32" not-null="false" />
+    <property name="FAmount" column="f_Amount" type="System.Decimal" precision="18" scale="2" not-null="false" />
   </class>
 </hibernate-mapping>

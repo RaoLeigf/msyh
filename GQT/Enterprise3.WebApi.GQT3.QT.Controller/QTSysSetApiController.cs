@@ -3351,7 +3351,6 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         {
                             foreach (QTSysSetModel z in PayMethodsByTypecode)
                             {
-
                                 z.PersistentState = PersistentState.Deleted;
                                 resultSysSet.Add(z);
                             }
@@ -3365,7 +3364,6 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     {
                         foreach (QTSysSetModel z in allSysSetsNot)
                         {
-
                             z.PersistentState = PersistentState.Deleted;
                             resultSysSet.Add(z);
                         }
@@ -3379,7 +3377,6 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
                             if (pro.PersistentState != PersistentState.Deleted)
                             {
-
                                 if (string.IsNullOrEmpty(pro.TypeCode))
                                 {
                                     return DCHelper.ErrorMessage("业务条线编码不能为空！");
@@ -3486,12 +3483,10 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
                             if (pro.PersistentState != PersistentState.Deleted)
                             {
-
                                 if (string.IsNullOrEmpty(pro.TypeCode))
                                 {
                                     return DCHelper.ErrorMessage("业务条线编码不能为空！");
                                 }
-                                
                                 if (resultSysSet.FindAll(t => t.Orgid == pro.Orgid && t.TypeCode == pro.TypeCode && t.PersistentState != PersistentState.Deleted).Count > 1)
                                 {
                                     return DCHelper.ErrorMessage(orgname + "该组织下的业务条线编码重复，请进行修改！");
@@ -4410,7 +4405,6 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         }
                     }
                 }
-
                 try
                 {
                     savedresult = QTSysSetService.Save<Int64>(resultSysSet, "");
@@ -5874,6 +5868,66 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             QTSysSetModel qTSys = new QTSysSetModel();
                             qTSys.DicType = "ZcfxName";
                             qTSys.DicName = "支出分项名称";
+                            qTSys.TypeCode = typedm;
+                            qTSys.TypeName = SysSetListBytypeCode[0].TypeName;
+                            qTSys.Isactive = SysSetListBytypeCode[0].Isactive;
+                            qTSys.Issystem = SysSetListBytypeCode[0].Issystem;
+                            qTSys.Bz = SysSetListBytypeCode[0].Bz;
+                            qTSys.OrgList = new List<OrganizeModel>();
+                            foreach (QTSysSetModel a in SysSetListBytypeCode)
+                            {
+                                if (a.Orgid != 0)
+                                {
+                                    qTSys.OrgList.Add(QTSysSetService.GetOrg(a.Orgid));
+                                }
+                            }
+                            data2.Add(qTSys);
+                        }
+                        return DCHelper.ModelListToJson<QTSysSetModel>(data2, data2.Count);
+                    }
+
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(baseModel.orgid))
+                    {
+                        new CreateCriteria(dicWhere)
+                            .Add(ORMRestrictions<Int64>.Eq("Orgid", long.Parse(baseModel.orgid)));
+                    }
+                    else
+                    {
+                        return DCHelper.ErrorMessage("组织id为空！");
+                    }
+                    data = QTSysSetService.Find(dicWhere, new string[] { "TypeCode Asc" }).Data.ToList();
+                    foreach (QTSysSetModel b in data)
+                    {
+                        b.OrgList = new List<OrganizeModel>();
+                        b.OrgList.Add(QTSysSetService.GetOrg(b.Orgid));
+                    }
+                }
+            }
+            else if (DicType == "Costitem")
+            {
+                if (string.IsNullOrEmpty(baseModel.uid))
+                {
+                    return DCHelper.ErrorMessage("用户id为空！");
+                }
+                User2Model user = QTSysSetService.GetUser(long.Parse(baseModel.uid));
+                if (user.UserNo == "Admin")
+                {
+                    new CreateCriteria(dicWhere)
+                        .Add(ORMRestrictions<Byte>.Eq("Issystem", 1));
+                    data = QTSysSetService.Find(dicWhere, new string[] { "TypeCode Asc" }).Data.ToList();
+                    if (data.Count > 0)
+                    {
+                        var data2 = new List<QTSysSetModel>();
+                        List<string> typeCodeList = data.Select(x => x.TypeCode).Distinct().ToList();//取所有支付方式的code集合
+                        foreach (string typedm in typeCodeList)
+                        {
+                            var SysSetListBytypeCode = data.FindAll(x => x.TypeCode == typedm);
+                            QTSysSetModel qTSys = new QTSysSetModel();
+                            qTSys.DicType = "Costitem";
+                            qTSys.DicName = "费用说明";
                             qTSys.TypeCode = typedm;
                             qTSys.TypeName = SysSetListBytypeCode[0].TypeName;
                             qTSys.Isactive = SysSetListBytypeCode[0].Isactive;
