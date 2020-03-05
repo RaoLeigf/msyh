@@ -136,6 +136,7 @@ namespace Enterprise3.WebApi.GSP3.SP.Model.Common
                             order by sp.f_date desc";
                     break;
                 case "004":
+                case "011":
                 case "005":
                     sql = @"select sp.phid PhId,sp.refbill_phid RefbillPhid,sp.proc_phid ProcPhid,sp.post_phid PostPhid,sp.opera_phid OperaPhid,
                             sp.operator_code OperatorCode,sp.f_seq FSeq,sp.f_send_date FSendDate,sp.f_date FDate,sp.f_approval FApproval,
@@ -225,6 +226,7 @@ namespace Enterprise3.WebApi.GSP3.SP.Model.Common
                             order by sp.f_date desc";
                         break;
                     case "004":
+                    case "011":
                     case "005":
                         sql = @"select sp.phid PhId,sp.refbill_phid RefbillPhid,sp.proc_phid ProcPhid,sp.post_phid PostPhid,sp.opera_phid OperaPhid,
                             sp.operator_code OperatorCode,sp.f_seq FSeq,sp.f_send_date FSendDate,sp.f_date FDate,sp.f_approval FApproval,
@@ -417,6 +419,7 @@ namespace Enterprise3.WebApi.GSP3.SP.Model.Common
                             order by sp.f_date desc";
                     break;
                 case "004":
+                case "011":
                 case "005":
                     sql = @"select sp.phid PhId,sp.refbill_phid RefbillPhid,sp.proc_phid ProcPhid,sp.post_phid PostPhid,sp.opera_phid OperaPhid,
                             sp.operator_code OperatorCode,sp.f_seq FSeq,sp.f_send_date FSendDate,sp.f_date FDate,sp.f_approval FApproval,
@@ -505,6 +508,7 @@ namespace Enterprise3.WebApi.GSP3.SP.Model.Common
                                 order by sp.f_date desc";
                         break;
                     case "004":
+                    case "011":
                     case "005":
                         sql = @"select sp.phid PhId,sp.refbill_phid RefbillPhid,sp.proc_phid ProcPhid,sp.post_phid PostPhid,sp.opera_phid OperaPhid,
                             sp.operator_code OperatorCode,sp.f_seq FSeq,sp.f_send_date FSendDate,sp.f_date FDate,sp.f_approval FApproval,

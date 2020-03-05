@@ -235,7 +235,7 @@ namespace GSP3.SP.Facade
                     }
                 }
             }
-            else if (billRequest.BType == BillType.BeginProject || billRequest.BType == BillType.MiddleProject)
+            else if (billRequest.BType == BillType.BeginProject || billRequest.BType == BillType.MiddleProject || billRequest.BType == BillType.ExpendBudeget)
             {
                 if (billRequest.OrgCodes != null && billRequest.OrgCodes.Count > 0)
                 {
@@ -252,7 +252,7 @@ namespace GSP3.SP.Facade
                 }
                 if (appvalRecords != null && appvalRecords.Count > 0)
                 {
-                    if (billRequest.BType == BillType.BeginProject)
+                    if (billRequest.BType == BillType.BeginProject || billRequest.BType == BillType.ExpendBudeget)
                     {
                         appvalRecords = appvalRecords.FindAll(t => t.ProjStatus == "1");
                     }
@@ -564,7 +564,7 @@ namespace GSP3.SP.Facade
                     appvalRecords = sqlDao.GetRecords(billRequest.Year, billRequest.Uid, billRequest.BType, billRequest.OrgCode, "9", billRequest.Splx_Phid);
                 }
             }
-            else if (billRequest.BType == BillType.BeginProject || billRequest.BType == BillType.MiddleProject)
+            else if (billRequest.BType == BillType.BeginProject || billRequest.BType == BillType.MiddleProject || billRequest.BType == BillType.ExpendBudeget)
             {
                 if (billRequest.OrgCodes != null && billRequest.OrgCodes.Count > 0)
                 {

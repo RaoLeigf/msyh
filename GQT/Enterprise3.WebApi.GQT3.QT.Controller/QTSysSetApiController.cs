@@ -4410,6 +4410,255 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         }
                     }
                 }
+
+                try
+                {
+                    savedresult = QTSysSetService.Save<Int64>(resultSysSet, "");
+                }
+                catch (Exception ex)
+                {
+                    savedresult.Status = ResponseStatus.Error;
+                    savedresult.Msg = ex.Message.ToString();
+                }
+            }
+            else if (SysSet.infoData[0].DicType == "Costitem")//费用项目
+            {
+                if (string.IsNullOrEmpty(SysSet.uid))
+                {
+                    return DCHelper.ErrorMessage("用户id为空！");
+                }
+                User2Model user = QTSysSetService.GetUser(long.Parse(SysSet.uid));
+
+                Dictionary<string, object> dicWhere = new Dictionary<string, object>();
+                new CreateCriteria(dicWhere)
+                    .Add(ORMRestrictions<string>.Eq("DicType", "Costitem"));
+
+                var PayMethods = QTSysSetService.Find(dicWhere, new string[] { "TypeCode Desc" }).Data;
+
+                //存原来有的PayMethodTwo编码现在没有了的集合
+                IList<QTSysSetModel> allSysSetsNot = new List<QTSysSetModel>();
+
+                allSysSetsNot = PayMethods;
+                //非内置的信息，用作数据验证
+                var PayMethodNots = PayMethods.ToList().FindAll(x => x.Issystem != 1);
+                //内置的信息，用作数据验证
+                var PayMethodYess = PayMethods.ToList().FindAll(x => x.Issystem == 1);
+                //var TypeCode = 0;
+                //if (PayMethods.Count > 0)
+                //{
+                //    TypeCode = int.Parse(PayMethods[0].TypeCode);
+                //}
+                if (user.UserNo == "Admin")
+                {
+                    PayMethods = PayMethods.ToList().FindAll(x => x.Issystem == 1);
+                    allSysSetsNot = allSysSetsNot.ToList().FindAll(t => t.Issystem == 1);
+                    foreach (QTSysSetModel set in SysSet.infoData)
+                    {
+                        //通过phid获取组织集合
+                        if (set.PhidList != null && set.PhidList.Count > 0 && allOrgs != null && allOrgs.Count > 0)
+                        {
+                            set.OrgList = allOrgs.ToList().FindAll(t => set.PhidList.Contains(t.PhId));
+                        }
+
+                        //if (string.IsNullOrEmpty(set.TypeCode))
+                        //{
+                        //    TypeCode++;
+                        //    set.TypeCode = ("000" + TypeCode).Substring(("000" + TypeCode).Length - 3);
+                        //}
+                        var PayMethodsByTypecode = PayMethods.ToList().FindAll(x => x.TypeCode == set.TypeCode);
+
+                        allSysSetsNot = allSysSetsNot.ToList().FindAll(t => t.TypeCode != set.TypeCode);
+                        if (set.OrgList != null && set.OrgList.Count > 0)
+                        {
+                            foreach (OrganizeModel org in set.OrgList)
+                            {
+                                //如果存在就删除，最后剩下的是要删除的
+                                var PayMethodsByTypecodeOrg = PayMethodsByTypecode.FindAll(x => x.Orgid == org.PhId);
+                                if (PayMethodsByTypecodeOrg.Count > 0)
+                                {
+                                    QTSysSetModel a = PayMethodsByTypecodeOrg[0];
+                                    if (a.TypeName != set.TypeName || a.Isactive != set.Isactive || a.Bz != set.Bz)
+                                    {
+                                        a.Isactive = set.Isactive;
+                                        a.TypeName = set.TypeName;
+                                        a.Bz = set.Bz;
+                                        a.Issystem = set.Issystem;
+                                        a.PersistentState = PersistentState.Modified;
+                                        resultSysSet.Add(a);
+                                    }
+                                    PayMethodsByTypecode.Remove(PayMethodsByTypecodeOrg[0]);
+                                }
+                                else
+                                {
+                                    QTSysSetModel b = new QTSysSetModel();
+                                    b.DicType = "Costitem";
+                                    b.DicName = "费用项目";
+                                    b.TypeCode = set.TypeCode;
+                                    b.TypeName = set.TypeName;
+                                    b.Bz = set.Bz;
+                                    b.Orgid = org.PhId;
+                                    b.Orgcode = org.OCode;
+                                    b.PersistentState = PersistentState.Added;
+                                    b.Isactive = set.Isactive;
+                                    b.Issystem = 1;
+                                    resultSysSet.Add(b);
+                                }
+                            }
+                            if (PayMethodsByTypecode.Count > 0)
+                            {
+                                foreach (QTSysSetModel delete in PayMethodsByTypecode)
+                                {
+                                    delete.PersistentState = PersistentState.Deleted;
+                                    resultSysSet.Add(delete);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (QTSysSetModel z in PayMethodsByTypecode)
+                            {
+                                z.PersistentState = PersistentState.Deleted;
+                                resultSysSet.Add(z);
+                            }
+                        }
+
+
+                    }
+
+                    //删除原有的现无的数据
+                    if (allSysSetsNot != null && allSysSetsNot.Count > 0)
+                    {
+                        foreach (QTSysSetModel z in allSysSetsNot)
+                        {
+                            z.PersistentState = PersistentState.Deleted;
+                            resultSysSet.Add(z);
+                        }
+                    }
+
+                    //数据验证
+                    if (resultSysSet != null && resultSysSet.Count > 0)
+                    {
+                        foreach (var pro in resultSysSet)
+                        {
+                            var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
+                            if (pro.PersistentState != PersistentState.Deleted)
+                            {
+                                if (string.IsNullOrEmpty(pro.TypeCode))
+                                {
+                                    return DCHelper.ErrorMessage("费用项目代码不能为空！");
+                                }
+                                if (resultSysSet.FindAll(t => t.Orgid == pro.Orgid && t.TypeCode == pro.TypeCode && t.PersistentState != PersistentState.Deleted).Count > 1)
+                                {
+                                    return DCHelper.ErrorMessage(orgname + "该组织下的费用项目代码重复，请进行修改！");
+                                }
+
+                                if (pro.Issystem == (byte)1)
+                                {
+                                    if (resultSysSet.FindAll(t => t.TypeCode == pro.TypeCode && t.Issystem != (byte)1).Count > 0)
+                                    {
+                                        return DCHelper.ErrorMessage(pro.TypeCode + "此费用项目代码不能同时存在私有与公有之中！");
+                                    }
+                                    if (PayMethodNots != null && PayMethodNots.Count > 0 && PayMethodNots.FindAll(t => t.TypeCode == pro.TypeCode && t.Issystem != (byte)1).Count > 0)
+                                    {
+                                        return DCHelper.ErrorMessage(pro.TypeCode + "此费用项目代码不能同时存在私有与公有之中！");
+                                    }
+                                }
+                                else
+                                {
+                                    if (resultSysSet.FindAll(t => t.TypeCode == pro.TypeCode && t.Issystem != (byte)0).Count > 0)
+                                    {
+                                        return DCHelper.ErrorMessage(pro.TypeCode + "此费用项目名称代码不能同时存在私有与公有之中！");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(SysSet.orgid))
+                    {
+                        return DCHelper.ErrorMessage("组织id为空！");
+                    }
+                    //查找该组织的所有支付方式
+                    var PayMethodsByOrg = PayMethods.ToList().FindAll(x => x.Orgid == long.Parse(SysSet.orgid));
+                    foreach (QTSysSetModel set in SysSet.infoData)
+                    {
+                        if (set.PhId == 0)
+                        {
+                            //TypeCode++;
+                            //set.TypeCode = ("000" + TypeCode).Substring(("000" + TypeCode).Length - 3);
+                            OrganizeModel organize = QTSysSetService.GetOrg(long.Parse(SysSet.orgid));
+                            set.Orgid = organize.PhId;
+                            set.Orgcode = organize.OCode;
+                            set.PersistentState = PersistentState.Added;
+                            resultSysSet.Add(set);
+                        }
+                        else
+                        {
+                            var a = PayMethodsByOrg.Find(x => x.PhId == set.PhId);
+                            if (a != null)
+                            {
+                                if (a.Issystem == (byte)1)
+                                {
+                                    if (set.PersistentState == PersistentState.Deleted || (a.TypeName != set.TypeName || a.Bz != set.Bz || a.Isactive != set.Isactive || a.TypeCode != set.TypeCode))
+                                    {
+                                        return DCHelper.ErrorMessage(a.TypeName + "为公有设置，不能进行修改或者删除！");
+                                    }
+                                    //return DCHelper.ErrorMessage(a.TypeName + "为公有设置，不能进行修改或者删除！");
+                                }
+                                if (set.PersistentState != PersistentState.Deleted)
+                                {
+                                    set.PersistentState = PersistentState.Modified;
+                                    resultSysSet.Add(set);
+                                }
+                                else
+                                {
+                                    resultSysSet.Add(set);
+                                }
+                                PayMethodsByOrg.Remove(a);
+                            }
+                        }
+                    }
+                    if (PayMethodsByOrg.Count > 0)
+                    {
+                        foreach (QTSysSetModel z in PayMethodsByOrg)
+                        {
+                            if (z.Issystem == (byte)1)
+                            {
+                                return DCHelper.ErrorMessage(z.TypeCode + "该基础数据为公有数据，你无权删除！");
+                            }
+                            z.PersistentState = PersistentState.Deleted;
+                            resultSysSet.Add(z);
+                        }
+                    }
+                    //数据验证
+                    if (resultSysSet != null && resultSysSet.Count > 0)
+                    {
+                        foreach (var pro in resultSysSet)
+                        {
+                            var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
+                            if (pro.PersistentState != PersistentState.Deleted)
+                            {
+                                if (string.IsNullOrEmpty(pro.TypeCode))
+                                {
+                                    return DCHelper.ErrorMessage("费用项目代码不能为空！");
+                                }
+                                if (resultSysSet.FindAll(t => t.Orgid == pro.Orgid && t.TypeCode == pro.TypeCode && t.PersistentState != PersistentState.Deleted).Count > 1)
+                                {
+                                    return DCHelper.ErrorMessage(orgname + "该组织下的费用项目代码重复，请进行修改！");
+                                }
+                                if (pro.Issystem != (byte)1)
+                                {
+                                    if (PayMethodYess != null && PayMethodYess.Count > 0 && PayMethodYess.ToList().FindAll(t => t.TypeCode == pro.TypeCode && t.Issystem == (byte)1).Count > 0)
+                                    {
+                                        return DCHelper.ErrorMessage(pro.TypeCode + "此费用项目代码不能同时存在私有与公有之中！");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 try
                 {
                     savedresult = QTSysSetService.Save<Int64>(resultSysSet, "");
