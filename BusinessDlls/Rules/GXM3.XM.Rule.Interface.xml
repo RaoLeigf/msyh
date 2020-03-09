@@ -98,5 +98,10 @@
             XmReportMst业务逻辑层接口
             </summary>
         </member>
+        <member name="T:GXM3.XM.Rule.Interface.IXmReportReturnRule">
+            <summary>
+            XmReportReturn业务逻辑层接口
+            </summary>
+        </member>
     </members>
 </doc>

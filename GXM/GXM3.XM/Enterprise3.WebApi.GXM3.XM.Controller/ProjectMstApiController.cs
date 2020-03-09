@@ -4288,6 +4288,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 new CreateCriteria(dicSysset).Add(ORMRestrictions<Int64>.NotEq("PhId", 0))
                     .Add(ORMRestrictions<string>.Eq("Orgcode", projectMst.OrgCode));
                 var syssets = QTSysSetService.Find(dicSysset).Data.ToList();
+                var projectCodes = result.Select(p => p.FProjCode.Remove(p.FProjCode.Length - 6,6)).Distinct().ToList();
+                var qtxms = QtXmDistributeService.Find(p => projectCodes.Contains(p.FProjcode)).Data;
                 foreach (var data in result)
                 {
                     var syssetProjectMst = syssets.FindAll(x => x.DicType == "ProjectProper" && x.Orgcode == data.FDeclarationUnit && x.TypeCode == data.FProjAttr);
@@ -4310,13 +4312,21 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         data.FLevel_EXName = syssetProjectMst3[0].TypeName;
                     }
 
+                    
+
+                    var qtxm = qtxms.Where(p => data.FProjCode.StartsWith(p.FProjcode)).FirstOrDefault();
+                    if(qtxm != null)
+                    {
+                        data.FProjName = qtxm.FProjname;
+                        data.FBusinessCode = qtxm.FBusiness;
+                    }
+
                     var businesses = syssets.FindAll(x => x.DicType == "Business" && x.Orgcode == data.FDeclarationUnit && x.TypeCode == data.FBusinessCode);
                     if (businesses != null && businesses.Count > 0)
                     {
                         //业务条线转名称
                         data.FBusinessName = businesses[0].TypeName;
                     }
-
                     //var dtls = ProjectMstService.FindProjectDtlBudgetDtlByForeignKey(data.PhId).Data;
                     //var FIfYsxz = 0;
                     //if (dtls.Count > 0)
@@ -5077,15 +5087,15 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                                         return DCHelper.ErrorMessage("选中的单据会议决议未通过，不能生成预算！");
                                     }
                                 }
-                                else
-                                {
-                                    return DCHelper.ErrorMessage("选中的单据暂无项目材料信息，不能生成预算！");
-                                }
+                                //else
+                                //{
+                                //    return DCHelper.ErrorMessage("选中的单据暂无项目材料信息，不能生成预算！");
+                                //}
                             }
-                            else
-                            {
-                                return DCHelper.ErrorMessage("选中的单据暂无项目材料信息，不能生成预算！");
-                            }
+                            //else
+                            //{
+                            //    return DCHelper.ErrorMessage("选中的单据暂无项目材料信息，不能生成预算！");
+                            //}
                             continue;
                         }
                         else
@@ -5519,8 +5529,25 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<string> PostImportXMData([FromBody]ImportXMDataRequest request)
+        public string PostImportXMData()
         {
+            ImportXMDataRequest request = new ImportXMDataRequest();
+            var form = HttpContext.Current.Request.Form;
+            for (int i = 0;i < form.AllKeys.Count(); i++)
+            {
+                switch (form.AllKeys[i])
+                {
+                    case "UserId": 
+                        request.UserId = long.Parse(HttpContext.Current.Request.Form[i]); break;
+                    case "FYear":
+                        request.FYear = int.Parse(HttpContext.Current.Request.Form[i]); break;
+                    case "OrgId":
+                        request.OrgId = long.Parse(HttpContext.Current.Request.Form[i]); break;
+                    case "OrgCode":
+                        request.OrgCode = HttpContext.Current.Request.Form[i]; break;
+                    default:break;
+                }
+            }
 
             var now = DateTime.Now;
             try
@@ -5574,11 +5601,17 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         Msg = "文件格式不正确"
                     });
                 }
+                ISheet sheet;
 
-
-                HSSFWorkbook wk = new HSSFWorkbook(file.InputStream);
-                ISheet sheet = wk.GetSheetAt(0);
-
+                if (file.ContentType == "application/vnd.ms-excel"){
+                    XSSFWorkbook wk = new XSSFWorkbook(file.InputStream);
+                    sheet = wk.GetSheetAt(0);
+                }
+                else
+                {
+                    HSSFWorkbook wk = new HSSFWorkbook(file.InputStream);
+                    sheet = wk.GetSheetAt(0);
+                }
                 /*
                  * 第一行为标题行，第二行为注意事项，第三个为小标题，第四行开始为正式数据（ 科目名称（选填）	支出分项名称（选填））
                  * 1.导入数据需要在日志上记录
@@ -5655,19 +5688,19 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         }
 
                         //四个选择项需要输入 是/否
-                        if (fIsApply != "是" || fIsApply != "否")
+                        if (fIsApply != "是" && fIsApply != "否")
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【是否申请补助】只能输入 是/否)");
                         }
-                        if (fIsPurchase != "是" || fIsPurchase != "否")
+                        if (fIsPurchase != "是" && fIsPurchase != "否")
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【是否集中采购】只能输入 是/否)");
                         }
-                        if (fIsReport != "是" || fIsReport != "否")
+                        if (fIsReport != "是" && fIsReport != "否")
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【是否必须签报列支】只能输入 是/否)");
                         }
-                        if (fIsResolution != "是" || fIsResolution != "否")
+                        if (fIsResolution != "是" && fIsResolution != "否")
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【是否集体决议】只能输入 是/否)");
                         }
@@ -5691,7 +5724,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                             && p.TypeCode == qtXmDistribute.First().FBusiness
                             && p.DicType == "Business");
 
-                        if (business.Data == null || business.Data.Count == 0 || business.Data.First().DicName != fBusinessName)
+                        if (business.Data == null || business.Data.Count == 0 || business.Data.First().TypeName != fBusinessName)
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【业务条线】不正确)");
                         }
@@ -5725,7 +5758,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         if (fSubitemName != string.Empty)
                         {
                             var fSubitemBusiness = QTSysSetService.Find(p => p.Orgid == request.OrgId
-                            && p.DicName == fSubitemName
+                            && p.TypeName == fSubitemName
                             && p.DicType == "ZcfxName");
 
                             if (fSubitemBusiness.Data == null || fSubitemBusiness.Data.Count == 0)
@@ -5742,6 +5775,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     }
                     catch (Exception ex)
                     {
+
                         //写入日志
                         Logger.Error($"时间：{now}  用户：{request.UserId}  异常：{ex.Message}");
                     }
@@ -5755,7 +5789,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                 var allList = new List<ProjectAllDataModel>();
 
-                var allCodes = ProjectMstService.Find(p => p.PhId != 0 && p.FDeleteMark == 0)?.Data?.Select(p => p.FProjName)?.ToList() ?? new List<string>();
+                var allCodes = ProjectMstService.Find(p => p.PhId != 0 && p.FDeleteMark == 0)?.Data?.Select(p => p.FProjCode)?.ToList() ?? new List<string>();
 
                 //导入正确的数据
                 var projectMstUploadsGroup = projectMstUploads.GroupBy(p => new { p.FProjCode, p.FBudgetDeptCode });
@@ -5774,7 +5808,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         FProjAmount = projectMstUploadGroup.Sum(p => p.FAmount),
                         FBudgetAmount = projectMstUploadGroup.Sum(p => p.FAmount),
                         FBusinessName = baseData.FBusinessName,
-                        FBudgetDept = baseData.FBudgetDept,
+                        FBudgetDept = baseData.FBudgetDeptCode,
                         FProjStatus = 1,
                         FApproveStatus = "1",
                         FIsApply = baseData.FIsApply == "是" ? (byte)1 : (byte)0,
@@ -5782,14 +5816,14 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         FIsReport = baseData.FIsReport == "是" ? (byte)1 : (byte)0,
                         FIsResolution = baseData.FIsResolution == "是" ? (byte)1 : (byte)0,
                         FBusinessCode = baseData.FBusinessCode,
-                        PersistentState = PersistentState.Added
+                        PersistentState = PersistentState.Added 
                     };
 
                     var projectdtlList = projectMstUploadGroup.Select(p => new ProjectDtlBudgetDtlModel
                     {
                         FName = p.FName,
                         FAmount = p.FAmount,
-                        FBudgetAccounts = p.FBudgetAccounts,
+                        FBudgetAccounts = p.FBudgetAccountsCode,
                         FSubitemCode = p.FSubitemCode,
                         FAmountAfterEdit = p.FAmount,
                         PersistentState = PersistentState.Added
@@ -5809,6 +5843,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                             //写入日志
                             Logger.Error($"时间：{now}  用户：{request.UserId}  异常：第{p.LineNum}行数据上传失败。(此组织的进度已不在年初，无法修改年初数据！)");
                         });
+                        continue;
                     }
 
                     //申报部门
@@ -5847,7 +5882,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         projectMst.FBudgetAmount = projectdtlList.Sum(p => p.FAmount);
                         projectMst.FProjAmount = projectdtlList.Sum(p => p.FAmount);
 
-                        var alldtlCodes = projectdtlList.Where(p => string.IsNullOrEmpty(p.FDtlCode)).Select(p => p.FDtlCode).ToList();
+                        var alldtlCodes = projectdtlList.Where(p => !string.IsNullOrEmpty(p.FDtlCode)).Select(p => p.FDtlCode).ToList();
 
                         foreach (var projectdtl in projectdtlList)
                         {
@@ -5897,7 +5932,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public string PostModelExcel([FromBody]List<ProjectMstExcelModel> model)
+        public string PostModelExcel([FromBody]ProjectMstExcelModel model)
         {
             var path = AppDomain.CurrentDomain.BaseDirectory + @"\\DownLoadFiles\\ProjectMst";
             FileStream modelFs = File.OpenRead(path + "\\model.xlsx");
@@ -5905,14 +5940,15 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             var book = new XSSFWorkbook(modelFs);
             //测试新建一个sheet
             var sheet = book.GetSheet("支出预算");
-
-            for (int i = 0; i < model.Count; i++)
+            var list = model.model;
+            for (int i = 0; i < list.Count; i++)
             {
+
                 var row = sheet.GetRow(i + 3);
 
-                row.GetCell(0).SetCellValue(model[i].ProjectCode ?? string.Empty);//项目编码
-                row.GetCell(1).SetCellValue(model[i].ProjectName ?? string.Empty);//项目名称
-                row.GetCell(3).SetCellValue(model[i].FBusinessName ?? string.Empty);//业务条线
+                row.GetCell(0).SetCellValue(list[i].ProjectCode ?? string.Empty);//项目编码
+                row.GetCell(1).SetCellValue(list[i].ProjectName ?? string.Empty);//项目名称
+                row.GetCell(3).SetCellValue(list[i].FBusinessName ?? string.Empty);//业务条线
             }
 
 

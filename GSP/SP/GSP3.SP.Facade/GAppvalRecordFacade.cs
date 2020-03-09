@@ -1564,7 +1564,7 @@ namespace GSP3.SP.Facade
                     }
                 }
             }
-            else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype==BillType.MiddleProject)
+            else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype==BillType.MiddleProject || gAppval.FBilltype == BillType.ExpendBudeget)
             {                
                 var projects = this.ProjectMstRule.Find(dic);
                 if (projects.Count > 0)
@@ -1788,7 +1788,7 @@ namespace GSP3.SP.Facade
                     savedResult = this.GKPaymentMstRule.Save<long>(updateGkPayments);
                 }
             }
-            else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype == BillType.MiddleProject)
+            else if (gAppval.FBilltype == BillType.BeginProject || gAppval.FBilltype == BillType.MiddleProject || gAppval.FBilltype == BillType.ExpendBudeget)
             {
                 var updateProjects = this.ProjectMstRule.Find(dic);
                 if (updateProjects.Count > 0)

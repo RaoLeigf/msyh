@@ -647,6 +647,13 @@
             <param name="id">外键值</param>
             <returns></returns>
         </member>
+        <member name="M:GXM3.XM.Service.XmReportMstService.FindXmReportReturnByForeignKey``1(``0)">
+            <summary>
+            通过外键值获取XmReportReturn明细数据
+            </summary>
+            <param name="id">外键值</param>
+            <returns></returns>
+        </member>
         <member name="M:GXM3.XM.Service.XmReportMstService.GetMSYHProjectReport(System.Int64)">
             <summary>
             通过单据主键获取签报单信息

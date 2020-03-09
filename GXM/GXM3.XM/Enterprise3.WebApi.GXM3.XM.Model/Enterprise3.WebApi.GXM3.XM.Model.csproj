@@ -63,6 +63,7 @@
     <Compile Include="Request\ProjectMstListModel.cs" />
     <Compile Include="Request\ProjectMstRequest.cs" />
     <Compile Include="Request\ProjectMstUpload.cs" />
+    <Compile Include="Request\XmReportSaveModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\GData\YQHL\GData.YQHL.Model\GData.YQHL.Model.csproj">

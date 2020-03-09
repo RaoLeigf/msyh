@@ -37,5 +37,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Model.Request
         /// </summary>
         [DataMember]
         public string OrgCode { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [DataMember]
+        public string files { get; set; }
     }
 }

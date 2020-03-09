@@ -226,7 +226,7 @@ namespace GXM3.XM.Model.Domain
 		/// 明细表集合
 		/// </summary>
 		[DataMember]
-		public IList<XmReportDtlModel> XmReportDtls
+		public virtual IList<XmReportDtlModel> XmReportDtls
 		{
 			get;
 			set;

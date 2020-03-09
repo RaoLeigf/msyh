@@ -119,6 +119,7 @@
     </Compile>
     <Compile Include="XmReportDtlFacade.cs" />
     <Compile Include="XmReportMstFacade.cs" />
+    <Compile Include="XmReportReturnFacade.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

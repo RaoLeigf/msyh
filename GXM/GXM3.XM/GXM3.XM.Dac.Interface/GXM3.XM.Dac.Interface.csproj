@@ -72,6 +72,7 @@
     <Compile Include="IProjectMstDac.cs" />
     <Compile Include="IXmReportDtlDac.cs" />
     <Compile Include="IXmReportMstDac.cs" />
+    <Compile Include="IXmReportReturnDac.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

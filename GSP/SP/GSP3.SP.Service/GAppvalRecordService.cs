@@ -644,6 +644,10 @@ namespace GSP3.SP.Service
                     {
                         this.ProjectMstFacade.UpdateProject(recordModel, "4");
                     }
+                    if(BillType.ExpendBudeget == recordModel.FBilltype)
+                    {
+                        this.ProjectMstFacade.UpdateExpenProject(recordModel, "4");
+                    }
                     if (BillType.MiddleProject == recordModel.FBilltype)
                     {
                         //跨审批流回退

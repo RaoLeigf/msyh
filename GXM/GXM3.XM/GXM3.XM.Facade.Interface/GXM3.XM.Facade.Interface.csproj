@@ -72,6 +72,7 @@
     <Compile Include="IProjectMstFacade.cs" />
     <Compile Include="IXmReportDtlFacade.cs" />
     <Compile Include="IXmReportMstFacade.cs" />
+    <Compile Include="IXmReportReturnFacade.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

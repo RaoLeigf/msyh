@@ -175,10 +175,11 @@ namespace GYS3.YS.Service
         public YsAccountMstModel GetAllYsAccountList(long orgId, string orgCode, string year, int chooseOwn, string verify)
         {
             YsAccountMstModel ysAccountMst = new YsAccountMstModel();
+            var ysAccount = this.YsAccountMstFacade.Find(t => t.Orgid == orgId && t.Uyear == year).Data;
             //判断组织是否保存过预决算
-            if(this.YsAccountMstFacade.Find(t => t.Orgid == orgId && t.Uyear == year).Data != null && this.YsAccountMstFacade.Find(t => t.Orgid == orgId && t.Uyear == year).Data.Count > 0)
+            if (ysAccount != null && ysAccount.Count > 0)
             {
-                ysAccountMst = this.YsAccountMstFacade.Find(t => t.Orgid == orgId && t.Uyear == year).Data[0];
+                ysAccountMst = ysAccount[0];
             }
             else
             {

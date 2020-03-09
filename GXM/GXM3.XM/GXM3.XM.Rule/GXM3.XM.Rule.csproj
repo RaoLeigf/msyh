@@ -102,6 +102,7 @@
     </Compile>
     <Compile Include="XmReportDtlRule.cs" />
     <Compile Include="XmReportMstRule.cs" />
+    <Compile Include="XmReportReturnRule.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

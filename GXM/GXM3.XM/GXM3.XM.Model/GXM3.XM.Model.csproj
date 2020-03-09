@@ -65,6 +65,7 @@
     <Compile Include="Domain\GenerateCodes\ProjectMstModel.cs" />
     <Compile Include="Domain\GenerateCodes\XmReportDtlModel.cs" />
     <Compile Include="Domain\GenerateCodes\XmReportMstModel.cs" />
+    <Compile Include="Domain\GenerateCodes\XmReportReturnModel.cs" />
     <Compile Include="Enums\EnumApproveStatus.cs" />
     <Compile Include="Enums\EnumCarryOver.cs" />
     <Compile Include="Enums\EnumProjAttr.cs" />
@@ -105,8 +106,9 @@
     <EmbeddedResource Include="Domain\Mappings\HBM\ProjectDtlPersonnel.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Domain\Mappings\HBM\XmReportDtl.hbm.xml" />
-    <Content Include="Domain\Mappings\HBM\XmReportMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\XmReportDtl.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\XmReportMst.hbm.xml" />
+    <EmbeddedResource Include="Domain\Mappings\HBM\XmReportReturn.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

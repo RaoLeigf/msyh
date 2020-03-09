@@ -4,6 +4,7 @@ using Enterprise3.WebApi.GQT3.QT.Model.Request;
 using Enterprise3.WebApi.GQT3.QT.Model.Response;
 using GQT3.QT.Model.Domain;
 using GQT3.QT.Service.Interface;
+using GXM3.XM.Service.Interface;
 using SUP.Common.Base;
 using SUP.Common.DataEntity;
 using System;
@@ -25,6 +26,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         ICorrespondenceSettingsService CorrespondenceSettingsService { get; set; }
         IQTSysSetService QTSysSetService { get; set; }
 
+        IProjectMstService ProjectMstService;
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -33,6 +35,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             QtXmDistributeService = base.GetObject<IQtXmDistributeService>("GQT3.QT.Service.QtXmDistribute");
             CorrespondenceSettingsService = base.GetObject<ICorrespondenceSettingsService>("GQT3.QT.Service.CorrespondenceSettings");
             QTSysSetService = base.GetObject<IQTSysSetService>("GQT3.QT.Service.QTSysSet");
+            ProjectMstService = base.GetObject<IProjectMstService>("GXM3.XM.Service.ProjectMst");
         }
 
         /// <summary>
@@ -347,7 +350,19 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostDelete([FromBody]XmDistributeModel data)
         {
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(data.FProjcode));
+            if(proMst != null && proMst.Data != null && proMst.Data.Count > 0)
+            {
+                return DataConverterHelper.SerializeObject(new
+                {
+                    Ststus = ResponseStatus.Error,
+                    Msg = "项目被引用，无法删除"
+                });
+            }
+            
+
             var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
+            
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             foreach (var a in rundata)
             {

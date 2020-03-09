@@ -72,6 +72,7 @@
     <Compile Include="IProjectMstRule.cs" />
     <Compile Include="IXmReportDtlRule.cs" />
     <Compile Include="IXmReportMstRule.cs" />
+    <Compile Include="IXmReportReturnRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
