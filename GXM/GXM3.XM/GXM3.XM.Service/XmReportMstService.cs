@@ -24,22 +24,23 @@ using GXM3.XM.Service.Interface;
 using GXM3.XM.Facade.Interface;
 using GXM3.XM.Model.Domain;
 using GQT3.QT.Facade.Interface;
+using SUP.Common.Base;
 
 namespace GXM3.XM.Service
 {
-    /// <summary>
-    /// XmReportMst服务组装处理类
-    /// </summary>
+	/// <summary>
+	/// XmReportMst服务组装处理类
+	/// </summary>
     public partial class XmReportMstService : EntServiceBase<XmReportMstModel>, IXmReportMstService
     {
-        #region 类变量及属性
-        /// <summary>
+		#region 类变量及属性
+		/// <summary>
         /// XmReportMst业务外观处理对象
         /// </summary>
-        IXmReportMstFacade XmReportMstFacade
+		IXmReportMstFacade XmReportMstFacade
         {
             get
-            {
+            {          
                 if (CurrentFacade == null)
                     throw new NGAppException("InitializeObjectFail");
 
@@ -47,10 +48,10 @@ namespace GXM3.XM.Service
             }
         }
 
-        /// <summary>
+		/// <summary>
         /// OrderDetails业务外观处理对象
         /// </summary>
-        private IXmReportDtlFacade XmReportDtlFacade { get; set; }
+		private IXmReportDtlFacade XmReportDtlFacade { get; set; }
 
         IProjectMstFacade ProjectMstFacade { get; set; }
 
@@ -104,14 +105,14 @@ namespace GXM3.XM.Service
             XmReportMstModel xmReportMst = new XmReportMstModel();
             //先查询是否已存在签报单数据
             var reports = this.XmReportMstFacade.Find(t => t.XmPhid == phid).Data;
-            if (reports != null && reports.Count > 0)
+            if(reports != null && reports.Count > 0)
             {
-                if (reports.Count == 1)
+                if(reports.Count == 1)
                 {
                     xmReportMst = reports[0];
                     //获取单据编码名称
                     var projects = this.ProjectMstFacade.Find(t => t.PhId == phid).Data;
-                    if (projects != null && projects.Count > 0)
+                    if(projects != null && projects.Count > 0)
                     {
                         xmReportMst.FProjCode = projects[0].FProjCode;
                         xmReportMst.FProjName = projects[0].FProjName;
@@ -154,7 +155,7 @@ namespace GXM3.XM.Service
                     }
                     //获取明细数据集合(项目明细转签报明细)
                     var projectDtls = this.ProjectDtlBudgetDtlFacade.Find(t => t.MstPhid == projects[0].PhId).Data;
-                    if (projectDtls != null && projectDtls.Count > 0)
+                    if(projectDtls != null && projectDtls.Count > 0)
                     {
                         IList<XmReportDtlModel> xmReportDtls = new List<XmReportDtlModel>();
                         foreach (var dtl in projectDtls)
@@ -177,6 +178,36 @@ namespace GXM3.XM.Service
         }
 
 
+        /// <summary>
+        /// 保存签报单额度返还明细
+        /// </summary>
+        /// <param name="XmReportReturns"></param>
+        /// <returns></returns>
+        public SavedResult<Int64> SaveReturn(List<XmReportReturnModel> XmReportReturns)
+        {
+            return XmReportReturnFacade.Save<Int64>(XmReportReturns);
+        }
+        
+        /// <summary>
+        /// 额度分配后金额的保存
+        /// </summary>
+        /// <param name="Msts"></param>
+        /// <param name="XmReportDtls"></param>
+        /// <returns></returns>
+        public string SaveReturnAmount(List<XmReportMstModel> Msts, List<XmReportDtlModel> XmReportDtls)
+        {
+            SavedResult<Int64> resultMst = XmReportMstFacade.Save<Int64>(Msts);
+            SavedResult<Int64> resultDtl =XmReportDtlFacade.Save<Int64>(XmReportDtls);
+            var result =
+                new
+                {
+                    Status = ResponseStatus.Success,
+                    Msg = "获取成功！",
+                    resultMst = DataConverterHelper.SerializeObject(resultMst),
+                    resultDtl= DataConverterHelper.SerializeObject(resultDtl)
+                };
+            return DataConverterHelper.SerializeObject(result); 
+        }
         #endregion
     }
 }

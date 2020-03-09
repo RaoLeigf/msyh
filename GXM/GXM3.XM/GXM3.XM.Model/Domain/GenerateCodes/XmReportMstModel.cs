@@ -23,13 +23,13 @@ using Enterprise3.Common.Model.Enums;
 
 namespace GXM3.XM.Model.Domain
 {
-	/// <summary>
-	/// XmReportMst实体定义类
-	/// </summary>
-	[Serializable]
+    /// <summary>
+    /// XmReportMst实体定义类
+    /// </summary>
+    [Serializable]
 	[DataContract(Namespace = "")]
-	public partial class XmReportMstModel : EntityBase<XmReportMstModel>
-	{
+    public partial class XmReportMstModel : EntityBase<XmReportMstModel>
+    {
 		/// <summary>
 		/// 主键
 		/// </summary>
@@ -51,20 +51,20 @@ namespace GXM3.XM.Model.Domain
 		}
 
 
-		/// <summary>
-		/// 签报单编码
-		/// </summary>
-		[DataMember]
-		public virtual System.String FCode
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// 签报单编码
+        /// </summary>
+        [DataMember]
+        public virtual System.String FCode
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// 关联项目名称
-		/// </summary>
-		[DataMember]
+        /// <summary>
+        /// 关联项目名称
+        /// </summary>
+        [DataMember]
 		public virtual System.Int64 XmPhid
 		{
 			get;
@@ -181,77 +181,76 @@ namespace GXM3.XM.Model.Domain
 			set;
 		}
 
-		/// <summary>
-		/// 是否从生成草案而产生的签报单（0-否，1-是）
-		/// </summary>
-		[DataMember]
-		public virtual System.Int32 FIsDraft
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// 是否从生成草案而产生的签报单（0-否，1-是）
+        /// </summary>
+        [DataMember]
+        public virtual System.Int32 FIsDraft
+        {
+            get;
+            set;
+        }
 
-		#region//虚拟字段
+        #region//虚拟字段
 
-		/// <summary>
-		/// 项目编码
-		/// </summary>
-		[DataMember]
-		public virtual System.String FProjCode
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        [DataMember]
+        public virtual System.String FProjCode
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// 项目名称
-		/// </summary>
-		[DataMember]
-		public virtual System.String FProjName
-		{
-			get;
-			set;
-		}
-		/// <summary>
-		/// 业务条线名称
-		/// </summary>
-		[DataMember]
-		public virtual System.String FBusinessName
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// 项目名称
+        /// </summary>
+        [DataMember]
+        public virtual System.String FProjName
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 业务条线名称
+        /// </summary>
+        [DataMember]
+        public virtual System.String FBusinessName
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// 明细表集合
-		/// </summary>
-		[DataMember]
-		public virtual IList<XmReportDtlModel> XmReportDtls
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// 明细表集合
+        /// </summary>
+        [DataMember]
+        public virtual IList<XmReportDtlModel> XmReportDtls
+        {
+            get;
+            set;
+        }
 
-		/// <summary>
-		/// 项目状态
-		/// </summary>
-		[DataMember]
-		public virtual System.Int32 FProjStatus
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// 该签报单申请金额
-		/// </summary>
-		[DataMember]
-		public virtual System.Decimal FAmount
-		{
-			get;
-			set;
-		}
-		#endregion
-	}
+        /// <summary>
+        /// 项目状态
+        /// </summary>
+        [DataMember]
+        public virtual System.Int32 FProjStatus
+        {
+            get;
+            set;
+        }
+        #endregion
+        /// <summary>
+        /// 该签报单申请金额
+        /// </summary>
+        [DataMember]
+        public virtual System.Decimal FAmount
+        {
+            get;
+            set;
+        }
+    }
 
 }

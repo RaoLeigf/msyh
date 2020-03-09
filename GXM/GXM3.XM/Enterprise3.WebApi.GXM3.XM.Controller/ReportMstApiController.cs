@@ -27,7 +27,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
     /// 
     /// </summary>
     [MethodExceptionFilter, SyncUserDbFilter]
-    public class ReportMstApiController : ApiBase
+    public class ReportMstApiController: ApiBase
     {
         IXmReportMstService XmReportMstService;
         IProjectMstService ProjectMstService;
@@ -108,7 +108,14 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     mst.FProjStatus = projectMst.FProjStatus;
                 }
             }
-            return DCHelper.ModelListToJson<XmReportMstModel>(result, (Int32)result.Count);
+            var data = new
+            {
+                Status = ResponseStatus.Success,
+                Msg = "获取成功！",
+                Data = result
+            };
+
+            return DataConverterHelper.SerializeObject(data);
         }
 
 
@@ -130,8 +137,32 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 XmReportDtls = data.XmReportDtls;
             }
+            //FSurplusAmount剩余预算金额
+            
+            /*if (Msts != null && Msts.Count > 0)
+            {
+                List<XmReportMstModel> approveMsts = Msts.FindAll(x => x.FApprove == 9);
+                if (approveMsts != null && approveMsts.Count > 0)
+                {
+                    XmReportMst.FSurplusAmount = XmReportMst.FSumAmount - approveMsts.Sum(x => x.FApproveAmount);
+                }
+            }*/
             if (XmReportMst.PhId == 0)
             {
+                List<XmReportMstModel> Msts = XmReportMstService.Find(x => x.XmPhid == XmReportMst.XmPhid).Data.ToList();
+                Msts.OrderByDescending(x => x.FCode);
+                if (Msts == null)
+                {
+                    XmReportMst.FCode = XmReportMst.FProjCode + "0001";
+                }
+                else
+                {
+                    var maxFCode = Msts[0].FCode;
+                    XmReportMst.FCode = maxFCode.Substring(0, maxFCode.Length - 4)+
+                        (long.Parse(maxFCode.Substring(maxFCode.Length - 4, 4))+1).ToString();
+                }
+
+                
                 XmReportMst.PersistentState = PersistentState.Added;
                 foreach (var dtl in XmReportDtls)
                 {
@@ -142,7 +173,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 XmReportMst.PersistentState = PersistentState.Modified;
             }
-            SavedResult<Int64> result = XmReportMstService.SaveXmReportMst(XmReportMst, XmReportDtls);
+            SavedResult<Int64> result=XmReportMstService.SaveXmReportMst(XmReportMst, XmReportDtls);
             return DataConverterHelper.SerializeObject(result);
         }
 
@@ -157,13 +188,12 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 return DCHelper.ErrorMessage("请先选择项目！");
             }
-            if (param.OrgId == 0)
+            if (param.OrgId==0)
             {
                 return DCHelper.ErrorMessage("组织code为空！");
             }
             var XmReportMst = XmReportMstService.Find(param.FPhid).Data;
-            if (XmReportMst.XmPhid != 0)
-            {
+            if (XmReportMst.XmPhid != 0) {
                 var projectMst = ProjectMstService.Find(XmReportMst.XmPhid).Data;
                 XmReportMst.FProjCode = projectMst.FProjCode;
                 XmReportMst.FProjName = projectMst.FProjName;
@@ -171,8 +201,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             }
             if (!string.IsNullOrEmpty(XmReportMst.FBusinessCode))
             {
-                var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == param.OrgId && x.TypeCode == XmReportMst.FBusinessCode).Data.ToList();
-                if (syssets != null && syssets.Count > 0)
+                var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == param.OrgId && x.TypeCode== XmReportMst.FBusinessCode).Data.ToList();
+                if(syssets!=null && syssets.Count > 0)
                 {
                     XmReportMst.FBusinessName = syssets[0].TypeName;
                 }
@@ -183,7 +213,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 FDeclarerId
             }*/
             var dtls = XmReportMstService.FindXmReportDtlByForeignKey(param.FPhid).Data;
-            if (dtls != null && dtls.Count > 0)
+            if(dtls!=null && dtls.Count > 0)
             {
                 var sysset2s = QTSysSetService.Find(x => x.DicType == "Costitem" && x.Orgid == param.OrgId).Data.ToList();
                 if (sysset2s != null && sysset2s.Count > 0)
@@ -214,9 +244,9 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 Msg = "获取成功！",
                 Data = result
             };
-
+            
             return DataConverterHelper.SerializeObject(data);
-
+            
         }
 
         /// <summary>
@@ -401,15 +431,140 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 }
             }
             var XmReportMsts = XmReportMstService.Find(x => x.XmPhid == param.FPhid).Data.ToList();
-            var FApproveAmount = XmReportMsts.Sum(x => x.FApproveAmount);
+            var FIsDraft = 0;//该单据是否存在从生成草案而产生的签报单
+            decimal FApproveAmount = 0;
+            if (XmReportMsts != null)
+            {
+                FApproveAmount = XmReportMsts.Sum(x => x.FApproveAmount);
+                var BA_Mst = XmReportMsts.Find(x => x.FIsDraft == 1);
+                if (BA_Mst != null)
+                {
+                    FIsDraft = 1;
+                }
+            }
             var data = new
             {
                 Status = ResponseStatus.Success,
                 Msg = "获取成功！",
                 Costitem = syssets,//费用说明
-                FSurplusAmount = mst.FProjAmount - FApproveAmount//剩余预算额度
+                FSurplusAmount = mst.FProjAmount- FApproveAmount,//剩余预算额度
+                FIsDraft= FIsDraft//等于1是已经生成过预算草案
             };
             return DataConverterHelper.SerializeObject(data);
+        }
+
+        /// <summary>
+        /// 保存签报单额度返还的数据
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public string PostSaveReturn([FromBody]XmReportSaveModel data)
+        {
+            if(data.XmReportMst==null && data.XmReportMst.PhId == 0)
+            {
+                return DCHelper.ErrorMessage("单据主键为空！");
+            }
+            if (data.XmReportReturns == null)
+            {
+                return DCHelper.ErrorMessage("额度返还为空！");
+            }
+            XmReportMstModel XmReportMst = XmReportMstService.Find(data.XmReportMst.PhId).Data;
+            foreach(var XmReportReturn in data.XmReportReturns)
+            {
+                if (XmReportReturn.PhId == 0)
+                {
+                    XmReportReturn.MstPhid = data.XmReportMst.PhId;
+                    XmReportReturn.PersistentState = PersistentState.Added;
+                }
+                else
+                {
+                    XmReportReturn.PersistentState = PersistentState.Modified;
+                }
+            }
+            var result=XmReportMstService.SaveReturn(data.XmReportReturns);
+            return DataConverterHelper.SerializeObject(result);
+        }
+
+        /// <summary>
+        /// 返还额度分配的保存
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public string PostSaveReturnAmount([FromBody]XmReportSaveModel data)
+        {
+            //FApproveAmount审批通过的金额（及签报通过的金额）
+            //FSurplusAmount剩余预算金额
+            if (data.XmReportMst != null)
+            {
+                if (data.XmReportMst.PhId != 0)
+                {
+                    XmReportMstModel XmReportMst = XmReportMstService.Find(data.XmReportMst.PhId).Data;
+                    Decimal FApproveAmount = 0;//该单据的审批通过金额
+                    Decimal FSumAmount = XmReportMst.FSumAmount;
+                    Decimal FSurplusAmount = 0;
+                    List<XmReportDtlModel> XmReportDtls = XmReportMstService.FindXmReportDtlByForeignKey(data.XmReportMst.PhId).Data.ToList();
+                    foreach(var dtl in XmReportDtls)
+                    {
+                        //前端传过来的明细数据
+                        var postDtl = data.XmReportDtls.Find(x => x.PhId == dtl.PhId);
+                        if (postDtl != null)
+                        {
+                            dtl.FAmount = postDtl.FAmount;
+                            dtl.FReturnAmount= postDtl.FReturnAmount;
+                        }
+                        dtl.PersistentState = PersistentState.Modified;
+                        FApproveAmount += dtl.FAmount - dtl.FReturnAmount;
+                    }
+                    XmReportMst.FApproveAmount = FApproveAmount;
+                    //取该项目的所有相关签报单(不包括当前单据)
+                    List<XmReportMstModel> Msts = XmReportMstService.Find(x => x.XmPhid == XmReportMst.XmPhid && x.PhId!= data.XmReportMst.PhId).Data.ToList();
+                    //取已审批的所有相关签报单
+                    List<XmReportMstModel> ApproveMsts = new List<XmReportMstModel>();
+                    if (Msts != null)
+                    {
+                        ApproveMsts = Msts.FindAll(x => x.FApprove == 9);
+                        if(ApproveMsts!=null && ApproveMsts.Count > 0)
+                        {
+                            for (var i = 0; i < ApproveMsts.Count; i++)
+                            {
+                                FApproveAmount += ApproveMsts[i].FApproveAmount;//总已审批金额
+                            }
+                        }
+                    }
+                    if (XmReportMst.XmPhid != 0)
+                    {
+                        //重新取单据的预算金额
+                        var xm3_Mst = ProjectMstService.Find(XmReportMst.XmPhid).Data;
+                        if (xm3_Mst != null)
+                        {
+                            FSumAmount = xm3_Mst.FProjAmount;
+                        }
+                    }
+                    FSurplusAmount = FSumAmount - FApproveAmount;
+
+                    foreach(var a in Msts)
+                    {
+                        a.FSumAmount = FSumAmount;
+                        a.FSurplusAmount = FSurplusAmount;
+                        a.PersistentState = PersistentState.Modified;
+                    }
+                    XmReportMst.PersistentState= PersistentState.Modified;
+                    Msts.Add(XmReportMst);
+                    string result = XmReportMstService.SaveReturnAmount(Msts, XmReportDtls);
+                    return result;
+                }
+                else
+                {
+                    return DCHelper.ErrorMessage("单据主键为空！");
+                }
+            }
+            else
+            {
+                return DCHelper.ErrorMessage("单据主表信息为空！");
+            }
+            
         }
     }
 }

@@ -23,13 +23,13 @@ using Enterprise3.Common.Model.Enums;
 
 namespace GXM3.XM.Model.Domain
 {
-	/// <summary>
-	/// XmReportDtl实体定义类
-	/// </summary>
-	[Serializable]
+    /// <summary>
+    /// XmReportDtl实体定义类
+    /// </summary>
+    [Serializable]
 	[DataContract(Namespace = "")]
-	public partial class XmReportDtlModel : EntityBase<XmReportDtlModel>
-	{
+    public partial class XmReportDtlModel : EntityBase<XmReportDtlModel>
+    {
 		/// <summary>
 		/// 构造函数
 		/// </summary>
@@ -137,15 +137,79 @@ namespace GXM3.XM.Model.Domain
 			set;
 		}
 
-		/// <summary>
+        /// <summary>
 		/// 费用项目代码
 		/// </summary>
 		[DataMember]
-		public virtual System.String CostitemCode
-		{
-			get;
-			set;
-		}
-	}
+        public virtual System.String CostitemCode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 返回金额
+		/// </summary>
+		[DataMember]
+        public virtual System.Decimal FReturnAmount
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 变量1
+		/// </summary>
+		[DataMember]
+        public virtual System.Decimal FVariable1
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 单位1
+		/// </summary>
+		[DataMember]
+        public virtual System.String FUnit1
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 变量2
+		/// </summary>
+		[DataMember]
+        public virtual System.Decimal FVariable2
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 单位2
+		/// </summary>
+		[DataMember]
+        public virtual System.String FUnit2
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 变量3
+		/// </summary>
+		[DataMember]
+        public virtual System.Decimal FVariable3
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 单位3
+		/// </summary>
+		[DataMember]
+        public virtual System.String FUnit3
+        {
+            get;
+            set;
+        }
+    }
 
 }

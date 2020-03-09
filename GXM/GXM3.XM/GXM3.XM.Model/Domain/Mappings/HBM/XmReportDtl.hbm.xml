@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping namespace="GXM3.XM.Model.Domain" assembly="GXM3.XM.Model" xmlns="urn:nhibernate-mapping-2.2">
-  <class name="XmReportDtlModel" table="XM3_ReportDtl">
-    <id name="PhId" access="property" column="Phid" >
-      <generator class="assigned">
-      </generator>
-    </id>
-    <version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
-    <property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
-    <property name="XmPhid" column="xm_phid" type="System.Int64" not-null="false" />
-    <property name="XmName" column="xm_name" type="System.String" length="500" not-null="false" />
-    <property name="FNum" column="f_num" type="System.Int32" not-null="false" />
-    <property name="FPrice" column="f_price" type="System.Decimal" precision="18" scale="2" not-null="false" />
-    <property name="FAmount" column="f_amount" type="System.Decimal" precision="18" scale="2" not-null="false" />
-    <property name="FIsCost" column="f_isCost" type="System.Int32" not-null="false" />
-    <property name="FRemark" column="f_remark" type="System.String" length="500" not-null="false" />
-    <property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
-    <property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
-    <property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
-    <property name="Creator" column="creator" type="System.Int64" not-null="true" />
-    <property name="Editor" column="editor" type="System.Int64" not-null="true" />
+	<class name="XmReportDtlModel" table="XM3_ReportDtl">
+		<id name="PhId" access="property" column="Phid" >
+			<generator class="assigned">
+			</generator>
+		</id>
+		<version name="NgRecordVer" column="ng_record_ver" type="System.Int32" />
+		<property name="MstPhid" column="mst_phid" type="System.Int64" not-null="false" />
+		<property name="XmPhid" column="xm_phid" type="System.Int64" not-null="false" />
+		<property name="XmName" column="xm_name" type="System.String" length="500" not-null="false" />
+		<property name="FNum" column="f_num" type="System.Int32" not-null="false" />
+		<property name="FPrice" column="f_price" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="FAmount" column="f_amount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+		<property name="FIsCost" column="f_isCost" type="System.Int32" not-null="false" />
+		<property name="FRemark" column="f_remark" type="System.String" length="500" not-null="false" />
+		<property name="NgInsertDt" column="ng_insert_dt" type="System.DateTime" not-null="true" />
+		<property name="NgUpdateDt" column="ng_update_dt" type="System.DateTime" not-null="true" />
+		<property name="CurOrgId" column="cur_orgid" type="System.Int64" not-null="true" />
+		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
+		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
     <property name="CostitemCode" column="costitem_code" type="System.String" length="100" not-null="false" />
+    <property name="FReturnAmount" column="f_returnamount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FVariable1" column="f_variable1" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FUnit1" column="f_unit1" type="System.String" length="100" not-null="false" />
+    <property name="FVariable2" column="f_variable2" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FUnit2" column="f_unit2" type="System.String" length="100" not-null="false" />
+    <property name="FVariable3" column="f_variable3" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FUnit3" column="f_unit3" type="System.String" length="100" not-null="false" />
   </class>
 </hibernate-mapping>

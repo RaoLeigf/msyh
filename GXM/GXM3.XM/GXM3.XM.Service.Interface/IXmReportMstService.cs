@@ -23,18 +23,18 @@ using GXM3.XM.Model.Domain;
 
 namespace GXM3.XM.Service.Interface
 {
-    /// <summary>
-    /// XmReportMst服务组装层接口
-    /// </summary>
+	/// <summary>
+	/// XmReportMst服务组装层接口
+	/// </summary>
     public partial interface IXmReportMstService : IEntServiceBase<XmReportMstModel>
     {
-        #region IXmReportMstService 业务添加的成员
+		#region IXmReportMstService 业务添加的成员
 
         /// <summary>
         /// 保存数据
         /// </summary>
-        /// <param name="xmReportMstEntity"></param>
-        /// <param name="xmReportDtlEntities"></param>
+		/// <param name="xmReportMstEntity"></param>
+		/// <param name="xmReportDtlEntities"></param>
         /// <returns></returns>
         SavedResult<Int64> SaveXmReportMst(XmReportMstModel xmReportMstEntity, List<XmReportDtlModel> xmReportDtlEntities);
 
@@ -57,6 +57,21 @@ namespace GXM3.XM.Service.Interface
         /// <param name="phid">单据主键</param>
         /// <returns></returns>
         XmReportMstModel GetMSYHProjectReport(long phid);
+
+        /// <summary>
+        /// 保存签报单额度返还明细
+        /// </summary>
+        /// <param name="XmReportReturns"></param>
+        /// <returns></returns>
+        SavedResult<Int64> SaveReturn(List<XmReportReturnModel> XmReportReturns);
+
+        /// <summary>
+        /// 额度分配后金额的保存
+        /// </summary>
+        /// <param name="Msts"></param>
+        /// <param name="XmReportDtls"></param>
+        /// <returns></returns>
+        string SaveReturnAmount(List<XmReportMstModel> Msts, List<XmReportDtlModel> XmReportDtls);
         #endregion
     }
 }
