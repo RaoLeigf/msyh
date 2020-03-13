@@ -1002,6 +1002,12 @@ namespace GSP3.SP.Facade
                             {
                                 payments[0].FProjStatus = 2;//把项目状态改成项目草案
                             }
+
+                            //不影响老逻辑，只处理
+                            if(gAppval.FBilltype == BillType.ExpendBudeget)
+                            {
+                                payments[0].FDateofDeclaration = DateTime.Now;
+                            }
                             //savedResult = this.GKPaymentMstRule.Save<long>(paymentMst[0]);
                             updatePro.Add(payments[0]);
                         }

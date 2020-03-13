@@ -4427,10 +4427,10 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                                 mstforminfo.PersistentState = PersistentState.Modified;
                                 if (mstforminfo.FProjStatus == 1)
                                 {
-                                    if (!string.IsNullOrEmpty(mstforminfo.FApproveStatus) && mstforminfo.FApproveStatus != "1" && mstforminfo.FApproveStatus != "4")
-                                    {
-                                        return DCHelper.ErrorMessage("审批以及审批成功的项目立项单据不能进行修改！");
-                                    }
+                                    //if (!string.IsNullOrEmpty(mstforminfo.FApproveStatus) && mstforminfo.FApproveStatus != "1" && mstforminfo.FApproveStatus != "4")
+                                    //{
+                                    //    return DCHelper.ErrorMessage("审批以及审批成功的项目立项单据不能进行修改！");
+                                    //}
                                 }
                                 else if (mstforminfo.FProjStatus == 2)
                                 {
@@ -4517,7 +4517,6 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     //申报进度
                     if (string.IsNullOrEmpty(mstforminfo.FType)) //项目保存时，如果没有进度状态，则增加
                     {
-
                         var processStatus = BudgetProcessCtrlService.FindBudgetProcessCtrl(mstforminfo.FDeclarationUnit, mstforminfo.FBudgetDept, mstforminfo.FYear);
                         //单位进度控制为1时，是年初申报，为3时，为年中调整
                         if (processStatus == "1")
@@ -4563,6 +4562,28 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         mstforminfo.FDeclarationDept = ProjectMstService.GetDefaultDept(projectAllData.UserId);
                         //申报人id
                         mstforminfo.FDeclarerId = projectAllData.UserId;
+                        #region 生成项目编码       
+                        string maxCode = "";
+                        //获取最大项目库编码
+                        if (allCodes != null && allCodes.Count > 0)
+                        {
+                            maxCode = allCodes.ToList().FindAll(t => t.StartsWith(projCode)) == null ? "" : allCodes.ToList().FindAll(t => t.StartsWith(projCode)).Max();
+                        }
+                        //分发的编码再加6位流水线号
+                        if (string.IsNullOrEmpty(maxCode))
+                        {
+                            projCode = mstforminfo.FProjCode + "000001";
+                        }
+                        else
+                        {
+                            projCode = mstforminfo.FProjCode + string.Format("{0:D6}", int.Parse(maxCode.Substring(maxCode.Length - 6, 6)) + 1);
+                        }
+                        allCodes.Add(projCode);
+                        mstforminfo.FProjCode = projCode;
+                        #endregion
+                    }
+                    else if(mstforminfo.PersistentState == PersistentState.Modified)
+                    {
                         #region 生成项目编码       
                         string maxCode = "";
                         //获取最大项目库编码
@@ -4632,8 +4653,69 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 {
                     foreach (var pro in projectAlls)
                     {
+                        var proCode = pro.ProjectMst.FProjCode.Remove(pro.ProjectMst.FProjCode.Length - 6, 6);
+                        var qtxm = QtXmDistributeService.Find(p => p.FProjcode == proCode && p.Orgcode == pro.ProjectMst.FDeclarationUnit)?.Data?.FirstOrDefault();
+                        var oldCode = string.Empty;
+                        if (pro.ProjectMst.PersistentState == PersistentState.Modified)
+                        {
+                            var project = ProjectMstService.Find(p => p.PhId == pro.ProjectMst.PhId).Data.FirstOrDefault();
+                            if(project != null)
+                            {
+                                oldCode = project.FProjCode.Remove(project.FProjCode.Length - 6, 6);
+                            }
+                            
+                        }
                         //保存数据
                         savedresult = ProjectMstService.SaveProjectMst(pro.ProjectMst, null, null, null, null, null, pro.ProjectDtlBudgetDtls, null);
+                        //更新项目项目的引用状态
+
+                        
+                        if (pro.ProjectMst.PersistentState == PersistentState.Added)
+                        {
+                            //var qtxm = QtXmDistributeService.Find(p => p.FProjcode == proCode && p.Orgcode == pro.ProjectMst.FDeclarationUnit)?.Data?.First();
+                            if(qtxm != null && qtxm.Isactive != 1)
+                            {
+                                qtxm.Isactive = 1;
+                                qtxm.PersistentState = PersistentState.Modified;
+                                QtXmDistributeService.Save<Int64>(qtxm, "");
+                            }
+                        }
+                        else if(pro.ProjectMst.PersistentState == PersistentState.Deleted)
+                        {
+                            //var qtxm = QtXmDistributeService.Find(p => p.FProjcode == proCode && p.Orgcode == pro.ProjectMst.FDeclarationUnit)?.Data?.First();
+                            var projects = ProjectMstService.Find(p => p.FProjCode.StartsWith(proCode) && p.FDeclarationUnit == pro.ProjectMst.FDeclarationUnit).Data;
+
+                            if((projects == null || projects.Count == 0) && qtxm != null && qtxm.Isactive != 0)
+                            {
+                                qtxm.Isactive = 0;
+                                qtxm.PersistentState = PersistentState.Modified;
+                                QtXmDistributeService.Save<Int64>(qtxm, "");
+                            }
+                        }
+                        else if(pro.ProjectMst.PersistentState == PersistentState.Modified)
+                        {
+                            //var qtxm = QtXmDistributeService.Find(p => p.FProjcode == proCode && p.Orgcode == pro.ProjectMst.FDeclarationUnit)?.Data?.First();
+                            
+
+                            if(oldCode != pro.ProjectMst.FProjCode)
+                            {
+                                if (qtxm != null)
+                                {
+                                    qtxm.Isactive = 1;
+                                    qtxm.PersistentState = PersistentState.Modified;
+                                    QtXmDistributeService.Save<Int64>(qtxm, "");
+                                }
+
+                                var projects = ProjectMstService.Find(p => p.FProjCode.StartsWith(oldCode) && p.FDeclarationUnit == pro.ProjectMst.FDeclarationUnit).Data;
+                                qtxm = QtXmDistributeService.Find(p => p.FProjcode == oldCode && p.Orgcode == pro.ProjectMst.FDeclarationUnit)?.Data?.FirstOrDefault();
+                                if ((projects == null || projects.Count == 0) && qtxm != null)
+                                {
+                                    qtxm.Isactive = 0;
+                                    qtxm.PersistentState = PersistentState.Modified;
+                                    QtXmDistributeService.Save<Int64>(qtxm, "");
+                                }
+                            }
+                        }
                     }
                 }
                 return DataConverterHelper.SerializeObject(savedresult);
@@ -5708,7 +5790,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                         //验证项目编码是否正确
                         var qtXmDistribute = QtXmDistributeService.Find(p => p.FProjcode == fProjCode && p.Orgid
-                         == request.OrgId).Data.ToList();
+                         == request.OrgId && p.IfUse == 1).Data.ToList();
                         if (qtXmDistribute == null || qtXmDistribute.Count == 0)
                         {
                             throw new Exception($"第{i + 1}行数据上传失败。(【项目编码】不正确)");
@@ -5906,6 +5988,14 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         //projectAllData.ProjectDtlBudgetDtls = projectdtlList.ToList();
                         //allList.Add(projectAllData);
                         ProjectMstService.SaveProjectMst(projectMst, null, null, null, null, null, projectdtlList.ToList(), null);
+                        var proCode = projectMst.FProjCode.Remove(projectMst.FProjCode.Length - 6, 6);
+                        var qtxm = QtXmDistributeService.Find(p => p.FProjcode == proCode && p.Orgcode == projectMst.FDeclarationUnit)?.Data?.FirstOrDefault();
+                        if (qtxm != null && qtxm.Isactive != 1)
+                        {
+                            qtxm.Isactive = 1;
+                            qtxm.PersistentState = PersistentState.Modified;
+                            QtXmDistributeService.Save<Int64>(qtxm, "");
+                        }
                     }
 
 
@@ -6053,6 +6143,41 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 Costitem = syssets,//费用说明
             };
             return DataConverterHelper.SerializeObject(data);
+        }
+
+       
+        /// <summary>
+        /// 获取单个支出预算项目详情
+        /// </summary>
+        /// <param name="projectMst"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetProjectInfo([FromUri]ProjectMstRequest projectMst)
+        {
+            if (projectMst.FProjPhId == 0)
+            {
+                return DCHelper.ErrorMessage("项目主键不能为空！");
+            }
+
+            try
+            {
+                ProjectAllDataModel projectAllData = new ProjectAllDataModel();
+                projectAllData.ProjectMst = ProjectMstService.Find(projectMst.FProjPhId).Data;
+
+                //返回对象增加附件
+                if (projectAllData.ProjectMst != null)
+                {
+                    projectAllData.ProjectAttachments = QtAttachmentService.Find(t => t.BTable == "XM3_PROJECTMST" && t.RelPhid == projectAllData.ProjectMst.PhId).Data.ToList();
+                }
+                projectAllData.ProjectDtlBudgetDtls = ProjectMstService.FindProjectDtlBudgetDtlByForeignKey(projectMst.FProjPhId).Data.ToList();
+                projectAllData.ProjectDtlBudgetDtls.Sort((ProjectDtlBudgetDtlModel dtl1, ProjectDtlBudgetDtlModel dtl2) => dtl1.FDtlCode.CompareTo(dtl2.FDtlCode));
+
+                return DataConverterHelper.SerializeObject(projectAllData);
+            }
+            catch (Exception ex)
+            {
+                return DCHelper.ErrorMessage(ex.Message);
+            }
         }
         #endregion
         #endregion

@@ -147,7 +147,7 @@ namespace Enterprise3.WebApi.GSP3.SP.Model.Common
                             xm.F_DECLARER Declarer 
                             from sp3_appval_record sp
                             left join XM3_PROJECTMST xm on sp.refbill_phid=xm.phid
-                            where sp.opera_phid='{0}' and xm.f_year='{1}' and xm.F_DECLARATIONDEPT in ({2}) and sp.f_approval in ('{3}') and sp.f_billtype='{4}'
+                            where sp.opera_phid='{0}' and xm.f_year='{1}' and xm.F_DECLARATIONUNIT in ({2}) and sp.f_approval in ('{3}') and sp.f_billtype='{4}'
                             and sp.proc_phid in (select phid from sp3_appval_proc where splx_phid='{5}') and sp.POST_PHID !=0
                             order by sp.f_date desc";
                     break;

@@ -269,7 +269,7 @@ namespace GSP3.SP.Service
 
                 }
             }
-            if(billType == BillType.BeginProject || billType == BillType.MiddleProject)
+            if(billType == BillType.BeginProject || billType == BillType.MiddleProject || billType == BillType.ExpendBudeget)
             {
                 dic.Clear();
                 new CreateCriteria(dic).Add(ORMRestrictions<long>.Eq("PhId", phid));

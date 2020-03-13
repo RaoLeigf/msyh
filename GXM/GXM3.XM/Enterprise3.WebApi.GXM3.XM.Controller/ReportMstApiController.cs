@@ -151,7 +151,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 List<XmReportMstModel> Msts = XmReportMstService.Find(x => x.XmPhid == XmReportMst.XmPhid).Data.ToList();
                 Msts.OrderByDescending(x => x.FCode);
-                if (Msts == null)
+                if (Msts == null || Msts.Count == 0)
                 {
                     XmReportMst.FCode = XmReportMst.FProjCode + "0001";
                 }

@@ -108,6 +108,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Response
             set;
         }
 
+        /// <summary>
+        /// 启用或停用 true代表启用，false代表停用
+        /// </summary>
+        [DataMember]
+        public virtual bool IfUse
+        {
+            get;
+            set;
+        }
         #region 项目分发所需
         /// <summary>
         /// 分发组织id
