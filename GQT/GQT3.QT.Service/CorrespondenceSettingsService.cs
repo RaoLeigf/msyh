@@ -998,18 +998,19 @@ namespace GQT3.QT.Service
         /// 得到完整登录信息（组织用户）
         /// </summary>
         /// <returns></returns>
-        public string GetLogininfo(long OrgId,long UserId)
+        public string GetLogininfo(long OrgId, long UserId)
         {
-            if (OrgId==0)
+            if (OrgId == 0)
             {
                 return DCHelper.ErrorMessage("组织id为空！");
             }
 
-            if (UserId==0)
+            if (UserId == 0)
             {
                 return DCHelper.ErrorMessage("用户id为空！");
             }
-            List<string> suiteList = new List<string> {  "GJS", "NYS", "NYK", "NJX", "NBF", "GYK" };//"GYS",
+            //民生银行权限全在GXM
+            List<string> suiteList = new List<string> { "GXM" };//{  "GJS", "NYS", "NYK", "NJX", "NBF", "GYK" };//"GYS",
             Dictionary<string, string> MenuButton = new Dictionary<string, string>();
             OrganizeModel Org = OrganizationFacade.Find(OrgId).Data;
             User2Model User = UserFacade.Find(UserId).Data;
@@ -1069,10 +1070,10 @@ namespace GQT3.QT.Service
             }
 
             //取物料
-            List<string> wlList = new List<string> { "GJS", "NYS", "NYK", "NJX", "NBF", "GYK" };
-            List<string> wlCodeList = new List<string> { "12130", "12131", "12132", "12133", "12134", "12135" };
+            //List<string> wlList = new List<string> { "GJS", "NYS", "NYK", "NJX", "NBF", "GYK" };
+            //List<string> wlCodeList = new List<string> { "12130", "12131", "12132", "12133", "12134", "12135" };
             Dictionary<string, bool> wlRight = new Dictionary<string, bool>();
-            try
+            /*try
             {
                 for (var j = 0; j < wlCodeList.Count; j++)
                 {
@@ -1084,13 +1085,13 @@ namespace GQT3.QT.Service
             catch (Exception ex)
             {
 
-            }
+            }*/
 
             var data = new
             {
                 Org = Org,
                 User = User,
-                MenuButton= MenuButton,
+                MenuButton = MenuButton,
                 appinfo = new
                 {
                     /*logid = "9999",
@@ -1100,16 +1101,16 @@ namespace GQT3.QT.Service
                     orgID = "488181024000002",
                     dbServer = "MTAuMC4xMy4xNjg6MTUyMS9uM25q",
                     uCode = "0006"*/
-                    logid= User.UserNo,
-                    username= User.UserName,
-                    ocode= Org.OCode,
+                    logid = User.UserNo,
+                    username = User.UserName,
+                    ocode = Org.OCode,
                     userID = AppInfoBase.UserID,
-                    orgID= AppInfoBase.OrgID,
-                    dbServer= Convert.ToBase64String(System.Text.Encoding.Default.GetBytes(AppInfoBase.DbServerName)),
-                    uCode= AppInfoBase.UCode
+                    orgID = AppInfoBase.OrgID,
+                    dbServer = Convert.ToBase64String(System.Text.Encoding.Default.GetBytes(AppInfoBase.DbServerName)),
+                    uCode = AppInfoBase.UCode
                 },
-                Year= Year,
-                wlRight= wlRight
+                Year = Year,
+                wlRight = wlRight
             };
             return DataConverterHelper.SerializeObject(data);
         }
@@ -1518,6 +1519,18 @@ namespace GQT3.QT.Service
             var org = OrganizationFacade.Find(x=> orgphidList.Contains(x.PhId), "OCode").Data.ToList().Select(x=>x.OName).ToList();
             var str = string.Join(",", org.ToArray());
             return str;
+        }
+
+        /// <summary>
+        /// 得到组织列表
+        /// </summary>
+        /// <param name="orgphidList"></param>
+        /// <returns></returns>
+        public List<OrganizeModel> GetOrgInfo(List<long> orgIds)
+        {
+            var orgList = OrganizationFacade.Find(x => orgIds.Contains(x.PhId), "OCode").Data.ToList();
+            
+            return orgList;
         }
 
         /// <summary>

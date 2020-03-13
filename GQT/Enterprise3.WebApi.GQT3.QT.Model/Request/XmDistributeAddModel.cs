@@ -49,6 +49,16 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Request
             get;
             set;
         }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        [DataMember]
+        public virtual bool IfUse
+        {
+            get;
+            set;
+        } = true;
         /// <summary>
         /// 用户id
         /// </summary>

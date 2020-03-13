@@ -9,6 +9,7 @@ using SUP.Common.Base;
 using SUP.Common.DataEntity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +55,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             [FromUri]int FBusinessOrder,
             [FromUri]int Sort)
         {
+            
             if (OrgPhid == 0)
             {
                 return DCHelper.ErrorMessage("组织ID为空！");
@@ -64,9 +66,12 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             {
                 FProjname = string.Empty;
             }
+           
             var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == OrgPhid).Data.ToList();
-            //取有权限修改的
+           
+            //有权限修改的项目数据
             var data1 = QtXmDistributeService.Find(x => x.Distributeorgid == OrgPhid && x.FProjname.Contains(FProjname), "FProjcode").Data.ToList();
+            var orgList = new List<long>();
             if (data1 != null && data1.Count > 0)
             {
                 var data2 = new List<QtXmDistributeModel>();
@@ -74,12 +79,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 foreach (var code in FProjcodeList1)
                 {
                     data2 = data1.FindAll(x => x.FProjcode == code);
-                    XmDistributeModel a = new XmDistributeModel();
-                    a.CurOrgId = data2.First(p => p.FProjcode == code).CurOrgId;
-                    a.CanFF = true;
-                    a.FProjcode = code;
-                    a.FProjname = data2[0].FProjname;
-                    a.FBusiness = data2[0].FBusiness;
+                    XmDistributeModel a = new XmDistributeModel
+                    {
+                        CurOrgId = data2.First(p => p.FProjcode == code).CurOrgId,
+                        CanFF = true,
+                        FProjcode = code,
+                        FProjname = data2[0].FProjname,
+                        FBusiness = data2[0].FBusiness,
+                        IfUse = data2.Find(p => p.Orgid == OrgPhid).IfUse == 0 ? false : true
+                };
                     if (!string.IsNullOrEmpty(a.FBusiness) && syssets != null)
                     {
                         if (syssets.Find(x => x.TypeCode == a.FBusiness) != null)
@@ -96,7 +104,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             var disabled = data2.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
                             a.EnableOrgList2.Add(new { phid = o, disabled = disabled });
                         }
-                        a.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(a.EnableOrgList);
+                        //a.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(a.EnableOrgList);
+                        orgList.AddRange(a.EnableOrgList);
                     }
                     if (data2.FindAll(x => x.Isactive == 1).Count > 0)
                     {
@@ -106,10 +115,11 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     {
                         a.CanUpdate = true;
                     }
+                    
                     result.Add(a);
                 }
             }
-
+            
             //取没分发权限的
             var data3 = QtXmDistributeService.Find(x => x.Distributeorgid != OrgPhid && x.Orgid == OrgPhid && x.FProjname.Contains(FProjname)).Data.ToList();
 
@@ -120,12 +130,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 foreach (var code in FProjcodeList2)
                 {
                     data4 = QtXmDistributeService.Find(x => x.FProjcode == code).Data.ToList();
-                    XmDistributeModel b = new XmDistributeModel();
-                    b.CurOrgId = data3.First(p => p.FProjcode == code).CurOrgId;
-                    b.CanFF = false;
-                    b.FProjcode = code;
-                    b.FProjname = data4[0].FProjname;
-                    b.FBusiness = data4[0].FBusiness;
+                    XmDistributeModel b = new XmDistributeModel
+                    {
+                        CurOrgId = data3.First(p => p.FProjcode == code).CurOrgId,
+                        CanFF = false,
+                        FProjcode = code,
+                        FProjname = data4[0].FProjname,
+                        FBusiness = data4[0].FBusiness,
+                        IfUse = data3.Find(p => p.Orgid == OrgPhid).IfUse == 0 ? false : true
+                    };
                     if (!string.IsNullOrEmpty(b.FBusiness) && syssets != null)
                     {
                         if (syssets.Find(x => x.TypeCode == b.FBusiness) != null)
@@ -143,13 +156,22 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             b.EnableOrgList2.Add(new { phid = o, disabled = disabled });
                         }
                         //b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
-                        b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
+                        //b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
+                        orgList.AddRange(b.EnableOrgList);
                     }
                     b.CanUpdate = false;
+                    
                     result.Add(b);
                 }
             }
-
+            orgList = orgList.Distinct().ToList();
+            var EnableOrgInfo = CorrespondenceSettingsService.GetOrgInfo(orgList);
+            foreach(var r in result)
+            {
+                r.EnableOrgStr = string.Join(",", EnableOrgInfo.Where(p => r.EnableOrgList.Contains(p.PhId))
+                    .OrderBy(p => p.OCode)
+                    .Select(p => p.OName)); 
+            }
             //先排编号
             if (Sort == 0)
             {
@@ -192,8 +214,10 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     result = result.OrderByDescending(x => x.FProjcode).ToList();
                 }
             }
+            
+
             //result = result.OrderBy(x => x.FProjcode).ToList();
-            return DCHelper.ModelListToJson<XmDistributeModel>(result, (Int32)result.Count);
+            return DCHelper.ModelListToJson<XmDistributeModel>(result, (Int32)result.Count); ;
         }
 
         /// <summary>
@@ -228,15 +252,18 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 data.data.Reverse();
                 for (var i = 0; i < data.data.Count; i++)
                 {
-                    QtXmDistributeModel model = new QtXmDistributeModel();
-                    model.FProjcode = QtXmDistributeService.CreateOrGetMaxProjCode(data.Year);
-                    model.FProjname = data.data[i].FProjname;
-                    model.FBusiness = data.data[i].FBusiness;
-                    model.Orgid = data.Orgid;
-                    model.Orgcode = data.Orgcode;
-                    model.Distributeorgid = data.Orgid;
-                    model.Distributeuserid = data.userid;
-                    model.PersistentState = PersistentState.Added;
+                    QtXmDistributeModel model = new QtXmDistributeModel
+                    {
+                        FProjcode = QtXmDistributeService.CreateOrGetMaxProjCode(data.Year),
+                        FProjname = data.data[i].FProjname,
+                        FBusiness = data.data[i].FBusiness,
+                        Orgid = data.Orgid,
+                        Orgcode = data.Orgcode,
+                        Distributeorgid = data.Orgid,
+                        Distributeuserid = data.userid,
+                        PersistentState = PersistentState.Added,
+                        IfUse = data.IfUse ? (byte)1 : (byte)0
+                    };
                     modelList.Add(model);
                 }
             }
@@ -313,6 +340,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     model.Orgcode = orglist1.Find(x => x.PhId == a).OCode;
                     model.Distributeorgid = data.orgid;
                     model.Distributeuserid = data.userid;
+                    model.IfUse = (byte)1;
                     model.PersistentState = PersistentState.Added;
                     rundata.Add(model);
                 }
@@ -334,11 +362,33 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             foreach (var a in rundata)
             {
+                if(a.Distributeorgid == data.orgid)
+                {
+                    a.IfUse = data.IfUse ? (byte)1 : (byte)0;
+                }
                 a.FProjname = data.FProjname;
                 a.FBusiness = data.FBusiness;
                 a.PersistentState = PersistentState.Modified;
             }
             savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
+            return DataConverterHelper.SerializeObject(savedresult);
+        }
+
+        /// <summary>
+        /// 修改启用状态
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public string PostUpdateUse([FromBody]XmDistributeModel data)
+        {
+            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && x.Orgid == data.CurOrgId).Data?.First();
+
+
+            rundata.PersistentState = PersistentState.Modified;
+            rundata.IfUse = data.IfUse ? (byte)1 : (byte)0;
+            var savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
+
             return DataConverterHelper.SerializeObject(savedresult);
         }
 
@@ -390,7 +440,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             try
             {
                 var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == OrgPhid).Data.ToList();
-                data = QtXmDistributeService.Find(x => x.Orgid == OrgPhid, "FProjcode").Data.ToList();
+                data = QtXmDistributeService.Find(x => x.Orgid == OrgPhid && x.IfUse == 1, "FProjcode desc").Data.ToList();
                 if (data != null && data.Count > 0)
                 {
                     foreach (var i in data)

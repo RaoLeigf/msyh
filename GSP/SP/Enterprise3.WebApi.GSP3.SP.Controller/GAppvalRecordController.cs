@@ -100,15 +100,15 @@ namespace Enterprise3.WebApi.GSP3.SP.Controller
             {
                 int total = 0;
                 //若是初次加载，则获取所有组织的审批信息
-                if(billRequest.IsFirst == 1)
-                {
+                //if (billRequest.IsFirst == 1)
+                //{
                     //RELATID = 'lg' AND PARENTORG IS null
                     var orgRelatitems = this.OrgRelatitem2Service.Find(t => t.RelatId == "lg" && t.ParentOrgId == 0).Data;
-                    if(orgRelatitems != null && orgRelatitems.Count == 1)
+                    if (orgRelatitems != null && orgRelatitems.Count == 1)
                     {
                         billRequest.Orgid = orgRelatitems[0].OrgId;
                     }
-                }
+                //}
                 List<AppvalRecordVo> recordVos = this.GAppvalRecordService.GetUnDoRecordList(billRequest, out total);
                 return DataConverterHelper.SerializeObject(new {
                     Status= "success",
@@ -277,15 +277,15 @@ namespace Enterprise3.WebApi.GSP3.SP.Controller
                 if(procTypes != null && procTypes.Count > 0)
                 {
                     //若是初次加载，则获取所有组织的审批信息
-                    if (billRequest.IsFirst == 1)
-                    {
+                    //if (billRequest.IsFirst == 1)
+                    //{
                         //RELATID = 'lg' AND PARENTORG IS null
                         var orgRelatitems = this.OrgRelatitem2Service.Find(t => t.RelatId == "lg" && t.ParentOrgId == 0).Data;
                         if (orgRelatitems != null && orgRelatitems.Count == 1)
                         {
                             billRequest.Orgid = orgRelatitems[0].OrgId;
                         }
-                    }
+                    //}
                     foreach (var sysSet in procTypes)
                     {
                         

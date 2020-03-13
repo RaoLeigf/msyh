@@ -128,6 +128,16 @@ namespace GQT3.QT.Model.Domain
             get;
             set;
         }
-    }
+
+		/// <summary>
+		/// 启用或停用 1代表启用，0代表停用
+		/// </summary>
+		[DataMember]
+		public virtual Byte IfUse
+		{
+			get;
+			set;
+		}
+	}
 
 }

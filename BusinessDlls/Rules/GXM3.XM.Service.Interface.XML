@@ -484,5 +484,20 @@
             <param name="phid">单据主键</param>
             <returns></returns>
         </member>
+        <member name="M:GXM3.XM.Service.Interface.IXmReportMstService.SaveReturn(System.Collections.Generic.List{GXM3.XM.Model.Domain.XmReportReturnModel})">
+            <summary>
+            保存签报单额度返还明细
+            </summary>
+            <param name="XmReportReturns"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GXM3.XM.Service.Interface.IXmReportMstService.SaveReturnAmount(System.Collections.Generic.List{GXM3.XM.Model.Domain.XmReportMstModel},System.Collections.Generic.List{GXM3.XM.Model.Domain.XmReportDtlModel})">
+            <summary>
+            额度分配后金额的保存
+            </summary>
+            <param name="Msts"></param>
+            <param name="XmReportDtls"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

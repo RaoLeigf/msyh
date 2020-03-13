@@ -19,5 +19,6 @@
 		<property name="Creator" column="creator" type="System.Int64" not-null="true" />
 		<property name="Editor" column="editor" type="System.Int64" not-null="true" />
     <property name="FBusiness" column="f_business" type="System.String" length="100" not-null="false" />
+    <property name="IfUse" column="ifuse" type="System.Byte" not-null="false" />
 	</class>
 </hibernate-mapping>

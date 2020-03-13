@@ -257,6 +257,13 @@ namespace GQT3.QT.Service.Interface
         string GetOrgStr(List<long> orgphidList);
 
         /// <summary>
+        /// 得到组织列表
+        /// </summary>
+        /// <param name="orgphidList"></param>
+        /// <returns></returns>
+        List<OrganizeModel> GetOrgInfo(List<long> orgIds);
+
+        /// <summary>
         /// 得到组织代码列表
         /// </summary>
         /// <param name="orgphidList"></param>
