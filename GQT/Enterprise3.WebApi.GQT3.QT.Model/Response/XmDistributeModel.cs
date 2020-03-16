@@ -112,7 +112,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Response
         /// 启用或停用 true代表启用，false代表停用
         /// </summary>
         [DataMember]
-        public virtual bool IfUse
+        public virtual byte IfUse
         {
             get;
             set;

@@ -86,7 +86,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         FProjcode = code,
                         FProjname = data2[0].FProjname,
                         FBusiness = data2[0].FBusiness,
-                        IfUse = data2.Find(p => p.Orgid == OrgPhid).IfUse == 0 ? false : true
+                        IfUse = data2.Find(p => p.Orgid == OrgPhid).IfUse
                 };
                     if (!string.IsNullOrEmpty(a.FBusiness) && syssets != null)
                     {
@@ -137,7 +137,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         FProjcode = code,
                         FProjname = data4[0].FProjname,
                         FBusiness = data4[0].FBusiness,
-                        IfUse = data3.Find(p => p.Orgid == OrgPhid).IfUse == 0 ? false : true
+                        IfUse = data3.Find(p => p.Orgid == OrgPhid).IfUse
                     };
                     if (!string.IsNullOrEmpty(b.FBusiness) && syssets != null)
                     {
@@ -262,7 +262,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         Distributeorgid = data.Orgid,
                         Distributeuserid = data.userid,
                         PersistentState = PersistentState.Added,
-                        IfUse = data.IfUse ? (byte)1 : (byte)0
+                        //IfUse = data.IfUse ? (byte)1 : (byte)0
+                        IfUse = data.data[i].IfUse
                     };
                     modelList.Add(model);
                 }
@@ -364,7 +365,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             {
                 if(a.Distributeorgid == data.orgid)
                 {
-                    a.IfUse = data.IfUse ? (byte)1 : (byte)0;
+                    a.IfUse = data.IfUse;
                 }
                 a.FProjname = data.FProjname;
                 a.FBusiness = data.FBusiness;
@@ -386,7 +387,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
 
 
             rundata.PersistentState = PersistentState.Modified;
-            rundata.IfUse = data.IfUse ? (byte)1 : (byte)0;
+            rundata.IfUse = data.IfUse;
             var savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
 
             return DataConverterHelper.SerializeObject(savedresult);

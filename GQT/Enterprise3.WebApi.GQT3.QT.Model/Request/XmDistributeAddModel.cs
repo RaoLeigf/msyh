@@ -51,15 +51,6 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Request
         }
 
         /// <summary>
-        /// 是否启用
-        /// </summary>
-        [DataMember]
-        public virtual bool IfUse
-        {
-            get;
-            set;
-        }
-        /// <summary>
         /// 用户id
         /// </summary>
         [DataMember]
@@ -67,5 +58,6 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Request
         {
             get; set;
         }
+
     }
 }
