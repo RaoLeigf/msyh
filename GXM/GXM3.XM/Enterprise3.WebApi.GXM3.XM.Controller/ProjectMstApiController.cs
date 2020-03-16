@@ -74,6 +74,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         IQtXmDistributeService QtXmDistributeService { get; set; }
 
         IBudgetAccountsService BudgetAccountsService { get; set; }
+
+        IOrgRelatitem2Service OrgRelatitem2Service { get; set; }
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -95,6 +97,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             GAppvalProcService = base.GetObject<IGAppvalProcService>("GSP3.SP.Service.GAppvalProc");
             QtXmDistributeService = base.GetObject<IQtXmDistributeService>("GQT3.QT.Service.QtXmDistribute");
             BudgetAccountsService = base.GetObject<IBudgetAccountsService>("GQT3.QT.Service.BudgetAccounts");
+            OrgRelatitem2Service = base.GetObject<IOrgRelatitem2Service>("GQT3.QT.Service.OrgRelatitem2");
         }
 
         /// <summary>
@@ -4390,9 +4393,10 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
                 //保存信息
                 SavedResult<Int64> savedresult = new SavedResult<Int64>();
-
+                
                 foreach (var projectData in projectAllData.ProjectAllDataModels)
                 {
+                    var ProjChange = false;//若为修改且修改了引用的项目时为true
                     ProjectAllDataModel projectAll = new ProjectAllDataModel();
 
                     ProjectMstModel mstforminfo = new ProjectMstModel();
@@ -4584,25 +4588,29 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                     }
                     else if(mstforminfo.PersistentState == PersistentState.Modified)
                     {
-                        #region 生成项目编码       
-                        string maxCode = "";
-                        //获取最大项目库编码
-                        if (allCodes != null && allCodes.Count > 0)
+                        if (projCode.Length == 12)
                         {
-                            maxCode = allCodes.ToList().FindAll(t => t.StartsWith(projCode)) == null ? "" : allCodes.ToList().FindAll(t => t.StartsWith(projCode)).Max();
+                            ProjChange = true;
+                            #region 生成项目编码       
+                            string maxCode = "";
+                            //获取最大项目库编码
+                            if (allCodes != null && allCodes.Count > 0)
+                            {
+                                maxCode = allCodes.ToList().FindAll(t => t.StartsWith(projCode)) == null ? "" : allCodes.ToList().FindAll(t => t.StartsWith(projCode)).Max();
+                            }
+                            //分发的编码再加6位流水线号
+                            if (string.IsNullOrEmpty(maxCode))
+                            {
+                                projCode = mstforminfo.FProjCode + "000001";
+                            }
+                            else
+                            {
+                                projCode = mstforminfo.FProjCode + string.Format("{0:D6}", int.Parse(maxCode.Substring(maxCode.Length - 6, 6)) + 1);
+                            }
+                            allCodes.Add(projCode);
+                            mstforminfo.FProjCode = projCode;
+                            #endregion
                         }
-                        //分发的编码再加6位流水线号
-                        if (string.IsNullOrEmpty(maxCode))
-                        {
-                            projCode = mstforminfo.FProjCode + "000001";
-                        }
-                        else
-                        {
-                            projCode = mstforminfo.FProjCode + string.Format("{0:D6}", int.Parse(maxCode.Substring(maxCode.Length - 6, 6)) + 1);
-                        }
-                        allCodes.Add(projCode);
-                        mstforminfo.FProjCode = projCode;
-                        #endregion
                     }
 
 
@@ -4617,7 +4625,15 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         mstforminfo.FProjAmount = projectdtlbudgetdtlgridinfo.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted).Sum(t => t.FAmount);
 
                         //暂存该项目下有效的明细编码
-                        List<string> alldtlCodes = projectdtlbudgetdtlgridinfo.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted && !string.IsNullOrEmpty(t.FDtlCode)).Select(t => t.FDtlCode).ToList();
+                        List<string> alldtlCodes = new List<string>();
+                        if (ProjChange == true)
+                        {
+                            
+                        }
+                        else
+                        {
+                            alldtlCodes = projectdtlbudgetdtlgridinfo.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted && !string.IsNullOrEmpty(t.FDtlCode)).Select(t => t.FDtlCode).ToList();
+                        }
                         for (var i = 0; i < projectdtlbudgetdtlgridinfo.Count; i++)
                         {
                             if (projectdtlbudgetdtlgridinfo[i].PersistentState == PersistentState.Deleted)
@@ -4635,6 +4651,20 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                                 else
                                 {
                                     projectdtlbudgetdtlgridinfo[i].FDtlCode = projCode + string.Format("{0:D4}", 1);
+                                }
+                            }
+                            else
+                            {
+                                if (ProjChange == true)
+                                {
+                                    if (alldtlCodes != null && alldtlCodes.Count > 0)
+                                    {
+                                        projectdtlbudgetdtlgridinfo[i].FDtlCode = projCode + string.Format("{0:D4}", int.Parse(alldtlCodes.Max().Substring(alldtlCodes.Max().Length - 4, 4)) + 1);
+                                    }
+                                    else
+                                    {
+                                        projectdtlbudgetdtlgridinfo[i].FDtlCode = projCode + string.Format("{0:D4}", 1);
+                                    }
                                 }
                             }
                             dtlCode = projectdtlbudgetdtlgridinfo[i].FDtlCode;
@@ -5314,10 +5344,13 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         {
             // 待上报预算
             Dictionary<string, object> dicWhere1 = new Dictionary<string, object>();
-            new CreateCriteria(dicWhere1).Add(ORMRestrictions<string>.Eq("FApproveStatus", "3"))
+            new CreateCriteria(dicWhere1).Add(ORMRestrictions<string>.Eq("FApproveStatus", "1"))
                 .Add(ORMRestrictions<Int32>.Eq("FLifeCycle", 0))
                 .Add(ORMRestrictions<Int64>.Eq("FDeclarerId", paramters.UserId))
-                .Add(ORMRestrictions<string>.Eq("FDeclarationUnit", paramters.OrgCode));
+                .Add(ORMRestrictions<string>.Eq("FDeclarationUnit", paramters.OrgCode))
+                .Add(ORMRestrictions<string>.Eq("FYear", paramters.Year))
+                .Add(ORMRestrictions<List<Int32>>.In("FProjStatus", new List<Int32> { 1 }))
+                .Add(ORMRestrictions<byte>.Eq("FDeleteMark", (byte)0));
             var ProjectCount = ProjectMstService.Find(dicWhere1).Data.Count;
 
             //待上报调整预算
@@ -5336,6 +5369,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 List<QTSysSetModel> procTypes = QTSysSetService.GetProcTypes();
                 if (procTypes != null && procTypes.Count > 0)
                 {
+                    var orgRelatitems = this.OrgRelatitem2Service.Find(t => t.RelatId == "lg" && t.ParentOrgId == 0).Data;
+                    if (orgRelatitems != null && orgRelatitems.Count == 1)
+                    {
+                        billRequest.Orgid = orgRelatitems[0].OrgId;
+                    }
                     foreach (var sysSet in procTypes)
                     {
                         billRequest.BType = sysSet.Value;

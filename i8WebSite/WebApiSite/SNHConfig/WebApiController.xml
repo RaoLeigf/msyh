@@ -159,6 +159,8 @@
     <property name="PerformEvalTargetTypeService" ref="GQT3.QT.Service.PerformEvalTargetType"/>
     <property name="GAppvalRecordService" ref="GSP3.SP.Service.GAppvalRecord"/>
     <property name="GAppvalProcService" ref="GSP3.SP.Service.GAppvalProc"/>
+    <property name="QtXmDistributeService" ref="GQT3.QT.Service.QtXmDistribute"/>
+    <property name="OrgRelatitem2Service" ref="GQT3.QT.Service.OrgRelatitem2"/>
   </object>
 
   <object type="Enterprise3.WebApi.GXM3.XM.Controller.ReportMstApiController, Enterprise3.WebApi.GXM3.XM.Controller" singleton="false">
