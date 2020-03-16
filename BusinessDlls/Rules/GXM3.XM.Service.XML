@@ -596,6 +596,14 @@
             <param name="uploadPath"></param>
             <returns></returns>
         </member>
+        <member name="M:GXM3.XM.Service.ProjectMstService.GetProjectMstDtlByOrgAndSubitem(System.String,System.String)">
+            <summary>
+            通过项目分项
+            </summary>
+            <param name="subitemcode"></param>
+            <param name="orgId"></param>
+            <returns></returns>
+        </member>
         <member name="T:GXM3.XM.Service.Resources">
             <summary>
               一个强类型的资源类，用于查找本地化的字符串等。

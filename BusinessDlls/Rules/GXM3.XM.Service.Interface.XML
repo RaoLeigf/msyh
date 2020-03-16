@@ -450,6 +450,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:GXM3.XM.Service.Interface.IProjectMstService.GetProjectMstDtlByOrgAndSubitem(System.String,System.String)">
+            <summary>
+            通过项目分项
+            </summary>
+            <param name="subitemcode"></param>
+            <param name="orgId"></param>
+            <returns></returns>
+        </member>
         <member name="T:GXM3.XM.Service.Interface.IXmReportMstService">
             <summary>
             XmReportMst服务组装层接口

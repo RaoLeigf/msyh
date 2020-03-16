@@ -69,6 +69,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
 
         IProjectMstService ProjectMstService { get; set; }
 
+        //IProjectDtlService ProjectDtlService { get; set; }
+
         IBudgetMstService BudgetMstService { get; set; }
 
         IExpenseMstService ExpenseMstService { get; set; }
@@ -3408,7 +3410,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             else
                             {
                                 //删除前需要判断有没有被引用
-                                var qtXmDistributeList = QtXmDistributeService.Find(x => x.FBusiness == pro.TypeCode);
+                                var qtXmDistributeList = QtXmDistributeService.Find(x => x.FBusiness == pro.TypeCode && x.Distributeorgid == pro.Orgid);
                                 if (qtXmDistributeList != null && qtXmDistributeList.Data != null && qtXmDistributeList.Data.Count > 0)
                                 {
                                     return DCHelper.ErrorMessage("存在被引用的数据！");
@@ -3502,7 +3504,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             else
                             {
                                 //删除前需要判断有没有被引用
-                                var qtXmDistributeList = QtXmDistributeService.Find(x => x.FBusiness == pro.TypeCode);
+                                var qtXmDistributeList = QtXmDistributeService.Find(x => x.FBusiness == pro.TypeCode && x.Distributeorgid == pro.Orgid);
                                 if (qtXmDistributeList != null && qtXmDistributeList.Data != null && qtXmDistributeList.Data.Count > 0)
                                 {
                                     return DCHelper.ErrorMessage("存在被引用的数据！");
@@ -4287,6 +4289,29 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         foreach (var pro in resultSysSet)
                         {
                             var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
+                            if(pro.PersistentState == PersistentState.Deleted
+                                )
+                            {
+                                var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(pro.TypeCode, pro.Orgcode);
+                                if (ifUse)
+                                {
+                                    return DCHelper.ErrorMessage("存在被引用的数据！");
+                                }
+                            };
+                            if(pro.PersistentState == PersistentState.Modified)
+                            {
+                                var data = QTSysSetService.Find(pro.PhId).Data;
+                                if(data.TypeCode != pro.TypeCode
+                                    || data.TypeName != pro.TypeName
+                                    || data.Bz != pro.Bz)
+                                {
+                                    var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(pro.TypeCode, pro.Orgcode);
+                                    if (ifUse)
+                                    {
+                                        return DCHelper.ErrorMessage("存在被引用的数据！");
+                                    }
+                                }
+                            }
                             if (pro.PersistentState != PersistentState.Deleted)
                             {
                                 if (string.IsNullOrEmpty(pro.TypeCode))
@@ -4384,6 +4409,29 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         foreach (var pro in resultSysSet)
                         {
                             var orgname = allOrgs.Find(t => t.PhId == pro.Orgid) == null ? "" : allOrgs.Find(t => t.PhId == pro.Orgid).OName;
+                            if (pro.PersistentState == PersistentState.Deleted
+                                )
+                            {
+                                var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(pro.TypeCode, pro.Orgcode);
+                                if (ifUse)
+                                {
+                                    return DCHelper.ErrorMessage("存在被引用的数据！");
+                                }
+                            };
+                            if (pro.PersistentState == PersistentState.Modified)
+                            {
+                                var data = QTSysSetService.Find(pro.PhId).Data;
+                                if (data.TypeCode != pro.TypeCode
+                                    || data.TypeName != pro.TypeName
+                                    || data.Bz != pro.Bz)
+                                {
+                                    var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(pro.TypeCode, pro.Orgcode);
+                                    if (ifUse)
+                                    {
+                                        return DCHelper.ErrorMessage("存在被引用的数据！");
+                                    }
+                                }
+                            }
                             if (pro.PersistentState != PersistentState.Deleted)
                             {
                                 if (string.IsNullOrEmpty(pro.TypeCode))

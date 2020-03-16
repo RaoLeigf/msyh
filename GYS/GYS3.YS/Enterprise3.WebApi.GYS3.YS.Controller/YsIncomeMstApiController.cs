@@ -228,7 +228,8 @@ namespace Enterprise3.WebApi.GYS3.YS.Controller
             }
             try
             {
-                if (param.YsIncomeMst.FApproval != 0 || param.YsIncomeMst.FIsbudget != 0)
+                if ((param.YsIncomeMst.FApproval != 0 && param.YsIncomeMst.FApproval != 2)
+                    || param.YsIncomeMst.FIsbudget != 0)
                 {
                     return DCHelper.ErrorMessage("只有待送审,未生成预算的收入预算可以进行修改！");
                 }

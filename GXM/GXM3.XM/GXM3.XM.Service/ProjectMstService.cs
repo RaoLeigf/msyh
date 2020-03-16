@@ -8684,6 +8684,34 @@ namespace GXM3.XM.Service
             return "";
         }
 
+        /// <summary>
+        /// 通过项目分项
+        /// </summary>
+        /// <param name="subitemcode"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public bool GetProjectMstDtlByOrgAndSubitem(string subitemcode, string orgCode)
+        {
+            //var result = new List<ProjectDtlBudgetDtlModel>();
+
+            var dtlList = ProjectDtlBudgetDtlFacade.Find(p => p.FSubitemCode == subitemcode).Data;
+            if(dtlList == null || dtlList.Count == 0)
+            {
+                return false;
+            }
+
+            var MstIds = dtlList.Select(p => p.MstPhid);
+
+            var mstList = ProjectMstFacade.Find(p => MstIds.Contains(p.PhId) && p.FDeclarationUnit == orgCode).Data;
+
+            if(mstList != null && mstList.Count > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         #region//签报单相关
         //public XmReportMstModel GetMSYHProjectReport(long phid)
         //{

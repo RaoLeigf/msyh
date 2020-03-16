@@ -269,7 +269,7 @@ namespace GSP3.SP.Service
 
                 }
             }
-            if(billType == BillType.BeginProject || billType == BillType.MiddleProject || billType == BillType.ExpendBudeget)
+            if(billType == BillType.BeginProject || billType == BillType.MiddleProject )
             {
                 dic.Clear();
                 new CreateCriteria(dic).Add(ORMRestrictions<long>.Eq("PhId", phid));
@@ -304,7 +304,43 @@ namespace GSP3.SP.Service
                 }
 
             }
-            if(billType == BillType.MiddleAddBudget || billType == BillType.MiddleUpdateBudget|| billType == BillType.MiddleDtlBudget || billType == BillType.MiddleBudget)
+            if (billType == BillType.ExpendBudeget)
+            {
+                dic.Clear();
+                new CreateCriteria(dic).Add(ORMRestrictions<long>.Eq("PhId", phid));
+                var gKpayment = this.ProjectMstFacade.Find(dic).Data;
+                if (gKpayment.Count > 0)
+                {
+                    IList<GAppvalRecordModel> records2 = GAppvalRecordFacade.Find(t => t.RefbillPhid == gKpayment[0].PhId && t.FBilltype == BillType.ExpendBudeget).Data.OrderByDescending(t => t.FSendDate).ToList();
+                    if (records2 != null && records2.Count > 0)
+                    {
+                        var result = this.GAppvalRecordFacade.GetAppvalRecordList(gKpayment[0].PhId, records2[0].ProcPhid, BillType.ExpendBudeget);
+                        if (result.Count > 0)
+                        {
+                            foreach (var record in result)
+                            {
+                                recordModels.Add(record);
+                            }
+                        }
+                    }
+                    //IList<GAppvalRecordModel> records = GAppvalRecordFacade.Find(t => t.RefbillPhid == gKpayment[0].PhId && t.FBilltype == BillType.MiddleProject).Data.OrderByDescending(t => t.FSendDate).ToList();
+                    //if (records != null && records.Count > 0)
+                    //{
+                    //    var result = this.GAppvalRecordFacade.GetAppvalRecordList(gKpayment[0].PhId, records[0].ProcPhid, BillType.MiddleProject);
+                    //    if (result.Count > 0)
+                    //    {
+                    //        foreach (var record in result)
+                    //        {
+                    //            recordModels.Add(record);
+                    //        }
+                    //    }
+                    //}
+                    recordModels = recordModels.OrderBy(t => t.FSeq).OrderBy(t => t.FSendDate).ToList();
+                }
+
+            }
+
+            if (billType == BillType.MiddleAddBudget || billType == BillType.MiddleUpdateBudget|| billType == BillType.MiddleDtlBudget || billType == BillType.MiddleBudget)
             {
                 dic.Clear();
                 new CreateCriteria(dic).Add(ORMRestrictions<long>.Eq("PhId", phid));

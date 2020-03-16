@@ -494,6 +494,14 @@ namespace GXM3.XM.Service.Interface
         /// </summary>
         /// <returns></returns>
         string ExportXMData(List<QtXmDistributeModel> data);
+
+        /// <summary>
+        /// 通过项目分项
+        /// </summary>
+        /// <param name="subitemcode"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        bool GetProjectMstDtlByOrgAndSubitem(string subitemcode, string orgCode);
         #endregion
     }
 }

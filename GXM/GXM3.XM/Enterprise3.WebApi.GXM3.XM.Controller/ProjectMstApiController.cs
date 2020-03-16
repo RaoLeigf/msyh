@@ -5717,12 +5717,12 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         var fBudgetDept = row.GetCell(4)?.ToString()?.Trim() ?? string.Empty;//费用归属
                         var fName = row.GetCell(5)?.ToString()?.Trim() ?? string.Empty;//费用说明
                         long.TryParse(row.GetCell(6)?.ToString()?.Trim() ?? "0", out long fAmount);//费用金额
-                        var fBudgetAccounts = row.GetCell(7)?.ToString()?.Trim() ?? string.Empty;//科目名称
-                        var fSubitemName = row.GetCell(8)?.ToString()?.Trim() ?? string.Empty;//支出分项名称
-                        var fIsApply = row.GetCell(9)?.ToString()?.Trim() ?? string.Empty;//是否申请补助
-                        var fIsPurchase = row.GetCell(10)?.ToString()?.Trim() ?? string.Empty;//是否集中采购
-                        var fIsReport = row.GetCell(11)?.ToString()?.Trim() ?? string.Empty;//是否必须签报列支
-                        var fIsResolution = row.GetCell(12)?.ToString()?.Trim() ?? string.Empty;//是否集体决议
+                        //var fBudgetAccounts = row.GetCell(7)?.ToString()?.Trim() ?? string.Empty;//科目名称
+                        //var fSubitemName = row.GetCell(8)?.ToString()?.Trim() ?? string.Empty;//支出分项名称
+                        var fIsApply = row.GetCell(7)?.ToString()?.Trim() ?? string.Empty;//是否申请补助
+                        var fIsPurchase = row.GetCell(8)?.ToString()?.Trim() ?? string.Empty;//是否集中采购
+                        var fIsReport = row.GetCell(9)?.ToString()?.Trim() ?? string.Empty;//是否必须签报列支
+                        var fIsResolution = row.GetCell(10)?.ToString()?.Trim() ?? string.Empty;//是否集体决议
                         //var fIsShare = row.GetCell(13)?.ToString()?.Trim() ?? string.Empty;//是否个人额度分摊
 
                         var projectMstUpload = new ProjectMstUpload
@@ -5735,8 +5735,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                             FBudgetDept = fBudgetDept,
                             FName = fName,
                             FAmount = fAmount,
-                            FBudgetAccounts = fBudgetAccounts,
-                            FSubitemName = fBusinessName,
+                            //FBudgetAccounts = fBudgetAccounts,
+                            //FSubitemName = fBusinessName,
                             FIsApply = fIsApply,
                             FIsPurchase = fIsPurchase,
                             FIsReport = fIsReport,
@@ -5823,33 +5823,33 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         }
                         projectMstUpload.FBudgetDeptCode = depts.Where(p => p.OName == fBudgetDept).First().OCode;
 
-                        //科目名称（选填）fBudgetAccounts	
-                        if (fBudgetAccounts != string.Empty)
-                        {
-                            var budgetAccounts = BudgetAccountsService.Find(p => p.KMMC == fBudgetAccounts);
+                        ////科目名称（选填）fBudgetAccounts	
+                        //if (fBudgetAccounts != string.Empty)
+                        //{
+                        //    var budgetAccounts = BudgetAccountsService.Find(p => p.KMMC == fBudgetAccounts);
 
-                            if (budgetAccounts.Data == null || budgetAccounts.Data.Count == 0)
-                            {
-                                throw new Exception($"第{i + 1}行数据上传失败。(【科目名称】不正确)");
-                            }
+                        //    if (budgetAccounts.Data == null || budgetAccounts.Data.Count == 0)
+                        //    {
+                        //        throw new Exception($"第{i + 1}行数据上传失败。(【科目名称】不正确)");
+                        //    }
 
-                            projectMstUpload.FBudgetAccountsCode = budgetAccounts.Data.First().KMDM;
-                        }
+                        //    projectMstUpload.FBudgetAccountsCode = budgetAccounts.Data.First().KMDM;
+                        //}
 
-                        //支出分项名称（选填）fSubitemName
-                        if (fSubitemName != string.Empty)
-                        {
-                            var fSubitemBusiness = QTSysSetService.Find(p => p.Orgid == request.OrgId
-                            && p.TypeName == fSubitemName
-                            && p.DicType == "ZcfxName");
+                        ////支出分项名称（选填）fSubitemName
+                        //if (fSubitemName != string.Empty)
+                        //{
+                        //    var fSubitemBusiness = QTSysSetService.Find(p => p.Orgid == request.OrgId
+                        //    && p.TypeName == fSubitemName
+                        //    && p.DicType == "ZcfxName");
 
-                            if (fSubitemBusiness.Data == null || fSubitemBusiness.Data.Count == 0)
-                            {
-                                throw new Exception($"第{i + 1}行数据上传失败。(【支出分项名称】不正确)");
-                            }
+                        //    if (fSubitemBusiness.Data == null || fSubitemBusiness.Data.Count == 0)
+                        //    {
+                        //        throw new Exception($"第{i + 1}行数据上传失败。(【支出分项名称】不正确)");
+                        //    }
 
-                            projectMstUpload.FSubitemCode = fSubitemBusiness.Data.First().TypeCode;
-                        }
+                        //    projectMstUpload.FSubitemCode = fSubitemBusiness.Data.First().TypeCode;
+                        //}
 
                         #endregion
 
