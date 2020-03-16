@@ -58,7 +58,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Request
         {
             get;
             set;
-        } = true;
+        }
         /// <summary>
         /// 用户id
         /// </summary>
