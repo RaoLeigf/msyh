@@ -4305,7 +4305,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                                     || data.TypeName != pro.TypeName
                                     || data.Bz != pro.Bz)
                                 {
-                                    var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(pro.TypeCode, pro.Orgcode);
+                                    var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(data.TypeCode, data.Orgcode);
                                     if (ifUse)
                                     {
                                         return DCHelper.ErrorMessage("存在被引用的数据！");
@@ -4425,7 +4425,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                                     || data.TypeName != pro.TypeName
                                     || data.Bz != pro.Bz)
                                 {
-                                    var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(pro.TypeCode, pro.Orgcode);
+                                    var ifUse = ProjectMstService.GetProjectMstDtlByOrgAndSubitem(data.TypeCode, data.Orgcode);
                                     if (ifUse)
                                     {
                                         return DCHelper.ErrorMessage("存在被引用的数据！");
