@@ -101,8 +101,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         a.EnableOrgList2 = new List<object>();
                         foreach (var o in a.EnableOrgList)
                         {
-                            var disabled = data2.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
-                            a.EnableOrgList2.Add(new { phid = o, disabled = disabled });
+                            if (o == OrgPhid)
+                            {
+                                a.EnableOrgList2.Add(new { phid = o, disabled = true });
+                            }
+                            else
+                            {
+                                var disabled = data2.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
+                                a.EnableOrgList2.Add(new { phid = o, disabled = disabled });
+                            }
                         }
                         //a.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(a.EnableOrgList);
                         orgList.AddRange(a.EnableOrgList);
@@ -146,7 +153,9 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                             b.FBusiness_EXName = syssets.Find(x => x.TypeCode == b.FBusiness).TypeName;
                         }
                     }
-                    b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
+                    b.EnableOrgList = new List<long>();
+                    b.EnableOrgList.Add(OrgPhid);
+                    /*b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
                     if (b.EnableOrgList != null && b.EnableOrgList.Count > 0)
                     {
                         b.EnableOrgList2 = new List<object>();
@@ -158,9 +167,11 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                         //b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
                         //b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
                         orgList.AddRange(b.EnableOrgList);
-                    }
-                    b.CanUpdate = false;
-                    
+                    }*/
+
+                    //b.CanUpdate = false;
+                    b.CanUpdate = data4[0].Isactive == 1 ? false : true;
+
                     result.Add(b);
                 }
             }
@@ -330,6 +341,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             }
             if (AddOrg != null && AddOrg.Count > 0)
             {
+                //取存在这个业务代码的所有组织
+                var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == data.FBusiness).Data.Select(x=>x.Orgid).ToList();
+                syssetOrgs = syssetOrgs.Except(AddOrg).ToList();
+                if (syssetOrgs.Count > 0)
+                {
+                    string orgStr = CorrespondenceSettingsService.GetOrgStr(syssetOrgs);
+                    return DCHelper.ErrorMessage(orgStr+"  这些组织不存在该业务条线");
+                }
+
                 var orglist1 = CorrespondenceSettingsService.GetOrgCodeList(AddOrg);
                 foreach (var a in AddOrg)
                 {
