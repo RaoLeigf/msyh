@@ -1129,3 +1129,32 @@ CREATE TABLE dbo.z_qtxmdistribute
 	)
 GO
 
+------------------2020.03刘杭增加字段------------------
+--sqlserver
+alter table XM3_ReportDtl add costitem_code VARCHAR(100);//明细表增加费用说明的代码
+alter table XM3_ReportMst add f_Amount numeric(18,2);//主表增加签报单申请金额
+//签报单额度返还表
+CREATE TABLE dbo.XM3_ReportReturn
+	(
+	phid             BIGINT NOT NULL,
+	mst_phid		 BIGINT NULL,
+	f_time			 DATETIME NULL,
+	f_code           VARCHAR (100) NULL,
+	f_name           VARCHAR (500) NULL,
+	f_amount         numeric(18,2) NULL,
+	creator          BIGINT NULL,
+	editor           BIGINT NULL,
+	cur_orgid        BIGINT NULL,
+	ng_insert_dt     DATETIME NULL,
+	ng_update_dt     DATETIME NULL,
+	ng_record_ver    INT NULL,
+	CONSTRAINT pk_XM3_ReportReturn PRIMARY KEY (phid)
+	)
+GO;
+alter table XM3_ReportDtl add f_returnamount numeric(18,2);//明细表增加返还金额
+alter table XM3_ReportDtl add f_variable1 numeric(18,2);//明细表增加变量1
+alter table XM3_ReportDtl add f_unit1 VARCHAR(100);//明细表增加单位1
+alter table XM3_ReportDtl add f_variable2 numeric(18,2);//明细表增加变量2
+alter table XM3_ReportDtl add f_unit2 VARCHAR(100);//明细表增加单位2
+alter table XM3_ReportDtl add f_variable3 numeric(18,2);//明细表增加变量3
+alter table XM3_ReportDtl add f_unit3 VARCHAR(100);//明细表增加单位3
