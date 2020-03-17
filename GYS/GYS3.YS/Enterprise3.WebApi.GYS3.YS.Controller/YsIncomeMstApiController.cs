@@ -214,7 +214,8 @@ namespace Enterprise3.WebApi.GYS3.YS.Controller
         [HttpPost]
         public string PostSave([FromBody]AllYsIncomeRequestModel param)
         {
-            if(param.YsIncomeMst == null || param.YsIncomeDtls == null || param.YsIncomeDtls.Count <= 0)
+            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+            if (param.YsIncomeMst == null || param.YsIncomeDtls == null || param.YsIncomeDtls.Count <= 0)
             {
                 return DCHelper.ErrorMessage("传递的收入预算信息不能为空！");
             }
@@ -234,6 +235,7 @@ namespace Enterprise3.WebApi.GYS3.YS.Controller
                     return DCHelper.ErrorMessage("只有待送审,未生成预算的收入预算可以进行修改！");
                 }
                 IList<YsIncomeDtlModel> ysIncomeDtls = new List<YsIncomeDtlModel>();
+                watch.Start();
                 //先进行数据调整
                 if (param.YsIncomeMst.PhId == 0)
                 {
@@ -299,9 +301,16 @@ namespace Enterprise3.WebApi.GYS3.YS.Controller
                         }
                     }
                 }
+
+                watch.Stop();
+                var a = watch.ElapsedMilliseconds;
+                watch.Restart();
                 param.YsIncomeMst.FDeclareAmount = ysIncomeDtls.ToList().FindAll(t => t.PersistentState != PersistentState.Deleted).Sum(t => t.FBudgetamount);
                 SavedResult<long> savedResult = new SavedResult<long>();
                 savedResult = this.YsIncomeMstService.SaveYsIncome(param.YsIncomeMst, ysIncomeDtls);
+                watch.Stop();
+                var b = watch.ElapsedMilliseconds;
+         
                 return DataConverterHelper.SerializeObject(savedResult);
             }
             catch (Exception ex)
