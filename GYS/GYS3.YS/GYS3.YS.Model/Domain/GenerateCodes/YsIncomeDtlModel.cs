@@ -187,7 +187,17 @@ namespace GYS3.YS.Model.Domain
             get;
             set;
         }
-        #endregion
-    }
+
+		/// <summary>
+		/// 是否修改
+		/// </summary>
+		[DataMember]
+		public virtual bool edit
+		{
+			get;
+			set;
+		}
+		#endregion
+	}
 
 }

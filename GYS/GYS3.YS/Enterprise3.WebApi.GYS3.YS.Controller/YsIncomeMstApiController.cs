@@ -285,14 +285,19 @@ namespace Enterprise3.WebApi.GYS3.YS.Controller
                                     dtl.PersistentState = PersistentState.Modified;
                                 }
                             }
-                            ysIncomeDtls.Add(dtl);
+
+                            if(!(dtl.PersistentState == PersistentState.Modified && dtl.edit == false)){
+                                ysIncomeDtls.Add(dtl);
+                            }
+                            
                         }
                     }
                     else
                     {
                         foreach (var dtl in param.YsIncomeDtls)
                         {
-                            if(dtl.PhId == 0)
+                            
+                            if (dtl.PhId == 0)
                             {
                                 continue;
                             }
