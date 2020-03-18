@@ -291,8 +291,12 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostXmFF([FromBody]XmDistributeModel data)
         {
-            var selectdata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
-
+            //改成取新建时默认的那条数据（即分发组织分发给自己的单据）
+            var selectdata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && x.Distributeorgid==x.Orgid).Data.ToList();
+            if (selectdata==null ||selectdata.Count == 0 || selectdata.Count>1)
+            {
+                return DCHelper.ErrorMessage("该项目数据有问题！");
+            }
             //判断是否有权限操作
             var orgList = CorrespondenceSettingsService.GetAuthOrgList(data.userid)?.Select(p => p.PhId)?.ToList() ?? new List<long>();
 
@@ -342,7 +346,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             if (AddOrg != null && AddOrg.Count > 0)
             {
                 //取存在这个业务代码的所有组织
-                var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == data.FBusiness).Data.Select(x=>x.Orgid).ToList();
+                var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == selectdata[0].FBusiness).Data.Select(x=>x.Orgid).ToList();
                 syssetOrgs = syssetOrgs.Except(AddOrg).ToList();
                 if (syssetOrgs.Count > 0)
                 {
@@ -354,13 +358,13 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 foreach (var a in AddOrg)
                 {
                     QtXmDistributeModel model = new QtXmDistributeModel();
-                    model.FProjcode = data.FProjcode;
-                    model.FProjname = data.FProjname;
-                    model.FBusiness = data.FBusiness;
+                    model.FProjcode = selectdata[0].FProjcode;//data.FProjcode;
+                    model.FProjname = selectdata[0].FProjname;//data.FProjname;
+                    model.FBusiness = selectdata[0].FBusiness;//data.FBusiness;
                     model.Orgid = a;
                     model.Orgcode = orglist1.Find(x => x.PhId == a).OCode;
-                    model.Distributeorgid = data.orgid;
-                    model.Distributeuserid = data.userid;
+                    model.Distributeorgid = selectdata[0].Distributeorgid;//data.orgid;
+                    model.Distributeuserid = selectdata[0].Distributeuserid;//data.userid;
                     model.IfUse = (byte)1;
                     model.PersistentState = PersistentState.Added;
                     rundata.Add(model);
