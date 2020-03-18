@@ -12,7 +12,7 @@ packages/
 *.suo
 *.user
 *.sln.docstates
-
+*.dll
 # Build results
 [Dd]ebug/
 [Rr]elease/
@@ -75,3 +75,5 @@ ModelManifest.xml
 
 #Backup file
 *.bak
+sqlite3
+applicationhost.config
