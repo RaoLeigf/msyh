@@ -1,7 +1,8 @@
 # Build and Object Folders
 bin/
 obj/
-
+BusinessDlls/Rules/
+WebSite/NG3WebSite/i6Rules/
 # Nuget packages directory
 packages/
 
