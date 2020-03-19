@@ -81,6 +81,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     data2 = data1.FindAll(x => x.FProjcode == code);
                     XmDistributeModel a = new XmDistributeModel
                     {
+                        PhId= data2[0].PhId,
+                        Orgcode= data2[0].Orgcode,
                         CurOrgId = data2.First(p => p.FProjcode == code).CurOrgId,
                         CanFF = true,
                         FProjcode = code,
@@ -139,6 +141,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     data4 = QtXmDistributeService.Find(x => x.FProjcode == code).Data.ToList();
                     XmDistributeModel b = new XmDistributeModel
                     {
+                        PhId = data4[0].PhId,
+                        Orgcode = data4[0].Orgcode,
                         CurOrgId = data3.First(p => p.FProjcode == code).CurOrgId,
                         CanFF = false,
                         FProjcode = code,
@@ -346,12 +350,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             if (AddOrg != null && AddOrg.Count > 0)
             {
                 //取存在这个业务代码的所有组织
-                var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == selectdata[0].FBusiness).Data.Select(x=>x.Orgid).ToList();
-                syssetOrgs = syssetOrgs.Except(AddOrg).ToList();
-                if (syssetOrgs.Count > 0)
+                if (!string.IsNullOrEmpty(selectdata[0].FBusiness))
                 {
-                    string orgStr = CorrespondenceSettingsService.GetOrgStr(syssetOrgs);
-                    return DCHelper.ErrorMessage(orgStr+"  这些组织不存在该业务条线");
+                    var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == selectdata[0].FBusiness).Data.Select(x => x.Orgid).ToList();
+                    var ExceptOrgs = AddOrg.Except(syssetOrgs).ToList();
+                    if (ExceptOrgs.Count > 0)
+                    {
+                        string orgStr = CorrespondenceSettingsService.GetOrgStr(ExceptOrgs);
+                        return DCHelper.ErrorMessage(orgStr + "  这些组织不存在该业务条线");
+                    }
                 }
 
                 var orglist1 = CorrespondenceSettingsService.GetOrgCodeList(AddOrg);
@@ -383,7 +390,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostUpdate([FromBody]XmDistributeModel data)
         {
-            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
+            /*var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             foreach (var a in rundata)
             {
@@ -394,7 +401,23 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 a.FProjname = data.FProjname;
                 a.FBusiness = data.FBusiness;
                 a.PersistentState = PersistentState.Modified;
+            }*/
+            var rundata = QtXmDistributeService.Find(data.PhId).Data;
+
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit == rundata.Orgcode);
+            if (proMst != null && proMst.Data != null && proMst.Data.Count > 0)
+            {
+                return DataConverterHelper.SerializeObject(new
+                {
+                    Ststus = ResponseStatus.Error,
+                    Msg = "项目被引用，无法修改！"
+                });
             }
+            SavedResult<Int64> savedresult = new SavedResult<Int64>();
+            rundata.IfUse = data.IfUse;
+            rundata.FProjname = data.FProjname;
+            rundata.FBusiness = data.FBusiness;
+            rundata.PersistentState = PersistentState.Modified;
             savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
             return DataConverterHelper.SerializeObject(savedresult);
         }
@@ -407,7 +430,18 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostUpdateUse([FromBody]XmDistributeModel data)
         {
-            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && x.Orgid == data.CurOrgId).Data?.First();
+            var rundata = QtXmDistributeService.Find(data.PhId).Data;
+
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit == rundata.Orgcode);
+            if (proMst != null && proMst.Data != null && proMst.Data.Count > 0)
+            {
+                return DataConverterHelper.SerializeObject(new
+                {
+                    Ststus = ResponseStatus.Error,
+                    Msg = "项目被引用，无法停用！"
+                });
+            }
+            //var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && x.Orgid == data.CurOrgId).Data?.First();
 
 
             rundata.PersistentState = PersistentState.Modified;
@@ -425,24 +459,28 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostDelete([FromBody]XmDistributeModel data)
         {
-            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(data.FProjcode));
+
+            var rundata = QtXmDistributeService.Find(data.PhId).Data;
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit== rundata.Orgcode);
             if(proMst != null && proMst.Data != null && proMst.Data.Count > 0)
             {
                 return DataConverterHelper.SerializeObject(new
                 {
                     Ststus = ResponseStatus.Error,
-                    Msg = "项目被引用，无法删除"
+                    Msg = "项目被引用，无法删除！"
                 });
             }
-            
 
-            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
+
+            /*var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
             
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             foreach (var a in rundata)
             {
                 a.PersistentState = PersistentState.Deleted;
-            }
+            }*/
+            SavedResult<Int64> savedresult = new SavedResult<Int64>();
+            rundata.PersistentState= PersistentState.Deleted;
             savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
             return DataConverterHelper.SerializeObject(savedresult);
         }
