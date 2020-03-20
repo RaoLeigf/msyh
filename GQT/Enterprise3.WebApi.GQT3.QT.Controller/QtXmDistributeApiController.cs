@@ -81,6 +81,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     data2 = data1.FindAll(x => x.FProjcode == code);
                     XmDistributeModel a = new XmDistributeModel
                     {
+                        PhId= data2[0].PhId,
+                        Orgcode= data2[0].Orgcode,
                         CurOrgId = data2.First(p => p.FProjcode == code).CurOrgId,
                         CanFF = true,
                         FProjcode = code,
@@ -132,13 +134,40 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
 
             if (data3 != null && data3.Count > 0)
             {
-                var data4 = new List<QtXmDistributeModel>();
+                foreach(var s in data3)
+                {
+                    XmDistributeModel b = new XmDistributeModel
+                    {
+                        PhId = s.PhId,
+                        Orgcode = s.Orgcode,
+                        CurOrgId = s.CurOrgId,
+                        CanFF = false,
+                        FProjcode = s.FProjcode,
+                        FProjname = s.FProjname,
+                        FBusiness = s.FBusiness,
+                        IfUse = s.IfUse
+                    };
+                    if (!string.IsNullOrEmpty(b.FBusiness) && syssets != null)
+                    {
+                        if (syssets.Find(x => x.TypeCode == b.FBusiness) != null)
+                        {
+                            b.FBusiness_EXName = syssets.Find(x => x.TypeCode == b.FBusiness).TypeName;
+                        }
+                    }
+                    b.CanUpdate = s.Isactive == 1 ? false : true;
+                    b.EnableOrgList = new List<long>();
+                    b.EnableOrgList.Add(s.Orgid);
+                    result.Add(b);
+                }
+                /*var data4 = new List<QtXmDistributeModel>();
                 var FProjcodeList2 = data3.Select(x => x.FProjcode).Distinct().ToList();
                 foreach (var code in FProjcodeList2)
                 {
-                    data4 = QtXmDistributeService.Find(x => x.FProjcode == code).Data.ToList();
+                    data4 = data3.Find(x => x.FProjcode == code).Data.ToList();
                     XmDistributeModel b = new XmDistributeModel
                     {
+                        PhId = data4[0].PhId,
+                        Orgcode = data4[0].Orgcode,
                         CurOrgId = data3.First(p => p.FProjcode == code).CurOrgId,
                         CanFF = false,
                         FProjcode = code,
@@ -155,25 +184,25 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     }
                     b.EnableOrgList = new List<long>();
                     b.EnableOrgList.Add(OrgPhid);
-                    /*b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
-                    if (b.EnableOrgList != null && b.EnableOrgList.Count > 0)
-                    {
-                        b.EnableOrgList2 = new List<object>();
-                        foreach (var o in b.EnableOrgList)
-                        {
-                            var disabled = data4.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
-                            b.EnableOrgList2.Add(new { phid = o, disabled = disabled });
-                        }
-                        //b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
-                        //b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
-                        orgList.AddRange(b.EnableOrgList);
-                    }*/
+                    b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
+                    //if (b.EnableOrgList != null && b.EnableOrgList.Count > 0)
+                    //{
+                    //    b.EnableOrgList2 = new List<object>();
+                    //    foreach (var o in b.EnableOrgList)
+                    //    {
+                    //        var disabled = data4.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
+                    //        b.EnableOrgList2.Add(new { phid = o, disabled = disabled });
+                    //    }
+                    //    //b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
+                    //    //b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
+                    //    orgList.AddRange(b.EnableOrgList);
+                    //}
 
                     //b.CanUpdate = false;
                     b.CanUpdate = data4[0].Isactive == 1 ? false : true;
 
                     result.Add(b);
-                }
+                }*/
             }
             orgList = orgList.Distinct().ToList();
             var EnableOrgInfo = CorrespondenceSettingsService.GetOrgInfo(orgList);
@@ -301,11 +330,11 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             var orgList = CorrespondenceSettingsService.GetAuthOrgList(data.userid)?.Select(p => p.PhId)?.ToList() ?? new List<long>();
 
             //全部删除情况
-            if (data.EnableOrgList == null
+            /*if (data.EnableOrgList == null
                 || data.EnableOrgList.Count == 0)
             {
                 return DCHelper.ErrorMessage("默认组织不能被删除！");
-            }
+            }*/
 
             //没有任何权限
             if (orgList == null
@@ -314,10 +343,10 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 return DCHelper.ErrorMessage("没有权限修改！");
             }
             //没有修改的权限
-            if (data.EnableOrgList.Except(orgList).Count() > 0)
+            /*if (data.EnableOrgList.Except(orgList).Count() > 0)
             {
                 return DCHelper.ErrorMessage("没有权限修改！");
-            }
+            }*/
             //默认组织不能删除
             if (!data.EnableOrgList.Exists(p => p == selectdata.First().Distributeorgid))
             {
@@ -346,12 +375,15 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             if (AddOrg != null && AddOrg.Count > 0)
             {
                 //取存在这个业务代码的所有组织
-                var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == selectdata[0].FBusiness).Data.Select(x=>x.Orgid).ToList();
-                syssetOrgs = syssetOrgs.Except(AddOrg).ToList();
-                if (syssetOrgs.Count > 0)
+                if (!string.IsNullOrEmpty(selectdata[0].FBusiness))
                 {
-                    string orgStr = CorrespondenceSettingsService.GetOrgStr(syssetOrgs);
-                    return DCHelper.ErrorMessage(orgStr+"  这些组织不存在该业务条线");
+                    var syssetOrgs = QTSysSetService.Find(x => x.DicType == "Business" && x.TypeCode == selectdata[0].FBusiness).Data.Select(x => x.Orgid).ToList();
+                    var ExceptOrgs = AddOrg.Except(syssetOrgs).ToList();
+                    if (ExceptOrgs.Count > 0)
+                    {
+                        string orgStr = CorrespondenceSettingsService.GetOrgStr(ExceptOrgs);
+                        return DCHelper.ErrorMessage(orgStr + "  这些组织不存在该业务条线");
+                    }
                 }
 
                 var orglist1 = CorrespondenceSettingsService.GetOrgCodeList(AddOrg);
@@ -383,7 +415,7 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostUpdate([FromBody]XmDistributeModel data)
         {
-            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
+            /*var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             foreach (var a in rundata)
             {
@@ -394,7 +426,23 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 a.FProjname = data.FProjname;
                 a.FBusiness = data.FBusiness;
                 a.PersistentState = PersistentState.Modified;
+            }*/
+            var rundata = QtXmDistributeService.Find(data.PhId).Data;
+
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit == rundata.Orgcode);
+            if (proMst != null && proMst.Data != null && proMst.Data.Count > 0)
+            {
+                return DataConverterHelper.SerializeObject(new
+                {
+                    Ststus = ResponseStatus.Error,
+                    Msg = "项目被引用，无法修改！"
+                });
             }
+            SavedResult<Int64> savedresult = new SavedResult<Int64>();
+            rundata.IfUse = data.IfUse;
+            rundata.FProjname = data.FProjname;
+            rundata.FBusiness = data.FBusiness;
+            rundata.PersistentState = PersistentState.Modified;
             savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
             return DataConverterHelper.SerializeObject(savedresult);
         }
@@ -407,7 +455,18 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostUpdateUse([FromBody]XmDistributeModel data)
         {
-            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && x.Orgid == data.CurOrgId).Data?.First();
+            var rundata = QtXmDistributeService.Find(data.PhId).Data;
+
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit == rundata.Orgcode);
+            if (proMst != null && proMst.Data != null && proMst.Data.Count > 0)
+            {
+                return DataConverterHelper.SerializeObject(new
+                {
+                    Ststus = ResponseStatus.Error,
+                    Msg = "项目被引用，无法停用！"
+                });
+            }
+            //var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode && x.Orgid == data.CurOrgId).Data?.First();
 
 
             rundata.PersistentState = PersistentState.Modified;
@@ -425,24 +484,42 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         [HttpPost]
         public string PostDelete([FromBody]XmDistributeModel data)
         {
-            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(data.FProjcode));
+
+            var rundata = QtXmDistributeService.Find(data.PhId).Data;
+            if (rundata.Orgid == rundata.Distributeorgid)
+            {
+                var elsedata = QtXmDistributeService.Find(x => x.FProjcode == rundata.FProjcode && x.Orgid != rundata.Orgid).Data.ToList();
+                if(elsedata!=null || elsedata.Count > 0)
+                {
+                    return DataConverterHelper.SerializeObject(new
+                    {
+
+                        Ststus = ResponseStatus.Error,
+                        Msg = "项目已被分发给其他组织，无法删除！"
+                    });
+                }
+                
+            }
+            var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit== rundata.Orgcode);
             if(proMst != null && proMst.Data != null && proMst.Data.Count > 0)
             {
                 return DataConverterHelper.SerializeObject(new
                 {
                     Ststus = ResponseStatus.Error,
-                    Msg = "项目被引用，无法删除"
+                    Msg = "项目被引用，无法删除！"
                 });
             }
-            
 
-            var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
+
+            /*var rundata = QtXmDistributeService.Find(x => x.FProjcode == data.FProjcode).Data.ToList();
             
             SavedResult<Int64> savedresult = new SavedResult<Int64>();
             foreach (var a in rundata)
             {
                 a.PersistentState = PersistentState.Deleted;
-            }
+            }*/
+            SavedResult<Int64> savedresult = new SavedResult<Int64>();
+            rundata.PersistentState= PersistentState.Deleted;
             savedresult = QtXmDistributeService.Save<Int64>(rundata, "");
             return DataConverterHelper.SerializeObject(savedresult);
         }

@@ -138,5 +138,26 @@ namespace Enterprise3.WebApi.GQT3.QT.Model.Response
             set;
         }
         #endregion
+
+
+        /// <summary>
+		/// 加个单据主键（修改 删除的时候只修改当前单据）
+		/// </summary>
+		[DataMember]
+        public virtual System.Int64 PhId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 组织代码
+        /// </summary>
+        [DataMember]
+        public virtual System.String Orgcode
+        {
+            get;
+            set;
+        }
     }
 }
