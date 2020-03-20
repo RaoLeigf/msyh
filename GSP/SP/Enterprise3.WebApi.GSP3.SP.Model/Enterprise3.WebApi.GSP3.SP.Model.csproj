@@ -70,6 +70,7 @@
     <Compile Include="Request\PostRequestModel.cs" />
     <Compile Include="Request\ProcRequestModel.cs" />
     <Compile Include="Response\AppvalRecordVo.cs" />
+    <Compile Include="Response\BasePageList.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\GData\Common\GData3.Common.Utils\GData3.Common.Utils.csproj">
