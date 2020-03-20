@@ -1151,10 +1151,10 @@ CREATE TABLE dbo.XM3_ReportReturn
 	CONSTRAINT pk_XM3_ReportReturn PRIMARY KEY (phid)
 	)
 GO;
-alter table XM3_ReportDtl add f_returnamount numeric(18,2);//明细表增加返还金额
-alter table XM3_ReportDtl add f_variable1 numeric(18,2);//明细表增加变量1
-alter table XM3_ReportDtl add f_unit1 VARCHAR(100);//明细表增加单位1
-alter table XM3_ReportDtl add f_variable2 numeric(18,2);//明细表增加变量2
-alter table XM3_ReportDtl add f_unit2 VARCHAR(100);//明细表增加单位2
-alter table XM3_ReportDtl add f_variable3 numeric(18,2);//明细表增加变量3
-alter table XM3_ReportDtl add f_unit3 VARCHAR(100);//明细表增加单位3
+alter table XM3_ReportDtl add f_returnamount numeric(18,2);--明细表增加返还金额
+alter table XM3_ReportDtl add f_variable1 numeric(18,2);--明细表增加变量1
+alter table XM3_ReportDtl add f_unit1 VARCHAR(100);--明细表增加单位1
+alter table XM3_ReportDtl add f_variable2 numeric(18,2);--明细表增加变量2
+alter table XM3_ReportDtl add f_unit2 VARCHAR(100);--明细表增加单位2
+alter table XM3_ReportDtl add f_variable3 numeric(18,2);--明细表增加变量3
+alter table XM3_ReportDtl add f_unit3 VARCHAR(100);--明细表增加单位3

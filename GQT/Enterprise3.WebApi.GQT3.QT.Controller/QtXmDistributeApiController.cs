@@ -134,11 +134,36 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
 
             if (data3 != null && data3.Count > 0)
             {
-                var data4 = new List<QtXmDistributeModel>();
+                foreach(var s in data3)
+                {
+                    XmDistributeModel b = new XmDistributeModel
+                    {
+                        PhId = s.PhId,
+                        Orgcode = s.Orgcode,
+                        CurOrgId = s.CurOrgId,
+                        CanFF = false,
+                        FProjcode = s.FProjcode,
+                        FProjname = s.FProjname,
+                        FBusiness = s.FBusiness,
+                        IfUse = s.IfUse
+                    };
+                    if (!string.IsNullOrEmpty(b.FBusiness) && syssets != null)
+                    {
+                        if (syssets.Find(x => x.TypeCode == b.FBusiness) != null)
+                        {
+                            b.FBusiness_EXName = syssets.Find(x => x.TypeCode == b.FBusiness).TypeName;
+                        }
+                    }
+                    b.CanUpdate = s.Isactive == 1 ? false : true;
+                    b.EnableOrgList = new List<long>();
+                    b.EnableOrgList.Add(s.Orgid);
+                    result.Add(b);
+                }
+                /*var data4 = new List<QtXmDistributeModel>();
                 var FProjcodeList2 = data3.Select(x => x.FProjcode).Distinct().ToList();
                 foreach (var code in FProjcodeList2)
                 {
-                    data4 = QtXmDistributeService.Find(x => x.FProjcode == code).Data.ToList();
+                    data4 = data3.Find(x => x.FProjcode == code).Data.ToList();
                     XmDistributeModel b = new XmDistributeModel
                     {
                         PhId = data4[0].PhId,
@@ -159,25 +184,25 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     }
                     b.EnableOrgList = new List<long>();
                     b.EnableOrgList.Add(OrgPhid);
-                    /*b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
-                    if (b.EnableOrgList != null && b.EnableOrgList.Count > 0)
-                    {
-                        b.EnableOrgList2 = new List<object>();
-                        foreach (var o in b.EnableOrgList)
-                        {
-                            var disabled = data4.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
-                            b.EnableOrgList2.Add(new { phid = o, disabled = disabled });
-                        }
-                        //b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
-                        //b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
-                        orgList.AddRange(b.EnableOrgList);
-                    }*/
+                    b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
+                    //if (b.EnableOrgList != null && b.EnableOrgList.Count > 0)
+                    //{
+                    //    b.EnableOrgList2 = new List<object>();
+                    //    foreach (var o in b.EnableOrgList)
+                    //    {
+                    //        var disabled = data4.Find(x => x.Orgid == o).Isactive == 0 ? false : true;
+                    //        b.EnableOrgList2.Add(new { phid = o, disabled = disabled });
+                    //    }
+                    //    //b.EnableOrgList = data4.OrderBy(x => x.Orgcode).Select(x => x.Orgid).ToList();
+                    //    //b.EnableOrgStr = CorrespondenceSettingsService.GetOrgStr(b.EnableOrgList);
+                    //    orgList.AddRange(b.EnableOrgList);
+                    //}
 
                     //b.CanUpdate = false;
                     b.CanUpdate = data4[0].Isactive == 1 ? false : true;
 
                     result.Add(b);
-                }
+                }*/
             }
             orgList = orgList.Distinct().ToList();
             var EnableOrgInfo = CorrespondenceSettingsService.GetOrgInfo(orgList);
@@ -305,11 +330,11 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             var orgList = CorrespondenceSettingsService.GetAuthOrgList(data.userid)?.Select(p => p.PhId)?.ToList() ?? new List<long>();
 
             //全部删除情况
-            if (data.EnableOrgList == null
+            /*if (data.EnableOrgList == null
                 || data.EnableOrgList.Count == 0)
             {
                 return DCHelper.ErrorMessage("默认组织不能被删除！");
-            }
+            }*/
 
             //没有任何权限
             if (orgList == null
@@ -318,10 +343,10 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                 return DCHelper.ErrorMessage("没有权限修改！");
             }
             //没有修改的权限
-            if (data.EnableOrgList.Except(orgList).Count() > 0)
+            /*if (data.EnableOrgList.Except(orgList).Count() > 0)
             {
                 return DCHelper.ErrorMessage("没有权限修改！");
-            }
+            }*/
             //默认组织不能删除
             if (!data.EnableOrgList.Exists(p => p == selectdata.First().Distributeorgid))
             {
@@ -461,6 +486,20 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         {
 
             var rundata = QtXmDistributeService.Find(data.PhId).Data;
+            if (rundata.Orgid == rundata.Distributeorgid)
+            {
+                var elsedata = QtXmDistributeService.Find(x => x.FProjcode == rundata.FProjcode && x.Orgid != rundata.Orgid).Data.ToList();
+                if(elsedata!=null || elsedata.Count > 0)
+                {
+                    return DataConverterHelper.SerializeObject(new
+                    {
+
+                        Ststus = ResponseStatus.Error,
+                        Msg = "项目已被分发给其他组织，无法删除！"
+                    });
+                }
+                
+            }
             var proMst = ProjectMstService.Find(p => p.FProjCode.StartsWith(rundata.FProjcode) && p.FDeclarationUnit== rundata.Orgcode);
             if(proMst != null && proMst.Data != null && proMst.Data.Count > 0)
             {
