@@ -27,5 +27,11 @@
     <property name="Editor" column="editor" type="System.Int64" not-null="true" />
     <property name="FIsDraft" column="F_IsDraft" type="System.Int32" not-null="false" />
     <property name="FAmount" column="f_Amount" type="System.Decimal" precision="18" scale="2" not-null="false" />
+    <property name="FOpinion_bankleader" column="f_opinion_bankleader" type="System.String" length="500" not-null="false" />
+    <property name="FOffice_audit" column="f_office_audit" type="System.String" length="500" not-null="false" />
+    <property name="FOpinion_CWH" column="f_opinion_CWH" type="System.String" length="500" not-null="false" />
+    <property name="FCountersign" column="f_Countersign" type="System.String" length="500" not-null="false" />
+    <property name="FOpinion_SponsorDept" column="f_opinion_SponsorDept" type="System.String" length="500" not-null="false" />
+
   </class>
 </hibernate-mapping>

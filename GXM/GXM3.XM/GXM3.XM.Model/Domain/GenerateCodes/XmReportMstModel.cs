@@ -251,6 +251,57 @@ namespace GXM3.XM.Model.Domain
             get;
             set;
         }
+        #region 从OA处取的值
+        /// <summary>
+        /// 行领导意见
+        /// </summary>
+        [DataMember]
+        public virtual System.String FOpinion_bankleader
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 办公室审核
+		/// </summary>
+		[DataMember]
+        public virtual System.String FOffice_audit
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 财委会意见
+		/// </summary>
+		[DataMember]
+        public virtual System.String FOpinion_CWH
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 会签
+		/// </summary>
+		[DataMember]
+        public virtual System.String FCountersign
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 主办部门意见
+		/// </summary>
+		[DataMember]
+        public virtual System.String FOpinion_SponsorDept
+        {
+            get;
+            set;
+        }
+        #endregion
     }
 
 }

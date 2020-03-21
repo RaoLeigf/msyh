@@ -193,6 +193,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 return DCHelper.ErrorMessage("组织code为空！");
             }
             var XmReportMst = XmReportMstService.Find(param.FPhid).Data;
+            
             if (XmReportMst.XmPhid != 0) {
                 var projectMst = ProjectMstService.Find(XmReportMst.XmPhid).Data;
                 XmReportMst.FProjCode = projectMst.FProjCode;
@@ -238,6 +239,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             result.XmReportMst = XmReportMst;
             result.XmReportDtls = dtls.ToList();
             result.XmReportReturns = Returns.ToList();
+            //返回对象增加附件
+            if (result.XmReportMst != null)
+            {
+                result.Attachments = QtAttachmentService.Find(t => t.BTable == "XM3_ReportMst" && t.RelPhid == result.XmReportMst.PhId).Data.ToList();
+            }
             var data = new
             {
                 Status = ResponseStatus.Success,
@@ -566,5 +572,33 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             }
             
         }
+
+        /// <summary>
+        /// 删除签报数据
+        /// </summary>
+        /// <param name="paramters"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public string PostDelete([FromBody]BaseListModel paramters)
+        {
+            if (paramters.FPhids == null && paramters.FPhids.Count== 0)
+            {
+                return DCHelper.ErrorMessage("未选中任何单据！");
+            }
+            List<XmReportMstModel> XmReportMsts = XmReportMstService.Find(x=>paramters.FPhids.Contains(x.PhId)).Data.ToList();
+            var ApproveMsts = XmReportMsts.FindAll(x => x.FApprove == 1 || x.FApprove == 9);
+            if(ApproveMsts!=null && ApproveMsts.Count > 0)
+            {
+                return DCHelper.ErrorMessage("存在单据处于审批中或者已审批！");
+            }
+            foreach(var Mst in XmReportMsts)
+            {
+                Mst.PersistentState = PersistentState.Deleted;
+            }
+            
+            var result = XmReportMstService.Save<Int64>(XmReportMsts,"");
+            return DataConverterHelper.SerializeObject(result);
+        }
+
     }
 }

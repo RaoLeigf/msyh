@@ -1,4 +1,5 @@
-﻿using GXM3.XM.Model.Domain;
+﻿using GQT3.QT.Model.Domain;
+using GXM3.XM.Model.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,16 @@ namespace Enterprise3.WebApi.GXM3.XM.Model.Request
         /// </summary>
         [DataMember]
         public List<XmReportReturnModel> XmReportReturns
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 附件
+        /// </summary>
+        [DataMember]
+        public virtual List<QtAttachmentModel> Attachments
         {
             get;
             set;

@@ -1158,3 +1158,10 @@ alter table XM3_ReportDtl add f_variable2 numeric(18,2);--明细表增加变量2
 alter table XM3_ReportDtl add f_unit2 VARCHAR(100);--明细表增加单位2
 alter table XM3_ReportDtl add f_variable3 numeric(18,2);--明细表增加变量3
 alter table XM3_ReportDtl add f_unit3 VARCHAR(100);--明细表增加单位3
+
+--3.20lh
+alter table XM3_ReportMst add f_opinion_bankleader VARCHAR(500);--主表增加行领导意见
+alter table XM3_ReportMst add f_office_audit VARCHAR(500);--主表增加办公室审核
+alter table XM3_ReportMst add f_opinion_CWH VARCHAR(500);--主表增加财委会意见
+alter table XM3_ReportMst add f_Countersign VARCHAR(500);--主表增加会签
+alter table XM3_ReportMst add f_opinion_SponsorDept VARCHAR(500);--主表增加主办部门意见

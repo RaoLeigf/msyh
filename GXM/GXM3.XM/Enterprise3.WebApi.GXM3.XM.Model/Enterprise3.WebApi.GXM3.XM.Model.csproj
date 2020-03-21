@@ -70,6 +70,10 @@
       <Project>{7341EA5F-B9AC-4E0E-A9C7-949454F0E6FF}</Project>
       <Name>GData.YQHL.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\GQT\GQT3.QT.Model\GQT3.QT.Model.csproj">
+      <Project>{47EE9856-F415-4171-8609-B0531DB86167}</Project>
+      <Name>GQT3.QT.Model</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GXM3.XM.Model\GXM3.XM.Model.csproj">
       <Project>{229f2520-c7ca-4086-9da9-cccc9abe0f75}</Project>
       <Name>GXM3.XM.Model</Name>
