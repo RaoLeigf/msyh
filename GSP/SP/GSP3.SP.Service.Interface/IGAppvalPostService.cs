@@ -18,7 +18,7 @@ using System.Linq;
 using System.Text;
 using Enterprise3.Common.Model.Results;
 using Enterprise3.NHORM.Interface.EntBase;
-
+using Enterprise3.WebApi.GSP3.SP.Model.Response;
 using GSP3.SP.Model.Domain;
 using GSP3.SP.Model.Extra;
 
@@ -111,7 +111,7 @@ namespace GSP3.SP.Service.Interface
         /// <param name="enableMark">是否启用</param>
         /// <param name="PostName">搜索字段</param>
         /// <returns></returns>
-        List<GAppvalPostAndOpersModel> GetAppvalPostOpersList(int PageIndex, int PageSize, long orgId, string uCode, List<long> searchOrgid, string enableMark, string PostName);
+        BasePageList<GAppvalPostAndOpersModel> GetAppvalPostOpersList(int PageIndex, int PageSize, long orgId, string uCode, List<long> searchOrgid, string enableMark, string PostName);
 
         /// <summary>
         /// 根据组织获取岗位（2019.10.17改成岗位根据操作员对应组织权限取）

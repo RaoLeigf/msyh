@@ -262,7 +262,7 @@ namespace Enterprise3.WebApi.GSP3.SP.Controller
             try
             {
                 var result = this.GAppvalPostService.GetAppvalPostOpersList(paramters.PageIndex, paramters.PageSize, paramters.Orgid, paramters.Ucode, paramters.SearchOrgid, paramters.EnableMark, paramters.PostName);
-                return DCHelper.ModelListToJson(result, result.Count, paramters.PageIndex, paramters.PageSize);
+                return DCHelper.ModelListToJson(result.Data, result.TotalCount, paramters.PageIndex, paramters.PageSize);
                 //return DataConverterHelper.SerializeObject(result);
             }
             catch (Exception ex)

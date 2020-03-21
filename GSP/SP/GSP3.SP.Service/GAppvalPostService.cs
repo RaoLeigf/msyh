@@ -29,6 +29,7 @@ using GSP3.SP.Model.Extra;
 using GSP3.SP.Model.Enums;
 using Enterprise3.Common.Base.Criterion;
 using SUP.Common.Base;
+using Enterprise3.WebApi.GSP3.SP.Model.Response;
 
 namespace GSP3.SP.Service
 {
@@ -444,7 +445,7 @@ namespace GSP3.SP.Service
         /// <param name="enableMark">是否启用</param>
         /// <param name="PostName">搜索字段</param>
         /// <returns></returns>
-        public List<GAppvalPostAndOpersModel> GetAppvalPostOpersList(int PageIndex, int PageSize, long orgId, string uCode, List<long> searchOrgid, string enableMark, string PostName)
+        public BasePageList<GAppvalPostAndOpersModel> GetAppvalPostOpersList(int PageIndex, int PageSize, long orgId, string uCode, List<long> searchOrgid, string enableMark, string PostName)
         {
             Dictionary<string, object> dic = new Dictionary<string, object>();
             List<GAppvalPostAndOpersModel> gAppvalPostAndOpers = new List<GAppvalPostAndOpersModel>();
@@ -553,7 +554,14 @@ namespace GSP3.SP.Service
                     gAppvalPostAndOpers.Add(gAppval);
                 }
             }
-            return gAppvalPostAndOpers;
+            
+            return new BasePageList<GAppvalPostAndOpersModel> 
+            { 
+                Data = gAppvalPostAndOpers , 
+                TotalCount = int.Parse(result.TotalItems.ToString()),
+                PageSize = PageSize,
+                PageIndex = PageIndex
+            };
         }
 
         /// <summary>
