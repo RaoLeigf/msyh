@@ -1552,6 +1552,53 @@ namespace GQT3.QT.Service
         {
             return OrganizationFacade.GetAuthOrgList(UserId);
         }
+
+
+        /// <summary>
+        /// 根据操作员id取操作员
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        public User2Model GetUserById(long UserId)
+        {
+            return UserFacade.Find(UserId).Data;
+        }
+        /// <summary>
+        /// 根据操作员code取操作员
+        /// </summary>
+        /// <param name="UserCode"></param>
+        /// <returns></returns>
+        public User2Model GetUserByCode(string UserCode)
+        {
+            var Users = UserFacade.Find(x => x.UserNo == UserCode).Data;
+            if(Users!=null && Users.Count > 0)
+            {
+                return Users[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 取组织列表
+        /// </summary>
+        /// <param name="Codes"></param>
+        /// <returns></returns>
+        public IList<OrganizeModel> GetOrgListByCode(List<string> Codes)
+        {
+            return OrganizationFacade.Find(x => Codes.Contains(x.OCode)).Data;
+        }
+
+        /// <summary>
+        /// 完整组织列表
+        /// </summary>
+        /// <returns></returns>
+        public IList<OrganizeModel> GetALLOrgList()
+        {
+            return OrganizationFacade.Find(x => x.PhId!=0).Data.ToList().OrderBy(x=>x.OCode).ToList();
+        }
     }
 }
 

@@ -27,5 +27,6 @@
     <property name="FUnit2" column="f_unit2" type="System.String" length="100" not-null="false" />
     <property name="FVariable3" column="f_variable3" type="System.Decimal" precision="18" scale="2" not-null="false" />
     <property name="FUnit3" column="f_unit3" type="System.String" length="100" not-null="false" />
+    <property name="FIfqt" column="f_ifqt" type="System.String" length="100" not-null="false" />
   </class>
 </hibernate-mapping>

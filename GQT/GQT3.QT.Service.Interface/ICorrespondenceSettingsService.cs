@@ -276,5 +276,32 @@ namespace GQT3.QT.Service.Interface
         /// <param name="UserId"></param>
         /// <returns></returns>
         IList<OrganizeModel> GetAuthOrgList(long UserId);
+
+        /// <summary>
+        /// 根据操作员id取操作员
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        User2Model GetUserById(long UserId);
+
+        /// <summary>
+        /// 根据操作员code取操作员
+        /// </summary>
+        /// <param name="UserCode"></param>
+        /// <returns></returns>
+        User2Model GetUserByCode(string UserCode);
+
+        /// <summary>
+        /// 取组织列表
+        /// </summary>
+        /// <param name="Codes"></param>
+        /// <returns></returns>
+        IList<OrganizeModel> GetOrgListByCode(List<string> Codes);
+
+        /// <summary>
+        /// 完整组织列表
+        /// </summary>
+        /// <returns></returns>
+        IList<OrganizeModel> GetALLOrgList();
     }
 }

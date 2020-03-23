@@ -3,6 +3,7 @@ using Enterprise3.WebApi.ApiControllerBase;
 using Enterprise3.WebApi.ApiControllerBase.Models;
 using Enterprise3.WebApi.GXM3.XM.Model.Common;
 using Enterprise3.WebApi.GXM3.XM.Model.Request;
+using Enterprise3.WebApi.GXM3.XM.Model.Response;
 using GData3.Common.Utils.Filters;
 using GQT3.QT.Model.Domain;
 using GQT3.QT.Service.Interface;
@@ -33,6 +34,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
         IProjectMstService ProjectMstService;
         IQTSysSetService QTSysSetService;
         IQtAttachmentService QtAttachmentService;
+        ICorrespondenceSettingsService CorrespondenceSettingsService;
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -42,6 +44,7 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             ProjectMstService = base.GetObject<IProjectMstService>("GXM3.XM.Service.ProjectMst");
             QTSysSetService = base.GetObject<IQTSysSetService>("GQT3.QT.Service.QTSysSet");
             QtAttachmentService = base.GetObject<IQtAttachmentService>("GQT3.QT.Service.QtAttachment");
+            CorrespondenceSettingsService = base.GetObject<ICorrespondenceSettingsService>("GQT3.QT.Service.CorrespondenceSettings");
         }
 
         /// <summary>
@@ -209,10 +212,10 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 }
             }
             //操作员代码转名称
-            /*if (XmReportMst.FDeclarerId!=0)
+            if (XmReportMst.FDeclarerId!=0)
             {
-                FDeclarerId
-            }*/
+                XmReportMst.FDeclarerName = CorrespondenceSettingsService.GetUserById(XmReportMst.FDeclarerId).UserName;
+            }
             var dtls = XmReportMstService.FindXmReportDtlByForeignKey(param.FPhid).Data;
             if(dtls!=null && dtls.Count > 0)
             {
@@ -600,5 +603,99 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             return DataConverterHelper.SerializeObject(result);
         }
 
+        /// <summary>
+        /// 取签报单列表数据(给网报)
+        /// </summary>
+        /// <returns>返回Json串</returns>
+        [HttpGet]
+        public string GetXmReportListToWB([FromUri]string OrgCode = "", [FromUri]string UserCode = "")
+        {
+            var projectMsts=new List<ProjectMstModel>();
+            if (!string.IsNullOrEmpty(UserCode))
+            {
+                var User = CorrespondenceSettingsService.GetUserByCode(UserCode);
+                if (User == null)
+                {
+                    return DCHelper.ErrorMessage("该操作员不存在！");
+                }
+                if (!string.IsNullOrEmpty(OrgCode))
+                {
+                    projectMsts = this.ProjectMstService.Find(t => t.FDeclarationUnit == OrgCode &&t.FDeclarerId== User.PhId && t.FApproveStatus == "3").Data.ToList();
+                }
+                else
+                {
+                    projectMsts = this.ProjectMstService.Find(t => t.FDeclarerId == User.PhId && t.FApproveStatus == "3").Data.ToList();
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(OrgCode))
+                {
+                    projectMsts = this.ProjectMstService.Find(t => t.FDeclarationUnit == OrgCode && t.FApproveStatus == "3").Data.ToList();
+                }
+                else
+                {
+                    return DCHelper.ErrorMessage("请传操作员代码或组织代码！");
+                }
+            }
+
+
+            var result = new List<XmReportToWBModel>();
+            if (projectMsts.Count > 0)
+            {
+                var XmPhids = projectMsts.Select(x => x.PhId).ToList();
+                List<XmReportMstModel> xmReportMsts= XmReportMstService.Find(x => XmPhids.Contains(x.XmPhid)).Data.ToList();
+                var dataToWB = new XmReportToWBModel();
+                var projectMst = new ProjectMstModel();
+                var Orgs = CorrespondenceSettingsService.GetOrgListByCode(projectMsts.Where(x => !string.IsNullOrEmpty(x.FBudgetDept)).Select(x => x.FBudgetDept).Distinct().ToList()).ToList();
+                foreach (var mst in xmReportMsts)
+                {
+                    //虚拟字段
+                    projectMst = projectMsts.ToList().Find(x => x.PhId == mst.XmPhid);
+                    dataToWB.PhId = mst.PhId;
+                    dataToWB.FTitle = mst.FTitle;
+                    dataToWB.FCode = mst.FCode;
+                    dataToWB.FProjName = projectMst.FProjName;
+                    dataToWB.FBudgetDept = projectMst.FBudgetDept;
+                    dataToWB.FBudgetDept_EXName = Orgs.Find(x => x.OCode == projectMst.FBudgetDept).OName;
+
+                    dataToWB.xmReportDtls = XmReportMstService.FindXmReportDtlByForeignKey(mst.PhId).Data.ToList();
+                    result.Add(dataToWB);
+                }
+            }
+            var data = new
+            {
+                Status = ResponseStatus.Success,
+                Msg = "获取成功！",
+                Data = result
+            };
+
+            return DataConverterHelper.SerializeObject(data);
+        }
+
+
+        /// <summary>
+        /// 完整组织列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public string GetOrgToWB()
+        {
+            var result = CorrespondenceSettingsService.GetALLOrgList().
+                Select(x=>
+                new {
+                    x.OCode,
+                    x.OName
+                }
+                );
+            var data = new
+            {
+                Status = ResponseStatus.Success,
+                Msg = "获取成功！",
+                Data = result
+            };
+
+            return DataConverterHelper.SerializeObject(data);
+        }
     }
 }

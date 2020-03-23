@@ -241,6 +241,16 @@ namespace GXM3.XM.Model.Domain
             get;
             set;
         }
+
+        /// <summary>
+		/// 签报人
+		/// </summary>
+		[DataMember]
+        public virtual System.String FDeclarerName
+        {
+            get;
+            set;
+        }
         #endregion
         /// <summary>
         /// 该签报单申请金额
@@ -302,6 +312,26 @@ namespace GXM3.XM.Model.Domain
             set;
         }
         #endregion
+
+        /// <summary>
+        /// 是否推送OA（0-否，1-是）
+        /// </summary>
+        [DataMember]
+        public virtual System.Int32 FIfOA
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 是否核准（0-否，1-是）
+        /// </summary>
+        [DataMember]
+        public virtual System.Int32 FIfCheck
+        {
+            get;
+            set;
+        }
     }
 
 }

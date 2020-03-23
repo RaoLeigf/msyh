@@ -210,6 +210,16 @@ namespace GXM3.XM.Model.Domain
             get;
             set;
         }
+
+        /// <summary>
+		/// 费用项目是否来源于基础数据（0否1是）
+		/// </summary>
+		[DataMember]
+        public virtual System.String FIfqt
+        {
+            get;
+            set;
+        }
     }
 
 }

@@ -1165,3 +1165,8 @@ alter table XM3_ReportMst add f_office_audit VARCHAR(500);--主表增加办公�
 alter table XM3_ReportMst add f_opinion_CWH VARCHAR(500);--主表增加财委会意见
 alter table XM3_ReportMst add f_Countersign VARCHAR(500);--主表增加会签
 alter table XM3_ReportMst add f_opinion_SponsorDept VARCHAR(500);--主表增加主办部门意见
+
+--3.21lh
+alter table XM3_ReportMst add F_IfOA INT;--主表增加是否推送OA（0-否，1-是）
+alter table XM3_ReportMst add F_IfCheck INT;--主表增加是否核准（0-否，1-是）
+alter table XM3_ReportDtl add f_ifqt VARCHAR(100);--明细表增加费用项目是否来源于基础数据（0否1是）

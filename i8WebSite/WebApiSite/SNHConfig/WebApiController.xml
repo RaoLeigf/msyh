@@ -167,6 +167,7 @@
     <property name="XmReportMstService" ref="GXM3.XM.Service.XmReportMst"/>
     <property name="ProjectMstService" ref="GXM3.XM.Service.ProjectMst"/>
     <property name="QTSysSetService" ref="GQT3.QT.Service.QTSysSet"/>
+    <property name="CorrespondenceSettingsService" ref="GQT3.QT.Service.CorrespondenceSettings"/>
 
   </object>
 

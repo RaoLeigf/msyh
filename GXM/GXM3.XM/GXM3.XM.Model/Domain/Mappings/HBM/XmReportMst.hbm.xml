@@ -32,6 +32,7 @@
     <property name="FOpinion_CWH" column="f_opinion_CWH" type="System.String" length="500" not-null="false" />
     <property name="FCountersign" column="f_Countersign" type="System.String" length="500" not-null="false" />
     <property name="FOpinion_SponsorDept" column="f_opinion_SponsorDept" type="System.String" length="500" not-null="false" />
-
+    <property name="FIfOA" column="F_IfOA" type="System.Int32" not-null="false" />
+    <property name="FIfCheck" column="F_IfCheck" type="System.Int32" not-null="false" />
   </class>
 </hibernate-mapping>

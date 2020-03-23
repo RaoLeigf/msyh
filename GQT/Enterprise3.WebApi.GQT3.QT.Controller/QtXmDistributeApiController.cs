@@ -158,6 +158,10 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     b.EnableOrgList = new List<long>();
                     b.EnableOrgList.Add(s.Orgid);
                     result.Add(b);
+                    if (!orgList.Contains(s.Orgid))
+                    {
+                        orgList.Add(s.Orgid);
+                    }
                 }
                 /*var data4 = new List<QtXmDistributeModel>();
                 var FProjcodeList2 = data3.Select(x => x.FProjcode).Distinct().ToList();
@@ -382,7 +386,14 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
                     if (ExceptOrgs.Count > 0)
                     {
                         string orgStr = CorrespondenceSettingsService.GetOrgStr(ExceptOrgs);
-                        return DCHelper.ErrorMessage(orgStr + "  这些组织不存在该业务条线");
+                        if (ExceptOrgs.Count > 1)
+                        {
+                            return DCHelper.ErrorMessage(orgStr + "  这些组织不存在该业务条线");
+                        }
+                        else
+                        {
+                            return DCHelper.ErrorMessage(orgStr + "  组织不存在该业务条线");
+                        }
                     }
                 }
 
@@ -532,7 +543,8 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
         public string GetQtXmDistributeByOrg([FromUri]long OrgPhid,
             [FromUri]int pageIndex = 0,
             [FromUri]int pageSize = 0,
-            [FromUri]string search = "")
+            [FromUri]string search = "",
+            [FromUri]string FYear = "")
         {
             if (OrgPhid == 0)
             {
@@ -542,7 +554,14 @@ namespace Enterprise3.WebApi.GQT3.QT.Controller
             try
             {
                 var syssets = QTSysSetService.Find(x => x.DicType == "Business" && x.Orgid == OrgPhid).Data.ToList();
-                data = QtXmDistributeService.Find(x => x.Orgid == OrgPhid && x.IfUse == 1, "FProjcode desc").Data.ToList();
+                if (string.IsNullOrEmpty(FYear))
+                {
+                    data = QtXmDistributeService.Find(x => x.Orgid == OrgPhid && x.IfUse == 1, "FProjcode desc").Data.ToList();
+                }
+                else
+                {
+                    data = QtXmDistributeService.Find(x => x.Orgid == OrgPhid && x.IfUse == 1 && x.FProjcode.StartsWith(FYear), "FProjcode desc").Data.ToList();
+                }
                 if (data != null && data.Count > 0)
                 {
                     foreach (var i in data)
