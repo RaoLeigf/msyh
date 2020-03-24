@@ -80,3 +80,4 @@ sqlite3
 applicationhost.config
 /BusinessDlls/Rules/*.dll
 /WebSite/NG3WebSite/i6Rules/*.dll
+/BusinessDlls
