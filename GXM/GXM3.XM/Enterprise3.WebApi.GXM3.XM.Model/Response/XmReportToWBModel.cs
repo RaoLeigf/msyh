@@ -73,11 +73,40 @@ namespace Enterprise3.WebApi.GXM3.XM.Model.Response
             get;
             set;
         }
+
+        /// <summary>
+        /// 该签报单申请金额
+        /// </summary>
+        [DataMember]
+        public virtual System.Decimal FAmount
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 固定额度
+        /// </summary>
+        [DataMember]
+        public virtual System.Decimal FixedAmount
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 变动额度
+        /// </summary>
+        [DataMember]
+        public virtual System.Decimal VariableAmount
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// 明细集合
         /// </summary>
         [DataMember]
-        public List<XmReportDtlModel> xmReportDtls
+        public List<XmReportDtlToWBModel> xmReportDtls
         {
             get;
             set;

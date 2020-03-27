@@ -503,5 +503,12 @@ namespace GXM3.XM.Service.Interface
         /// <returns></returns>
         bool GetProjectMstDtlByOrgAndSubitem(string subitemcode, string orgCode);
         #endregion
+
+        /// <summary>
+        /// 通过外键集合值获取ProjectDtlBudgetDtl明细数据
+        /// </summary>
+        /// <param name="ids">外键值</param>
+        /// <returns></returns>
+        FindedResults<ProjectDtlBudgetDtlModel> FindProjectDtlBudgetDtlsByForeignKeys(List<long> ids);
     }
 }

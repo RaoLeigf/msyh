@@ -8722,7 +8722,15 @@ namespace GXM3.XM.Service
         #endregion
         #endregion
 
-
+        /// <summary>
+        /// 通过外键集合值获取ProjectDtlBudgetDtl明细数据
+        /// </summary>
+        /// <param name="ids">外键值</param>
+        /// <returns></returns>
+        public FindedResults<ProjectDtlBudgetDtlModel> FindProjectDtlBudgetDtlsByForeignKeys(List<long> ids)
+        {
+            return ProjectDtlBudgetDtlFacade.Find(x=> ids.Contains(x.MstPhid));
+        }
     }
 }
 

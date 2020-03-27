@@ -208,6 +208,16 @@ namespace GXM3.XM.Service
                 };
             return DataConverterHelper.SerializeObject(result); 
         }
+
+        /// <summary>
+        /// 通过外键集合获取XmReportDtl明细数据
+        /// </summary>
+        /// <param name="ids">外键值</param>
+        /// <returns></returns>
+        public FindedResults<XmReportDtlModel> FindXmReportDtlsByForeignKeys(List<long> ids)
+        {
+            return XmReportDtlFacade.Find(x=> ids.Contains(x.MstPhid));
+        }
         #endregion
     }
 }

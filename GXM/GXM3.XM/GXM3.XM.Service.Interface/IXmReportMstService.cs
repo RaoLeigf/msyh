@@ -72,6 +72,13 @@ namespace GXM3.XM.Service.Interface
         /// <param name="XmReportDtls"></param>
         /// <returns></returns>
         string SaveReturnAmount(List<XmReportMstModel> Msts, List<XmReportDtlModel> XmReportDtls);
+
+        /// <summary>
+        /// 通过外键集合获取XmReportDtl明细数据
+        /// </summary>
+        /// <param name="ids">外键值</param>
+        /// <returns></returns>
+        FindedResults<XmReportDtlModel> FindXmReportDtlsByForeignKeys(List<long> ids);
         #endregion
     }
 }

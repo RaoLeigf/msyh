@@ -645,22 +645,45 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
             {
                 var XmPhids = projectMsts.Select(x => x.PhId).ToList();
                 List<XmReportMstModel> xmReportMsts= XmReportMstService.Find(x => XmPhids.Contains(x.XmPhid)).Data.ToList();
-                var dataToWB = new XmReportToWBModel();
+                
                 var projectMst = new ProjectMstModel();
                 var Orgs = CorrespondenceSettingsService.GetOrgListByCode(projectMsts.Where(x => !string.IsNullOrEmpty(x.FBudgetDept)).Select(x => x.FBudgetDept).Distinct().ToList()).ToList();
-                foreach (var mst in xmReportMsts)
+                if (xmReportMsts!=null && xmReportMsts.Count > 0)
                 {
-                    //虚拟字段
-                    projectMst = projectMsts.ToList().Find(x => x.PhId == mst.XmPhid);
-                    dataToWB.PhId = mst.PhId;
-                    dataToWB.FTitle = mst.FTitle;
-                    dataToWB.FCode = mst.FCode;
-                    dataToWB.FProjName = projectMst.FProjName;
-                    dataToWB.FBudgetDept = projectMst.FBudgetDept;
-                    dataToWB.FBudgetDept_EXName = Orgs.Find(x => x.OCode == projectMst.FBudgetDept).OName;
+                    var xmReportDtls = XmReportMstService.FindXmReportDtlsByForeignKeys(xmReportMsts.Select(x => x.PhId).ToList()).Data.ToList();
+                    for (var i=0;i< xmReportMsts.Count; i++)
+                    {
+                        var dataToWB = new XmReportToWBModel();
+                        projectMst = projectMsts.ToList().Find(x => x.PhId == xmReportMsts[i].XmPhid);
+                        dataToWB.PhId = xmReportMsts[i].PhId;
+                        dataToWB.FTitle = xmReportMsts[i].FTitle;
+                        dataToWB.FCode = xmReportMsts[i].FCode;
+                        dataToWB.FProjName = projectMst.FProjName;
+                        dataToWB.FBudgetDept = projectMst.FBudgetDept;
+                        dataToWB.FBudgetDept_EXName = Orgs.Find(x => x.OCode == projectMst.FBudgetDept).OName;
+                        dataToWB.FAmount = xmReportMsts[i].FAmount;
+                        var dtls = xmReportDtls.FindAll(x => x.MstPhid == xmReportMsts[i].PhId);
+                        dataToWB.xmReportDtls = dtls.Select(x=>new XmReportDtlToWBModel
+                        {
+                            PhId=x.PhId,
+                            CostitemCode=x.CostitemCode,
+                            XmName=x.XmName,
+                            FPrice=x.FPrice,
+                            FAmount=x.FAmount,
+                            FIsCost=x.FIsCost,
+                            FReturnAmount=x.FReturnAmount,
+                            FVariable1=x.FVariable1,
+                            FUnit1=x.FUnit1,
+                            FVariable2=x.FVariable2,
+                            FUnit2=x.FUnit2,
+                            FVariable3=x.FVariable3,
+                            FUnit3=x.FUnit3
 
-                    dataToWB.xmReportDtls = XmReportMstService.FindXmReportDtlByForeignKey(mst.PhId).Data.ToList();
-                    result.Add(dataToWB);
+                        }).ToList();
+                        dataToWB.FixedAmount = dtls.Where(x => x.FIsCost == 1).Sum(x => x.FAmount);
+                        dataToWB.VariableAmount = dtls.Where(x => x.FIsCost == 0).Sum(x => x.FAmount);
+                        result.Add(dataToWB);
+                    }
                 }
             }
             var data = new
@@ -697,5 +720,79 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
 
             return DataConverterHelper.SerializeObject(data);
         }
+
+        /// <summary>
+        /// 取支出预算列表数据(给网报)
+        /// </summary>
+        /// <returns>返回Json串</returns>
+        [HttpGet]
+        public string GetProjectListToWB([FromUri]string OrgCode = "", [FromUri]string UserCode = "")
+        {
+            var projectMsts = new List<ProjectMstModel>();
+            if (!string.IsNullOrEmpty(UserCode))
+            {
+                var User = CorrespondenceSettingsService.GetUserByCode(UserCode);
+                if (User == null)
+                {
+                    return DCHelper.ErrorMessage("该操作员不存在！");
+                }
+                if (!string.IsNullOrEmpty(OrgCode))
+                {
+                    projectMsts = this.ProjectMstService.Find(t => t.FDeclarationUnit == OrgCode && t.FDeclarerId == User.PhId && t.FApproveStatus == "3").Data.ToList();
+                }
+                else
+                {
+                    projectMsts = this.ProjectMstService.Find(t => t.FDeclarerId == User.PhId && t.FApproveStatus == "3").Data.ToList();
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(OrgCode))
+                {
+                    projectMsts = this.ProjectMstService.Find(t => t.FDeclarationUnit == OrgCode && t.FApproveStatus == "3").Data.ToList();
+                }
+                else
+                {
+                    return DCHelper.ErrorMessage("请传操作员代码或组织代码！");
+                }
+            }
+            var result = new object();
+            if (projectMsts.Count > 0)
+            {
+                var phids = projectMsts.Select(x => x.PhId).ToList();
+                var Orgs = CorrespondenceSettingsService.GetOrgListByCode(projectMsts.Where(x => !string.IsNullOrEmpty(x.FBudgetDept)).Select(x => x.FBudgetDept).Distinct().ToList()).ToList();
+                var xmDtls = ProjectMstService.FindProjectDtlBudgetDtlsByForeignKeys(phids).Data.ToList();
+                result = projectMsts.Select(x =>
+                 new {
+                     x.PhId,
+                     x.FProjCode,
+                     x.FProjName,
+                     x.FBudgetDept,
+                     FBudgetDept_EXName= Orgs.Find(a => a.OCode == x.FBudgetDept).OName,
+                     x.FProjAmount,
+                     xmDtls = xmDtls.FindAll(y => y.MstPhid == x.PhId).
+                      Select(t => new
+                      {
+                        t.FDtlCode,
+                        t.FName,
+                        t.FAmount,
+                        t.FAmountEdit,
+                        t.FAmountAfterEdit
+                      })
+                  });
+                //var Orgs = CorrespondenceSettingsService.GetOrgListByCode(projectMsts.Where(x => !string.IsNullOrEmpty(x.FBudgetDept)).Select(x => x.FBudgetDept).Distinct().ToList()).ToList();
+                
+                
+            }
+            var data = new
+            {
+                Status = ResponseStatus.Success,
+                Msg = "获取成功！",
+                Data = result
+            };
+
+            return DataConverterHelper.SerializeObject(data);
+        }
+
     }
 }

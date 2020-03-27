@@ -64,6 +64,7 @@
     <Compile Include="Request\ProjectMstRequest.cs" />
     <Compile Include="Request\ProjectMstUpload.cs" />
     <Compile Include="Request\XmReportSaveModel.cs" />
+    <Compile Include="Response\XmReportDtlToWBModel.cs" />
     <Compile Include="Response\XmReportToWBModel.cs" />
   </ItemGroup>
   <ItemGroup>

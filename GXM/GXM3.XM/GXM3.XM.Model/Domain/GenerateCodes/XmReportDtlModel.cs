@@ -98,7 +98,7 @@ namespace GXM3.XM.Model.Domain
 		}
 
 		/// <summary>
-		/// 金额
+		/// 单价
 		/// </summary>
 		[DataMember]
 		public virtual System.Decimal FPrice
