@@ -103,6 +103,74 @@ namespace Enterprise3.WebApi.GXM3.XM.Model.Response
         }
 
         /// <summary>
+		/// 业务条线编码
+		/// </summary>
+		[DataMember]
+        public virtual System.String FBusinessCode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 业务条线名称
+        /// </summary>
+        [DataMember]
+        public virtual System.String FBusinessName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 签报理由
+		/// </summary>
+		[DataMember]
+        public virtual System.String FReason
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 申请时间（签报时间）
+		/// </summary>
+		[DataMember]
+        public virtual System.DateTime? FTime
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+		/// 联系电话
+		/// </summary>
+		[DataMember]
+        public virtual System.String FPhone
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 项目编码
+        /// </summary>
+        [DataMember]
+        public virtual System.String FProjCode
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 签报人
+		/// </summary>
+		[DataMember]
+        public virtual System.String FDeclarerName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// 明细集合
         /// </summary>
         [DataMember]

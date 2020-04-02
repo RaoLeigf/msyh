@@ -135,5 +135,14 @@ namespace Enterprise3.WebApi.GXM3.XM.Model.Response
             get;
             set;
         }
+        /// <summary>
+		/// 明细备注
+		/// </summary>
+		[DataMember]
+        public virtual System.String FRemark
+        {
+            get;
+            set;
+        }
     }
 }

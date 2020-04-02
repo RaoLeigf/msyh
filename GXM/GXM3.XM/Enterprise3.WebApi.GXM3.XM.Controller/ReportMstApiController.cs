@@ -651,6 +651,11 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                 if (xmReportMsts!=null && xmReportMsts.Count > 0)
                 {
                     var xmReportDtls = XmReportMstService.FindXmReportDtlsByForeignKeys(xmReportMsts.Select(x => x.PhId).ToList()).Data.ToList();
+                    var FBusiness = xmReportMsts.Where(x => !string.IsNullOrEmpty(x.FBusinessCode)).Select(y => y.FBusinessCode).Distinct().ToList();
+                    var syssets = QTSysSetService.Find(x => x.DicType == "Business" && FBusiness.Contains(x.TypeCode )).Data.ToList();
+                    //&& x.Orgid == param.OrgId && x.TypeCode == XmReportMst.FBusinessCode
+                    var FDeclarerIds = xmReportMsts.Where(x => x.FDeclarerId != 0).Select(y => y.FDeclarerId).Distinct().ToList();
+                    var FDeclarers = CorrespondenceSettingsService.GetUserByIds(FDeclarerIds);
                     for (var i=0;i< xmReportMsts.Count; i++)
                     {
                         var dataToWB = new XmReportToWBModel();
@@ -662,6 +667,13 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                         dataToWB.FBudgetDept = projectMst.FBudgetDept;
                         dataToWB.FBudgetDept_EXName = Orgs.Find(x => x.OCode == projectMst.FBudgetDept).OName;
                         dataToWB.FAmount = xmReportMsts[i].FAmount;
+                        dataToWB.FBusinessCode = xmReportMsts[i].FBusinessCode;
+                        dataToWB.FBusinessName = syssets?.Where(x => x.TypeCode == xmReportMsts[i].FBusinessCode && x.Orgcode== projectMst.FDeclarationUnit).FirstOrDefault()?.TypeName??string.Empty;
+                        dataToWB.FTime = xmReportMsts[i].FTime;
+                        dataToWB.FPhone = xmReportMsts[i].FPhone;
+                        dataToWB.FReason = xmReportMsts[i].FReason;
+                        dataToWB.FProjCode = projectMst.FProjCode;
+                        dataToWB.FDeclarerName = FDeclarers.Where(x => x.PhId == xmReportMsts[i].FDeclarerId).FirstOrDefault()?.UserName ?? string.Empty;
                         var dtls = xmReportDtls.FindAll(x => x.MstPhid == xmReportMsts[i].PhId);
                         dataToWB.xmReportDtls = dtls.Select(x=>new XmReportDtlToWBModel
                         {
@@ -677,7 +689,8 @@ namespace Enterprise3.WebApi.GXM3.XM.Controller
                             FVariable2=x.FVariable2,
                             FUnit2=x.FUnit2,
                             FVariable3=x.FVariable3,
-                            FUnit3=x.FUnit3
+                            FUnit3=x.FUnit3,
+                            FRemark=x.FRemark
 
                         }).ToList();
                         dataToWB.FixedAmount = dtls.Where(x => x.FIsCost == 1).Sum(x => x.FAmount);

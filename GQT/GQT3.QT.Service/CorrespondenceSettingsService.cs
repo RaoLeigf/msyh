@@ -1599,6 +1599,16 @@ namespace GQT3.QT.Service
         {
             return OrganizationFacade.Find(x => x.PhId!=0).Data.ToList().OrderBy(x=>x.OCode).ToList();
         }
+
+        /// <summary>
+        /// 根据操作员ids取操作员
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <returns></returns>
+        public List<User2Model> GetUserByIds(List<long> Ids)
+        {
+            return UserFacade.Find(x=> Ids.Contains(x.PhId)).Data.ToList();
+        }
     }
 }
 

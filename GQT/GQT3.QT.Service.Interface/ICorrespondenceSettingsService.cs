@@ -303,5 +303,12 @@ namespace GQT3.QT.Service.Interface
         /// </summary>
         /// <returns></returns>
         IList<OrganizeModel> GetALLOrgList();
+
+        /// <summary>
+        /// 根据操作员ids取操作员
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <returns></returns>
+        List<User2Model> GetUserByIds(List<long> Ids);
     }
 }
